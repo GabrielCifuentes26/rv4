@@ -112,11 +112,11 @@
         /* ── GLASS CARD ── */
         .form-glass {
             width:100%; max-width:426px;
-            background:rgba(255,255,255,0.55);
-            backdrop-filter:blur(32px); -webkit-backdrop-filter:blur(32px);
+            background:rgba(255,255,255,0.12);
+            backdrop-filter:blur(40px) saturate(180%); -webkit-backdrop-filter:blur(40px) saturate(180%);
             border-radius:28px; padding:46px 42px;
-            border:1px solid rgba(255,255,255,0.38);
-            box-shadow:0 32px 96px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.6);
+            border:1px solid rgba(255,255,255,0.22);
+            box-shadow:0 32px 96px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.35);
             animation:cardIn .7s cubic-bezier(.34,1.56,.64,1) both;
         }
         @keyframes cardIn { from{opacity:0;transform:translateY(32px) scale(.96)} to{opacity:1;transform:none} }
@@ -131,21 +131,21 @@
         .form-header { margin-bottom:28px; }
         .form-tag {
             display:inline-flex; align-items:center; gap:6px;
-            background:rgba(14,165,233,0.08); border:1px solid rgba(14,165,233,0.2);
-            color:var(--blue-dark); padding:4px 12px; border-radius:20px;
+            background:rgba(14,165,233,0.18); border:1px solid rgba(14,165,233,0.35);
+            color:#7dd3fc; padding:4px 12px; border-radius:20px;
             font-size:0.67rem; font-weight:700; letter-spacing:0.5px;
             text-transform:uppercase; margin-bottom:14px;
         }
         .form-tag-dot { width:6px; height:6px; border-radius:50%; background:var(--blue); animation:dot 2s infinite; }
-        .form-title { font-size:1.9rem; font-weight:900; color:var(--navy); margin-bottom:5px; letter-spacing:-0.9px; }
-        .form-subtitle { font-size:0.83rem; color:var(--gray); }
+        .form-title { font-size:1.9rem; font-weight:900; color:#fff; margin-bottom:5px; letter-spacing:-0.9px; }
+        .form-subtitle { font-size:0.83rem; color:rgba(255,255,255,0.6); }
 
         /* ── FLOATING LABEL FIELDS ── */
         .form-body { display:flex; flex-direction:column; gap:14px; }
         .float-field { position:relative; }
         .float-field input, .float-field select {
-            width:100%; background:#f8fafc; border:2px solid #e2e8f0;
-            border-radius:13px; color:var(--navy);
+            width:100%; background:rgba(255,255,255,0.1); border:1.5px solid rgba(255,255,255,0.2);
+            border-radius:13px; color:#fff;
             padding:22px 46px 8px 14px;
             font-size:0.9rem; font-family:inherit; outline:none;
             transition:border-color .2s, box-shadow .2s, background .2s;
@@ -153,15 +153,15 @@
         }
         .float-field.has-eye input { padding-right:76px; }
         .float-field input:focus, .float-field select:focus {
-            border-color:var(--blue); background:#fff;
-            box-shadow:0 0 0 4px rgba(14,165,233,0.1);
+            border-color:var(--blue); background:rgba(255,255,255,0.15);
+            box-shadow:0 0 0 4px rgba(14,165,233,0.18);
         }
         .float-field input.valid { border-color:var(--green); }
-        .float-field input.valid:focus { box-shadow:0 0 0 4px rgba(16,185,129,0.1); }
+        .float-field input.valid:focus { box-shadow:0 0 0 4px rgba(16,185,129,0.15); }
         .float-field label {
             position:absolute; left:14px; top:50%;
             transform:translateY(-50%);
-            font-size:0.9rem; color:#94a3b8;
+            font-size:0.9rem; color:rgba(255,255,255,0.5);
             pointer-events:none;
             transition:all .2s cubic-bezier(.4,0,.2,1);
             font-weight:500;
@@ -169,17 +169,17 @@
         .float-field.active label, .float-field.filled label {
             top:10px; transform:none;
             font-size:0.61rem; font-weight:700;
-            color:var(--blue); letter-spacing:0.5px; text-transform:uppercase;
+            color:#7dd3fc; letter-spacing:0.5px; text-transform:uppercase;
         }
-        .float-field.filled:not(.active) label { color:var(--gray2); }
+        .float-field.filled:not(.active) label { color:rgba(255,255,255,0.45); }
         .float-field input::placeholder { opacity:0; }
 
         /* ── AUTOFILL: quitar color azul/amarillo de Chrome ── */
         .float-field input:-webkit-autofill,
         .float-field input:-webkit-autofill:hover,
         .float-field input:-webkit-autofill:focus {
-            -webkit-box-shadow: 0 0 0 100px #f8fafc inset !important;
-            -webkit-text-fill-color: var(--navy) !important;
+            -webkit-box-shadow: 0 0 0 100px rgba(15,23,42,0.7) inset !important;
+            -webkit-text-fill-color: #fff !important;
             transition: background-color 9999s ease-in-out 0s;
         }
         /* Técnica: disparar animación cuando Chrome autofilla */
@@ -209,9 +209,9 @@
         .eye-btn:hover { color:var(--navy); }
 
         /* ── FIELD LABEL (for empresa) ── */
-        .field-label { font-size:0.68rem; font-weight:700; color:var(--navy2); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:8px; }
-        .field-hint  { display:block; text-align:right; font-size:0.72rem; color:var(--blue); cursor:pointer; text-decoration:none; font-weight:600; margin-top:6px; }
-        .field-hint:hover { color:var(--blue-dark); }
+        .field-label { font-size:0.68rem; font-weight:700; color:rgba(255,255,255,0.7); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:8px; }
+        .field-hint  { display:block; text-align:right; font-size:0.72rem; color:#7dd3fc; cursor:pointer; text-decoration:none; font-weight:600; margin-top:6px; }
+        .field-hint:hover { color:#bae6fd; }
 
         /* ── PASSWORD STRENGTH ── */
         .pass-strength { margin-top:8px; }
@@ -230,16 +230,16 @@
         /* ── EMPRESA SELECTOR ── */
         .empresa-select { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
         .empresa-opt {
-            border:2px solid #e2e8f0; border-radius:13px;
+            border:1.5px solid rgba(255,255,255,0.18); border-radius:13px;
             padding:14px 10px; text-align:center; cursor:pointer;
-            transition:all .2s; background:#f8fafc;
+            transition:all .2s; background:rgba(255,255,255,0.07);
         }
-        .empresa-opt:hover { border-color:var(--blue); background:rgba(14,165,233,0.04); }
-        .empresa-opt.selected { border-color:var(--blue); background:rgba(14,165,233,0.08); box-shadow:0 0 0 4px rgba(14,165,233,0.08); }
-        .empresa-opt.selected .emp-name { color:var(--blue-dark); }
+        .empresa-opt:hover { border-color:rgba(14,165,233,0.6); background:rgba(14,165,233,0.12); }
+        .empresa-opt.selected { border-color:var(--blue); background:rgba(14,165,233,0.2); box-shadow:0 0 0 3px rgba(14,165,233,0.15); }
+        .empresa-opt.selected .emp-name { color:#7dd3fc; }
         .emp-icon { font-size:1.4rem; margin-bottom:5px; }
-        .emp-name { font-size:0.82rem; font-weight:800; color:var(--navy); }
-        .emp-desc { font-size:0.62rem; color:var(--gray2); margin-top:2px; }
+        .emp-name { font-size:0.82rem; font-weight:800; color:rgba(255,255,255,0.9); }
+        .emp-desc { font-size:0.62rem; color:rgba(255,255,255,0.4); margin-top:2px; }
 
         /* ── ALERTS ── */
         .alert {
@@ -281,10 +281,11 @@
         /* ── DIVIDER & TOGGLE ── */
         .divider { display:flex; align-items:center; gap:14px; }
         .divider-line { flex:1; height:1px; background:#e2e8f0; }
-        .divider-text { font-size:0.7rem; color:#94a3b8; }
-        .toggle-link { text-align:center; font-size:0.82rem; color:var(--gray); }
-        .toggle-link a { color:var(--blue); text-decoration:none; font-weight:700; cursor:pointer; }
-        .toggle-link a:hover { color:var(--blue-dark); text-decoration:underline; }
+        .divider-text { font-size:0.7rem; color:rgba(255,255,255,0.35); }
+        .divider-line { flex:1; height:1px; background:rgba(255,255,255,0.15); }
+        .toggle-link { text-align:center; font-size:0.82rem; color:rgba(255,255,255,0.55); }
+        .toggle-link a { color:#7dd3fc; text-decoration:none; font-weight:700; cursor:pointer; }
+        .toggle-link a:hover { color:#bae6fd; text-decoration:underline; }
 
         /* ── SUCCESS STATE ── */
         .success-state {
