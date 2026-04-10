@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — Control Presupuestario</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "FIREBASE_API_KEY",
+            authDomain: "FIREBASE_AUTH_DOMAIN",
+            projectId: "FIREBASE_PROJECT_ID",
+            storageBucket: "FIREBASE_STORAGE_BUCKET",
+            messagingSenderId: "FIREBASE_MESSAGING_SENDER_ID",
+            appId: "FIREBASE_APP_ID"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                const name = user.displayName || user.email.split('@')[0];
+                document.getElementById('user-name').textContent = name;
+            } else {
+                window.location.href = 'login.html';
+            }
+        });
+
+        document.getElementById('btn-logout').addEventListener('click', () => {
+            signOut(auth).then(() => window.location.href = 'login.html');
+        });
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: #0f172a;
+            color: #e2e8f0;
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            font-size: 13px;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ── SIDEBAR ── */
+        .sidebar {
+            width: 54px; background: #0a0f1e; flex-shrink: 0;
+            display: flex; flex-direction: column; align-items: center;
+            padding: 16px 0; gap: 8px;
+            border-right: 1px solid rgba(255,255,255,0.06);
+        }
+        .sidebar .s-logo {
+            width: 36px; height: 36px; border-radius: 8px;
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 900; font-size: 11px; color: #fff;
+            letter-spacing: 0.5px; margin-bottom: 14px;
+        }
+        .s-icon {
+            width: 36px; height: 36px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            color: #475569; font-size: 14px; cursor: pointer;
+            transition: background .15s, color .15s; text-decoration: none;
+        }
+        .s-icon:hover { background: #1e293b; color: #cbd5e1; }
+        .s-icon.active { background: #1e293b; color: #6366f1; }
+        .s-divider { width: 28px; height: 1px; background: rgba(255,255,255,0.06); margin: 6px 0; }
+
+        /* ── MAIN ── */
+        .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+        /* ── TOPBAR ── */
+        .topbar {
+            background: #0a0f1e;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            padding: 10px 20px;
+            display: flex; align-items: center; justify-content: space-between;
+            flex-shrink: 0;
+        }
+        .topbar-left { display: flex; align-items: center; gap: 12px; }
+        .home-link {
+            color: #475569; text-decoration: none; font-size: 0.72rem;
+            display: flex; align-items: center; gap: 5px;
+            transition: color .2s;
+        }
+        .home-link:hover { color: #94a3b8; }
+        .topbar-brand { font-size: 1rem; font-weight: 800; color: #fff; letter-spacing: 1px; }
+        .topbar-brand span { color: #6366f1; }
+        .topbar-sub { font-size: 0.68rem; color: #475569; }
+        .topbar-right { display: flex; align-items: center; gap: 10px; }
+        .topbar-right select {
+            background: #1e293b; border: 1px solid rgba(255,255,255,0.08);
+            color: #94a3b8; padding: 4px 10px; border-radius: 6px;
+            font-size: 0.7rem; font-family: inherit; outline: none;
+        }
+        .user-chip {
+            display: flex; align-items: center; gap: 8px;
+            background: #1e293b; border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px; padding: 4px 12px 4px 4px;
+        }
+        .user-avatar {
+            width: 26px; height: 26px; border-radius: 50%;
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.65rem; font-weight: 700; color: #fff;
+        }
+        #user-name { font-size: 0.72rem; color: #94a3b8; }
+        .btn-logout {
+            background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2);
+            color: #ef4444; padding: 4px 12px; border-radius: 6px;
+            font-size: 0.7rem; font-weight: 600; cursor: pointer;
+            font-family: inherit; transition: background .2s;
+        }
+        .btn-logout:hover { background: rgba(239,68,68,0.2); }
+        .badge-tag {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: #fff; font-size: 0.62rem; font-weight: 700;
+            padding: 3px 10px; border-radius: 10px; letter-spacing: 0.5px;
+        }
+
+        /* ── KPI ROW ── */
+        .kpi-row {
+            display: flex; gap: 8px; padding: 10px 20px;
+            background: #0a0f1e;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            flex-shrink: 0;
+        }
+        .kpi-card {
+            flex: 1; background: #1e293b;
+            border-radius: 10px; padding: 12px 16px;
+            border-top: 3px solid #334155;
+            transition: transform .2s, box-shadow .2s;
+        }
+        .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+        .kpi-card.c1 { border-top-color: #6366f1; }
+        .kpi-card.c2 { border-top-color: #0ea5e9; }
+        .kpi-card.c3 { border-top-color: #f59e0b; }
+        .kpi-card.c4 { border-top-color: #ef4444; }
+        .kpi-card.c5 { border-top-color: #10b981; }
+        .kpi-card.c6 { border-top-color: #a855f7; }
+        .kpi-label { font-size: 0.62rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px; }
+        .kpi-value { font-size: 1.4rem; font-weight: 800; color: #f1f5f9; white-space: nowrap; }
+        .kpi-value span { font-size: 0.72rem; font-weight: 400; color: #64748b; }
+
+        /* ── TABLE ── */
+        .table-section { padding: 10px 20px 8px; flex-shrink: 0; }
+        .section-label { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 1px; color: #475569; margin-bottom: 7px; font-weight: 600; }
+        .table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid rgba(255,255,255,0.06); }
+        table { width: 100%; border-collapse: collapse; font-size: 0.72rem; }
+        thead tr { background: #1e293b; }
+        th {
+            padding: 9px 12px; text-align: right; font-weight: 600;
+            color: #7dd3fc; white-space: nowrap;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        th:first-child { text-align: left; color: #94a3b8; }
+        tbody tr { border-bottom: 1px solid rgba(255,255,255,0.04); transition: background .15s; }
+        tbody tr:nth-child(odd)  { background: #0f172a; }
+        tbody tr:nth-child(even) { background: #131e30; }
+        tbody tr:hover { background: #1e293b; }
+        td { padding: 6px 12px; text-align: right; color: #94a3b8; white-space: nowrap; }
+        td:first-child { text-align: left; color: #cbd5e1; }
+        .pct-asig { color: #f59e0b; font-weight: 700; }
+        .pct-disp { color: #10b981; font-weight: 700; }
+        .pct-neg  { color: #ef4444; font-weight: 700; }
+        tr.total-row { background: #162032 !important; border-top: 2px solid #6366f1; }
+        tr.total-row td { color: #f1f5f9; font-weight: 700; }
+
+        /* ── CHARTS ── */
+        .charts-row {
+            display: grid; grid-template-columns: 210px 1fr 1fr;
+            gap: 10px; padding: 0 20px 14px;
+            height: 260px; flex-shrink: 0;
+        }
+        .chart-card {
+            background: #1e293b; border-radius: 10px; padding: 14px;
+            border: 1px solid rgba(255,255,255,0.06);
+            display: flex; flex-direction: column; overflow: hidden;
+        }
+        .chart-card canvas { flex: 1; min-height: 0; }
+        .chart-title { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.8px; color: #475569; margin-bottom: 8px; font-weight: 600; }
+
+        .gauge-wrap { position: relative; flex: 1; display: flex; align-items: center; justify-content: center; }
+        .gauge-overlay { position: absolute; text-align: center; bottom: 18%; }
+        .gauge-val { font-size: 1.15rem; font-weight: 800; color: #f1f5f9; }
+        .gauge-sub { font-size: 0.58rem; color: #475569; margin-top: 1px; }
+        .gauge-stats { display: flex; justify-content: space-around; margin-top: 6px; }
+        .gstat { text-align: center; }
+        .gstat-val { font-size: 0.76rem; font-weight: 700; }
+        .gstat-lbl { font-size: 0.56rem; color: #475569; }
+
+        /* ── FOOTER ── */
+        .footer-bar {
+            background: #0a0f1e; border-top: 1px solid rgba(255,255,255,0.05);
+            padding: 6px 20px; font-size: 0.6rem; color: #1e293b;
+            display: flex; justify-content: space-between; flex-shrink: 0;
+        }
+        .footer-bar span { color: #334155; }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="s-logo">DB</div>
+        <a href="index.html" class="s-icon" title="Inicio">⌂</a>
+        <div class="s-icon active">▦</div>
+        <div class="s-divider"></div>
+        <div class="s-icon">◈</div>
+        <div class="s-icon">◉</div>
+        <div class="s-icon" style="margin-top:auto" id="btn-logout" title="Cerrar sesión">⏻</div>
+    </div>
+
+    <!-- Main -->
+    <div class="main">
+
+        <!-- Topbar -->
+        <div class="topbar">
+            <div class="topbar-left">
+                <a href="index.html" class="home-link">← Inicio</a>
+                <div>
+                    <div class="topbar-brand">DOUG<span>LAS</span></div>
+                    <div class="topbar-sub">Control Presupuestario de Obra</div>
+                </div>
+            </div>
+            <div class="topbar-right">
+                <select><option>Proyecto: CONSBA T</option></select>
+                <select><option>Periodo: 2026</option></select>
+                <div class="user-chip">
+                    <div class="user-avatar">G</div>
+                    <span id="user-name">Usuario</span>
+                </div>
+                <button class="btn-logout" id="btn-logout">Salir</button>
+                <span class="badge-tag">XIV</span>
+            </div>
+        </div>
+
+        <!-- KPIs -->
+        <div class="kpi-row">
+            <div class="kpi-card c1"><div class="kpi-label">PPTO RSI</div><div class="kpi-value">162.08 <span>mill.</span></div></div>
+            <div class="kpi-card c2"><div class="kpi-label">PPTO ESL</div><div class="kpi-value">162.39 <span>mill.</span></div></div>
+            <div class="kpi-card c3"><div class="kpi-label">Ejecutado</div><div class="kpi-value">129.38 <span>mill.</span></div></div>
+            <div class="kpi-card c4"><div class="kpi-label">Comprometido</div><div class="kpi-value">19.95 <span>mill.</span></div></div>
+            <div class="kpi-card c5"><div class="kpi-label">Asignado</div><div class="kpi-value">149.33 <span>mill.</span></div></div>
+            <div class="kpi-card c6"><div class="kpi-label">Disponible Imputable</div><div class="kpi-value">13.06 <span>mill.</span></div></div>
+        </div>
+
+        <!-- Table -->
+        <div class="table-section">
+            <div class="section-label">Resumen por Área</div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Área</th><th>PPTO RSI</th><th>PPTO ESL</th><th>Ejecutado</th>
+                            <th>Comprometido</th><th>Asignado</th><th>Disponible Imputable</th>
+                            <th>% Asignado</th><th>% Disponible</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Construcción</td><td>120,477,476.11</td><td>123,454,431.78</td><td>98,168,770.89</td><td>16,540,708.91</td><td>114,709,479.80</td><td>8,744,951.98</td><td class="pct-asig">92.92%</td><td class="pct-disp">7.08%</td></tr>
+                        <tr><td>Urbanización</td><td>29,837,668.62</td><td>29,939,366.88</td><td>25,195,463.25</td><td>1,984,100.25</td><td>27,179,563.50</td><td>2,759,803.38</td><td class="pct-asig">90.79%</td><td class="pct-disp">9.21%</td></tr>
+                        <tr><td>I.7a Construcción</td><td>4,122,589.34</td><td>2,840,245.67</td><td>1,950,423.18</td><td>441,209.56</td><td>2,391,632.74</td><td>448,612.93</td><td class="pct-asig">84.20%</td><td class="pct-disp">15.80%</td></tr>
+                        <tr><td>I.7a Urbanización</td><td>2,358,147.25</td><td>1,640,198.45</td><td>1,278,456.83</td><td>218,643.21</td><td>1,497,100.04</td><td>143,098.41</td><td class="pct-asig">91.28%</td><td class="pct-disp">8.72%</td></tr>
+                        <tr><td>I.7a Infraestructura</td><td>1,036,089.81</td><td>299,982.34</td><td>584,814.64</td><td>165,579.51</td><td>750,394.15</td><td>-450,411.81</td><td class="pct-asig">250.15%</td><td class="pct-neg">-150.15%</td></tr>
+                        <tr><td>Megaproyecto Urbanización Aprobada</td><td>1,000,000.00</td><td>980,000.00</td><td>789,234.56</td><td>140,000.00</td><td>929,234.56</td><td>50,765.44</td><td class="pct-asig">94.82%</td><td class="pct-disp">5.18%</td></tr>
+                        <tr><td>Megaproyecto Infraestructura Aprobada</td><td>3,245,344.76</td><td>3,129,066.57</td><td>1,402,996.62</td><td>464,803.01</td><td>1,867,799.63</td><td>1,261,266.94</td><td class="pct-asig">59.69%</td><td class="pct-disp">40.31%</td></tr>
+                        <tr class="total-row"><td>Total</td><td>162,077,315.89</td><td>162,283,291.69</td><td>129,370,159.97</td><td>19,955,044.45</td><td>149,325,204.42</td><td>13,064,142.32</td><td class="pct-asig">91.98%</td><td class="pct-disp">8.04%</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="charts-row">
+            <div class="chart-card">
+                <div class="chart-title">Avance General</div>
+                <div class="gauge-wrap">
+                    <canvas id="gaugeChart"></canvas>
+                    <div class="gauge-overlay">
+                        <div class="gauge-val">149.33</div>
+                        <div class="gauge-sub">mill. asignado</div>
+                    </div>
+                </div>
+                <div class="gauge-stats">
+                    <div class="gstat"><div class="gstat-val" style="color:#f59e0b">129.38M</div><div class="gstat-lbl">Ejecutado</div></div>
+                    <div class="gstat"><div class="gstat-val" style="color:#6366f1">91.98%</div><div class="gstat-lbl">% Asignado</div></div>
+                    <div class="gstat"><div class="gstat-val" style="color:#10b981">13.06M</div><div class="gstat-lbl">Disponible</div></div>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-title">Ejecutado por Etapa</div>
+                <canvas id="etapaChart"></canvas>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-title">Avance por Fase</div>
+                <canvas id="faseChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer-bar">
+            <span>XIV / CONSBA T — Sistema de Control Presupuestario de Obra</span>
+            <span>Actualizado: 2026</span>
+        </div>
+
+    </div><!-- /main -->
+
+<script>
+    Chart.defaults.color = '#475569';
+    Chart.defaults.borderColor = 'rgba(255,255,255,0.06)';
+
+    const C = { indigo:'#6366f1', sky:'#0ea5e9', amber:'#f59e0b', emerald:'#10b981', red:'#ef4444', bg:'#1e293b' };
+
+    // Gauge
+    new Chart(document.getElementById('gaugeChart'), {
+        type: 'doughnut',
+        data: {
+            datasets: [{ data:[91.98, 8.02], backgroundColor:[C.indigo,'#0f172a'], borderWidth:0, circumference:240, rotation:240 }]
+        },
+        options: { responsive:true, cutout:'74%', plugins:{ legend:{display:false}, tooltip:{enabled:false} } }
+    });
+
+    // Etapa
+    new Chart(document.getElementById('etapaChart'), {
+        type: 'bar',
+        data: {
+            labels: ['Gas\nCombustión','Acero\nEst.','Plomería\nAC','Pisos/\nRev.','Muros\nDiv.','Fachada\nExt.','Acabados\nFin.','Eléctrico\nGral.'],
+            datasets: [
+                { label:'PPTO ESL',    data:[15200,22400,18600,12800,9400,16500,11200,8900], backgroundColor:C.sky,     borderRadius:3, barPercentage:0.72 },
+                { label:'Ejecutado',   data:[13800,20100,16200,11400,8600,14900,9800,7200],  backgroundColor:C.indigo,  borderRadius:3, barPercentage:0.72 },
+                { label:'Comprometido',data:[800,  1200, 1400, 900,  600, 1100, 800, 600],   backgroundColor:C.emerald, borderRadius:3, barPercentage:0.72 }
+            ]
+        },
+        options: {
+            responsive:true, maintainAspectRatio:false,
+            plugins:{ legend:{ position:'top', labels:{font:{size:9}, boxWidth:10, padding:8, color:'#64748b'} } },
+            scales:{
+                x:{ ticks:{font:{size:8}, color:'#475569'}, grid:{display:false} },
+                y:{ ticks:{font:{size:9}, color:'#475569', callback:v=>v+'K'} }
+            }
+        }
+    });
+
+    // Fase
+    new Chart(document.getElementById('faseChart'), {
+        type: 'bar',
+        data: {
+            labels:['Fase 1','Fase 2','Fase 3','Fase 4','Fase 5'],
+            datasets:[
+                { label:'PPTO ESL',  data:[48000,42000,35000,28000,9283], backgroundColor:C.sky,    borderRadius:3, barPercentage:0.72 },
+                { label:'Ejecutado', data:[44500,38200,28600,15300,2770], backgroundColor:C.amber,  borderRadius:3, barPercentage:0.72 }
+            ]
+        },
+        options:{
+            responsive:true, maintainAspectRatio:false,
+            plugins:{ legend:{ position:'top', labels:{font:{size:9}, boxWidth:10, padding:8, color:'#64748b'} } },
+            scales:{
+                x:{ ticks:{font:{size:9}, color:'#475569'}, grid:{display:false} },
+                y:{ ticks:{font:{size:9}, color:'#475569', callback:v=>(v/1000).toFixed(0)+'M'} }
+            }
+        }
+    });
+</script>
+</body>
+</html>

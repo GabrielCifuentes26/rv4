@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar sesión — Douglas</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            background: #0f172a;
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* ── LEFT PANEL ── */
+        .left-panel {
+            flex: 1; position: relative; overflow: hidden;
+            background: linear-gradient(145deg, #0d1b35 0%, #0f2a4a 50%, #162040 100%);
+            display: flex; flex-direction: column;
+            justify-content: center; padding: 60px;
+        }
+        .left-panel::before {
+            content: ''; position: absolute; top: -100px; right: -100px;
+            width: 500px; height: 500px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(99,102,241,0.12) 0%, transparent 70%);
+        }
+        .left-panel::after {
+            content: ''; position: absolute; bottom: -80px; left: -80px;
+            width: 400px; height: 400px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(16,185,129,0.08) 0%, transparent 70%);
+        }
+        .panel-logo {
+            font-size: 1.5rem; font-weight: 900; color: #fff;
+            letter-spacing: 3px; text-transform: uppercase;
+            margin-bottom: 60px; position: relative; z-index: 1;
+        }
+        .panel-logo span { color: #4ade80; }
+        .panel-heading {
+            font-size: 2.8rem; font-weight: 900; color: #fff;
+            line-height: 1.1; margin-bottom: 20px;
+            position: relative; z-index: 1; letter-spacing: -1px;
+        }
+        .panel-heading em { color: #6366f1; font-style: normal; }
+        .panel-sub {
+            font-size: 0.9rem; color: rgba(255,255,255,0.45);
+            line-height: 1.75; max-width: 360px;
+            position: relative; z-index: 1; margin-bottom: 50px;
+        }
+        .panel-stats {
+            display: flex; gap: 40px; position: relative; z-index: 1;
+        }
+        .p-stat-num { font-size: 1.6rem; font-weight: 800; color: #fff; }
+        .p-stat-lbl { font-size: 0.7rem; color: rgba(255,255,255,0.35); margin-top: 2px; }
+
+        /* Mock dashboard card */
+        .mock-card {
+            position: absolute; bottom: 40px; right: 40px;
+            background: rgba(30, 41, 59, 0.85);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px; padding: 20px; width: 240px;
+            backdrop-filter: blur(8px); z-index: 1;
+        }
+        .mock-header { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+        .mock-avatar { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg,#6366f1,#4f46e5); }
+        .mock-title { font-size: 0.75rem; font-weight: 600; color: #e2e8f0; }
+        .mock-title-sub { font-size: 0.62rem; color: #475569; }
+        .mock-bars { display: flex; flex-direction: column; gap: 8px; }
+        .mock-bar-item { display: flex; align-items: center; gap: 8px; }
+        .mock-bar-label { font-size: 0.62rem; color: #475569; width: 50px; flex-shrink: 0; }
+        .mock-bar-track { flex: 1; height: 6px; background: #0f172a; border-radius: 3px; overflow: hidden; }
+        .mock-bar-fill { height: 100%; border-radius: 3px; }
+        .mock-pct { font-size: 0.62rem; color: #64748b; width: 30px; text-align: right; }
+
+        /* ── RIGHT PANEL / FORM ── */
+        .right-panel {
+            width: 440px; flex-shrink: 0;
+            background: #0a0f1e;
+            display: flex; flex-direction: column;
+            justify-content: center; padding: 50px 44px;
+            border-left: 1px solid rgba(255,255,255,0.05);
+        }
+        .form-header { margin-bottom: 36px; }
+        .form-tag {
+            display: inline-block; background: rgba(99,102,241,0.1);
+            border: 1px solid rgba(99,102,241,0.25);
+            color: #818cf8; padding: 4px 12px; border-radius: 20px;
+            font-size: 0.68rem; font-weight: 600; letter-spacing: 0.5px;
+            text-transform: uppercase; margin-bottom: 14px;
+        }
+        .form-title { font-size: 1.8rem; font-weight: 800; color: #f1f5f9; margin-bottom: 6px; letter-spacing: -0.5px; }
+        .form-subtitle { font-size: 0.82rem; color: #475569; }
+
+        .login-form { display: flex; flex-direction: column; gap: 16px; }
+        .field { display: flex; flex-direction: column; gap: 6px; }
+        .field label { font-size: 0.72rem; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.6px; }
+        .field-wrap { position: relative; }
+        .field-icon {
+            position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+            font-size: 0.9rem; color: #475569; pointer-events: none;
+        }
+        .field input {
+            width: 100%; background: #1e293b;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 9px; color: #e2e8f0;
+            padding: 12px 14px 12px 40px;
+            font-size: 0.88rem; font-family: inherit; outline: none;
+            transition: border-color .2s, background .2s;
+        }
+        .field input:focus {
+            border-color: rgba(99,102,241,0.5);
+            background: #243048;
+        }
+        .field input::placeholder { color: #334155; }
+
+        .field-hint {
+            text-align: right; font-size: 0.7rem;
+            color: #6366f1; cursor: pointer; text-decoration: none;
+        }
+        .field-hint:hover { color: #818cf8; }
+
+        .error-msg {
+            background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2);
+            border-radius: 8px; padding: 10px 14px;
+            font-size: 0.78rem; color: #f87171;
+            display: none; align-items: center; gap: 8px;
+        }
+        .error-msg.show { display: flex; }
+
+        .btn-login {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: #fff; border: none; padding: 13px;
+            border-radius: 9px; font-size: 0.9rem; font-weight: 700;
+            cursor: pointer; font-family: inherit;
+            transition: opacity .2s, transform .1s;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            margin-top: 4px;
+        }
+        .btn-login:hover { opacity: 0.9; }
+        .btn-login:active { transform: scale(0.99); }
+        .btn-login:disabled { opacity: 0.6; cursor: not-allowed; }
+        .spinner {
+            width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: #fff; border-radius: 50%;
+            animation: spin .6s linear infinite; display: none;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .divider { display: flex; align-items: center; gap: 12px; }
+        .divider-line { flex: 1; height: 1px; background: rgba(255,255,255,0.06); }
+        .divider-text { font-size: 0.7rem; color: #334155; }
+
+        .back-link {
+            text-align: center; font-size: 0.78rem; color: #475569; margin-top: 8px;
+        }
+        .back-link a { color: #6366f1; text-decoration: none; font-weight: 600; }
+        .back-link a:hover { color: #818cf8; }
+
+        .success-msg {
+            background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.2);
+            border-radius: 8px; padding: 10px 14px;
+            font-size: 0.78rem; color: #34d399;
+            display: none; align-items: center; gap: 8px;
+        }
+        .success-msg.show { display: flex; }
+    </style>
+</head>
+<body>
+
+    <!-- Left decorative panel -->
+    <div class="left-panel">
+        <div class="panel-logo">DOUG<span>LAS</span></div>
+        <div class="panel-heading">Control<br><em>inteligente</em><br>de obra</div>
+        <p class="panel-sub">Accede al sistema de gestión y control presupuestario en tiempo real de todos tus proyectos.</p>
+        <div class="panel-stats">
+            <div><div class="p-stat-num">162M</div><div class="p-stat-lbl">Presupuesto gestionado</div></div>
+            <div><div class="p-stat-num">91.98%</div><div class="p-stat-lbl">Avance general</div></div>
+        </div>
+
+        <!-- Mock card -->
+        <div class="mock-card">
+            <div class="mock-header">
+                <div class="mock-avatar"></div>
+                <div>
+                    <div class="mock-title">CONSBA T — XIV</div>
+                    <div class="mock-title-sub">Control presupuestario</div>
+                </div>
+            </div>
+            <div class="mock-bars">
+                <div class="mock-bar-item">
+                    <div class="mock-bar-label">Construcción</div>
+                    <div class="mock-bar-track"><div class="mock-bar-fill" style="width:93%;background:#6366f1"></div></div>
+                    <div class="mock-pct">93%</div>
+                </div>
+                <div class="mock-bar-item">
+                    <div class="mock-bar-label">Urbanización</div>
+                    <div class="mock-bar-track"><div class="mock-bar-fill" style="width:91%;background:#0ea5e9"></div></div>
+                    <div class="mock-pct">91%</div>
+                </div>
+                <div class="mock-bar-item">
+                    <div class="mock-bar-label">I.7a</div>
+                    <div class="mock-bar-track"><div class="mock-bar-fill" style="width:84%;background:#10b981"></div></div>
+                    <div class="mock-pct">84%</div>
+                </div>
+                <div class="mock-bar-item">
+                    <div class="mock-bar-label">Megaproyecto</div>
+                    <div class="mock-bar-track"><div class="mock-bar-fill" style="width:60%;background:#f59e0b"></div></div>
+                    <div class="mock-pct">60%</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right: Login form -->
+    <div class="right-panel">
+        <div class="form-header">
+            <div class="form-tag">Acceso al sistema</div>
+            <div class="form-title">Bienvenido</div>
+            <div class="form-subtitle">Ingresa tus credenciales para continuar</div>
+        </div>
+
+        <form class="login-form" id="loginForm" onsubmit="return false">
+
+            <div class="field">
+                <label>Correo electrónico</label>
+                <div class="field-wrap">
+                    <span class="field-icon">✉</span>
+                    <input type="email" id="email" placeholder="correo@ejemplo.com" required>
+                </div>
+            </div>
+
+            <div class="field">
+                <label>Contraseña</label>
+                <div class="field-wrap">
+                    <span class="field-icon">🔒</span>
+                    <input type="password" id="password" placeholder="••••••••" required>
+                </div>
+                <a href="#" class="field-hint">¿Olvidaste tu contraseña?</a>
+            </div>
+
+            <div class="error-msg" id="errorMsg">
+                <span>⚠</span><span id="errorText">Credenciales incorrectas</span>
+            </div>
+
+            <div class="success-msg" id="successMsg">
+                <span>✓</span><span>Acceso correcto. Redirigiendo...</span>
+            </div>
+
+            <button class="btn-login" type="submit" id="btnLogin">
+                <div class="spinner" id="spinner"></div>
+                <span id="btnText">Iniciar sesión</span>
+            </button>
+
+            <div class="divider">
+                <div class="divider-line"></div>
+                <span class="divider-text">o</span>
+                <div class="divider-line"></div>
+            </div>
+
+            <div class="back-link">
+                ¿No tienes cuenta? <a href="index.html">Volver al inicio</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Firebase Auth -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "FIREBASE_API_KEY",
+            authDomain: "FIREBASE_AUTH_DOMAIN",
+            projectId: "FIREBASE_PROJECT_ID",
+            storageBucket: "FIREBASE_STORAGE_BUCKET",
+            messagingSenderId: "FIREBASE_MESSAGING_SENDER_ID",
+            appId: "FIREBASE_APP_ID"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        document.getElementById('loginForm').addEventListener('submit', async () => {
+            const email    = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const btn      = document.getElementById('btnLogin');
+            const spinner  = document.getElementById('spinner');
+            const btnText  = document.getElementById('btnText');
+            const errorMsg = document.getElementById('errorMsg');
+            const errorTxt = document.getElementById('errorText');
+            const successMsg = document.getElementById('successMsg');
+
+            // Reset
+            errorMsg.classList.remove('show');
+            successMsg.classList.remove('show');
+            btn.disabled = true;
+            spinner.style.display = 'block';
+            btnText.textContent = 'Verificando...';
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                successMsg.classList.add('show');
+                btnText.textContent = 'Acceso concedido';
+                setTimeout(() => window.location.href = 'dashboard.html', 1200);
+            } catch (err) {
+                spinner.style.display = 'none';
+                btn.disabled = false;
+                btnText.textContent = 'Iniciar sesión';
+                const msgs = {
+                    'auth/invalid-email':       'El correo no es válido.',
+                    'auth/user-not-found':      'No existe una cuenta con ese correo.',
+                    'auth/wrong-password':      'Contraseña incorrecta.',
+                    'auth/invalid-credential':  'Correo o contraseña incorrectos.',
+                    'auth/too-many-requests':   'Demasiados intentos. Inténtalo más tarde.'
+                };
+                errorTxt.textContent = msgs[err.code] || 'Error al iniciar sesión.';
+                errorMsg.classList.add('show');
+            }
+        });
+    </script>
+
+</body>
+</html>
