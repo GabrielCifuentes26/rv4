@@ -14,17 +14,25 @@
         );
 
         // Verificar sesión activa
-        client.auth.getSession().then(({ data: { session } }) => {
-            if (session) {
-                const name = session.user.user_metadata?.nombre || session.user.email.split('@')[0];
-                document.getElementById('user-name').textContent = name;
-            } else {
-                window.location.href = 'login.html';
+        client.auth.getSession().then(async ({ data: { session } }) => {
+            if (!session) { window.location.href = 'login.html'; return; }
+            const name = session.user.user_metadata?.nombre || session.user.email.split('@')[0];
+            document.getElementById('user-name').textContent = name;
+            // Verificar rol en tabla usuarios
+            const { data } = await client
+                .from('usuarios')
+                .select('rol')
+                .eq('correo', session.user.email)
+                .single();
+            if (data?.rol === 'admin') {
+                document.getElementById('btn-admin').style.display = 'inline-flex';
             }
         });
 
-        document.getElementById('btn-logout').addEventListener('click', () => {
-            client.auth.signOut().then(() => window.location.href = 'login.html');
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('btn-logout').addEventListener('click', () => {
+                client.auth.signOut().then(() => window.location.href = 'login.html');
+            });
         });
     </script>
     <style>
@@ -104,6 +112,13 @@
             font-size: 0.65rem; font-weight: 700; color: #fff;
         }
         #user-name { font-size: 0.72rem; color: #94a3b8; }
+        .btn-admin {
+            background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.25);
+            color: #818cf8; padding: 4px 12px; border-radius: 6px;
+            font-size: 0.7rem; font-weight: 600; cursor: pointer;
+            text-decoration: none; transition: background .2s;
+        }
+        .btn-admin:hover { background: rgba(99,102,241,0.2); }
         .btn-logout {
             background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2);
             color: #ef4444; padding: 4px 12px; border-radius: 6px;
@@ -229,6 +244,7 @@
                     <div class="user-avatar">G</div>
                     <span id="user-name">Usuario</span>
                 </div>
+                <a href="admin.html" class="btn-admin" id="btn-admin" style="display:none">⚙ Admin</a>
                 <button class="btn-logout" id="btn-logout">Salir</button>
                 <span class="badge-tag">XIV</span>
             </div>
