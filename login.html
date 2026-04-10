@@ -267,56 +267,46 @@
     </div>
 
     <!-- Firebase Auth -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-        const firebaseConfig = {
-            apiKey: "FIREBASE_API_KEY",
-            authDomain: "FIREBASE_AUTH_DOMAIN",
-            projectId: "FIREBASE_PROJECT_ID",
-            storageBucket: "FIREBASE_STORAGE_BUCKET",
-            messagingSenderId: "FIREBASE_MESSAGING_SENDER_ID",
-            appId: "FIREBASE_APP_ID"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const { createClient } = supabase;
+        const client = createClient(
+            'https://iipgrojliqeyycvgnkrc.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlpcGdyb2psaXFleXljdmdua3JjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NzA1NzYsImV4cCI6MjA5MTM0NjU3Nn0.Y6FQ-1qWd7HPMvTnK4alpKxM-YLJ5CsKmkorAZKMJrg'
+        );
 
         document.getElementById('loginForm').addEventListener('submit', async () => {
-            const email    = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
-            const btn      = document.getElementById('btnLogin');
-            const spinner  = document.getElementById('spinner');
-            const btnText  = document.getElementById('btnText');
-            const errorMsg = document.getElementById('errorMsg');
-            const errorTxt = document.getElementById('errorText');
+            const email      = document.getElementById('email').value.trim();
+            const password   = document.getElementById('password').value;
+            const btn        = document.getElementById('btnLogin');
+            const spinner    = document.getElementById('spinner');
+            const btnText    = document.getElementById('btnText');
+            const errorMsg   = document.getElementById('errorMsg');
+            const errorTxt   = document.getElementById('errorText');
             const successMsg = document.getElementById('successMsg');
 
-            // Reset
             errorMsg.classList.remove('show');
             successMsg.classList.remove('show');
             btn.disabled = true;
             spinner.style.display = 'block';
             btnText.textContent = 'Verificando...';
 
-            try {
-                await signInWithEmailAndPassword(auth, email, password);
+            const { error } = await client.auth.signInWithPassword({ email, password });
+
+            if (!error) {
                 successMsg.classList.add('show');
                 btnText.textContent = 'Acceso concedido';
                 setTimeout(() => window.location.href = 'dashboard.html', 1200);
-            } catch (err) {
+            } else {
                 spinner.style.display = 'none';
                 btn.disabled = false;
                 btnText.textContent = 'Iniciar sesión';
                 const msgs = {
-                    'auth/invalid-email':       'El correo no es válido.',
-                    'auth/user-not-found':      'No existe una cuenta con ese correo.',
-                    'auth/wrong-password':      'Contraseña incorrecta.',
-                    'auth/invalid-credential':  'Correo o contraseña incorrectos.',
-                    'auth/too-many-requests':   'Demasiados intentos. Inténtalo más tarde.'
+                    'Invalid login credentials': 'Correo o contraseña incorrectos.',
+                    'Email not confirmed':        'Correo no confirmado.',
+                    'Too many requests':          'Demasiados intentos. Inténtalo más tarde.'
                 };
-                errorTxt.textContent = msgs[err.code] || 'Error al iniciar sesión.';
+                errorTxt.textContent = msgs[error.message] || error.message;
                 errorMsg.classList.add('show');
             }
         });
