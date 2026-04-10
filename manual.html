@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual Técnico — Costos&Presupuestos</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            background: #fff;
+            color: #1e293b;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        /* ── PORTADA ── */
+        .cover {
+            width: 100%;
+            min-height: 100vh;
+            background: linear-gradient(145deg, #0d1b35 0%, #0f2a4a 50%, #162040 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 80px;
+            page-break-after: always;
+            position: relative;
+            overflow: hidden;
+        }
+        .cover::before {
+            content: '';
+            position: absolute; top: -120px; right: -120px;
+            width: 600px; height: 600px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%);
+        }
+        .cover::after {
+            content: '';
+            position: absolute; bottom: -100px; left: -100px;
+            width: 500px; height: 500px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(16,185,129,0.08) 0%, transparent 70%);
+        }
+        .cover-logo {
+            font-size: 1.2rem; font-weight: 900; color: #fff;
+            letter-spacing: 4px; text-transform: uppercase;
+            margin-bottom: 60px; z-index: 1;
+        }
+        .cover-logo span { color: #4ade80; }
+        .cover-tag {
+            background: rgba(99,102,241,0.15);
+            border: 1px solid rgba(99,102,241,0.3);
+            color: #818cf8;
+            padding: 6px 16px; border-radius: 20px;
+            font-size: 0.72rem; font-weight: 600; letter-spacing: 1px;
+            text-transform: uppercase; margin-bottom: 24px; z-index: 1;
+        }
+        .cover-title {
+            font-size: 3.5rem; font-weight: 900; color: #fff;
+            line-height: 1.1; letter-spacing: -2px;
+            margin-bottom: 16px; z-index: 1;
+        }
+        .cover-title em { color: #6366f1; font-style: normal; }
+        .cover-sub {
+            font-size: 1rem; color: rgba(255,255,255,0.45);
+            max-width: 480px; margin-bottom: 60px; z-index: 1; line-height: 1.7;
+        }
+        .cover-meta {
+            display: flex; gap: 40px; z-index: 1;
+        }
+        .cover-meta-item { }
+        .cover-meta-label { font-size: 0.65rem; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 1px; }
+        .cover-meta-value { font-size: 0.9rem; font-weight: 600; color: rgba(255,255,255,0.8); margin-top: 2px; }
+        .cover-line {
+            width: 60px; height: 4px; background: linear-gradient(90deg, #6366f1, #4ade80);
+            border-radius: 2px; margin-bottom: 24px; z-index: 1;
+        }
+
+        /* ── CONTENIDO ── */
+        .content {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 60px 60px;
+        }
+
+        /* Índice */
+        .toc {
+            page-break-after: always;
+            padding-bottom: 40px;
+        }
+        .toc-title {
+            font-size: 1.6rem; font-weight: 800; color: #0f172a;
+            margin-bottom: 32px; padding-bottom: 12px;
+            border-bottom: 3px solid #6366f1;
+        }
+        .toc-list { list-style: none; }
+        .toc-list li {
+            display: flex; align-items: center; gap: 0;
+            padding: 10px 0;
+            border-bottom: 1px dashed #e2e8f0;
+            font-size: 0.88rem;
+        }
+        .toc-num {
+            width: 32px; height: 32px; border-radius: 8px;
+            background: #f1f5f9;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.72rem; font-weight: 700; color: #6366f1;
+            flex-shrink: 0; margin-right: 14px;
+        }
+        .toc-text { flex: 1; color: #334155; font-weight: 500; }
+        .toc-dots { flex: 1; border-bottom: 1px dotted #cbd5e1; margin: 0 12px; }
+        .toc-page { color: #94a3b8; font-size: 0.78rem; }
+
+        /* Secciones */
+        .section {
+            margin-bottom: 56px;
+            page-break-inside: avoid;
+        }
+        .section-header {
+            display: flex; align-items: center; gap: 14px;
+            margin-bottom: 24px;
+        }
+        .section-num {
+            width: 40px; height: 40px; border-radius: 10px;
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.85rem; font-weight: 800; color: #fff;
+            flex-shrink: 0;
+        }
+        .section-title {
+            font-size: 1.3rem; font-weight: 800; color: #0f172a;
+        }
+        .section-subtitle {
+            font-size: 0.78rem; color: #64748b; font-weight: 400; margin-top: 2px;
+        }
+
+        p { color: #475569; line-height: 1.8; margin-bottom: 14px; font-size: 0.88rem; }
+        p strong { color: #0f172a; }
+
+        /* Diagramas ASCII */
+        .diagram {
+            background: #0f172a;
+            border-radius: 12px;
+            padding: 24px 28px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        .diagram pre {
+            font-family: 'Courier New', monospace;
+            font-size: 0.78rem;
+            color: #94a3b8;
+            line-height: 1.7;
+            white-space: pre;
+        }
+        .diagram pre .accent { color: #6366f1; }
+
+        /* Diagramas visuales con cajas HTML */
+        .building {
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        .floor {
+            display: flex; align-items: center;
+            padding: 14px 20px; gap: 16px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .floor:last-child { border-bottom: none; }
+        .floor-num {
+            font-size: 0.65rem; font-weight: 700; color: #94a3b8;
+            text-transform: uppercase; width: 60px; flex-shrink: 0;
+        }
+        .floor-file {
+            background: #f8fafc; border: 1px solid #e2e8f0;
+            border-radius: 6px; padding: 4px 12px;
+            font-size: 0.78rem; font-weight: 700; color: #1e293b;
+            font-family: 'Courier New', monospace;
+        }
+        .floor-desc { font-size: 0.78rem; color: #64748b; flex: 1; }
+        .floor-badge {
+            font-size: 0.62rem; font-weight: 700; padding: 2px 8px;
+            border-radius: 10px; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .badge-green { background: #dcfce7; color: #16a34a; }
+        .badge-blue  { background: #dbeafe; color: #1d4ed8; }
+        .badge-purple{ background: #ede9fe; color: #7c3aed; }
+        .badge-red   { background: #fee2e2; color: #dc2626; }
+        .badge-yellow{ background: #fef9c3; color: #b45309; }
+
+        /* Tabla */
+        table {
+            width: 100%; border-collapse: collapse;
+            margin: 20px 0; font-size: 0.83rem;
+        }
+        thead tr { background: #0f172a; }
+        thead th {
+            padding: 12px 16px; text-align: left;
+            color: #94a3b8; font-weight: 600;
+            font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        tbody tr { border-bottom: 1px solid #f1f5f9; }
+        tbody tr:hover { background: #f8fafc; }
+        tbody td { padding: 11px 16px; color: #475569; }
+        tbody td:first-child { font-weight: 600; color: #1e293b; font-family: 'Courier New', monospace; font-size: 0.8rem; }
+        tbody td.role-admin { color: #7c3aed; font-weight: 700; }
+        tbody td.role-user  { color: #1d4ed8; font-weight: 700; }
+
+        /* Info box */
+        .info-box {
+            border-radius: 10px; padding: 16px 20px;
+            margin: 16px 0; display: flex; gap: 14px; align-items: flex-start;
+        }
+        .info-box.blue  { background: #eff6ff; border-left: 4px solid #3b82f6; }
+        .info-box.green { background: #f0fdf4; border-left: 4px solid #22c55e; }
+        .info-box.amber { background: #fffbeb; border-left: 4px solid #f59e0b; }
+        .info-box.purple{ background: #faf5ff; border-left: 4px solid #a855f7; }
+        .info-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 1px; }
+        .info-text { font-size: 0.83rem; color: #374151; line-height: 1.7; }
+        .info-text strong { color: #111827; }
+
+        /* Flujo de pasos */
+        .steps { display: flex; flex-direction: column; gap: 0; margin: 20px 0; }
+        .step {
+            display: flex; gap: 16px; align-items: flex-start;
+            position: relative;
+        }
+        .step:not(:last-child)::before {
+            content: '';
+            position: absolute; left: 15px; top: 36px;
+            width: 2px; height: calc(100% - 4px);
+            background: #e2e8f0;
+        }
+        .step-circle {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.72rem; font-weight: 800; color: #fff;
+            flex-shrink: 0; z-index: 1;
+        }
+        .step-body { padding: 6px 0 24px; }
+        .step-title { font-size: 0.88rem; font-weight: 700; color: #1e293b; margin-bottom: 4px; }
+        .step-desc  { font-size: 0.8rem; color: #64748b; line-height: 1.6; }
+
+        /* Arquitectura de cajas */
+        .arch-grid {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 12px; margin: 20px 0;
+        }
+        .arch-box {
+            border: 1px solid #e2e8f0; border-radius: 10px;
+            padding: 16px; background: #f8fafc;
+        }
+        .arch-box-title {
+            font-size: 0.78rem; font-weight: 700; color: #0f172a;
+            margin-bottom: 6px; display: flex; align-items: center; gap: 8px;
+        }
+        .arch-box-title .dot {
+            width: 8px; height: 8px; border-radius: 50%;
+        }
+        .arch-box-desc { font-size: 0.75rem; color: #64748b; line-height: 1.6; }
+
+        /* Credenciales */
+        .cred-box {
+            background: #0f172a; border-radius: 10px;
+            padding: 20px 24px; margin: 16px 0;
+        }
+        .cred-row {
+            display: flex; align-items: center; gap: 12px;
+            padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .cred-row:last-child { border-bottom: none; }
+        .cred-label { font-size: 0.68rem; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; width: 100px; flex-shrink: 0; }
+        .cred-value { font-family: 'Courier New', monospace; font-size: 0.82rem; color: #e2e8f0; }
+        .cred-value.green { color: #4ade80; }
+        .cred-value.purple { color: #a78bfa; }
+
+        /* URL links */
+        .url-list { list-style: none; margin: 12px 0; }
+        .url-list li {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 14px; border-radius: 8px;
+            background: #f8fafc; border: 1px solid #e2e8f0;
+            margin-bottom: 8px;
+        }
+        .url-icon { font-size: 1rem; flex-shrink: 0; }
+        .url-label { font-size: 0.75rem; color: #64748b; width: 120px; flex-shrink: 0; }
+        .url-val { font-family: 'Courier New', monospace; font-size: 0.78rem; color: #6366f1; word-break: break-all; }
+
+        /* Divisor de sección */
+        .divider {
+            height: 1px; background: #f1f5f9;
+            margin: 40px 0;
+        }
+
+        /* Page break hints */
+        .page-break { page-break-before: always; }
+
+        /* Footer */
+        .footer {
+            margin-top: 60px; padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .footer-brand { font-size: 0.72rem; font-weight: 800; color: #94a3b8; letter-spacing: 2px; }
+        .footer-brand span { color: #6366f1; }
+        .footer-note { font-size: 0.68rem; color: #cbd5e1; }
+
+        /* ── BOTÓN PDF ── */
+        .btn-pdf {
+            position: fixed; bottom: 32px; right: 32px; z-index: 999;
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: #fff; border: none; border-radius: 50px;
+            padding: 14px 24px; font-size: 0.88rem; font-weight: 700;
+            font-family: 'Inter', sans-serif; cursor: pointer;
+            display: flex; align-items: center; gap: 10px;
+            box-shadow: 0 8px 32px rgba(99,102,241,0.45);
+            transition: transform .15s, box-shadow .15s;
+        }
+        .btn-pdf:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(99,102,241,0.55);
+        }
+        .btn-pdf:active { transform: scale(0.97); }
+        .btn-pdf svg { width: 18px; height: 18px; fill: #fff; flex-shrink: 0; }
+
+        @media print {
+            body { font-size: 12px; }
+            .cover { min-height: 100vh; }
+            .content { padding: 40px 50px; }
+            .section { page-break-inside: avoid; }
+            .diagram { page-break-inside: avoid; }
+            .building { page-break-inside: avoid; }
+            .btn-pdf { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════ PORTADA -->
+<div class="cover">
+    <div class="cover-logo">Costos&<span>Presupuestos</span></div>
+    <div class="cover-tag">Documentación Técnica</div>
+    <div class="cover-line"></div>
+    <div class="cover-title">Manual de<br><em>Construcción</em><br>del Sistema</div>
+    <p class="cover-sub">Guía completa de cómo fue diseñado, construido y publicado el sistema de gestión y control presupuestario Costos&Presupuestos.</p>
+    <div class="cover-meta">
+        <div class="cover-meta-item">
+            <div class="cover-meta-label">Autor</div>
+            <div class="cover-meta-value">Gabriel Cifuentes</div>
+        </div>
+        <div class="cover-meta-item">
+            <div class="cover-meta-label">Versión</div>
+            <div class="cover-meta-value">1.0</div>
+        </div>
+        <div class="cover-meta-item">
+            <div class="cover-meta-label">Fecha</div>
+            <div class="cover-meta-value">Abril 2026</div>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════ CONTENIDO -->
+<div class="content">
+
+    <!-- ÍNDICE -->
+    <div class="toc">
+        <div class="toc-title">Índice de contenido</div>
+        <ul class="toc-list">
+            <li><div class="toc-num">1</div><span class="toc-text">¿Qué es el sistema?</span><span class="toc-dots"></span><span class="toc-page">Sección 1</span></li>
+            <li><div class="toc-num">2</div><span class="toc-text">Estructura del proyecto (los 4 pisos)</span><span class="toc-dots"></span><span class="toc-page">Sección 2</span></li>
+            <li><div class="toc-num">3</div><span class="toc-text">¿Dónde vive el sistema? (GitHub + GitHub Pages)</span><span class="toc-dots"></span><span class="toc-page">Sección 3</span></li>
+            <li><div class="toc-num">4</div><span class="toc-text">Cómo funciona el inicio de sesión</span><span class="toc-dots"></span><span class="toc-page">Sección 4</span></li>
+            <li><div class="toc-num">5</div><span class="toc-text">Qué es Supabase y para qué sirve</span><span class="toc-dots"></span><span class="toc-page">Sección 5</span></li>
+            <li><div class="toc-num">6</div><span class="toc-text">Roles de usuario: admin vs usuario</span><span class="toc-dots"></span><span class="toc-page">Sección 6</span></li>
+            <li><div class="toc-num">7</div><span class="toc-text">Panel de administrador (admin.html)</span><span class="toc-dots"></span><span class="toc-page">Sección 7</span></li>
+            <li><div class="toc-num">8</div><span class="toc-text">Credenciales y accesos importantes</span><span class="toc-dots"></span><span class="toc-page">Sección 8</span></li>
+            <li><div class="toc-num">9</div><span class="toc-text">Resumen de todas las piezas</span><span class="toc-dots"></span><span class="toc-page">Sección 9</span></li>
+        </ul>
+    </div>
+
+    <!-- ── SECCIÓN 1 ── -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-num">1</div>
+            <div>
+                <div class="section-title">¿Qué es el sistema?</div>
+                <div class="section-subtitle">Visión general del proyecto</div>
+            </div>
+        </div>
+
+        <p>El sistema <strong>Costos&Presupuestos</strong> es una aplicación web de control presupuestario para proyectos de construcción. Permite a los usuarios autorizados ver el avance de obra, monitorear presupuestos ejecutados y gestionar el equipo de trabajo.</p>
+
+        <div class="info-box blue">
+            <div class="info-icon">💡</div>
+            <div class="info-text"><strong>Dato clave:</strong> Es 100% web — no necesitas instalar nada. Solo entras desde un navegador (Chrome, Edge, Safari) en cualquier computadora o celular.</div>
+        </div>
+
+        <p>El sistema fue construido con tecnologías gratuitas y de código abierto:</p>
+
+        <div class="arch-grid">
+            <div class="arch-box">
+                <div class="arch-box-title"><div class="dot" style="background:#6366f1"></div>HTML / CSS / JavaScript</div>
+                <div class="arch-box-desc">Los lenguajes base de cualquier página web. HTML define la estructura, CSS el diseño visual, y JavaScript la interactividad.</div>
+            </div>
+            <div class="arch-box">
+                <div class="arch-box-title"><div class="dot" style="background:#0ea5e9"></div>Chart.js</div>
+                <div class="arch-box-desc">Librería gratuita que dibuja las gráficas (barras, velocímetro) dentro del dashboard de forma automática.</div>
+            </div>
+            <div class="arch-box">
+                <div class="arch-box-title"><div class="dot" style="background:#10b981"></div>Supabase</div>
+                <div class="arch-box-desc">Base de datos en la nube. Guarda los usuarios, contraseñas y roles. Completamente gratuito en el plan básico.</div>
+            </div>
+            <div class="arch-box">
+                <div class="arch-box-title"><div class="dot" style="background:#f59e0b"></div>GitHub Pages</div>
+                <div class="arch-box-desc">Servicio gratuito de GitHub que publica el sitio en internet. Cualquier persona puede acceder desde su navegador.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ── SECCIÓN 2 ── -->
+    <div class="section page-break">
+        <div class="section-header">
+            <div class="section-num">2</div>
+            <div>
+                <div class="section-title">Estructura del proyecto</div>
+                <div class="section-subtitle">Los 4 pisos del sistema</div>
+            </div>
+        </div>
+
+        <p>Piensa en el sistema como un <strong>edificio de 4 pisos</strong>. Cada piso es un archivo HTML diferente con una función específica:</p>
+
+        <div class="building">
+            <div class="floor" style="background:#faf5ff">
+                <div class="floor-num">4° Piso</div>
+                <div class="floor-file">admin.html</div>
+                <div class="floor-desc">Panel de administrador — gestión de usuarios</div>
+                <div class="floor-badge badge-purple">Solo Admin</div>
+            </div>
+            <div class="floor" style="background:#eff6ff">
+                <div class="floor-num">3° Piso</div>
+                <div class="floor-file">dashboard.html</div>
+                <div class="floor-desc">Tablero de control — KPIs, gráficas y tabla de avance</div>
+                <div class="floor-badge badge-blue">Login requerido</div>
+            </div>
+            <div class="floor" style="background:#f0fdf4">
+                <div class="floor-num">2° Piso</div>
+                <div class="floor-file">login.html</div>
+                <div class="floor-desc">Puerta de entrada — formulario de correo y contraseña</div>
+                <div class="floor-badge badge-green">Acceso libre</div>
+            </div>
+            <div class="floor" style="background:#f8fafc">
+                <div class="floor-num">1° Piso</div>
+                <div class="floor-file">index.html</div>
+                <div class="floor-desc">Vitrina pública — página de presentación del sistema</div>
+                <div class="floor-badge badge-green">Acceso libre</div>
+            </div>
+        </div>
+
+        <div class="info-box amber">
+            <div class="info-icon">🔒</div>
+            <div class="info-text">Los pisos 3 y 4 tienen <strong>portero automático</strong>: si intentas entrar sin sesión activa, el sistema te regresa automáticamente al login.</div>
+        </div>
+
+        <p>Cada archivo HTML contiene en un solo documento el diseño visual (CSS) y la lógica de funcionamiento (JavaScript). No se necesitan carpetas complejas ni servidores especiales.</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ── SECCIÓN 3 ── -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-num">3</div>
+            <div>
+                <div class="section-title">¿Dónde vive el sistema?</div>
+                <div class="section-subtitle">GitHub como bodega y GitHub Pages como escaparate</div>
+            </div>
+        </div>
+
+        <p>El código vive en dos lugares a la vez:</p>
+
+        <div class="diagram">
+            <pre>
+  Tu computadora                      Internet
+  ─────────────────                   ────────────────────────────────
+
+  📁 Carpeta local              push  📦 GitHub (bodega de código)
+     index.html    ───────────────►      github.com/GabrielCifuentes26
+     dashboard.html                      /rv4
+     login.html                                    │
+     admin.html                                    │ GitHub Pages lo publica
+                                                   ▼
+                                     🌐  gabrielcifuentes26.github.io
+                                         /rv4/
+                                                   │
+                                         Cualquier persona
+                                         en el mundo puede entrar</pre>
+        </div>
+
+        <p><strong>GitHub</strong> actúa como una bodega inteligente que guarda cada versión del código. Cada vez que se hace un cambio y se sube ("push"), GitHub guarda un historial de lo que cambió y cuándo.</p>
+
+        <p><strong>GitHub Pages</strong> lee esa bodega automáticamente y publica el contenido como un sitio web accesible desde cualquier navegador, sin costo alguno.</p>
+
+        <div class="steps">
+            <div class="step">
+                <div class="step-circle">1</div>
+                <div class="step-body">
+                    <div class="step-title">Se edita un archivo HTML en la computadora local</div>
+                    <div class="step-desc">Los cambios se hacen en la carpeta del proyecto usando un editor de código.</div>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-circle">2</div>
+                <div class="step-body">
+                    <div class="step-title">Se ejecuta <code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;font-size:0.78rem">git push</code> en la terminal</div>
+                    <div class="step-desc">Este comando sube los cambios desde la computadora a la bodega de GitHub.</div>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-circle">3</div>
+                <div class="step-body">
+                    <div class="step-title">GitHub Pages detecta el cambio automáticamente</div>
+                    <div class="step-desc">En menos de 2 minutos, el sitio en vivo se actualiza con los nuevos archivos.</div>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-circle">4</div>
+                <div class="step-body">
+                    <div class="step-title">El sitio está disponible en la URL pública</div>
+                    <div class="step-desc">Cualquier usuario con el enlace puede ver la versión actualizada desde su navegador.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ── SECCIÓN 4 ── -->
+    <div class="section page-break">
+        <div class="section-header">
+            <div class="section-num">4</div>
+            <div>
+                <div class="section-title">Cómo funciona el inicio de sesión</div>
+                <div class="section-subtitle">El flujo completo desde que el usuario escribe su correo</div>
+            </div>
+        </div>
+
+        <p>Cuando un usuario entra a <strong>login.html</strong> y escribe sus datos, ocurre la siguiente secuencia:</p>
+
+        <div class="diagram">
+            <pre>
+  [Usuario escribe correo + contraseña]
+               │
+               ▼
+      login.html pregunta a Supabase:
+      "¿Existe esta combinación?"
+               │
+       ┌───────┴────────┐
+       ▼                ▼
+   ✅  SÍ existe     ❌  NO existe
+       │                │
+  Crea una sesión   Muestra mensaje
+  activa (token)    de error en rojo
+       │
+       ▼
+  Redirige automáticamente
+  → dashboard.html
+       │
+       ▼
+  dashboard.html verifica:
+  "¿Hay sesión activa?"
+       │
+  ┌────┴─────┐
+  ▼          ▼
+ SÍ         NO
+  │          │
+Muestra   Regresa a
+tablero   login.html</pre>
+        </div>
+
+        <div class="info-box green">
+            <div class="info-icon">🔑</div>
+            <div class="info-text"><strong>¿Qué es una sesión?</strong> Cuando Supabase confirma que el usuario es válido, guarda una "llave temporal" en el navegador. Esta llave dura mientras el navegador esté abierto. Al presionar "Salir", la llave se destruye y hay que volver a autenticarse.</div>
+        </div>
+
+        <p>Las contraseñas <strong>nunca</strong> se guardan como texto plano. Supabase las convierte en un código cifrado (hash) que ni el administrador puede leer. Solo Supabase sabe verificar si una contraseña ingresada coincide con el hash almacenado.</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ── SECCIÓN 5 ── -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-num">5</div>
+            <div>
+                <div class="section-title">Qué es Supabase y para qué sirve</div>
+                <div class="section-subtitle">El cerebro del sistema</div>
+            </div>
+        </div>
+
+        <p>Supabase es el <strong>"cerebro"</strong> del sistema. Se encarga de recordar quiénes son los usuarios y qué permisos tienen. Los archivos HTML son solo la parte visual; sin Supabase, no habría autenticación ni base de datos.</p>
+
+        <div class="diagram">
+            <pre>
+  ┌───────────────────────────────────────────────────┐
+  │                    SUPABASE                       │
+  │                                                   │
+  │   ┌───────────────┐      ┌─────────────────────┐  │
+  │   │     AUTH      │      │   BASE DE DATOS     │  │
+  │   │               │      │                     │  │
+  │   │  Usuarios:    │      │  Tabla: usuarios    │  │
+  │   │  ─ correo     │      │  ┌─────┬──────┬───┐ │  │
+  │   │  ─ contraseña │      │  │ nom │ cor  │rol│ │  │
+  │   │    (cifrada)  │      │  ├─────┼──────┼───┤ │  │
+  │   │  ─ uid único  │      │  │ Gab │gcif..│adm│ │  │
+  │   │               │      │  └─────┴──────┴───┘ │  │
+  │   └───────────────┘      └─────────────────────┘  │
+  │                                                   │
+  └───────────────────────────────────────────────────┘
+          ▲                          ▲
+          │                          │
+     login.html               dashboard.html
+     admin.html                admin.html
+     (autenticación)          (lectura de roles)</pre>
+        </div>
+
+        <p>Supabase tiene dos componentes que el sistema usa activamente:</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Componente</th>
+                    <th>Función</th>
+                    <th>Quién lo usa</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Auth</td>
+                    <td>Gestiona el registro e inicio de sesión de usuarios. Guarda contraseñas cifradas.</td>
+                    <td>login.html, admin.html</td>
+                </tr>
+                <tr>
+                    <td>Database (tabla usuarios)</td>
+                    <td>Guarda información adicional: nombre, correo y rol de cada usuario.</td>
+                    <td>dashboard.html, admin.html</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="info-box purple">
+            <div class="info-icon">⚡</div>
+            <div class="info-text"><strong>Gratuito:</strong> El plan gratuito de Supabase permite hasta 50,000 usuarios activos mensuales y 500 MB de base de datos. Es más que suficiente para este proyecto.</div>
+        </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ── SECCIÓN 6 ── -->
+    <div class="section page-break">
+        <div class="section-header">
+            <div class="section-num">6</div>
+            <div>
+                <div class="section-title">Roles de usuario</div>
+                <div class="section-subtitle">admin vs usuario — quién puede hacer qué</div>
+            </div>
+        </div>
+
+        <p>Cada usuario en el sistema tiene un <strong>rol</strong> asignado en la base de datos. El rol determina a qué partes del sistema puede acceder:</p>
+
+        <div class="diagram">
+            <pre>
+  Usuario entra con rol = "usuario"     Usuario entra con rol = "admin"
+  ─────────────────────────────────     ──────────────────────────────
+
+  ✅  Puede ver dashboard.html          ✅  Puede ver dashboard.html
+  ❌  NO puede ver admin.html           ✅  Puede ver admin.html
+  ❌  NO ve botón "⚙ Admin"             ✅  Ve el botón "⚙ Admin"
+  ❌  NO puede crear/borrar usuarios    ✅  Puede crear, editar y
+                                            eliminar usuarios</pre>
+        </div>
+
+        <p>El sistema verifica el rol en dos momentos:</p>
+
+        <div class="steps">
+            <div class="step">
+                <div class="step-circle">A</div>
+                <div class="step-body">
+                    <div class="step-title">Al cargar el dashboard</div>
+                    <div class="step-desc">El sistema consulta la tabla <code style="background:#f1f5f9;padding:2px 6px;border-radius:4px">usuarios</code> para saber el rol del usuario activo. Si es admin, muestra el botón "⚙ Admin" en la barra superior.</div>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-circle">B</div>
+                <div class="step-body">
+                    <div class="step-title">Al intentar entrar a admin.html</div>
+                    <div class="step-desc">Aunque un usuario normal intente ir directamente a la URL de admin.html, el sistema verifica el rol y lo regresa al dashboard si no es admin.</div>
+                </div>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Acción</th>
+                    <th style="text-align:center">Rol: usuario</th>
+                    <th style="text-align:center">Rol: admin</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Ver index.html</td>
+                    <td style="text-align:center;color:#16a34a">✅</td>
+                    <td style="text-align:center;color:#16a34a">✅</td>
+                </tr>
+                <tr>
+                    <td>Iniciar sesión</td>
+                    <td style="text-align:center;color:#16a34a">✅</td>
+                    <td style="text-align:center;color:#16a34a">✅</td>
+                </tr>
+                <tr>
+                    <td>Ver dashboard</td>
+                    <td style="text-align:center;color:#16a34a">✅</td>
+                    <td style="text-align:center;color:#16a34a">✅</td>
+                </tr>
+                <tr>
+                    <td>Ver botón Admin</td>
+                    <td style="text-align:center;color:#dc2626">❌</td>
+                    <td style="text-align:center;color:#16a34a">✅</td>
+                </tr>
+                <tr>
+                    <td>Acceder a admin.html</td>
+                    <td style="text-align:center;color:#dc2626">❌</td>
+                    <td style="text-align:center;color:#16a34a">✅</td>
+                </tr>
+                <tr>
+                    <td>Crear usuarios nuevos</td>
+                    <td style="text-align:center;color:#dc2626">❌</td>
+                    <td style="text-align:center;color:#16a34a">✅</td>
+                </tr>
+                <tr>
+                    <td>Eliminar usuarios</td>
+                    <td style="text-align:center;color:#dc2626">❌</td>
+                    <td style="text-align:center;color:#16a34a">✅</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ── SECCIÓN 7 ── -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-num">7</div>
+            <div>
+                <div class="section-title">Panel de administrador</div>
+                <div class="section-subtitle">Qué puede hacer admin.html</div>
+            </div>
+        </div>
+
+        <p>El panel de administrador permite gestionar todos los usuarios del sistema sin necesidad de programar ni de pedir ayuda externa. Funciona directamente desde el navegador.</p>
+
+        <div class="diagram">
+            <pre>
+                         admin.html
+                              │
+           ┌──────────────────┼──────────────────┐
+           ▼                  ▼                  ▼
+     Ver todos         Agregar usuario     Eliminar usuario
+     los usuarios           │                   │
+     (tabla)                │                   │
+                    ┌───────┴──────┐     ┌───────┴──────┐
+                    ▼              ▼     ▼              ▼
+                 En Auth       En tabla En Auth       En tabla
+                 (crea la    (guarda    (borra la    (borra el
+                 contraseña)  nombre    contraseña)   registro)
+                              y rol)</pre>
+        </div>
+
+        <p>Las operaciones disponibles en el panel son:</p>
+
+        <div class="steps">
+            <div class="step">
+                <div class="step-circle">+</div>
+                <div class="step-body">
+                    <div class="step-title">Agregar usuario nuevo</div>
+                    <div class="step-desc">Se llena un formulario con nombre, correo, contraseña y rol. El sistema crea la cuenta en Supabase Auth y registra los datos en la tabla usuarios simultáneamente.</div>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-circle">✎</div>
+                <div class="step-body">
+                    <div class="step-title">Editar usuario existente</div>
+                    <div class="step-desc">Se puede cambiar el nombre, correo y rol de cualquier usuario. Los cambios se guardan en la tabla usuarios de la base de datos.</div>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-circle">✕</div>
+                <div class="step-body">
+                    <div class="step-title">Eliminar usuario</div>
+                    <div class="step-desc">El sistema pide confirmación antes de borrar. Al confirmar, elimina la cuenta de Auth y el registro en la tabla usuarios al mismo tiempo.</div>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-circle">🔍</div>
+                <div class="step-body">
+                    <div class="step-title">Buscar usuarios</div>
+                    <div class="step-desc">Hay un campo de búsqueda que filtra la tabla en tiempo real mientras se escribe, por nombre o correo.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ── SECCIÓN 8 ── -->
+    <div class="section page-break">
+        <div class="section-header">
+            <div class="section-num">8</div>
+            <div>
+                <div class="section-title">Credenciales y accesos importantes</div>
+                <div class="section-subtitle">Guarda esta información en un lugar seguro</div>
+            </div>
+        </div>
+
+        <div class="info-box amber">
+            <div class="info-icon">⚠️</div>
+            <div class="info-text"><strong>Importante:</strong> No compartas las claves de Supabase con personas no autorizadas. Las claves service_role tienen acceso total a la base de datos.</div>
+        </div>
+
+        <p><strong>Acceso al sistema (usuario administrador):</strong></p>
+        <div class="cred-box">
+            <div class="cred-row">
+                <div class="cred-label">Correo</div>
+                <div class="cred-value green">gcifuentes@rvcuatro.com</div>
+            </div>
+            <div class="cred-row">
+                <div class="cred-label">Contraseña</div>
+                <div class="cred-value green">4nalista</div>
+            </div>
+            <div class="cred-row">
+                <div class="cred-label">Rol</div>
+                <div class="cred-value purple">admin</div>
+            </div>
+        </div>
+
+        <p><strong>URLs del sistema en vivo:</strong></p>
+        <ul class="url-list">
+            <li>
+                <div class="url-icon">🏠</div>
+                <div class="url-label">Página de inicio</div>
+                <div class="url-val">gabrielcifuentes26.github.io/rv4/</div>
+            </li>
+            <li>
+                <div class="url-icon">🔑</div>
+                <div class="url-label">Login</div>
+                <div class="url-val">gabrielcifuentes26.github.io/rv4/login.html</div>
+            </li>
+            <li>
+                <div class="url-icon">📊</div>
+                <div class="url-label">Dashboard</div>
+                <div class="url-val">gabrielcifuentes26.github.io/rv4/dashboard.html</div>
+            </li>
+            <li>
+                <div class="url-icon">⚙️</div>
+                <div class="url-label">Admin Panel</div>
+                <div class="url-val">gabrielcifuentes26.github.io/rv4/admin.html</div>
+            </li>
+        </ul>
+
+        <p><strong>Acceso a servicios externos:</strong></p>
+        <ul class="url-list">
+            <li>
+                <div class="url-icon">📦</div>
+                <div class="url-label">GitHub Repo</div>
+                <div class="url-val">github.com/GabrielCifuentes26/rv4</div>
+            </li>
+            <li>
+                <div class="url-icon">🗄️</div>
+                <div class="url-label">Supabase</div>
+                <div class="url-val">supabase.com → proyecto: iipgrojliqeyycvgnkrc</div>
+            </li>
+        </ul>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ── SECCIÓN 9 ── -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-num">9</div>
+            <div>
+                <div class="section-title">Resumen de todas las piezas</div>
+                <div class="section-subtitle">El mapa completo del sistema</div>
+            </div>
+        </div>
+
+        <p>Esta tabla resume todas las piezas que conforman el sistema, su propósito y dónde vive cada una:</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Pieza</th>
+                    <th>Para qué sirve</th>
+                    <th>Dónde vive</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>index.html</td>
+                    <td>Vitrina pública — presentación del sistema</td>
+                    <td>GitHub Pages</td>
+                </tr>
+                <tr>
+                    <td>login.html</td>
+                    <td>Formulario de inicio de sesión</td>
+                    <td>GitHub Pages</td>
+                </tr>
+                <tr>
+                    <td>dashboard.html</td>
+                    <td>Tablero con KPIs, tabla y gráficas de avance</td>
+                    <td>GitHub Pages</td>
+                </tr>
+                <tr>
+                    <td>admin.html</td>
+                    <td>Panel para gestionar usuarios (CRUD completo)</td>
+                    <td>GitHub Pages</td>
+                </tr>
+                <tr>
+                    <td>Supabase Auth</td>
+                    <td>Guarda cuentas y contraseñas cifradas</td>
+                    <td>Nube — Supabase</td>
+                </tr>
+                <tr>
+                    <td>Supabase DB</td>
+                    <td>Tabla usuarios: nombre, correo, rol</td>
+                    <td>Nube — Supabase</td>
+                </tr>
+                <tr>
+                    <td>GitHub</td>
+                    <td>Bodega con historial de versiones del código</td>
+                    <td>Nube — GitHub</td>
+                </tr>
+                <tr>
+                    <td>GitHub Pages</td>
+                    <td>Publica el sitio gratis en internet</td>
+                    <td>Nube — GitHub</td>
+                </tr>
+                <tr>
+                    <td>Chart.js</td>
+                    <td>Librería que dibuja las gráficas del dashboard</td>
+                    <td>CDN (cargado automáticamente)</td>
+                </tr>
+                <tr>
+                    <td>Supabase JS SDK</td>
+                    <td>Permite que el HTML se comunique con Supabase</td>
+                    <td>CDN (cargado automáticamente)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="info-box green">
+            <div class="info-icon">✅</div>
+            <div class="info-text"><strong>Todo el sistema es gratuito.</strong> GitHub Pages, Supabase (plan gratuito) y las librerías CDN no tienen costo. El único costo potencial sería si el tráfico creciera enormemente en el futuro.</div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+        <div class="footer-brand">Costos&<span>Presupuestos</span></div>
+        <div class="footer-note">Manual Técnico v1.0 — Abril 2026 — Generado con Claude Code</div>
+    </div>
+
+</div>
+
+<!-- Botón descargar PDF -->
+<button class="btn-pdf" onclick="descargarPDF()">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 16l-5-5 1.41-1.41L11 13.17V4h2v9.17l2.59-2.58L17 11l-5 5zm-7 4v-2h14v2H5z"/>
+    </svg>
+    Descargar PDF
+</button>
+
+<script>
+    function descargarPDF() {
+        const btn = document.querySelector('.btn-pdf');
+        const originalText = btn.innerHTML;
+
+        // Cambia el texto del botón mientras procesa
+        btn.innerHTML = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;fill:#fff;animation:spin .8s linear infinite">
+            <path d="M12 4V2A10 10 0 0 0 2 12h2a8 8 0 0 1 8-8z"/>
+        </svg> Preparando...`;
+        btn.disabled = true;
+
+        setTimeout(() => {
+            window.print();
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }, 300);
+    }
+</script>
+
+<style>
+    @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+
+</body>
+</html>
