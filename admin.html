@@ -1003,7 +1003,7 @@
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${SERVICE_KEY}`, 'apikey': SERVICE_KEY }
             });
-            await client.from('usuarios').delete().eq('id', id);
+            await SERVICE_CLIENT.from('usuarios').delete().eq('id', id);
             showToast('Usuario eliminado', 'success');
             loadUsers();
         } catch (err) {
