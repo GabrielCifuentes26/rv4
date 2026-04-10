@@ -183,7 +183,7 @@
         .float-field.filled:not(.active) label { color:var(--gray2); }
         .float-field input::placeholder { opacity:0; }
 
-        /* ── AUTOFILL: mover label arriba y quitar color azul de Chrome ── */
+        /* ── AUTOFILL: quitar color azul/amarillo de Chrome ── */
         .float-field input:-webkit-autofill,
         .float-field input:-webkit-autofill:hover,
         .float-field input:-webkit-autofill:focus {
@@ -191,12 +191,11 @@
             -webkit-text-fill-color: var(--navy) !important;
             transition: background-color 9999s ease-in-out 0s;
         }
-        .float-field input:-webkit-autofill ~ label {
-            top: 10px !important; transform: none !important;
-            font-size: 0.61rem !important; font-weight: 700 !important;
-            color: var(--blue) !important; letter-spacing: 0.5px !important;
-            text-transform: uppercase !important;
-        }
+        /* Técnica: disparar animación cuando Chrome autofilla */
+        @keyframes autofillStart  { from {} to {} }
+        @keyframes autofillCancel { from {} to {} }
+        .float-field input:-webkit-autofill    { animation: autofillStart  0.001s; }
+        .float-field input:not(:-webkit-autofill) { animation: autofillCancel 0.001s; }
 
         /* Field icons right */
         .field-right {
@@ -516,22 +515,16 @@
 
     let selectedEmpresa = 'RV4';
 
-    // Detectar autofill del browser al cargar
-    window.addEventListener('load', () => {
-        setTimeout(() => {
-            [
-                ['loginEmail',    'ff-loginEmail',  'email'],
-                ['loginPassword', 'ff-loginPass',   'pass'],
-                ['regNombre',     'ff-regNombre',   'text'],
-                ['regCorreo',     'ff-regCorreo',   'email'],
-                ['regPassword',   'ff-regPass',     'pass']
-            ].forEach(([inputId, wrapperId, type]) => {
-                const inp = document.getElementById(inputId);
-                if (inp && inp.value) {
-                    document.getElementById(wrapperId)?.classList.add('filled');
-                }
-            });
-        }, 300);
+    // Detectar autofill via animationstart (técnica estándar cross-browser)
+    document.querySelectorAll('.float-field input').forEach(inp => {
+        const wrap = inp.closest('.float-field');
+        inp.addEventListener('animationstart', (e) => {
+            if (e.animationName === 'autofillStart') {
+                wrap.classList.add('filled');
+            } else if (e.animationName === 'autofillCancel') {
+                if (!inp.value) wrap.classList.remove('filled');
+            }
+        });
     });
 
     // ── FLOATING LABELS ──────────────────────────────────────────────────────
