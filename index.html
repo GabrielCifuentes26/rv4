@@ -264,39 +264,51 @@
         .cat-header { text-align: center; margin-bottom: 50px; }
         .cat-header .section-sub { margin: 0 auto; }
         .cat-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr);
-            gap: 24px; max-width: 900px; margin: 0 auto;
+            display: grid; grid-template-columns: repeat(5, 1fr);
+            gap: 18px; max-width: 1140px; margin: 0 auto;
         }
         .cat-card {
-            background: var(--bg); border: 2px solid var(--border);
-            border-radius: 20px; padding: 36px 28px;
+            background: var(--surface); border: 1.5px solid var(--border);
+            border-radius: 18px; padding: 28px 16px 24px;
             text-align: center; cursor: pointer;
-            transition: all .3s cubic-bezier(.34,1.56,.64,1);
+            transition: all .32s cubic-bezier(.34,1.56,.64,1);
             position: relative; overflow: hidden;
         }
+        /* colored top stripe per card */
         .cat-card::before {
-            content: ''; position: absolute; inset: 0;
-            background: linear-gradient(135deg, rgba(14,165,233,0.08), rgba(249,115,22,0.04));
-            opacity: 0; transition: opacity .3s;
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: var(--cat-c, var(--border));
+            opacity: 0.35; transition: opacity .3s;
         }
-        .cat-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-lg); border-color: var(--blue); }
+        /* bottom glow on hover */
+        .cat-card::after {
+            content: ''; position: absolute; inset: 0; border-radius: 18px;
+            box-shadow: 0 0 0 0 var(--cat-c, transparent);
+            transition: box-shadow .3s;
+        }
+        .cat-card:hover {
+            transform: translateY(-7px);
+            border-color: var(--cat-c, var(--border));
+            box-shadow: 0 12px 32px rgba(15,23,42,0.12), 0 0 0 3px color-mix(in srgb, var(--cat-c, #000) 12%, transparent);
+        }
         .cat-card:hover::before { opacity: 1; }
         .cat-card.active {
             background: var(--navy); border-color: var(--navy);
-            transform: translateY(-6px); box-shadow: 0 16px 40px rgba(15,23,42,0.25);
+            transform: translateY(-5px);
+            box-shadow: 0 16px 40px rgba(15,23,42,0.28);
         }
-        .cat-card.active::before { opacity: 0; }
-        .cat-card.active .cat-icon { background: rgba(255,255,255,0.1); }
+        .cat-card.active::before { background: var(--cat-c, var(--ng)); opacity: 0.8; }
+        .cat-card.active .cat-icon { background: rgba(255,255,255,0.08); font-size: 1.7rem; }
         .cat-card.active .cat-name { color: #fff; }
-        .cat-card.active .cat-count { color: rgba(255,255,255,0.5); }
+        .cat-card.active .cat-count { color: rgba(255,255,255,0.45); }
         .cat-icon {
-            width: 68px; height: 68px; border-radius: 18px;
-            background: var(--surface); display: flex; align-items: center;
-            justify-content: center; font-size: 2rem; margin: 0 auto 18px;
-            box-shadow: var(--shadow); transition: background .3s;
+            width: 58px; height: 58px; border-radius: 14px;
+            background: var(--bg); display: flex; align-items: center;
+            justify-content: center; font-size: 1.8rem; margin: 0 auto 14px;
+            transition: background .3s;
         }
-        .cat-name { font-size: 1.15rem; font-weight: 800; color: var(--navy); margin-bottom: 6px; }
-        .cat-count { font-size: 0.78rem; color: var(--gray2); }
+        .cat-name { font-size: 1rem; font-weight: 800; color: var(--navy); margin-bottom: 5px; }
+        .cat-count { font-size: 0.73rem; font-weight: 600; color: var(--gray2); }
 
         /* ── PROJECTS + MAP ROW ── */
         .projects-section { background: var(--bg); padding: 80px 50px; }
@@ -471,25 +483,30 @@
         <p class="section-sub">Selecciona una categoría para explorar los proyectos disponibles y su ubicación en el mapa.</p>
     </div>
     <div class="cat-grid">
-        <div class="cat-card active" data-cat="todos" onclick="selectCategory(this, 'todos')">
+        <div class="cat-card active" data-cat="todos" style="--cat-c:#0f172a" onclick="selectCategory(this, 'todos')">
             <div class="cat-icon">🗂️</div>
             <div class="cat-name">Todos</div>
             <div class="cat-count">22 proyectos</div>
         </div>
-        <div class="cat-card" data-cat="casas" onclick="selectCategory(this, 'casas')">
+        <div class="cat-card" data-cat="casas" style="--cat-c:#0ea5e9" onclick="selectCategory(this, 'casas')">
             <div class="cat-icon">🏠</div>
             <div class="cat-name">Casas</div>
             <div class="cat-count">8 proyectos</div>
         </div>
-        <div class="cat-card" data-cat="lotes" onclick="selectCategory(this, 'lotes')">
+        <div class="cat-card" data-cat="lotes" style="--cat-c:#10b981" onclick="selectCategory(this, 'lotes')">
             <div class="cat-icon">🌿</div>
             <div class="cat-name">Lotes</div>
             <div class="cat-count">13 proyectos</div>
         </div>
-        <div class="cat-card" data-cat="edificios" onclick="selectCategory(this, 'edificios')">
+        <div class="cat-card" data-cat="edificios" style="--cat-c:#f97316" onclick="selectCategory(this, 'edificios')">
             <div class="cat-icon">🏢</div>
             <div class="cat-name">Edificios</div>
             <div class="cat-count">1 proyecto</div>
+        </div>
+        <div class="cat-card" data-cat="maquinaria" style="--cat-c:#f59e0b" onclick="selectCategory(this, 'maquinaria')">
+            <div class="cat-icon">⚙️</div>
+            <div class="cat-name">Maquinaria</div>
+            <div class="cat-count">0 proyectos</div>
         </div>
     </div>
 </section>
@@ -558,8 +575,8 @@
         { id:'salucentrozacapa',   cat:'edificios',name:'Salucentro Zacapa',       icon:'🏥', bg:'#ede9fe', loc:'Zacapa, ZA',    price:'Q 8,500,000', hab:'—', banos:'—', m2:'2500', lat:14.9750, lng:-89.5350 },
     ];
 
-    const CAT_LABELS = { todos:'Todos los proyectos', casas:'Casas', lotes:'Lotes', edificios:'Edificios' };
-    const CAT_ICONS  = { todos:'🗂️', casas:'🏠', lotes:'🌿', edificios:'🏢' };
+    const CAT_LABELS = { todos:'Todos los proyectos', casas:'Casas', lotes:'Lotes', edificios:'Edificios', maquinaria:'Maquinaria' };
+    const CAT_ICONS  = { todos:'🗂️', casas:'🏠', lotes:'🌿', edificios:'🏢', maquinaria:'⚙️' };
 
     // ── MAPA ─────────────────────────────────────────────────────────────────
     const map = L.map('map', { zoomControl: true, scrollWheelZoom: true })
@@ -584,12 +601,12 @@
         });
     }
 
-    const CAT_COLORS = { casas:'#0ea5e9', lotes:'#10b981', edificios:'#f97316' };
+    const CAT_COLORS = { casas:'#0ea5e9', lotes:'#10b981', edificios:'#f97316', maquinaria:'#f59e0b' };
 
     let markers = {};
 
     function buildPopup(p) {
-        const catLabel = { casas:'Casa', lotes:'Lote', edificios:'Edificio' }[p.cat];
+        const catLabel = { casas:'Casa', lotes:'Lote', edificios:'Edificio', maquinaria:'Maquinaria' }[p.cat];
         return `<div>
             <div class="map-popup-name">${p.name}</div>
             <div class="map-popup-cat">${catLabel} · ${p.loc}</div>
