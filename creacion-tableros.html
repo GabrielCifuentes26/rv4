@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creación de Tableros — Costos&Presupuestos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --nc:  #FEFAF4;
+            --ng:  #C9A84C;
+            --ng2: #A8832A;
+            --nn:  #152540;
+            --nb:  #F2E8D0;
+            --nbd: #DDD0B0;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            background: #ffffff;
+            color: var(--nn);
+            overflow-x: hidden;
+        }
+
+        /* ── NAV ── */
+        nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+            background: rgba(254,250,244,0.97);
+            border-bottom: 1px solid var(--nbd);
+            box-shadow: 0 2px 20px rgba(21,37,64,0.08);
+            padding: 0 50px; height: 68px;
+            display: flex; align-items: center; justify-content: space-between;
+            backdrop-filter: blur(14px);
+        }
+        nav::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, var(--nn) 0%, var(--ng) 45%, var(--nn) 100%);
+        }
+
+        .logo {
+            font-size: 1.15rem; font-weight: 900; color: var(--nn);
+            letter-spacing: 2px; text-transform: uppercase; flex-shrink: 0;
+            text-decoration: none;
+        }
+        .logo span { color: var(--ng); }
+
+        .nav-menu { display: flex; align-items: center; gap: 2px; }
+        .nav-link {
+            display: flex; align-items: center; gap: 5px;
+            color: var(--nn); font-size: 0.95rem; font-weight: 700;
+            padding: 8px 18px; border-radius: 8px;
+            text-decoration: none; background: none; border: none;
+            cursor: pointer; font-family: inherit;
+            transition: color .18s, background .18s;
+            white-space: nowrap; letter-spacing: .3px;
+        }
+        .nav-link:hover { color: var(--ng2); background: var(--nb); }
+        .nav-link .arrow { font-size: 0.68rem; transition: transform .2s; line-height: 1; }
+
+        /* dropdown wrapper */
+        .nav-item { position: relative; }
+        .nav-item.open .arrow { transform: rotate(180deg); }
+        .nav-item.open > .nav-link { color: var(--ng2); background: var(--nb); }
+
+        /* dropdown panel */
+        .drop-panel {
+            position: absolute; top: calc(100% + 10px); left: 0;
+            background: rgba(254,250,244,0.55);
+            backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(255,255,255,0.45);
+            border-top: 2px solid var(--ng); border-radius: 0 0 14px 14px;
+            box-shadow: 0 14px 40px rgba(21,37,64,0.18), inset 0 1px 0 rgba(255,255,255,0.5);
+            min-width: 220px; padding: 6px;
+            opacity: 0; visibility: hidden; transform: translateY(-8px);
+            transition: opacity .22s ease, transform .22s ease, visibility .22s;
+        }
+        .nav-item.open .drop-panel { opacity: 1; visibility: visible; transform: translateY(0); }
+        .drop-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 14px; border-radius: 8px;
+            font-size: 0.87rem; font-weight: 600; color: var(--nn);
+            text-decoration: none; border-left: 2px solid transparent;
+            transition: background .15s, color .15s, border-color .15s;
+        }
+        .drop-item:hover { background: var(--nb); color: var(--ng2); border-left-color: var(--ng); }
+        .drop-item.active { background: var(--nb); color: var(--ng2); border-left-color: var(--ng); }
+        .drop-item-icon { font-size: 1rem; }
+
+        /* nav actions */
+        .nav-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+        .btn-admin {
+            padding: 8px 18px; border-radius: 8px;
+            font-size: 0.85rem; font-weight: 700; letter-spacing: .5px;
+            color: var(--nn); background: var(--nb); border: 2px solid var(--ng);
+            text-decoration: none; cursor: pointer; font-family: inherit;
+            transition: background .18s, color .18s;
+        }
+        .btn-admin:hover { background: var(--ng); color: #fff; }
+        .btn-logout {
+            padding: 8px 20px; border-radius: 8px;
+            font-size: 0.85rem; font-weight: 700; letter-spacing: .5px;
+            color: #fff; background: var(--nn); border: 2px solid var(--nn);
+            cursor: pointer; font-family: inherit;
+            transition: background .18s, color .18s, border-color .18s;
+        }
+        .btn-logout:hover { background: var(--ng); border-color: var(--ng); }
+
+        /* ── PAGE CONTENT ── */
+        .page-content {
+            padding-top: 68px;
+            min-height: 100vh;
+            background: #ffffff;
+        }
+
+        @media (max-width: 768px) {
+            nav { padding: 0 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="mainNav">
+    <a href="index.html" class="logo">Costos&<span>Presupuestos</span></a>
+
+    <div class="nav-menu">
+        <a href="index.html#proyectos" class="nav-link">Presupuesto</a>
+
+        <div class="nav-item" id="dropCronograma">
+            <button class="nav-link" onclick="toggleDrop('dropCronograma')">
+                Cronograma <span class="arrow">▾</span>
+            </button>
+            <div class="drop-panel">
+                <a href="cierre-contable.html" class="drop-item">
+                    <span class="drop-item-icon">📋</span> Cierre Contable
+                </a>
+                <a href="creacion-tableros.html" class="drop-item active">
+                    <span class="drop-item-icon">📊</span> Creación de Tableros
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="nav-actions">
+        <a href="admin.html" class="btn-admin" id="btnAdmin" style="display:none">Admin</a>
+        <button onclick="doLogout()" class="btn-logout">Cerrar sesión</button>
+    </div>
+</nav>
+
+<!-- CONTENIDO -->
+<div class="page-content"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+    const { createClient } = supabase;
+    const client = createClient(
+        'https://iipgrojliqeyycvgnkrc.supabase.co',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlpcGdyb2psaXFleXljdmdua3JjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NzA1NzYsImV4cCI6MjA5MTM0NjU3Nn0.Y6FQ-1qWd7HPMvTnK4alpKxM-YLJ5CsKmkorAZKMJrg'
+    );
+
+    async function doLogout() {
+        await client.auth.signOut();
+        window.location.href = 'login.html';
+    }
+
+    function toggleDrop(id) {
+        const item = document.getElementById(id);
+        const isOpen = item.classList.contains('open');
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('open'));
+        if (!isOpen) item.classList.add('open');
+    }
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.nav-item')) {
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('open'));
+        }
+    });
+
+    (async () => {
+        const { data: { user } } = await client.auth.getUser();
+        if (!user) return;
+        const { data } = await client.from('usuarios').select('rol').eq('id', user.id).single();
+        if (data?.rol === 'admin') {
+            document.getElementById('btnAdmin').style.display = 'inline-block';
+        }
+    })();
+</script>
+</body>
+</html>
