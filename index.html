@@ -149,17 +149,17 @@
             position: absolute; inset: 0;
             background-size: cover; background-position: center;
             opacity: 0; will-change: transform, opacity;
-            transition: opacity 1.2s ease;
+            transition: opacity 2.2s ease-in-out;
         }
         .slide.active { opacity: 1; }
         @keyframes kb1 { from{transform:scale(1)    translate(0,0)}      to{transform:scale(1.08) translate(-1%,-1%)} }
         @keyframes kb2 { from{transform:scale(1.08) translate(-1%,-1%)}  to{transform:scale(1)    translate(0,0)} }
         @keyframes kb3 { from{transform:scale(1)    translate(1%,0)}     to{transform:scale(1.08) translate(-1%,1%)} }
         @keyframes kb4 { from{transform:scale(1.06) translate(0,-1%)}    to{transform:scale(1)    translate(1%,1%)} }
-        .slide.kb1{animation:kb1 8s ease-in-out forwards}
-        .slide.kb2{animation:kb2 8s ease-in-out forwards}
-        .slide.kb3{animation:kb3 8s ease-in-out forwards}
-        .slide.kb4{animation:kb4 8s ease-in-out forwards}
+        .slide.kb1{animation:kb1 12s ease-in-out forwards}
+        .slide.kb2{animation:kb2 12s ease-in-out forwards}
+        .slide.kb3{animation:kb3 12s ease-in-out forwards}
+        .slide.kb4{animation:kb4 12s ease-in-out forwards}
         .slide-overlay {
             position: absolute; inset: 0; z-index: 1;
             background:
@@ -689,7 +689,7 @@
             showSlide(0);
             // Precargar las primeras 3 imágenes
             slides.slice(0, 3).forEach(u => { const i = new Image(); i.src = u; });
-            timer = setInterval(() => showSlide((current + 1) % slides.length), 4000);
+            timer = setInterval(() => showSlide((current + 1) % slides.length), 7000);
         } catch(e) { console.warn('Slider:', e); }
     }
 
@@ -703,7 +703,7 @@
         // Quitar slides anteriores con fade
         box.querySelectorAll('.slide').forEach(s => {
             s.classList.remove('active');
-            setTimeout(() => s.remove(), 1300);
+            setTimeout(() => s.remove(), 2400);
         });
         // Crear nuevo slide
         const el = document.createElement('div');
@@ -721,7 +721,7 @@
     function goSlide(idx) {
         clearInterval(timer);
         showSlide(idx);
-        timer = setInterval(() => showSlide((current + 1) % slides.length), 4000);
+        timer = setInterval(() => showSlide((current + 1) % slides.length), 7000);
     }
 
     initSlider();
