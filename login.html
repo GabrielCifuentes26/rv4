@@ -29,7 +29,7 @@
         body {
             font-family: 'Inter', 'Segoe UI', sans-serif;
             min-height: 100vh;
-            background: #053E68;
+            background: linear-gradient(135deg, #F4CD04 0%, #0A6AAD 45%, #053E68 100%);
             display: flex;
             overflow: hidden;
             position: relative;
@@ -38,13 +38,13 @@
         /* ── ANIMATED BLOBS ── */
         .blob {
             position: fixed; border-radius: 50%;
-            filter: blur(110px); opacity: 0.7;
+            filter: blur(120px); opacity: 0.22;
             pointer-events: none; z-index: 0;
         }
-        .blob-1 { width:700px; height:700px; background:rgba(5,62,104,0.85);  top:-200px; left:-100px; animation: bm1 13s ease-in-out infinite; }
-        .blob-2 { width:560px; height:560px; background:rgba(244,205,4,0.30);  bottom:-160px; right:240px; animation: bm2 16s ease-in-out infinite; }
-        .blob-3 { width:460px; height:460px; background:rgba(244,205,4,0.18);  top:35%; right:-60px; animation: bm3 11s ease-in-out infinite; }
-        .blob-4 { width:380px; height:380px; background:rgba(5,62,104,0.60);   bottom:20%; left:35%; animation: bm1 19s ease-in-out infinite reverse; }
+        .blob-1 { width:700px; height:700px; background:#F4CD04; top:-200px; left:-100px; animation: bm1 13s ease-in-out infinite; }
+        .blob-2 { width:560px; height:560px; background:#053E68; bottom:-160px; right:240px; animation: bm2 16s ease-in-out infinite; }
+        .blob-3 { width:460px; height:460px; background:#F4CD04; top:35%; right:-60px; animation: bm3 11s ease-in-out infinite; }
+        .blob-4 { width:380px; height:380px; background:#053E68; bottom:20%; left:35%; animation: bm1 19s ease-in-out infinite reverse; }
         @keyframes bm1 { 0%,100%{transform:translate(0,0) scale(1)} 33%{transform:translate(45px,-65px) scale(1.08)} 66%{transform:translate(-35px,42px) scale(0.94)} }
         @keyframes bm2 { 0%,100%{transform:translate(0,0) scale(1)} 33%{transform:translate(-55px,35px) scale(1.06)} 66%{transform:translate(32px,-45px) scale(0.97)} }
         @keyframes bm3 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-35px,55px)} }
