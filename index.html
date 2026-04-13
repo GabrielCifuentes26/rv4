@@ -48,52 +48,60 @@
         /* ── NAV ── */
         nav {
             position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
-            background: var(--nc);
-            border-bottom: 1px solid var(--nbd);
-            padding: 0 50px;
-            height: 64px;
+            background: transparent;
+            border-bottom: 1px solid rgba(255,255,255,0.15);
+            padding: 0 50px; height: 64px;
             display: flex; align-items: center; justify-content: space-between;
-            transition: box-shadow .3s;
+            transition: background .4s, border-color .4s, box-shadow .4s;
         }
         nav::before {
             content: '';
             position: absolute; top: 0; left: 0; right: 0; height: 3px;
             background: linear-gradient(90deg, var(--nn) 0%, var(--ng) 45%, var(--nn) 100%);
+            opacity: 0; transition: opacity .4s;
         }
-        nav.scrolled { box-shadow: 0 4px 28px rgba(21,37,64,0.10); }
+        nav.scrolled {
+            background: var(--nc);
+            border-bottom-color: var(--nbd);
+            box-shadow: 0 4px 28px rgba(21,37,64,0.10);
+        }
+        nav.scrolled::before { opacity: 1; }
 
         .logo {
-            font-size: 1.15rem; font-weight: 900; color: var(--nn);
+            font-size: 1.15rem; font-weight: 900; color: #fff;
             letter-spacing: 2px; text-transform: uppercase; flex-shrink: 0;
+            transition: color .4s;
         }
         .logo span { color: var(--ng); }
+        nav.scrolled .logo { color: var(--nn); }
 
         /* menu central */
         .nav-menu { display: flex; align-items: center; gap: 2px; }
         .nav-link {
             display: flex; align-items: center; gap: 5px;
-            color: var(--nn); font-size: 0.875rem; font-weight: 600;
+            color: rgba(255,255,255,0.92); font-size: 0.875rem; font-weight: 600;
             padding: 8px 16px; border-radius: 8px;
             text-decoration: none; background: none; border: none;
             cursor: pointer; font-family: inherit;
             transition: color .18s, background .18s;
             white-space: nowrap;
         }
-        .nav-link:hover { color: var(--ng2); background: var(--nb); }
+        .nav-link:hover { color: #fff; background: rgba(255,255,255,0.12); }
         .nav-link .arrow { font-size: 0.65rem; transition: transform .2s; line-height: 1; }
+        nav.scrolled .nav-link { color: var(--nn); }
+        nav.scrolled .nav-link:hover { color: var(--ng2); background: var(--nb); }
 
         /* dropdown wrapper */
         .nav-item { position: relative; }
-        .nav-item.open .arrow  { transform: rotate(180deg); }
-        .nav-item.open > .nav-link { color: var(--ng2); background: var(--nb); }
+        .nav-item.open .arrow { transform: rotate(180deg); }
+        .nav-item.open > .nav-link { color: #fff; background: rgba(255,255,255,0.12); }
+        nav.scrolled .nav-item.open > .nav-link { color: var(--ng2); background: var(--nb); }
 
         /* dropdown panel */
         .drop-panel {
             position: absolute; top: calc(100% + 10px); left: 0;
-            background: var(--nc);
-            border: 1px solid var(--nbd);
-            border-top: 2px solid var(--ng);
-            border-radius: 0 0 12px 12px;
+            background: var(--nc); border: 1px solid var(--nbd);
+            border-top: 2px solid var(--ng); border-radius: 0 0 12px 12px;
             box-shadow: 0 10px 32px rgba(21,37,64,0.13);
             min-width: 210px; padding: 6px;
             opacity: 0; visibility: hidden; transform: translateY(-6px);
@@ -104,8 +112,7 @@
             display: flex; align-items: center; gap: 10px;
             padding: 10px 14px; border-radius: 8px;
             font-size: 0.85rem; font-weight: 500; color: var(--nn);
-            text-decoration: none;
-            border-left: 2px solid transparent;
+            text-decoration: none; border-left: 2px solid transparent;
             transition: background .15s, color .15s, border-color .15s;
         }
         .drop-item:hover { background: var(--nb); color: var(--ng2); border-left-color: var(--ng); }
@@ -116,121 +123,107 @@
         .btn-admin {
             padding: 7px 16px; border-radius: 8px;
             font-size: 0.8rem; font-weight: 700; letter-spacing: .5px;
-            color: var(--nn); background: var(--nb);
-            border: 1.5px solid var(--ng);
+            color: #fff; background: rgba(201,168,76,0.15); border: 1.5px solid var(--ng);
             text-decoration: none; cursor: pointer; font-family: inherit;
             transition: background .18s, color .18s;
         }
         .btn-admin:hover { background: var(--ng); color: #fff; }
+        nav.scrolled .btn-admin { color: var(--nn); background: var(--nb); }
         .btn-logout {
             padding: 7px 18px; border-radius: 8px;
             font-size: 0.8rem; font-weight: 700; letter-spacing: .5px;
-            color: #fff; background: var(--nn);
-            border: 1.5px solid var(--nn);
+            color: var(--nn); background: #fff; border: 1.5px solid #fff;
             cursor: pointer; font-family: inherit;
-            transition: background .18s, border-color .18s;
+            transition: background .18s, color .18s, border-color .18s;
         }
-        .btn-logout:hover { background: var(--ng); border-color: var(--ng); }
+        .btn-logout:hover { background: var(--ng); border-color: var(--ng); color: #fff; }
+        nav.scrolled .btn-logout { color: #fff; background: var(--nn); border-color: var(--nn); }
+        nav.scrolled .btn-logout:hover { background: var(--ng); border-color: var(--ng); }
 
-        /* ── HERO ── */
-        .hero {
-            min-height: 100vh; padding: 120px 50px 80px;
-            background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 40%, #fff 100%);
-            display: flex; align-items: center; gap: 60px;
-            position: relative; overflow: hidden;
+        /* ── HERO SLIDER ── */
+        .hero-slider {
+            position: relative; height: 100vh; min-height: 600px;
+            overflow: hidden; background: var(--nn);
         }
-        .hero::before {
-            content: '';
-            position: absolute; top: -200px; right: -200px;
-            width: 700px; height: 700px; border-radius: 50%;
-            background: radial-gradient(circle, rgba(14,165,233,0.12) 0%, transparent 70%);
-            animation: floatBg 8s ease-in-out infinite;
+        .slide {
+            position: absolute; inset: 0;
+            background-size: cover; background-position: center;
+            opacity: 0; will-change: transform, opacity;
+            transition: opacity 1.2s ease;
         }
-        .hero::after {
-            content: '';
-            position: absolute; bottom: -150px; left: -100px;
-            width: 500px; height: 500px; border-radius: 50%;
-            background: radial-gradient(circle, rgba(249,115,22,0.08) 0%, transparent 70%);
-            animation: floatBg 10s ease-in-out infinite reverse;
+        .slide.active { opacity: 1; }
+        @keyframes kb1 { from{transform:scale(1)    translate(0,0)}      to{transform:scale(1.08) translate(-1%,-1%)} }
+        @keyframes kb2 { from{transform:scale(1.08) translate(-1%,-1%)}  to{transform:scale(1)    translate(0,0)} }
+        @keyframes kb3 { from{transform:scale(1)    translate(1%,0)}     to{transform:scale(1.08) translate(-1%,1%)} }
+        @keyframes kb4 { from{transform:scale(1.06) translate(0,-1%)}    to{transform:scale(1)    translate(1%,1%)} }
+        .slide.kb1{animation:kb1 8s ease-in-out forwards}
+        .slide.kb2{animation:kb2 8s ease-in-out forwards}
+        .slide.kb3{animation:kb3 8s ease-in-out forwards}
+        .slide.kb4{animation:kb4 8s ease-in-out forwards}
+        .slide-overlay {
+            position: absolute; inset: 0; z-index: 1;
+            background: linear-gradient(135deg, rgba(21,37,64,0.65) 0%, rgba(21,37,64,0.38) 55%, rgba(0,0,0,0.18) 100%);
         }
-        @keyframes floatBg {
-            0%, 100% { transform: translate(0,0); }
-            50%       { transform: translate(30px, -30px); }
+        .slider-content {
+            position: absolute; inset: 0; z-index: 2;
+            display: flex; align-items: center;
+            padding: 0 50px; padding-top: 64px;
         }
-        .hero-content { flex: 1; max-width: 540px; position: relative; z-index: 1; }
-        .hero-badge {
+        .slider-text { max-width: 580px; }
+        .slider-badge {
             display: inline-flex; align-items: center; gap: 8px;
-            background: rgba(14,165,233,0.1); border: 1px solid rgba(14,165,233,0.3);
-            color: var(--blue-dark); padding: 6px 16px; border-radius: 20px;
+            background: rgba(201,168,76,0.2); border: 1px solid rgba(201,168,76,0.5);
+            color: var(--ng); padding: 6px 16px; border-radius: 20px;
             font-size: 0.72rem; font-weight: 700; letter-spacing: 1px;
             text-transform: uppercase; margin-bottom: 24px;
             animation: fadeInDown .6s ease both;
         }
-        .badge-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--blue); animation: pulse 2s infinite; }
+        .badge-dot { width:7px; height:7px; border-radius:50%; background:var(--ng); animation:pulse 2s infinite; }
         @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(0.8)} }
-
-        .hero h1 {
-            font-size: 3.6rem; font-weight: 900; color: var(--navy);
+        .slider-h1 {
+            font-size: 4rem; font-weight: 900; color: #fff;
             line-height: 1.05; margin-bottom: 20px; letter-spacing: -1.5px;
             animation: fadeInUp .7s ease .1s both;
         }
-        .hero h1 em { color: var(--blue); font-style: normal; }
-        .hero p {
-            color: var(--gray); font-size: 1rem; line-height: 1.75;
+        .slider-h1 em { color: var(--ng); font-style: normal; }
+        .slider-p {
+            color: rgba(255,255,255,0.82); font-size: 1rem; line-height: 1.75;
             margin-bottom: 36px; max-width: 440px;
             animation: fadeInUp .7s ease .2s both;
         }
-        .hero-cta {
-            display: flex; gap: 14px; flex-wrap: wrap;
-            animation: fadeInUp .7s ease .3s both;
-        }
+        .slider-cta { display: flex; gap: 14px; flex-wrap: wrap; animation: fadeInUp .7s ease .3s both; }
         .btn-primary {
-            background: var(--orange); color: #fff;
+            background: var(--ng); color: var(--nn);
             padding: 13px 30px; border-radius: 9px; font-weight: 700;
             font-size: 0.9rem; text-decoration: none; border: none; cursor: pointer;
             transition: background .2s, transform .15s, box-shadow .2s;
-            box-shadow: 0 4px 16px rgba(249,115,22,0.35);
+            box-shadow: 0 4px 16px rgba(201,168,76,0.45);
         }
-        .btn-primary:hover { background: var(--orange-dk); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(249,115,22,0.4); }
+        .btn-primary:hover { background: var(--ng2); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(201,168,76,0.5); }
         .btn-primary:active { transform: translateY(0); }
         .btn-secondary {
-            background: transparent; color: var(--navy);
+            background: transparent; color: #fff;
             padding: 13px 30px; border-radius: 9px; font-weight: 600;
-            font-size: 0.9rem; text-decoration: none; border: 2px solid var(--border);
+            font-size: 0.9rem; text-decoration: none; border: 2px solid rgba(255,255,255,0.4);
             transition: border-color .2s, color .2s, background .2s;
         }
-        .btn-secondary:hover { border-color: var(--blue); color: var(--blue); background: rgba(14,165,233,0.05); }
-
-        .hero-visual {
-            flex: 1; max-width: 520px; position: relative; z-index: 1;
-            animation: fadeInRight .8s ease .2s both;
-        }
-        .hero-card {
-            background: var(--surface); border-radius: 20px; padding: 28px;
-            box-shadow: var(--shadow-lg); border: 1px solid var(--border);
-            transform: rotate(-2deg); transition: transform .3s;
-        }
-        .hero-card:hover { transform: rotate(0deg); }
-        .hc-header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
-        .hc-dot { width: 10px; height: 10px; border-radius: 50%; }
-        .hc-title { font-size: 0.78rem; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 1px; }
-        .hc-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 20px; }
-        .hc-stat { background: var(--bg); border-radius: 12px; padding: 14px; text-align: center; }
-        .hc-stat-val { font-size: 1.3rem; font-weight: 800; color: var(--navy); }
-        .hc-stat-lbl { font-size: 0.65rem; color: var(--gray2); margin-top: 2px; }
-        .hc-bar-section { display: flex; flex-direction: column; gap: 10px; }
-        .hc-bar-row { display: flex; align-items: center; gap: 10px; }
-        .hc-bar-name { font-size: 0.72rem; color: var(--gray); width: 70px; flex-shrink: 0; }
-        .hc-bar-track { flex: 1; height: 8px; background: var(--bg); border-radius: 4px; overflow: hidden; }
-        .hc-bar-fill { height: 100%; border-radius: 4px; transition: width 1s ease; }
-        .hc-bar-pct { font-size: 0.68rem; font-weight: 700; color: var(--navy); width: 34px; text-align: right; }
-
-        .hero-stats {
+        .btn-secondary:hover { border-color: var(--ng); color: var(--ng); background: rgba(201,168,76,0.1); }
+        .slider-stats {
             display: flex; gap: 40px; margin-top: 48px;
             animation: fadeInUp .7s ease .4s both;
         }
-        .stat-num { font-size: 1.8rem; font-weight: 900; color: var(--navy); }
-        .stat-label { font-size: 0.72rem; color: var(--gray); margin-top: 2px; }
+        .stat-num   { font-size: 1.8rem; font-weight: 900; color: #fff; }
+        .stat-label { font-size: 0.72rem; color: rgba(255,255,255,0.65); margin-top: 2px; }
+        .slider-dots {
+            position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%);
+            z-index: 3; display: flex; gap: 8px;
+        }
+        .s-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: rgba(255,255,255,0.35); border: none; cursor: pointer; padding: 0;
+            transition: background .3s, transform .3s;
+        }
+        .s-dot.active { background: var(--ng); transform: scale(1.4); }
 
         /* ── KEYFRAMES ── */
         @keyframes fadeInDown { from { opacity:0; transform:translateY(-20px); } to { opacity:1; transform:translateY(0); } }
@@ -436,64 +429,27 @@
     </div>
 </nav>
 
-<!-- HERO -->
-<section class="hero">
-    <div class="hero-content">
-        <div class="hero-badge"><div class="badge-dot"></div>Sistema de Control Presupuestario</div>
-        <h1>Control de<br><em>Proyectos</em><br>en tiempo real</h1>
-        <p>Gestiona el presupuesto, avance y ejecución de todos tus proyectos inmobiliarios desde un solo lugar.</p>
-        <div class="hero-cta">
-            <a href="login.html" class="btn-primary">Acceder al sistema</a>
-            <a href="#proyectos" class="btn-secondary">Ver proyectos</a>
-        </div>
-        <div class="hero-stats">
-            <div><div class="stat-num">22</div><div class="stat-label">Proyectos activos</div></div>
-            <div><div class="stat-num">2</div><div class="stat-label">Empresas</div></div>
-            <div><div class="stat-num">91%</div><div class="stat-label">Avance promedio</div></div>
-        </div>
-    </div>
-
-    <div class="hero-visual">
-        <div class="hero-card">
-            <div class="hc-header">
-                <div class="hc-dot" style="background:#ef4444"></div>
-                <div class="hc-dot" style="background:#f59e0b"></div>
-                <div class="hc-dot" style="background:#10b981"></div>
-                <div class="hc-title" style="margin-left:6px">Control Presupuestario</div>
+<!-- HERO SLIDER -->
+<section class="hero-slider">
+    <div id="slidesContainer"></div>
+    <div class="slide-overlay"></div>
+    <div class="slider-content">
+        <div class="slider-text">
+            <div class="slider-badge"><div class="badge-dot"></div>Sistema de Control Presupuestario</div>
+            <h1 class="slider-h1">Control de<br><em>Proyectos</em><br>en tiempo real</h1>
+            <p class="slider-p">Gestiona el presupuesto, avance y ejecución de todos tus proyectos inmobiliarios desde un solo lugar.</p>
+            <div class="slider-cta">
+                <a href="login.html" class="btn-primary">Acceder al sistema</a>
+                <a href="#proyectos" class="btn-secondary">Ver proyectos</a>
             </div>
-            <div class="hc-stats">
-                <div class="hc-stat">
-                    <div class="hc-stat-val" style="color:var(--blue-dark)">162M</div>
-                    <div class="hc-stat-lbl">Presupuesto</div>
-                </div>
-                <div class="hc-stat">
-                    <div class="hc-stat-val" style="color:var(--orange)">129M</div>
-                    <div class="hc-stat-lbl">Ejecutado</div>
-                </div>
-                <div class="hc-stat">
-                    <div class="hc-stat-val" style="color:var(--green)">92%</div>
-                    <div class="hc-stat-lbl">Avance</div>
-                </div>
-            </div>
-            <div class="hc-bar-section">
-                <div class="hc-bar-row">
-                    <div class="hc-bar-name">Construcción</div>
-                    <div class="hc-bar-track"><div class="hc-bar-fill" style="width:93%;background:var(--blue)"></div></div>
-                    <div class="hc-bar-pct">93%</div>
-                </div>
-                <div class="hc-bar-row">
-                    <div class="hc-bar-name">Urbanización</div>
-                    <div class="hc-bar-track"><div class="hc-bar-fill" style="width:91%;background:var(--orange)"></div></div>
-                    <div class="hc-bar-pct">91%</div>
-                </div>
-                <div class="hc-bar-row">
-                    <div class="hc-bar-name">I.7a</div>
-                    <div class="hc-bar-track"><div class="hc-bar-fill" style="width:84%;background:var(--green)"></div></div>
-                    <div class="hc-bar-pct">84%</div>
-                </div>
+            <div class="slider-stats">
+                <div><div class="stat-num">22</div><div class="stat-label">Proyectos activos</div></div>
+                <div><div class="stat-num">2</div><div class="stat-label">Empresas</div></div>
+                <div><div class="stat-num">91%</div><div class="stat-label">Avance promedio</div></div>
             </div>
         </div>
     </div>
+    <div class="slider-dots" id="sliderDots"></div>
 </section>
 
 <!-- CATEGORÍAS -->
@@ -715,14 +671,58 @@
     // ── INIT ──────────────────────────────────────────────────────────────────
     renderCards('todos');
 
-    // Animación de las barras del hero al cargar
-    window.addEventListener('load', () => {
-        document.querySelectorAll('.hc-bar-fill').forEach(bar => {
-            const w = bar.style.width;
-            bar.style.width = '0';
-            setTimeout(() => { bar.style.width = w; }, 500);
+    // ── HERO SLIDER ──────────────────────────────────────────────────────────
+    const KB = ['kb1','kb2','kb3','kb4'];
+    let slides = [], current = 0, timer = null;
+
+    async function initSlider() {
+        try {
+            const r = await fetch('https://api.github.com/repos/GabrielCifuentes26/rv4/contents/imagenes%20de%20proyectos');
+            const files = await r.json();
+            slides = files
+                .filter(f => /\.(png|jpg|jpeg|webp)$/i.test(f.name))
+                .map(f => f.download_url);
+            if (!slides.length) return;
+            buildDots();
+            showSlide(0);
+            // Precargar las primeras 3 imágenes
+            slides.slice(0, 3).forEach(u => { const i = new Image(); i.src = u; });
+            timer = setInterval(() => showSlide((current + 1) % slides.length), 4000);
+        } catch(e) { console.warn('Slider:', e); }
+    }
+
+    function buildDots() {
+        document.getElementById('sliderDots').innerHTML =
+            slides.map((_,i) => `<button class="s-dot${i===0?' active':''}" onclick="goSlide(${i})"></button>`).join('');
+    }
+
+    function showSlide(idx) {
+        const box = document.getElementById('slidesContainer');
+        // Quitar slides anteriores con fade
+        box.querySelectorAll('.slide').forEach(s => {
+            s.classList.remove('active');
+            setTimeout(() => s.remove(), 1300);
         });
-    });
+        // Crear nuevo slide
+        const el = document.createElement('div');
+        el.className = `slide ${KB[idx % 4]}`;
+        el.style.backgroundImage = `url("${slides[idx]}")`;
+        box.appendChild(el);
+        requestAnimationFrame(() => el.classList.add('active'));
+        // Dots
+        document.querySelectorAll('.s-dot').forEach((d,i) => d.classList.toggle('active', i===idx));
+        // Precargar siguiente
+        new Image().src = slides[(idx + 1) % slides.length];
+        current = idx;
+    }
+
+    function goSlide(idx) {
+        clearInterval(timer);
+        showSlide(idx);
+        timer = setInterval(() => showSlide((current + 1) % slides.length), 4000);
+    }
+
+    initSlider();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
