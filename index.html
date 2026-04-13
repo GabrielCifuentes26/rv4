@@ -145,8 +145,9 @@
             position: relative; height: 100vh; min-height: 600px;
             overflow: hidden; background: var(--nn);
         }
+        #slidesContainer { position: absolute; inset: 0; z-index: 0; }
         .slide {
-            position: absolute; inset: 0;
+            position: absolute; inset: 0; z-index: 0;
             background-size: cover; background-position: center;
             opacity: 0; will-change: transform, opacity;
             transition: opacity 2.2s ease-in-out;
