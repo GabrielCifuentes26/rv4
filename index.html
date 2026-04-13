@@ -106,12 +106,14 @@
         /* dropdown panel */
         .drop-panel {
             position: absolute; top: calc(100% + 10px); left: 0;
-            background: var(--nc); border: 1px solid var(--nbd);
-            border-top: 2px solid var(--ng); border-radius: 0 0 12px 12px;
-            box-shadow: 0 10px 32px rgba(21,37,64,0.13);
-            min-width: 210px; padding: 6px;
-            opacity: 0; visibility: hidden; transform: translateY(-6px);
-            transition: opacity .18s, transform .18s, visibility .18s;
+            background: rgba(254,250,244,0.55);
+            backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(255,255,255,0.45);
+            border-top: 2px solid var(--ng); border-radius: 0 0 14px 14px;
+            box-shadow: 0 14px 40px rgba(21,37,64,0.18), inset 0 1px 0 rgba(255,255,255,0.5);
+            min-width: 220px; padding: 6px;
+            opacity: 0; visibility: hidden; transform: translateY(-8px);
+            transition: opacity .22s ease, transform .22s ease, visibility .22s;
         }
         .nav-item.open .drop-panel { opacity: 1; visibility: visible; transform: translateY(0); }
         .drop-item {
