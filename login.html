@@ -106,32 +106,51 @@
         /* ── PLANO ARQUITECTÓNICO ── */
         .floor-plan {
             position: fixed; bottom: 0; left: 0;
-            width: 55%; height: 75%;
+            width: 66%; height: 90%;
             z-index: 0; pointer-events: none;
-            opacity: 0.07;
+            opacity: 0.09;
         }
-        .floor-plan line, .floor-plan path, .floor-plan rect, .floor-plan polyline {
-            stroke: #ffffff; stroke-width: 1.5;
+        .floor-plan line, .floor-plan path, .floor-plan polyline {
+            stroke: #ffffff; stroke-width: 1.8;
             fill: none; stroke-linecap: round; stroke-linejoin: round;
         }
-        /* Dibujo progresivo por sección */
-        @keyframes draw { 0%{stroke-dashoffset:var(--len)} 70%{stroke-dashoffset:0} 85%{stroke-dashoffset:0;opacity:1} 100%{stroke-dashoffset:0;opacity:0.4} }
-        .fp-line { stroke-dasharray: var(--len); stroke-dashoffset: var(--len); animation: draw 12s ease-in-out infinite; }
-        .fp-line:nth-child(1)  { animation-delay: 0s; }
-        .fp-line:nth-child(2)  { animation-delay: 0.4s; }
-        .fp-line:nth-child(3)  { animation-delay: 0.8s; }
-        .fp-line:nth-child(4)  { animation-delay: 1.2s; }
-        .fp-line:nth-child(5)  { animation-delay: 1.6s; }
-        .fp-line:nth-child(6)  { animation-delay: 2.0s; }
-        .fp-line:nth-child(7)  { animation-delay: 2.4s; }
-        .fp-line:nth-child(8)  { animation-delay: 2.8s; }
-        .fp-line:nth-child(9)  { animation-delay: 3.2s; }
-        .fp-line:nth-child(10) { animation-delay: 3.6s; }
-        .fp-line:nth-child(11) { animation-delay: 4.0s; }
-        .fp-line:nth-child(12) { animation-delay: 4.4s; }
-        .fp-line:nth-child(13) { animation-delay: 4.8s; }
-        .fp-line:nth-child(14) { animation-delay: 5.2s; }
-        .fp-line:nth-child(15) { animation-delay: 5.6s; }
+        .floor-plan rect:not(.fp-room) {
+            stroke: #ffffff; stroke-width: 1.8;
+            fill: none; stroke-linecap: round; stroke-linejoin: round;
+        }
+        @keyframes draw {
+            0%   { stroke-dashoffset: var(--len); opacity: 0; }
+            5%   { opacity: 1; }
+            45%  { stroke-dashoffset: 0; opacity: 1; }
+            72%  { stroke-dashoffset: 0; opacity: 0.5; }
+            100% { stroke-dashoffset: 0; opacity: 0.15; }
+        }
+        @keyframes roomAppear {
+            0%, 8%   { fill-opacity: 0; }
+            38%, 65% { fill-opacity: 1; }
+            92%, 100%{ fill-opacity: 0; }
+        }
+        @keyframes labelAppear {
+            0%, 18%  { opacity: 0; }
+            45%, 68% { opacity: 1; }
+            93%, 100%{ opacity: 0; }
+        }
+        .fp-line {
+            stroke-dasharray: var(--len); stroke-dashoffset: var(--len);
+            animation: draw 8s ease-in-out infinite;
+        }
+        .fp-room {
+            fill: rgba(201,168,76,0.08); stroke: none !important;
+            fill-opacity: 0;
+            animation: roomAppear 8s ease-in-out infinite;
+        }
+        .fp-label {
+            fill: rgba(255,255,255,0.9);
+            font-size: 9px; font-family: 'Courier New', monospace;
+            letter-spacing: 1.2px; font-weight: bold;
+            opacity: 0;
+            animation: labelAppear 8s ease-in-out infinite;
+        }
 
         /* Partículas flotantes */
         .particles { position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
@@ -410,38 +429,168 @@
 <div class="blob blob-5"></div>
 
 <!-- Plano arquitectónico animado -->
-<svg class="floor-plan" viewBox="0 0 600 480" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMax meet">
-    <!-- Pared exterior top -->
-    <line class="fp-line" x1="40" y1="40"  x2="560" y2="40"  style="--len:520"/>
-    <!-- Pared exterior right -->
-    <line class="fp-line" x1="560" y1="40" x2="560" y2="440" style="--len:400"/>
-    <!-- Pared exterior bottom -->
-    <line class="fp-line" x1="560" y1="440" x2="40" y2="440" style="--len:520"/>
-    <!-- Pared exterior left -->
-    <line class="fp-line" x1="40" y1="440" x2="40" y2="40"   style="--len:400"/>
+<svg class="floor-plan" viewBox="0 0 700 545" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMax meet">
 
-    <!-- División central vertical -->
-    <line class="fp-line" x1="260" y1="40"  x2="260" y2="280" style="--len:240"/>
-    <!-- División central horizontal -->
-    <line class="fp-line" x1="40"  y1="200" x2="260" y2="200" style="--len:220"/>
-    <!-- División derecha horizontal -->
-    <line class="fp-line" x1="260" y1="180" x2="560" y2="180" style="--len:300"/>
-    <!-- División derecha vertical -->
-    <line class="fp-line" x1="400" y1="180" x2="400" y2="440" style="--len:260"/>
-    <!-- Pasillo horizontal inferior -->
-    <line class="fp-line" x1="40"  y1="340" x2="400" y2="340" style="--len:360"/>
-    <!-- Habitación baño -->
-    <line class="fp-line" x1="140" y1="200" x2="140" y2="340" style="--len:140"/>
-    <line class="fp-line" x1="140" y1="280" x2="260" y2="280" style="--len:120"/>
+<!-- RELLENO DE HABITACIONES -->
+<rect class="fp-room" x="37" y="37" width="231" height="186" style="animation-delay:1.2s"/>
+<rect class="fp-room" x="357" y="37" width="191" height="186" style="animation-delay:1.5s"/>
+<rect class="fp-room" x="548" y="37" width="115" height="101" style="animation-delay:1.8s"/>
+<rect class="fp-room" x="548" y="138" width="115" height="85" style="animation-delay:2.0s"/>
+<rect class="fp-room" x="37" y="223" width="231" height="145" style="animation-delay:2.3s"/>
+<rect class="fp-room" x="37" y="368" width="231" height="135" style="animation-delay:2.6s"/>
+<rect class="fp-room" x="357" y="223" width="191" height="145" style="animation-delay:2.8s"/>
+<rect class="fp-room" x="548" y="223" width="115" height="145" style="animation-delay:3.0s"/>
+<rect class="fp-room" x="357" y="368" width="306" height="135" style="animation-delay:3.3s"/>
 
-    <!-- Arco puerta sala -->
-    <path class="fp-line" d="M 260 200 A 40 40 0 0 0 220 160" style="--len:63"/>
-    <!-- Arco puerta habitación -->
-    <path class="fp-line" d="M 40 340 A 35 35 0 0 1 75 305"  style="--len:55"/>
-    <!-- Arco puerta baño -->
-    <path class="fp-line" d="M 140 280 A 30 30 0 0 0 170 250" style="--len:47"/>
-    <!-- Arco puerta cocina -->
-    <path class="fp-line" d="M 400 340 A 35 35 0 0 1 435 305" style="--len:55"/>
+<!-- ETIQUETAS DE HABITACIONES -->
+<text class="fp-label" x="152" y="130" text-anchor="middle" style="animation-delay:2.5s">RECÁMARA PRINCIPAL</text>
+<text class="fp-label" x="452" y="128" text-anchor="middle" style="animation-delay:2.8s">RECÁMARA 2</text>
+<text class="fp-label" x="605" y="90" text-anchor="middle" style="animation-delay:3.0s">BAÑO 1</text>
+<text class="fp-label" x="605" y="186" text-anchor="middle" style="animation-delay:3.1s">CLOSET</text>
+<text class="fp-label" x="311" y="268" text-anchor="middle" style="animation-delay:3.3s">HALL</text>
+<text class="fp-label" x="152" y="294" text-anchor="middle" style="animation-delay:3.4s">SALA</text>
+<text class="fp-label" x="152" y="438" text-anchor="middle" style="animation-delay:3.6s">COMEDOR</text>
+<text class="fp-label" x="452" y="298" text-anchor="middle" style="animation-delay:3.7s">COCINA</text>
+<text class="fp-label" x="605" y="298" text-anchor="middle" style="animation-delay:3.9s">BAÑO 2</text>
+<text class="fp-label" x="510" y="438" text-anchor="middle" style="animation-delay:4.1s">GARAJE</text>
+
+<!-- PAREDES EXTERIORES -->
+<line class="fp-line" x1="35" y1="35" x2="663" y2="35" style="--len:628; animation-delay:0s"/>
+<line class="fp-line" x1="663" y1="35" x2="663" y2="503" style="--len:468; animation-delay:0.12s"/>
+<line class="fp-line" x1="663" y1="503" x2="35" y2="503" style="--len:628; animation-delay:0.24s"/>
+<line class="fp-line" x1="35" y1="503" x2="35" y2="35" style="--len:468; animation-delay:0.36s"/>
+
+<!-- PAREDES INTERIORES -->
+<line class="fp-line" x1="270" y1="35" x2="270" y2="503" style="--len:468; animation-delay:0.48s"/>
+<line class="fp-line" x1="355" y1="35" x2="355" y2="503" style="--len:468; animation-delay:0.60s"/>
+<line class="fp-line" x1="35" y1="223" x2="663" y2="223" style="--len:628; animation-delay:0.72s"/>
+<line class="fp-line" x1="35" y1="368" x2="663" y2="368" style="--len:628; animation-delay:0.84s"/>
+<line class="fp-line" x1="548" y1="35" x2="548" y2="223" style="--len:188; animation-delay:0.96s"/>
+<line class="fp-line" x1="548" y1="138" x2="663" y2="138" style="--len:115; animation-delay:1.08s"/>
+<line class="fp-line" x1="548" y1="223" x2="548" y2="368" style="--len:145; animation-delay:1.20s"/>
+
+<!-- VENTANAS fachada norte -->
+<line class="fp-line" x1="70"  y1="29" x2="130" y2="29" style="--len:60; animation-delay:1.32s"/>
+<line class="fp-line" x1="155" y1="29" x2="240" y2="29" style="--len:85; animation-delay:1.44s"/>
+<line class="fp-line" x1="375" y1="29" x2="445" y2="29" style="--len:70; animation-delay:1.56s"/>
+<line class="fp-line" x1="463" y1="29" x2="530" y2="29" style="--len:67; animation-delay:1.68s"/>
+<line class="fp-line" x1="562" y1="29" x2="648" y2="29" style="--len:86; animation-delay:1.80s"/>
+<!-- VENTANAS fachada oeste -->
+<line class="fp-line" x1="29" y1="70"  x2="29" y2="140" style="--len:70; animation-delay:1.92s"/>
+<line class="fp-line" x1="29" y1="250" x2="29" y2="335" style="--len:85; animation-delay:2.04s"/>
+<line class="fp-line" x1="29" y1="388" x2="29" y2="468" style="--len:80; animation-delay:2.16s"/>
+<!-- VENTANAS fachada este -->
+<line class="fp-line" x1="669" y1="58"  x2="669" y2="118" style="--len:60; animation-delay:2.28s"/>
+<line class="fp-line" x1="669" y1="248" x2="669" y2="358" style="--len:110; animation-delay:2.40s"/>
+<line class="fp-line" x1="669" y1="390" x2="669" y2="468" style="--len:78; animation-delay:2.52s"/>
+<!-- VENTANAS fachada sur -->
+<line class="fp-line" x1="65"  y1="509" x2="155" y2="509" style="--len:90; animation-delay:2.64s"/>
+<line class="fp-line" x1="175" y1="509" x2="255" y2="509" style="--len:80; animation-delay:2.76s"/>
+<line class="fp-line" x1="380" y1="509" x2="490" y2="509" style="--len:110; animation-delay:2.88s"/>
+<line class="fp-line" x1="515" y1="509" x2="645" y2="509" style="--len:130; animation-delay:3.00s"/>
+
+<!-- PUERTAS (arcos) -->
+<path class="fp-line" d="M 270 223 A 50 50 0 0 0 220 173" style="--len:79; animation-delay:3.12s"/>
+<path class="fp-line" d="M 355 223 A 48 48 0 0 1 403 175" style="--len:75; animation-delay:3.24s"/>
+<path class="fp-line" d="M 548 100 A 40 40 0 0 0 588 60" style="--len:63; animation-delay:3.36s"/>
+<line class="fp-line" x1="548" y1="145" x2="630" y2="145" style="--len:82; animation-delay:3.48s"/>
+<path class="fp-line" d="M 270 368 A 48 48 0 0 0 222 320" style="--len:75; animation-delay:3.60s"/>
+<path class="fp-line" d="M 355 368 A 42 42 0 0 1 397 326" style="--len:66; animation-delay:3.72s"/>
+<path class="fp-line" d="M 548 285 A 38 38 0 0 0 586 247" style="--len:60; animation-delay:3.84s"/>
+<path class="fp-line" d="M 210 503 A 45 45 0 0 0 165 458" style="--len:71; animation-delay:3.96s"/>
+<line class="fp-line" x1="380" y1="503" x2="630" y2="503" style="--len:250; animation-delay:4.08s"/>
+
+<!-- RECÁMARA PRINCIPAL: cama doble -->
+<rect class="fp-line" x="52" y="50" width="100" height="120" style="--len:440; animation-delay:4.20s"/>
+<line class="fp-line" x1="52" y1="76" x2="152" y2="76" style="--len:100; animation-delay:4.32s"/>
+<rect class="fp-line" x="55" y="53" width="42" height="23" style="--len:130; animation-delay:4.44s"/>
+<rect class="fp-line" x="101" y="53" width="42" height="23" style="--len:130; animation-delay:4.56s"/>
+<rect class="fp-line" x="158" y="52" width="24" height="24" style="--len:96; animation-delay:4.68s"/>
+<line class="fp-line" x1="52" y1="190" x2="258" y2="190" style="--len:206; animation-delay:4.80s"/>
+<line class="fp-line" x1="155" y1="190" x2="155" y2="223" style="--len:33; animation-delay:4.92s"/>
+
+<!-- RECÁMARA 2: cama + escritorio -->
+<rect class="fp-line" x="372" y="50" width="80" height="100" style="--len:360; animation-delay:5.04s"/>
+<line class="fp-line" x1="372" y1="74" x2="452" y2="74" style="--len:80; animation-delay:5.16s"/>
+<rect class="fp-line" x="375" y="53" width="74" height="21" style="--len:190; animation-delay:5.28s"/>
+<rect class="fp-line" x="462" y="50" width="78" height="32" style="--len:220; animation-delay:5.40s"/>
+<rect class="fp-line" x="478" y="82" width="30" height="24" style="--len:108; animation-delay:5.52s"/>
+
+<!-- BAÑO 1: bañera + lavabo + inodoro -->
+<rect class="fp-line" x="562" y="48" width="46" height="74" style="--len:240; animation-delay:5.64s"/>
+<line class="fp-line" x1="566" y1="52" x2="604" y2="52" style="--len:38; animation-delay:5.76s"/>
+<path class="fp-line" d="M 566 122 A 38 19 0 0 1 608 122" style="--len:90; animation-delay:5.88s"/>
+<rect class="fp-line" x="562" y="106" width="28" height="22" style="--len:100; animation-delay:6.00s"/>
+<rect class="fp-line" x="624" y="48" width="24" height="30" style="--len:108; animation-delay:6.12s"/>
+<line class="fp-line" x1="627" y1="48" x2="644" y2="48" style="--len:17; animation-delay:6.24s"/>
+
+<!-- CLOSET: percheros verticales -->
+<line class="fp-line" x1="575" y1="148" x2="575" y2="218" style="--len:70; animation-delay:6.36s"/>
+<line class="fp-line" x1="610" y1="148" x2="610" y2="218" style="--len:70; animation-delay:6.48s"/>
+<line class="fp-line" x1="645" y1="148" x2="645" y2="218" style="--len:70; animation-delay:6.60s"/>
+
+<!-- SALA: sofá en L + mesa centro + TV -->
+<rect class="fp-line" x="52" y="238" width="130" height="36" style="--len:332; animation-delay:6.72s"/>
+<rect class="fp-line" x="52" y="238" width="36" height="95" style="--len:262; animation-delay:6.84s"/>
+<rect class="fp-line" x="105" y="292" width="65" height="42" style="--len:214; animation-delay:6.96s"/>
+<rect class="fp-line" x="60" y="225" width="90" height="9" style="--len:198; animation-delay:7.08s"/>
+
+<!-- COMEDOR: mesa + sillas -->
+<rect class="fp-line" x="58" y="390" width="112" height="72" style="--len:368; animation-delay:7.20s"/>
+<line class="fp-line" x1="72"  y1="386" x2="118" y2="386" style="--len:46; animation-delay:7.32s"/>
+<line class="fp-line" x1="128" y1="386" x2="162" y2="386" style="--len:34; animation-delay:7.44s"/>
+<line class="fp-line" x1="72"  y1="466" x2="162" y2="466" style="--len:90; animation-delay:7.56s"/>
+<line class="fp-line" x1="54"  y1="400" x2="54"  y2="452" style="--len:52; animation-delay:7.68s"/>
+<line class="fp-line" x1="174" y1="400" x2="174" y2="452" style="--len:52; animation-delay:7.80s"/>
+
+<!-- COCINA: mesada en L + isla + estufa + fregadero -->
+<line class="fp-line" x1="368" y1="236" x2="368" y2="360" style="--len:124; animation-delay:7.92s"/>
+<line class="fp-line" x1="368" y1="236" x2="536" y2="236" style="--len:168; animation-delay:8.04s"/>
+<line class="fp-line" x1="536" y1="236" x2="536" y2="290" style="--len:54; animation-delay:8.16s"/>
+<rect class="fp-line" x="382" y="298" width="130" height="52" style="--len:364; animation-delay:8.28s"/>
+<rect class="fp-line" x="372" y="342" width="66" height="20" style="--len:172; animation-delay:8.40s"/>
+<line class="fp-line" x1="379" y1="350" x2="389" y2="350" style="--len:10; animation-delay:8.52s"/>
+<line class="fp-line" x1="397" y1="350" x2="407" y2="350" style="--len:10; animation-delay:8.64s"/>
+<line class="fp-line" x1="415" y1="350" x2="425" y2="350" style="--len:10; animation-delay:8.76s"/>
+<rect class="fp-line" x="468" y="240" width="46" height="28" style="--len:148; animation-delay:8.88s"/>
+<line class="fp-line" x1="491" y1="246" x2="491" y2="262" style="--len:16; animation-delay:9.00s"/>
+
+<!-- BAÑO 2: ducha + lavabo + inodoro -->
+<rect class="fp-line" x="562" y="237" width="54" height="54" style="--len:216; animation-delay:9.12s"/>
+<line class="fp-line" x1="562" y1="264" x2="616" y2="264" style="--len:54; animation-delay:9.24s"/>
+<line class="fp-line" x1="589" y1="237" x2="589" y2="291" style="--len:54; animation-delay:9.36s"/>
+<rect class="fp-line" x="563" y="300" width="27" height="22" style="--len:98; animation-delay:9.48s"/>
+<rect class="fp-line" x="624" y="237" width="24" height="30" style="--len:108; animation-delay:9.60s"/>
+
+<!-- LAVANDERÍA: lavadora + secadora -->
+<rect class="fp-line" x="560" y="337" width="42" height="26" style="--len:136; animation-delay:9.72s"/>
+<rect class="fp-line" x="610" y="337" width="42" height="26" style="--len:136; animation-delay:9.84s"/>
+<line class="fp-line" x1="574" y1="350" x2="588" y2="350" style="--len:14; animation-delay:9.96s"/>
+<line class="fp-line" x1="624" y1="350" x2="638" y2="350" style="--len:14; animation-delay:10.08s"/>
+
+<!-- GARAJE: 2 plazas de coche -->
+<rect class="fp-line" x="370" y="385" width="128" height="100" style="--len:456; animation-delay:10.20s"/>
+<line class="fp-line" x1="370" y1="408" x2="498" y2="408" style="--len:128; animation-delay:10.32s"/>
+<line class="fp-line" x1="370" y1="462" x2="498" y2="462" style="--len:128; animation-delay:10.44s"/>
+<rect class="fp-line" x="516" y="385" width="130" height="100" style="--len:460; animation-delay:10.56s"/>
+<line class="fp-line" x1="516" y1="408" x2="646" y2="408" style="--len:130; animation-delay:10.68s"/>
+<line class="fp-line" x1="516" y1="462" x2="646" y2="462" style="--len:130; animation-delay:10.80s"/>
+
+<!-- PASILLO/HALL: escalera -->
+<line class="fp-line" x1="283" y1="48"  x2="283" y2="218" style="--len:170; animation-delay:10.92s"/>
+<line class="fp-line" x1="283" y1="62"  x2="349" y2="62"  style="--len:66; animation-delay:11.04s"/>
+<line class="fp-line" x1="283" y1="78"  x2="349" y2="78"  style="--len:66; animation-delay:11.16s"/>
+<line class="fp-line" x1="283" y1="94"  x2="349" y2="94"  style="--len:66; animation-delay:11.28s"/>
+<line class="fp-line" x1="283" y1="110" x2="349" y2="110" style="--len:66; animation-delay:11.40s"/>
+<line class="fp-line" x1="283" y1="126" x2="349" y2="126" style="--len:66; animation-delay:11.52s"/>
+<line class="fp-line" x1="283" y1="142" x2="349" y2="142" style="--len:66; animation-delay:11.64s"/>
+<line class="fp-line" x1="283" y1="158" x2="349" y2="158" style="--len:66; animation-delay:11.76s"/>
+<line class="fp-line" x1="283" y1="174" x2="349" y2="174" style="--len:66; animation-delay:11.88s"/>
+<line class="fp-line" x1="283" y1="190" x2="349" y2="190" style="--len:66; animation-delay:12.00s"/>
+<line class="fp-line" x1="283" y1="206" x2="349" y2="206" style="--len:66; animation-delay:12.12s"/>
+<line class="fp-line" x1="349" y1="48"  x2="349" y2="218" style="--len:170; animation-delay:12.24s"/>
+<line class="fp-line" x1="283" y1="48"  x2="349" y2="218" style="--len:182; animation-delay:12.36s"/>
+
 </svg>
 
 <!-- Floating particles -->
@@ -471,33 +620,6 @@
             <div><div class="p-stat-num">22</div><div class="p-stat-lbl">Proyectos</div></div>
             <div><div class="p-stat-num">91.98%</div><div class="p-stat-lbl">Avance</div></div>
             <div><div class="p-stat-num">2</div><div class="p-stat-lbl">Empresas</div></div>
-        </div>
-        <div class="mini-card">
-            <div class="mc-header">
-                <div class="mc-avatar">📊</div>
-                <div>
-                    <div class="mc-title">RV4 — Control Presupuestario</div>
-                    <div class="mc-sub">Categorías de proyectos</div>
-                </div>
-            </div>
-            <div class="mc-grid">
-                <div class="mc-chip" style="background:rgba(16,185,129,0.18);border:1px solid rgba(16,185,129,0.3)">
-                    <div class="mc-chip-icon">🌿</div>
-                    <div class="mc-chip-name" style="color:#34d399">Lotes</div>
-                </div>
-                <div class="mc-chip" style="background:rgba(14,165,233,0.18);border:1px solid rgba(14,165,233,0.3)">
-                    <div class="mc-chip-icon">🏠</div>
-                    <div class="mc-chip-name" style="color:#38bdf8">Casas</div>
-                </div>
-                <div class="mc-chip" style="background:rgba(249,115,22,0.18);border:1px solid rgba(249,115,22,0.3)">
-                    <div class="mc-chip-icon">🏢</div>
-                    <div class="mc-chip-name" style="color:#fb923c">Edificios</div>
-                </div>
-                <div class="mc-chip" style="background:rgba(245,158,11,0.18);border:1px solid rgba(245,158,11,0.3)">
-                    <div class="mc-chip-icon">⚙️</div>
-                    <div class="mc-chip-name" style="color:#fbbf24">Maquinaria</div>
-                </div>
-            </div>
         </div>
     </div>
 
