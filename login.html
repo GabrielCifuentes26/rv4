@@ -256,13 +256,13 @@
 
         /* ── BUTTON WITH SHIMMER ── */
         .btn-main {
-            width:100%; background:linear-gradient(135deg,var(--orange) 0%,#d45e00 100%);
+            width:100%; background:linear-gradient(135deg,#C9A84C 0%,#A8832A 100%);
             color:#fff; border:none; padding:15.5px;
             border-radius:13px; font-size:0.93rem; font-weight:800;
             cursor:pointer; font-family:inherit;
             display:flex; align-items:center; justify-content:center; gap:8px;
             position:relative; overflow:hidden;
-            box-shadow:0 5px 22px rgba(249,115,22,0.42);
+            box-shadow:0 5px 22px rgba(201,168,76,0.42);
             transition:transform .15s, box-shadow .15s, opacity .15s;
             margin-top:4px;
         }
@@ -274,7 +274,7 @@
             animation:shimmer 3.5s ease-in-out infinite;
         }
         @keyframes shimmer { 0%{left:-75%} 60%,100%{left:155%} }
-        .btn-main:hover  { transform:translateY(-2px); box-shadow:0 10px 30px rgba(249,115,22,0.52); }
+        .btn-main:hover  { transform:translateY(-2px); box-shadow:0 10px 30px rgba(201,168,76,0.55); }
         .btn-main:active { transform:translateY(0); }
         .btn-main:disabled { opacity:.6; cursor:not-allowed; transform:none; box-shadow:none; }
         .spinner { width:17px; height:17px; border:2.5px solid rgba(255,255,255,0.4); border-top-color:#fff; border-radius:50%; animation:spin .6s linear infinite; display:none; flex-shrink:0; }
@@ -370,7 +370,7 @@
                 <div class="form-view visible" id="viewLogin">
                     <div class="form-header">
                         <div class="card-logo">
-                            <img src="imagenes de proyectos/Logos/logo-rv4-blanco.png" alt="RV4" style="height:46px;width:auto;">
+                            <img src="imagenes de proyectos/Logos/logo-rv4-blanco.png" alt="RV4" style="height:1.9rem;width:auto;">
                         </div>
                         <div class="form-tag"><div class="form-tag-dot"></div>Acceso al sistema</div>
                         <div class="form-title">Bienvenido</div>
@@ -419,7 +419,7 @@
                 <div class="form-view hidden" id="viewRegister">
                     <div class="form-header">
                         <div class="card-logo">
-                            <img src="imagenes de proyectos/Logos/logo-rv4-blanco.png" alt="RV4" style="height:46px;width:auto;">
+                            <img src="imagenes de proyectos/Logos/logo-rv4-blanco.png" alt="RV4" style="height:1.9rem;width:auto;">
                         </div>
                         <div class="form-tag" style="background:rgba(249,115,22,0.08);border-color:rgba(249,115,22,0.2);color:var(--orange-dk)">
                             <div class="form-tag-dot" style="background:var(--orange)"></div>Nueva cuenta
