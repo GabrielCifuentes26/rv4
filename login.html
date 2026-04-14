@@ -107,13 +107,8 @@
         /* ── RIGHT PANEL ── */
         .right-panel {
             width:560px; flex-shrink:0;
-            display:flex; flex-direction:column; align-items:center; justify-content:center;
+            display:flex; align-items:center; justify-content:center;
             padding:40px 48px 40px 32px; position:relative;
-            gap: 18px;
-        }
-        .floating-logo {
-            position: relative; z-index: 2;
-            align-self: flex-start; margin-left: 8px;
         }
 
         /* ── GLASS CARD ── */
@@ -367,15 +362,6 @@
     <!-- ── RIGHT PANEL ── -->
     <div class="right-panel">
 
-        <!-- Logo flotante sobre el fondo difuminado -->
-        <div class="floating-logo">
-            <svg viewBox="0 0 220 58" fill="none" xmlns="http://www.w3.org/2000/svg" style="height:52px;width:auto;">
-                <polygon points="0,54 0,13 9,20 9,54" fill="#D4A832"/>
-                <polygon points="14,54 14,2 25,9 25,54" fill="rgba(255,255,255,0.85)"/>
-                <text x="36" y="50" font-family="Inter,'Arial Black',Arial,sans-serif" font-weight="900" font-size="46" letter-spacing="-1.5" fill="rgba(255,255,255,0.95)">RV4</text>
-            </svg>
-        </div>
-
         <!-- Glass form card -->
         <div class="form-glass" id="formGlass">
             <div class="form-wrap">
@@ -383,7 +369,9 @@
                 <!-- ── LOGIN ── -->
                 <div class="form-view visible" id="viewLogin">
                     <div class="form-header">
-
+                        <div class="card-logo">
+                            <img src="imagenes de proyectos/Logos/logo-rv4-blanco.png" alt="RV4" style="height:46px;width:auto;">
+                        </div>
                         <div class="form-tag"><div class="form-tag-dot"></div>Acceso al sistema</div>
                         <div class="form-title">Bienvenido</div>
                         <div class="form-subtitle">Ingresa tus credenciales para continuar</div>
@@ -430,7 +418,9 @@
                 <!-- ── REGISTRO ── -->
                 <div class="form-view hidden" id="viewRegister">
                     <div class="form-header">
-
+                        <div class="card-logo">
+                            <img src="imagenes de proyectos/Logos/logo-rv4-blanco.png" alt="RV4" style="height:46px;width:auto;">
+                        </div>
                         <div class="form-tag" style="background:rgba(249,115,22,0.08);border-color:rgba(249,115,22,0.2);color:var(--orange-dk)">
                             <div class="form-tag-dot" style="background:var(--orange)"></div>Nueva cuenta
                         </div>
