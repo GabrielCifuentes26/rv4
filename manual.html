@@ -353,7 +353,7 @@
         </div>
         <div class="cover-meta-item">
             <div class="cover-meta-label">Versión</div>
-            <div class="cover-meta-value">1.1</div>
+            <div class="cover-meta-value">1.2</div>
         </div>
         <div class="cover-meta-item">
             <div class="cover-meta-label">Fecha</div>
@@ -370,7 +370,7 @@
         <div class="toc-title">Índice de contenido</div>
         <ul class="toc-list">
             <li><div class="toc-num">1</div><span class="toc-text">¿Qué es el sistema?</span><span class="toc-dots"></span><span class="toc-page">Sección 1</span></li>
-            <li><div class="toc-num">2</div><span class="toc-text">Estructura del proyecto (los 4 pisos)</span><span class="toc-dots"></span><span class="toc-page">Sección 2</span></li>
+            <li><div class="toc-num">2</div><span class="toc-text">Estructura del proyecto (los 6 módulos)</span><span class="toc-dots"></span><span class="toc-page">Sección 2</span></li>
             <li><div class="toc-num">3</div><span class="toc-text">¿Dónde vive el sistema? (GitHub + GitHub Pages)</span><span class="toc-dots"></span><span class="toc-page">Sección 3</span></li>
             <li><div class="toc-num">4</div><span class="toc-text">Cómo funciona el inicio de sesión</span><span class="toc-dots"></span><span class="toc-page">Sección 4</span></li>
             <li><div class="toc-num">5</div><span class="toc-text">Qué es Supabase y para qué sirve</span><span class="toc-dots"></span><span class="toc-page">Sección 5</span></li>
@@ -379,6 +379,7 @@
             <li><div class="toc-num">8</div><span class="toc-text">Credenciales y accesos importantes</span><span class="toc-dots"></span><span class="toc-page">Sección 8</span></li>
             <li><div class="toc-num">9</div><span class="toc-text">Resumen de todas las piezas</span><span class="toc-dots"></span><span class="toc-page">Sección 9</span></li>
             <li><div class="toc-num">10</div><span class="toc-text">Diseño visual del login — plano, animaciones y responsive</span><span class="toc-dots"></span><span class="toc-page">Sección 10</span></li>
+            <li><div class="toc-num">11</div><span class="toc-text">Módulo Cronograma — Cierre Contable y Creación de Tableros</span><span class="toc-dots"></span><span class="toc-page">Sección 11</span></li>
         </ul>
     </div>
 
@@ -429,42 +430,54 @@
             <div class="section-num">2</div>
             <div>
                 <div class="section-title">Estructura del proyecto</div>
-                <div class="section-subtitle">Los 4 pisos del sistema</div>
+                <div class="section-subtitle">Los 6 módulos del sistema</div>
             </div>
         </div>
 
-        <p>Piensa en el sistema como un <strong>edificio de 4 pisos</strong>. Cada piso es un archivo HTML diferente con una función específica:</p>
+        <p>El sistema está compuesto por <strong>6 archivos HTML</strong>, cada uno con una función específica. Los primeros 4 forman el núcleo y los 2 nuevos pertenecen al módulo <strong>Cronograma</strong>:</p>
 
         <div class="building">
             <div class="floor" style="background:#faf5ff">
-                <div class="floor-num">4° Piso</div>
+                <div class="floor-num">6° Módulo</div>
                 <div class="floor-file">admin.html</div>
-                <div class="floor-desc">Panel de administrador — gestión de usuarios</div>
+                <div class="floor-desc">Panel de administrador — gestión completa de usuarios (CRUD)</div>
                 <div class="floor-badge badge-purple">Solo Admin</div>
             </div>
+            <div class="floor" style="background:#fef9c3">
+                <div class="floor-num">5° Módulo</div>
+                <div class="floor-file">creacion-tableros.html</div>
+                <div class="floor-desc">Cronograma → Dashboards y visualización por proyecto</div>
+                <div class="floor-badge badge-yellow">En desarrollo</div>
+            </div>
+            <div class="floor" style="background:#fef9c3">
+                <div class="floor-num">4° Módulo</div>
+                <div class="floor-file">cierre-contable.html</div>
+                <div class="floor-desc">Cronograma → Revisión y consolidación mensual de cuentas</div>
+                <div class="floor-badge badge-yellow">En desarrollo</div>
+            </div>
             <div class="floor" style="background:#eff6ff">
-                <div class="floor-num">3° Piso</div>
+                <div class="floor-num">3° Módulo</div>
                 <div class="floor-file">dashboard.html</div>
                 <div class="floor-desc">Tablero de control — KPIs, gráficas y tabla de avance</div>
                 <div class="floor-badge badge-blue">Login requerido</div>
             </div>
             <div class="floor" style="background:#f0fdf4">
-                <div class="floor-num">2° Piso</div>
+                <div class="floor-num">2° Módulo</div>
                 <div class="floor-file">login.html</div>
-                <div class="floor-desc">Puerta de entrada — formulario de correo y contraseña</div>
+                <div class="floor-desc">Puerta de entrada — formulario de inicio de sesión y registro</div>
                 <div class="floor-badge badge-green">Acceso libre</div>
             </div>
             <div class="floor" style="background:#f8fafc">
-                <div class="floor-num">1° Piso</div>
+                <div class="floor-num">1° Módulo</div>
                 <div class="floor-file">index.html</div>
-                <div class="floor-desc">Vitrina pública — página de presentación del sistema</div>
+                <div class="floor-desc">Vitrina pública — catálogo de proyectos con mapa interactivo</div>
                 <div class="floor-badge badge-green">Acceso libre</div>
             </div>
         </div>
 
         <div class="info-box amber">
             <div class="info-icon">🔒</div>
-            <div class="info-text">Los pisos 3 y 4 tienen <strong>portero automático</strong>: si intentas entrar sin sesión activa, el sistema te regresa automáticamente al login.</div>
+            <div class="info-text">Los módulos 3, 4, 5 y 6 tienen <strong>portero automático</strong>: si intentas entrar sin sesión activa, el sistema te regresa automáticamente al login. El módulo 6 además verifica que el rol sea <strong>admin</strong>.</div>
         </div>
 
         <p>Cada archivo HTML contiene en un solo documento el diseño visual (CSS) y la lógica de funcionamiento (JavaScript). No se necesitan carpetas complejas ni servidores especiales.</p>
@@ -919,17 +932,27 @@ tablero   login.html</pre>
                 </tr>
                 <tr>
                     <td>login.html</td>
-                    <td>Formulario de inicio de sesión</td>
+                    <td>Formulario de inicio de sesión y registro de nuevos usuarios</td>
                     <td>GitHub Pages</td>
                 </tr>
                 <tr>
                     <td>dashboard.html</td>
-                    <td>Tablero con KPIs, tabla y gráficas de avance</td>
+                    <td>Tablero con KPIs, tabla y gráficas de avance por proyecto</td>
+                    <td>GitHub Pages</td>
+                </tr>
+                <tr>
+                    <td>cierre-contable.html</td>
+                    <td>Módulo Cronograma — revisión y consolidación mensual de cuentas</td>
+                    <td>GitHub Pages</td>
+                </tr>
+                <tr>
+                    <td>creacion-tableros.html</td>
+                    <td>Módulo Cronograma — dashboards y visualización por proyecto</td>
                     <td>GitHub Pages</td>
                 </tr>
                 <tr>
                     <td>admin.html</td>
-                    <td>Panel para gestionar usuarios (CRUD completo)</td>
+                    <td>Panel para gestionar usuarios (CRUD completo) — solo admin</td>
                     <td>GitHub Pages</td>
                 </tr>
                 <tr>
@@ -1189,10 +1212,169 @@ tablero   login.html</pre>
         </div>
     </div>
 
+    <div class="divider"></div>
+
+    <!-- ── SECCIÓN 11 ── -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-num">11</div>
+            <div>
+                <div class="section-title">Módulo Cronograma</div>
+                <div class="section-subtitle">Cierre Contable y Creación de Tableros — nuevas herramientas del sistema</div>
+            </div>
+        </div>
+
+        <p>El módulo <strong>Cronograma</strong> agrupa las herramientas de seguimiento financiero y visualización que complementan el dashboard principal. Se accede desde la barra de navegación superior mediante un menú desplegable.</p>
+
+        <div class="diagram">
+            <pre>
+  Barra de navegación principal
+  ─────────────────────────────────────────────────────
+  Logo              Presupuesto    Cronograma ▾    [Admin] [Salir]
+                         │               │
+                         │        ┌──────┴───────────┐
+                         ▼        ▼                   ▼
+                    index.html   📋 Cierre         📊 Creación
+                    #proyectos      Contable           de Tableros
+                                    │                   │
+                               cierre-              creacion-
+                               contable.html        tableros.html</pre>
+        </div>
+
+        <p><strong>Características comunes de ambas páginas:</strong></p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Característica</th>
+                    <th>Detalle</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Autenticación</td>
+                    <td>Verifican sesión activa con Supabase al cargar. Sin sesión → redirigen al login.</td>
+                </tr>
+                <tr>
+                    <td>Botón Admin condicional</td>
+                    <td>Solo aparece si el usuario tiene <code style="background:#f1f5f9;padding:2px 6px;border-radius:4px">rol = "admin"</code> en la tabla usuarios.</td>
+                </tr>
+                <tr>
+                    <td>Navegación</td>
+                    <td>Menú Cronograma desplegable con las dos sub-páginas. La página activa se marca visualmente.</td>
+                </tr>
+                <tr>
+                    <td>Responsive</td>
+                    <td>Breakpoint a ≤ 768px: nav padding reducido, ícono de encabezado oculto, título más pequeño.</td>
+                </tr>
+                <tr>
+                    <td>Paleta visual</td>
+                    <td>Crema cálido <code style="background:#f1f5f9;padding:2px 6px;border-radius:4px">#FEFAF4</code>, dorado <code style="background:#f1f5f9;padding:2px 6px;border-radius:4px">#C9A84C</code>, azul marino <code style="background:#f1f5f9;padding:2px 6px;border-radius:4px">#152540</code> — consistente con el resto del sistema.</td>
+                </tr>
+                <tr>
+                    <td>Franja dorada superior</td>
+                    <td>Degradado marino → dorado → marino de 3px en el borde superior del nav.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="divider" style="margin:28px 0"></div>
+
+        <p><strong>📋 cierre-contable.html — Cierre Contable</strong></p>
+        <p>Herramienta para la revisión y consolidación mensual de cuentas del proyecto. Permite centralizar el estado financiero al cierre de cada período.</p>
+
+        <div class="steps">
+            <div class="step">
+                <div class="step-circle">📋</div>
+                <div class="step-body">
+                    <div class="step-title">Propósito principal</div>
+                    <div class="step-desc">Revisión y consolidación mensual de cuentas. Centraliza el estado financiero al cierre de cada período contable.</div>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-circle">🧭</div>
+                <div class="step-body">
+                    <div class="step-title">Ruta de acceso</div>
+                    <div class="step-desc">Nav principal → Cronograma ▾ → Cierre Contable. Breadcrumb: Inicio › Cronograma › Cierre Contable.</div>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-circle">🔧</div>
+                <div class="step-body">
+                    <div class="step-title">Estado actual</div>
+                    <div class="step-desc">Estructura y navegación implementadas. El contenido funcional (<code style="background:#f1f5f9;padding:2px 6px;border-radius:4px">.page-content</code>) está en desarrollo — pendiente de definir los módulos de cuentas.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="divider" style="margin:28px 0"></div>
+
+        <p><strong>📊 creacion-tableros.html — Creación de Tableros</strong></p>
+        <p>Herramienta para crear y gestionar dashboards y visualizaciones de datos organizadas por proyecto.</p>
+
+        <div class="steps">
+            <div class="step">
+                <div class="step-circle">📊</div>
+                <div class="step-body">
+                    <div class="step-title">Propósito principal</div>
+                    <div class="step-desc">Creación y gestión de tableros de visualización (dashboards) organizados por proyecto. Complementa al dashboard.html con vistas personalizadas.</div>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-circle">🧭</div>
+                <div class="step-body">
+                    <div class="step-title">Ruta de acceso</div>
+                    <div class="step-desc">Nav principal → Cronograma ▾ → Creación de Tableros. Breadcrumb: Inicio › Cronograma › Creación de Tableros.</div>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-circle">🔧</div>
+                <div class="step-body">
+                    <div class="step-title">Estado actual</div>
+                    <div class="step-desc">Estructura y navegación implementadas. El contenido funcional (<code style="background:#f1f5f9;padding:2px 6px;border-radius:4px">.page-content</code>) está en desarrollo — pendiente de definir los tipos de tableros a crear.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-box amber">
+            <div class="info-icon">🚧</div>
+            <div class="info-text"><strong>En desarrollo:</strong> Ambas páginas tienen la navegación, autenticación y diseño visual listos. El contenido funcional de cada módulo (formularios, tablas, gráficas) se implementará en la siguiente fase del proyecto.</div>
+        </div>
+
+        <p><strong>Acceso por rol:</strong></p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Página</th>
+                    <th style="text-align:center">Rol: usuario</th>
+                    <th style="text-align:center">Rol: admin</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>cierre-contable.html</td>
+                    <td style="text-align:center;color:#16a34a">✅ (con sesión)</td>
+                    <td style="text-align:center;color:#16a34a">✅</td>
+                </tr>
+                <tr>
+                    <td>creacion-tableros.html</td>
+                    <td style="text-align:center;color:#16a34a">✅ (con sesión)</td>
+                    <td style="text-align:center;color:#16a34a">✅</td>
+                </tr>
+                <tr>
+                    <td>Botón Admin visible</td>
+                    <td style="text-align:center;color:#dc2626">❌</td>
+                    <td style="text-align:center;color:#16a34a">✅</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
     <!-- FOOTER -->
     <div class="footer">
         <div class="footer-brand">Costos&<span>Presupuestos</span></div>
-        <div class="footer-note">Manual Técnico v1.1 — Abril 2026 — Generado con Claude Code</div>
+        <div class="footer-note">Manual Técnico v1.2 — Abril 2026 — Generado con Claude Code</div>
     </div>
 
 </div>
