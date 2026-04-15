@@ -108,7 +108,8 @@
             position: fixed;
             top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            width: 78%; height: auto;
+            width: min(82vw, calc(84vh * 1.385));
+            height: auto;
             z-index: 0; pointer-events: none;
             opacity: 0.17;
         }
@@ -414,10 +415,14 @@
         .success-msg { font-size:0.87rem; color:var(--gray); line-height:1.78; max-width:300px; }
         .success-sub { font-size:0.74rem; color:#94a3b8; }
 
+        @media (max-width: 1024px) {
+            .floor-plan { width: min(90vw, calc(82vh * 1.385)); }
+        }
         @media (max-width: 768px) {
             .left-panel { display:none; }
             .right-panel { width:100%; padding:28px 16px; }
             .form-glass { padding:36px 28px; }
+            .floor-plan { width: min(98vw, calc(62vh * 1.385)); opacity: 0.13; }
         }
     </style>
 </head>
