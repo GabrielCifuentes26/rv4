@@ -235,6 +235,27 @@
         .stage-badge.done { color:#16a34a; background:#dcfce7; }
         .stage-badge.late { color:#dc2626; background:#fee2e2; }
 
+        /* ── GESTIÓN PERÍODOS ── */
+        .btn-gear { width:40px; height:40px; border-radius:10px; border:1.5px solid #e2e8f0; background:#fff; color:#64748b; font-size:1rem; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; transition:all .18s; flex-shrink:0; }
+        .btn-gear:hover { border-color:#C9A84C; color:#C9A84C; background:#fffbeb; }
+        .periodo-list { display:flex; flex-direction:column; gap:8px; }
+        .periodo-item { display:flex; align-items:center; gap:10px; padding:12px 14px; border:1.5px solid #e2e8f0; border-radius:12px; background:#f8fafc; transition:border-color .15s; }
+        .periodo-item:hover { border-color:#e2e8f0; background:#f1f5f9; }
+        .periodo-item-name { flex:1; font-size:0.9rem; font-weight:700; color:#152540; }
+        .periodo-item-input { flex:1; padding:7px 11px; border:1.5px solid #C9A84C; border-radius:8px; font-size:0.88rem; font-family:inherit; color:#152540; background:#fff; outline:none; }
+        .btn-pi { width:32px; height:32px; border-radius:8px; border:1.5px solid #e2e8f0; background:#fff; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; font-size:0.82rem; transition:all .15s; flex-shrink:0; }
+        .btn-pi-edit:hover { background:#fffbeb; border-color:#C9A84C; }
+        .btn-pi-del:hover  { background:#fef2f2; border-color:#fca5a5; color:#dc2626; }
+        .btn-pi-save { background:#152540; color:#fff; border-color:#152540; font-size:0.72rem; font-weight:700; width:auto; padding:0 12px; }
+        .btn-pi-save:hover { background:#C9A84C; border-color:#C9A84C; }
+        .btn-pi-cancel { font-size:0.72rem; color:#64748b; }
+
+        .confirm-box { background:#fff3cd; border:1.5px solid #fcd34d; border-radius:12px; padding:16px; margin-bottom:16px; }
+        .confirm-box.danger { background:#fef2f2; border-color:#fca5a5; }
+        .confirm-ttl { font-size:0.85rem; font-weight:800; color:#152540; margin-bottom:4px; }
+        .confirm-msg { font-size:0.8rem; color:#64748b; line-height:1.5; }
+        .confirm-msg strong { color:#dc2626; }
+
         /* RESPONSIVE */
         @media (max-width:1100px) { .cc-kpis { grid-template-columns:repeat(2,1fr); } }
         @media (max-width:768px) {
@@ -315,6 +336,7 @@
         <select class="periodo-select" id="periodoSel" onchange="onPeriodoChange()">
           <option value="">— Seleccionar —</option>
         </select>
+        <button class="btn-gear admin-only" style="display:none" onclick="openGestionPeriodos()" title="Gestionar períodos">⚙️</button>
         <button class="btn-cc btn-cc-outline admin-only" style="display:none" onclick="openModalPeriodo()">+ Período</button>
         <button class="btn-cc btn-cc-primary admin-only" style="display:none" onclick="openModalSociedad()">+ Sociedad</button>
       </div>
@@ -500,6 +522,47 @@
       </div>
       <div class="modal-body">
         <div class="detail-grid" id="mDetalleGrid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL GESTIÓN PERÍODOS -->
+  <div class="modal-ov" id="modalGestion">
+    <div class="modal-box">
+      <div class="modal-hdr">
+        <span class="modal-ttl">Gestionar Períodos</span>
+        <button class="modal-x" onclick="closeModal('modalGestion')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="periodo-list" id="gestionList"></div>
+      </div>
+      <div class="modal-ftr">
+        <button class="btn-cancel-m" onclick="closeModal('modalGestion')">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL CONFIRMAR ELIMINAR — paso 1 -->
+  <div class="modal-ov" id="modalConfirmDel">
+    <div class="modal-box">
+      <div class="modal-hdr">
+        <span class="modal-ttl">⚠️ Eliminar Período</span>
+        <button class="modal-x" onclick="closeModal('modalConfirmDel')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="confirm-box danger">
+          <div class="confirm-ttl">¿Estás seguro de eliminar este período?</div>
+          <div class="confirm-msg">Se eliminarán también <strong>todas las sociedades y etapas</strong> asociadas. Esta acción <strong>no se puede deshacer</strong>.</div>
+        </div>
+        <div class="f-field">
+          <label class="f-label">Escribe el nombre del período para confirmar</label>
+          <input class="f-input" id="confirmDelInput" placeholder="Nombre exacto del período..." oninput="checkConfirmDel()" />
+        </div>
+        <p id="confirmDelHint" style="font-size:0.72rem;color:#94a3b8;margin-top:-8px">Nombre a confirmar: <strong id="confirmDelTarget"></strong></p>
+      </div>
+      <div class="modal-ftr">
+        <button class="btn-cancel-m" onclick="closeModal('modalConfirmDel')">Cancelar</button>
+        <button class="btn-save-m" id="btnConfirmDelFinal" style="background:#dc2626;opacity:0.4;cursor:not-allowed" disabled onclick="executarDelete()">Eliminar definitivamente</button>
       </div>
     </div>
   </div>
@@ -736,6 +799,79 @@
             ${cells}
             <td class="td-act">${act}</td>
         </tr>`;
+    }
+
+    // ── GESTIÓN PERÍODOS ─────────────────────────────────────────────
+    let _periodos = [];
+    let _delTarget = { id: null, nombre: '' };
+
+    async function openGestionPeriodos() {
+        const { data } = await client.from('cc_periodos').select('*').order('id', { ascending: false });
+        _periodos = data || [];
+        renderGestionList();
+        openModal('modalGestion');
+    }
+
+    function renderGestionList() {
+        const list = document.getElementById('gestionList');
+        if (_periodos.length === 0) {
+            list.innerHTML = `<div class="cc-empty" style="padding:24px"><div class="cc-empty-ttl">Sin períodos creados</div></div>`;
+            return;
+        }
+        list.innerHTML = _periodos.map(p => `
+        <div class="periodo-item" id="pitem-${p.id}">
+            <span class="periodo-item-name" id="pname-${p.id}">${p.nombre}</span>
+            <button class="btn-pi btn-pi-edit" title="Editar" onclick="startEditPeriodo(${p.id},'${p.nombre.replace(/'/g,"\\'")}')">✏️</button>
+            <button class="btn-pi btn-pi-del"  title="Eliminar" onclick="confirmDeletePeriodo(${p.id},'${p.nombre.replace(/'/g,"\\'")}')">🗑️</button>
+        </div>`).join('');
+    }
+
+    function startEditPeriodo(id, nombre) {
+        const item = document.getElementById(`pitem-${id}`);
+        item.innerHTML = `
+            <input class="periodo-item-input" id="pedit-${id}" value="${nombre}" placeholder="Nombre del período" />
+            <button class="btn-pi btn-pi-save" onclick="saveEditPeriodo(${id})">Guardar</button>
+            <button class="btn-pi btn-pi-cancel" onclick="renderGestionList()">✕</button>`;
+        document.getElementById(`pedit-${id}`).focus();
+    }
+
+    async function saveEditPeriodo(id) {
+        const nombre = document.getElementById(`pedit-${id}`).value.trim();
+        if (!nombre) return alert('El nombre no puede estar vacío.');
+        const { error } = await SERVICE_CLIENT.from('cc_periodos').update({ nombre }).eq('id', id);
+        if (error) { alert('Error: ' + error.message); return; }
+        const p = _periodos.find(x => x.id === id);
+        if (p) p.nombre = nombre;
+        renderGestionList();
+        await loadPeriodos();
+    }
+
+    function confirmDeletePeriodo(id, nombre) {
+        _delTarget = { id, nombre };
+        document.getElementById('confirmDelTarget').textContent = nombre;
+        document.getElementById('confirmDelInput').value = '';
+        const btn = document.getElementById('btnConfirmDelFinal');
+        btn.disabled = true; btn.style.opacity = '0.4'; btn.style.cursor = 'not-allowed';
+        closeModal('modalGestion');
+        openModal('modalConfirmDel');
+    }
+
+    function checkConfirmDel() {
+        const val = document.getElementById('confirmDelInput').value.trim();
+        const btn = document.getElementById('btnConfirmDelFinal');
+        const ok  = val === _delTarget.nombre;
+        btn.disabled = !ok;
+        btn.style.opacity  = ok ? '1'            : '0.4';
+        btn.style.cursor   = ok ? 'pointer'      : 'not-allowed';
+    }
+
+    async function executarDelete() {
+        const { error } = await SERVICE_CLIENT.from('cc_periodos').delete().eq('id', _delTarget.id);
+        if (error) { alert('Error: ' + error.message); return; }
+        closeModal('modalConfirmDel');
+        _periodos = _periodos.filter(p => p.id !== _delTarget.id);
+        if (currentPeriodoId == _delTarget.id) { currentPeriodoId = null; }
+        await loadPeriodos();
     }
 
     // ── DETALLE ───────────────────────────────────────────────────────
