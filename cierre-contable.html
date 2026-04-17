@@ -523,6 +523,10 @@
       <div class="modal-body">
         <div class="detail-grid" id="mDetalleGrid"></div>
       </div>
+      <div class="modal-ftr">
+        <button class="btn-cancel-m" onclick="closeModal('modalDetalle')">Cancelar</button>
+        <button class="btn-save-m" onclick="saveAllEtapas()">Guardar cambios</button>
+      </div>
     </div>
   </div>
 
@@ -913,8 +917,6 @@
                   </select></div>
                 <div class="f-field"><label class="f-label">Notas</label>
                   <input class="f-input" id="dNotas-${i+1}" value="${ne}" placeholder="Observaciones..." /></div>
-                <button class="btn-guardar-et" onclick="saveEtapa(${i+1})">Guardar Etapa ${i+1}</button>
-                <div class="saved-flash" id="dFlash-${i+1}">✓ Guardado</div>
               </div>
             </div>`;
         }).join('');
@@ -931,18 +933,26 @@
         b.textContent = `${STATUS_DOT[st]} ${STATUS_LABEL[st]}`;
     }
 
-    async function saveEtapa(n) {
-        const existing = _cache.cierres.find(c => c.etapa_num===n);
-        const payload  = { sociedad_id:_cache.socId, etapa_num:n, responsable:document.getElementById(`dResp-${n}`).value, fecha_limite:document.getElementById(`dFecha-${n}`).value||null, estatus:document.getElementById(`dEstatus-${n}`).value, notas:document.getElementById(`dNotas-${n}`).value };
-        const { error } = existing?.id
-            ? await SERVICE_CLIENT.from('cc_cierres').update(payload).eq('id', existing.id)
-            : await SERVICE_CLIENT.from('cc_cierres').insert(payload);
-        if (error) { alert('Error: ' + error.message); return; }
-        const f = document.getElementById(`dFlash-${n}`);
-        f.style.display = 'block'; setTimeout(()=>{ f.style.display='none'; }, 2000);
+    async function saveAllEtapas() {
+        const btn = document.querySelector('#modalDetalle .btn-save-m');
+        btn.textContent = 'Guardando...'; btn.disabled = true;
+
+        for (let n = 1; n <= 4; n++) {
+            const existing = _cache.cierres.find(c => c.etapa_num===n);
+            const payload  = { sociedad_id:_cache.socId, etapa_num:n, responsable:document.getElementById(`dResp-${n}`).value, fecha_limite:document.getElementById(`dFecha-${n}`).value||null, estatus:document.getElementById(`dEstatus-${n}`).value, notas:document.getElementById(`dNotas-${n}`).value };
+            const { error } = existing?.id
+                ? await SERVICE_CLIENT.from('cc_cierres').update(payload).eq('id', existing.id)
+                : await SERVICE_CLIENT.from('cc_cierres').insert(payload);
+            if (error) { alert('Error en etapa ' + n + ': ' + error.message); btn.textContent='Guardar cambios'; btn.disabled=false; return; }
+        }
+
+        btn.textContent = '✓ Guardado'; btn.style.background = '#16a34a';
+        setTimeout(() => { btn.textContent='Guardar cambios'; btn.style.background=''; btn.disabled=false; }, 1500);
+
         const { data } = await client.from('cc_cierres').select('*').eq('sociedad_id', _cache.socId).order('etapa_num');
         _cache.cierres = data||[];
         loadBoard();
+        setTimeout(() => closeModal('modalDetalle'), 1600);
     }
 
     // ── INIT ──────────────────────────────────────────────────────────
