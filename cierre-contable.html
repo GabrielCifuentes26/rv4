@@ -6,430 +6,212 @@
     <title>Cierre Contable — Costos&Presupuestos</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-        :root {
-            --nc:  #FEFAF4;
-            --ng:  #C9A84C;
-            --ng2: #A8832A;
-            --nn:  #152540;
-            --nb:  #F2E8D0;
-            --nbd: #DDD0B0;
-        }
-
-        body {
-            font-family: 'Inter', 'Segoe UI', sans-serif;
-            background: #ffffff;
-            color: var(--nn);
-            overflow-x: hidden;
-        }
+        :root { --nc:#FEFAF4; --ng:#C9A84C; --ng2:#A8832A; --nn:#152540; --nb:#F2E8D0; --nbd:#DDD0B0; }
+        body { font-family:'Inter','Segoe UI',sans-serif; background:#fff; color:var(--nn); overflow-x:hidden; }
 
         /* ── NAV ── */
-        nav {
-            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
-            background: rgba(254,250,244,0.97);
-            border-bottom: 1px solid var(--nbd);
-            box-shadow: 0 2px 20px rgba(21,37,64,0.08);
-            padding: 0 50px; height: 68px;
-            display: flex; align-items: center; justify-content: space-between;
-            backdrop-filter: blur(14px);
-        }
-        nav::before {
-            content: '';
-            position: absolute; top: 0; left: 0; right: 0; height: 3px;
-            background: linear-gradient(90deg, var(--nn) 0%, var(--ng) 45%, var(--nn) 100%);
-        }
-
-        .logo {
-            font-size: 1.15rem; font-weight: 900; color: var(--nn);
-            letter-spacing: 2px; text-transform: uppercase; flex-shrink: 0;
-            text-decoration: none;
-        }
-        .logo span { color: var(--ng); }
-
-        .nav-menu { display: flex; align-items: center; gap: 2px; }
-        .nav-link {
-            display: flex; align-items: center; gap: 5px;
-            color: var(--nn); font-size: 0.95rem; font-weight: 700;
-            padding: 8px 18px; border-radius: 8px;
-            text-decoration: none; background: none; border: none;
-            cursor: pointer; font-family: inherit;
-            transition: color .18s, background .18s;
-            white-space: nowrap; letter-spacing: .3px;
-        }
-        .nav-link:hover { color: var(--ng2); background: var(--nb); }
-        .nav-link .arrow { font-size: 0.68rem; transition: transform .2s; line-height: 1; }
-
-        /* dropdown wrapper */
-        .nav-item { position: relative; }
-        .nav-item.open .arrow { transform: rotate(180deg); }
-        .nav-item.open > .nav-link { color: var(--ng2); background: var(--nb); }
-
-        /* dropdown panel */
-        .drop-panel {
-            position: absolute; top: calc(100% + 10px); left: 0;
-            background: rgba(254,250,244,0.55);
-            backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
-            border: 1px solid rgba(255,255,255,0.45);
-            border-top: 2px solid var(--ng); border-radius: 0 0 14px 14px;
-            box-shadow: 0 14px 40px rgba(21,37,64,0.18), inset 0 1px 0 rgba(255,255,255,0.5);
-            min-width: 220px; padding: 6px;
-            opacity: 0; visibility: hidden; transform: translateY(-8px);
-            transition: opacity .22s ease, transform .22s ease, visibility .22s;
-        }
-        .nav-item.open .drop-panel { opacity: 1; visibility: visible; transform: translateY(0); }
-        .drop-item {
-            display: flex; align-items: center; gap: 10px;
-            padding: 10px 14px; border-radius: 8px;
-            font-size: 0.87rem; font-weight: 600; color: var(--nn);
-            text-decoration: none; border-left: 2px solid transparent;
-            transition: background .15s, color .15s, border-color .15s;
-        }
-        .drop-item:hover { background: var(--nb); color: var(--ng2); border-left-color: var(--ng); }
-        .drop-item.active { background: var(--nb); color: var(--ng2); border-left-color: var(--ng); }
-        .drop-item-icon { font-size: 1rem; }
-
-        /* nav actions */
-        .nav-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-        .btn-admin {
-            padding: 8px 18px; border-radius: 8px;
-            font-size: 0.85rem; font-weight: 700; letter-spacing: .5px;
-            color: var(--nn); background: var(--nb); border: 2px solid var(--ng);
-            text-decoration: none; cursor: pointer; font-family: inherit;
-            transition: background .18s, color .18s;
-        }
-        .btn-admin:hover { background: var(--ng); color: #fff; }
-        .btn-logout {
-            padding: 8px 20px; border-radius: 8px;
-            font-size: 0.85rem; font-weight: 700; letter-spacing: .5px;
-            color: #fff; background: var(--nn); border: 2px solid var(--nn);
-            cursor: pointer; font-family: inherit;
-            transition: background .18s, color .18s, border-color .18s;
-        }
-        .btn-logout:hover { background: var(--ng); border-color: var(--ng); }
+        nav { position:fixed; top:0; left:0; right:0; z-index:1000; background:rgba(254,250,244,0.97); border-bottom:1px solid var(--nbd); box-shadow:0 2px 20px rgba(21,37,64,0.08); padding:0 50px; height:68px; display:flex; align-items:center; justify-content:space-between; backdrop-filter:blur(14px); }
+        nav::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--nn) 0%,var(--ng) 45%,var(--nn) 100%); }
+        .logo { font-size:1.15rem; font-weight:900; color:var(--nn); letter-spacing:2px; text-transform:uppercase; flex-shrink:0; text-decoration:none; }
+        .logo span { color:var(--ng); }
+        .nav-menu { display:flex; align-items:center; gap:2px; }
+        .nav-link { display:flex; align-items:center; gap:5px; color:var(--nn); font-size:0.95rem; font-weight:700; padding:8px 18px; border-radius:8px; text-decoration:none; background:none; border:none; cursor:pointer; font-family:inherit; transition:color .18s,background .18s; white-space:nowrap; letter-spacing:.3px; }
+        .nav-link:hover { color:var(--ng2); background:var(--nb); }
+        .nav-link .arrow { font-size:0.68rem; transition:transform .2s; line-height:1; }
+        .nav-item { position:relative; }
+        .nav-item.open .arrow { transform:rotate(180deg); }
+        .nav-item.open > .nav-link { color:var(--ng2); background:var(--nb); }
+        .drop-panel { position:absolute; top:calc(100% + 10px); left:0; background:rgba(254,250,244,0.55); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); border:1px solid rgba(255,255,255,0.45); border-top:2px solid var(--ng); border-radius:0 0 14px 14px; box-shadow:0 14px 40px rgba(21,37,64,0.18),inset 0 1px 0 rgba(255,255,255,0.5); min-width:220px; padding:6px; opacity:0; visibility:hidden; transform:translateY(-8px); transition:opacity .22s ease,transform .22s ease,visibility .22s; }
+        .nav-item.open .drop-panel { opacity:1; visibility:visible; transform:translateY(0); }
+        .drop-item { display:flex; align-items:center; gap:10px; padding:10px 14px; border-radius:8px; font-size:0.87rem; font-weight:600; color:var(--nn); text-decoration:none; border-left:2px solid transparent; transition:background .15s,color .15s,border-color .15s; }
+        .drop-item:hover { background:var(--nb); color:var(--ng2); border-left-color:var(--ng); }
+        .drop-item.active { background:var(--nb); color:var(--ng2); border-left-color:var(--ng); }
+        .drop-item-icon { font-size:1rem; }
+        .nav-actions { display:flex; align-items:center; gap:10px; flex-shrink:0; }
+        .btn-admin { padding:8px 18px; border-radius:8px; font-size:0.85rem; font-weight:700; letter-spacing:.5px; color:var(--nn); background:var(--nb); border:2px solid var(--ng); text-decoration:none; cursor:pointer; font-family:inherit; transition:background .18s,color .18s; }
+        .btn-admin:hover { background:var(--ng); color:#fff; }
+        .btn-logout { padding:8px 20px; border-radius:8px; font-size:0.85rem; font-weight:700; letter-spacing:.5px; color:#fff; background:var(--nn); border:2px solid var(--nn); cursor:pointer; font-family:inherit; transition:background .18s,color .18s,border-color .18s; }
+        .btn-logout:hover { background:var(--ng); border-color:var(--ng); }
 
         /* ── PAGE HEADER ── */
-        .page-header {
-            margin-top: 68px;
-            position: relative;
-            overflow: hidden;
-            background: linear-gradient(135deg, #0d1c31 0%, var(--nn) 55%, #1e3558 100%);
-            min-height: 220px;
-            display: flex; align-items: center;
-            padding: 0 60px;
-        }
-        .page-header::before {
-            content: '';
-            position: absolute; inset: 0;
-            background: radial-gradient(ellipse at 70% 50%, rgba(201,168,76,0.10) 0%, transparent 65%);
-        }
-        .page-header::after {
-            content: '';
-            position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
-            background: linear-gradient(90deg, transparent 0%, var(--ng) 40%, var(--ng) 60%, transparent 100%);
-        }
-        .page-header-body {
-            position: relative; z-index: 1;
-            display: flex; flex-direction: column; gap: 10px;
-        }
-        .page-breadcrumb {
-            display: flex; align-items: center; gap: 7px;
-            font-size: 0.78rem; font-weight: 600; letter-spacing: .5px;
-            text-transform: uppercase;
-        }
-        .page-breadcrumb a {
-            color: rgba(201,168,76,0.75); text-decoration: none;
-            transition: color .18s;
-        }
-        .page-breadcrumb a:hover { color: var(--ng); }
-        .page-breadcrumb .sep { color: rgba(255,255,255,0.25); }
-        .page-breadcrumb .current { color: var(--ng); }
-        .page-header-title {
-            font-size: 2.6rem; font-weight: 900;
-            color: #ffffff; letter-spacing: -0.5px; line-height: 1.1;
-        }
-        .page-header-title span { color: var(--ng); }
-        .page-header-sub {
-            font-size: 0.92rem; font-weight: 500;
-            color: rgba(255,255,255,0.55); margin-top: 2px;
-        }
-        .page-header-icon {
-            position: absolute; right: 60px; top: 50%;
-            transform: translateY(-50%);
-            opacity: 0.07; pointer-events: none;
-            line-height: 1;
-        }
-        .page-header-icon svg {
-            width: 160px; height: 160px; fill: #ffffff;
-        }
+        .page-header { margin-top:68px; position:relative; overflow:hidden; background:linear-gradient(135deg,#0d1c31 0%,var(--nn) 55%,#1e3558 100%); min-height:220px; display:flex; align-items:center; padding:0 60px; }
+        .page-header::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 70% 50%,rgba(201,168,76,0.10) 0%,transparent 65%); }
+        .page-header::after { content:''; position:absolute; bottom:0; left:0; right:0; height:3px; background:linear-gradient(90deg,transparent 0%,var(--ng) 40%,var(--ng) 60%,transparent 100%); }
+        .page-header-body { position:relative; z-index:1; display:flex; flex-direction:column; gap:10px; }
+        .page-breadcrumb { display:flex; align-items:center; gap:7px; font-size:0.78rem; font-weight:600; letter-spacing:.5px; text-transform:uppercase; }
+        .page-breadcrumb a { color:rgba(201,168,76,0.75); text-decoration:none; transition:color .18s; }
+        .page-breadcrumb a:hover { color:var(--ng); }
+        .page-breadcrumb .sep { color:rgba(255,255,255,0.25); }
+        .page-breadcrumb .current { color:var(--ng); }
+        .page-header-title { font-size:2.6rem; font-weight:900; color:#ffffff; letter-spacing:-0.5px; line-height:1.1; }
+        .page-header-title span { color:var(--ng); }
+        .page-header-sub { font-size:0.92rem; font-weight:500; color:rgba(255,255,255,0.55); margin-top:2px; }
+        .page-header-icon { position:absolute; right:60px; top:50%; transform:translateY(-50%); opacity:0.07; pointer-events:none; line-height:1; }
+        .page-header-icon svg { width:160px; height:160px; fill:#ffffff; }
 
         /* ── PAGE CONTENT ── */
-        .page-content {
-            min-height: calc(100vh - 68px - 220px);
-            background: #f8fafc;
-        }
+        .page-content { min-height:calc(100vh - 68px - 220px); background:#f1f5f9; }
 
-        @media (max-width: 768px) {
-            nav { padding: 0 20px; }
-            .page-header { padding: 40px 24px; min-height: 180px; }
-            .page-header-icon { display: none; }
-            .page-header-title { font-size: 1.9rem; }
-        }
+        /* ═══════════════════════════════════════════
+           TABLERO DE CIERRES
+        ═══════════════════════════════════════════ */
+        .cc-wrap { max-width:1440px; margin:0 auto; padding:40px 48px 64px; }
 
-        /* ══════════════════════════════════════════
-           CIERRE CONTABLE — UI STYLES
-        ══════════════════════════════════════════ */
-        .cc-wrap {
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 36px 40px 60px;
-        }
+        /* HERO ROW */
+        .cc-hero { display:flex; align-items:flex-start; justify-content:space-between; gap:24px; margin-bottom:32px; flex-wrap:wrap; }
+        .cc-title { font-size:1.9rem; font-weight:900; color:#152540; margin-bottom:8px; letter-spacing:-0.3px; }
+        .cc-subtitle { font-size:0.875rem; color:#64748b; line-height:1.6; max-width:440px; }
+        .cc-hero-controls { display:flex; align-items:center; gap:10px; flex-wrap:wrap; flex-shrink:0; padding-top:4px; }
+        .periodo-label { font-size:0.82rem; font-weight:700; color:#152540; white-space:nowrap; }
+        .periodo-select { appearance:none; background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%23152540' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E") no-repeat right 12px center; border:1.5px solid #e2e8f0; border-radius:10px; padding:10px 34px 10px 14px; font-size:0.87rem; font-weight:700; color:#152540; font-family:inherit; cursor:pointer; min-width:210px; transition:border-color .15s; box-shadow:0 1px 4px rgba(0,0,0,0.06); }
+        .periodo-select:focus { outline:none; border-color:#C9A84C; }
 
-        /* ── TOOLBAR ── */
-        .cc-toolbar {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 20px;
-            margin-bottom: 32px;
-            flex-wrap: wrap;
-        }
-        .cc-kpis { display: flex; gap: 14px; flex-wrap: wrap; }
+        /* KPI CARDS */
+        .cc-kpis { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:28px; }
+        .kpi-card { background:#fff; border-radius:18px; padding:24px 26px 20px; border:1.5px solid #e2e8f0; box-shadow:0 2px 12px rgba(0,0,0,0.05); position:relative; overflow:hidden; }
+        .kpi-card::before { content:''; position:absolute; top:0; left:0; right:0; height:4px; border-radius:18px 18px 0 0; }
+        .kpi-card.kpi-gray::before  { background:#94a3b8; }
+        .kpi-card.kpi-amber::before { background:#f59e0b; }
+        .kpi-card.kpi-green::before { background:#22c55e; }
+        .kpi-card.kpi-red::before   { background:#ef4444; }
+        .kpi-top { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:14px; }
+        .kpi-label { font-size:0.65rem; font-weight:800; text-transform:uppercase; letter-spacing:0.9px; color:#94a3b8; padding-top:2px; line-height:1.3; }
+        .kpi-ico { font-size:1.4rem; opacity:0.7; }
+        .kpi-value { font-size:2.8rem; font-weight:900; line-height:1; margin-bottom:6px; }
+        .kpi-card.kpi-gray  .kpi-value { color:#64748b; }
+        .kpi-card.kpi-amber .kpi-value { color:#d97706; }
+        .kpi-card.kpi-green .kpi-value { color:#16a34a; }
+        .kpi-card.kpi-red   .kpi-value { color:#dc2626; }
+        .kpi-sub { font-size:0.72rem; color:#94a3b8; font-weight:500; line-height:1.4; min-height:1em; }
 
-        .kpi-card {
-            background: #fff;
-            border: 1.5px solid #e2e8f0;
-            border-radius: 14px;
-            padding: 18px 22px;
-            min-width: 130px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-            position: relative; overflow: hidden;
-        }
-        .kpi-card::before {
-            content: ''; position: absolute;
-            top: 0; left: 0; right: 0; height: 4px; border-radius: 14px 14px 0 0;
-        }
-        .kpi-card.kpi-green::before { background: #22c55e; }
-        .kpi-card.kpi-amber::before { background: #f59e0b; }
-        .kpi-card.kpi-gray::before  { background: #94a3b8; }
-        .kpi-card.kpi-red::before   { background: #ef4444; }
-        .kpi-label { font-size: 0.66rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #94a3b8; margin-bottom: 6px; }
-        .kpi-value { font-size: 2rem; font-weight: 900; line-height: 1; }
-        .kpi-card.kpi-green .kpi-value { color: #16a34a; }
-        .kpi-card.kpi-amber .kpi-value { color: #d97706; }
-        .kpi-card.kpi-gray  .kpi-value { color: #64748b; }
-        .kpi-card.kpi-red   .kpi-value { color: #dc2626; }
+        /* BOARD WRAPPER */
+        .board-wrap { background:#fff; border-radius:20px; border:1.5px solid #e2e8f0; box-shadow:0 4px 28px rgba(0,0,0,0.07); overflow:hidden; }
+        .board-toolbar { display:flex; align-items:center; justify-content:space-between; padding:16px 24px; border-bottom:1.5px solid #f1f5f9; }
+        .board-count { font-size:0.78rem; font-weight:600; color:#94a3b8; }
+        .board-scroll { overflow-x:auto; }
 
-        /* ── ACTIONS ── */
-        .cc-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-        .periodo-select {
-            appearance: none;
-            background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%23152540' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E") no-repeat right 12px center;
-            border: 1.5px solid #e2e8f0; border-radius: 10px;
-            padding: 10px 34px 10px 14px;
-            font-size: 0.87rem; font-weight: 600; color: #152540; font-family: inherit;
-            cursor: pointer; min-width: 190px; transition: border-color .15s;
-        }
-        .periodo-select:focus { outline: none; border-color: #C9A84C; }
+        /* TABLE */
+        .board-table { width:100%; border-collapse:collapse; min-width:980px; }
 
-        .btn-cc {
-            display: inline-flex; align-items: center; gap: 6px;
-            padding: 10px 18px; border-radius: 10px; font-size: 0.85rem;
-            font-weight: 700; font-family: inherit; cursor: pointer; border: none;
-            transition: all .18s; white-space: nowrap;
-        }
-        .btn-cc-primary { background: #152540; color: #fff; }
-        .btn-cc-primary:hover { background: #C9A84C; }
-        .btn-cc-outline { background: #fff; color: #152540; border: 1.5px solid #e2e8f0; }
-        .btn-cc-outline:hover { border-color: #C9A84C; color: #C9A84C; }
+        /* THEAD */
+        .board-thead th { background:#f8fafc; padding:14px 16px; font-size:0.65rem; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:#94a3b8; border-bottom:2px solid #e8edf2; text-align:left; white-space:nowrap; }
+        .th-soc { width:180px; border-right:1.5px solid #e8edf2 !important; }
+        .th-act { width:80px; text-align:center !important; }
 
-        /* ── SECTION HEADER ── */
-        .cc-section-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-        .cc-section-title { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; }
+        /* ROWS */
+        .board-row { border-bottom:1px solid #f1f5f9; transition:background .12s; }
+        .board-row:hover { background:#fafbff; }
+        .board-row:last-child { border-bottom:none; }
 
-        /* ── BOARD ── */
-        .cc-board { display: flex; flex-direction: column; gap: 12px; }
+        /* SOC CELL */
+        .td-soc { padding:0; border-right:1.5px solid #f1f5f9; vertical-align:middle; }
+        .soc-inner { display:flex; align-items:center; gap:11px; padding:20px 18px; }
+        .soc-dot { width:11px; height:11px; border-radius:50%; flex-shrink:0; box-shadow:0 0 0 3px rgba(0,0,0,0.07); transition:transform .2s; }
+        .board-row:hover .soc-dot { transform:scale(1.2); }
+        .soc-name { font-size:0.9rem; font-weight:800; color:#152540; letter-spacing:0.4px; }
 
-        /* ── SOCIETY CARD ── */
-        .society-card {
-            background: #fff; border: 1.5px solid #e2e8f0;
-            border-radius: 16px; overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-            transition: border-color .2s, box-shadow .2s;
-        }
-        .society-card:hover { border-color: #C9A84C; box-shadow: 0 4px 20px rgba(201,168,76,0.1); }
+        /* STAGE CELL */
+        .td-et { padding:10px 10px; vertical-align:top; border-right:1px solid #f8fafc; }
 
-        .soc-header {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 16px 22px; cursor: pointer; user-select: none;
-        }
-        .soc-left { display: flex; align-items: center; gap: 10px; }
-        .soc-dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }
-        .soc-name { font-size: 1rem; font-weight: 800; color: #152540; letter-spacing: 0.5px; }
+        /* MINI CARD */
+        .stage-mini { border:1.5px solid; border-radius:12px; padding:13px 15px; display:flex; flex-direction:column; gap:5px; min-height:114px; transition:box-shadow .15s,transform .15s; }
+        .stage-mini:hover { box-shadow:0 4px 14px rgba(0,0,0,0.09); transform:translateY(-1px); }
+        .stage-mini.pend { background:#f8fafc; border-color:#e2e8f0; }
+        .stage-mini.proc { background:#fffdf0; border-color:#fcd34d; }
+        .stage-mini.done { background:#f0fdf4; border-color:#86efac; }
+        .stage-mini.late { background:#fef2f2; border-color:#fca5a5; }
 
-        .soc-right { display: flex; align-items: center; gap: 10px; }
-        .stage-pills { display: flex; gap: 6px; }
-        .s-pill {
-            display: inline-flex; align-items: center; gap: 4px;
-            padding: 4px 10px; border-radius: 20px; font-size: 0.69rem;
-            font-weight: 700; border: 1.5px solid; white-space: nowrap;
-        }
-        .s-pill.pend { color: #64748b; background: #f1f5f9; border-color: #cbd5e1; }
-        .s-pill.proc { color: #d97706; background: #fffbeb; border-color: #fcd34d; }
-        .s-pill.done { color: #16a34a; background: #f0fdf4; border-color: #86efac; }
-        .s-pill.late { color: #dc2626; background: #fef2f2; border-color: #fca5a5; }
+        .sm-badge { display:inline-flex; align-items:center; gap:4px; padding:4px 11px; border-radius:20px; font-size:0.67rem; font-weight:800; margin-bottom:4px; width:fit-content; }
+        .sm-badge.pend { background:#e2e8f0; color:#64748b; }
+        .sm-badge.proc { background:#fef3c7; color:#b45309; }
+        .sm-badge.done { background:#16a34a; color:#fff; }
+        .sm-badge.late { background:#dc2626; color:#fff; }
 
-        .btn-edit-soc {
-            padding: 6px 14px; border-radius: 8px; font-size: 0.76rem; font-weight: 700;
-            font-family: inherit; cursor: pointer; background: #f8fafc;
-            border: 1.5px solid #e2e8f0; color: #152540; transition: all .15s;
-        }
-        .btn-edit-soc:hover { border-color: #C9A84C; color: #b8870a; }
+        .sm-meta { font-size:0.72rem; color:#64748b; display:flex; align-items:center; gap:5px; line-height:1.35; }
 
-        .soc-arrow { font-size: 0.75rem; color: #94a3b8; transition: transform .2s; }
-        .society-card.expanded .soc-arrow { transform: rotate(180deg); }
+        .sm-days { font-size:0.68rem; font-weight:700; display:flex; align-items:center; gap:3px; margin-top:5px; padding-top:6px; border-top:1px solid rgba(0,0,0,0.07); }
+        .days-ok       { color:#16a34a; }
+        .days-late-fin { color:#94a3b8; }
+        .days-overdue  { color:#dc2626; }
+        .days-today    { color:#dc2626; }
+        .days-urgent   { color:#dc2626; }
+        .days-warn     { color:#d97706; }
+        .days-ahead    { color:#16a34a; }
 
-        /* ── CARD DETAIL (expanded) ── */
-        .soc-detail { display: none; padding: 0 22px 22px; border-top: 1px solid #f1f5f9; }
-        .society-card.expanded .soc-detail { display: block; }
+        /* ACT CELL */
+        .td-act { padding:10px; vertical-align:middle; text-align:center; }
+        .btn-row-edit { width:38px; height:38px; border-radius:10px; border:1.5px solid #e2e8f0; background:#f8fafc; color:#152540; font-size:0.88rem; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; transition:all .15s; }
+        .btn-row-edit:hover { background:#152540; color:#C9A84C; border-color:#152540; transform:scale(1.08); }
 
-        .stages-grid {
-            display: grid; grid-template-columns: repeat(4, 1fr);
-            gap: 12px; margin-top: 16px;
-        }
-        .stage-card {
-            border: 1.5px solid; border-radius: 12px; padding: 14px;
-        }
-        .stage-card.pend { background: #f8fafc; border-color: #e2e8f0; }
-        .stage-card.proc { background: #fffbeb; border-color: #fcd34d; }
-        .stage-card.done { background: #f0fdf4; border-color: #86efac; }
-        .stage-card.late { background: #fef2f2; border-color: #fca5a5; }
+        /* EMPTY */
+        .cc-empty { text-align:center; padding:72px 20px; }
+        .cc-empty-ico { font-size:3.2rem; margin-bottom:14px; }
+        .cc-empty-ttl { font-size:1.08rem; font-weight:800; color:#152540; margin-bottom:7px; }
+        .cc-empty-sub { font-size:0.84rem; color:#94a3b8; }
 
-        .stage-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-        .stage-num-lbl { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: #94a3b8; }
-        .stage-badge {
-            display: inline-flex; align-items: center; gap: 3px;
-            padding: 3px 8px; border-radius: 10px; font-size: 0.65rem; font-weight: 700;
-        }
-        .stage-badge.pend { color: #64748b; background: #e2e8f0; }
-        .stage-badge.proc { color: #d97706; background: #fef3c7; }
-        .stage-badge.done { color: #16a34a; background: #dcfce7; }
-        .stage-badge.late { color: #dc2626; background: #fee2e2; }
+        /* BTN CC */
+        .btn-cc { display:inline-flex; align-items:center; gap:6px; padding:10px 18px; border-radius:10px; font-size:0.84rem; font-weight:700; font-family:inherit; cursor:pointer; border:none; transition:all .18s; white-space:nowrap; }
+        .btn-cc-primary { background:#152540; color:#fff; }
+        .btn-cc-primary:hover { background:#C9A84C; }
+        .btn-cc-outline { background:#fff; color:#152540; border:1.5px solid #e2e8f0; }
+        .btn-cc-outline:hover { border-color:#C9A84C; color:#C9A84C; }
 
-        .stage-card-name { font-size: 0.8rem; font-weight: 700; color: #152540; margin-bottom: 8px; }
-        .stage-meta { display: flex; flex-direction: column; gap: 3px; font-size: 0.73rem; color: #64748b; }
-        .stage-meta span { display: flex; align-items: center; gap: 4px; }
-        .meta-red { color: #dc2626 !important; font-weight: 600; }
+        /* ── MODALS ── */
+        .modal-ov { display:none; position:fixed; inset:0; background:rgba(15,23,42,0.5); backdrop-filter:blur(4px); z-index:3000; align-items:center; justify-content:center; padding:20px; }
+        .modal-ov.open { display:flex; }
+        .modal-box { background:#fff; border-radius:20px; padding:32px; width:100%; max-width:540px; max-height:90vh; overflow-y:auto; box-shadow:0 24px 60px rgba(0,0,0,0.18); }
+        .modal-box.modal-wide { max-width:880px; }
+        .modal-hdr { display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; }
+        .modal-ttl { font-size:1.15rem; font-weight:800; color:#152540; }
+        .modal-x { width:32px; height:32px; border-radius:8px; border:none; background:#f1f5f9; color:#64748b; font-size:1rem; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+        .modal-x:hover { background:#fee2e2; color:#dc2626; }
+        .modal-body { display:flex; flex-direction:column; gap:16px; }
+        .f-field { display:flex; flex-direction:column; gap:5px; }
+        .f-label { font-size:0.72rem; font-weight:700; color:#152540; text-transform:uppercase; letter-spacing:0.5px; }
+        .f-input,.f-select { padding:11px 14px; border:1.5px solid #e2e8f0; border-radius:10px; font-size:0.88rem; font-family:inherit; color:#152540; background:#fafafa; transition:border-color .15s; width:100%; }
+        .f-input:focus,.f-select:focus { outline:none; border-color:#C9A84C; background:#fff; }
+        .etapa-block { border:1.5px solid #e2e8f0; border-radius:12px; padding:16px; background:#f8fafc; }
+        .etapa-block-ttl { font-size:0.79rem; font-weight:800; color:#152540; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+        .etapa-block-ttl span { background:#152540; color:#C9A84C; width:22px; height:22px; border-radius:6px; display:inline-flex; align-items:center; justify-content:center; font-size:0.7rem; flex-shrink:0; }
+        .etapa-fields { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+        .modal-ftr { display:flex; gap:10px; justify-content:flex-end; margin-top:24px; padding-top:20px; border-top:1px solid #f1f5f9; }
+        .btn-cancel-m { padding:11px 22px; border-radius:10px; font-size:0.86rem; font-weight:700; font-family:inherit; background:#f1f5f9; color:#64748b; border:none; cursor:pointer; }
+        .btn-save-m { padding:11px 28px; border-radius:10px; font-size:0.86rem; font-weight:700; font-family:inherit; background:#152540; color:#fff; border:none; cursor:pointer; transition:background .15s; }
+        .btn-save-m:hover { background:#C9A84C; }
+        .detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+        .detail-stage-blk { border:1.5px solid #e2e8f0; border-radius:12px; padding:18px; background:#fafafa; }
+        .detail-stage-blk.proc { border-color:#fcd34d; background:#fffdf5; }
+        .detail-stage-blk.done { border-color:#86efac; background:#f0fdf4; }
+        .detail-stage-blk.late { border-color:#fca5a5; background:#fef2f2; }
+        .detail-stage-ttl { font-size:0.83rem; font-weight:800; color:#152540; display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+        .detail-fields { display:flex; flex-direction:column; gap:10px; }
+        .btn-guardar-et { width:100%; padding:10px; border-radius:10px; font-size:0.84rem; font-weight:700; font-family:inherit; background:#152540; color:#fff; border:none; cursor:pointer; margin-top:4px; transition:background .15s; }
+        .btn-guardar-et:hover { background:#C9A84C; }
+        .saved-flash { color:#16a34a; font-size:0.78rem; font-weight:700; text-align:center; margin-top:4px; display:none; }
+        .stage-badge { display:inline-flex; align-items:center; gap:3px; padding:3px 8px; border-radius:10px; font-size:0.65rem; font-weight:700; }
+        .stage-badge.pend { color:#64748b; background:#e2e8f0; }
+        .stage-badge.proc { color:#d97706; background:#fef3c7; }
+        .stage-badge.done { color:#16a34a; background:#dcfce7; }
+        .stage-badge.late { color:#dc2626; background:#fee2e2; }
 
-        /* ── EMPTY STATES ── */
-        .cc-empty {
-            text-align: center; padding: 60px 20px;
+        /* RESPONSIVE */
+        @media (max-width:1100px) { .cc-kpis { grid-template-columns:repeat(2,1fr); } }
+        @media (max-width:768px) {
+            nav { padding:0 20px; }
+            .page-header { padding:40px 24px; min-height:180px; }
+            .page-header-icon { display:none; }
+            .page-header-title { font-size:1.9rem; }
+            .cc-wrap { padding:24px 18px 48px; }
+            .cc-kpis { grid-template-columns:repeat(2,1fr); gap:12px; }
+            .cc-hero { flex-direction:column; }
+            .detail-grid { grid-template-columns:1fr; }
         }
-        .cc-empty-ico { font-size: 2.8rem; margin-bottom: 12px; }
-        .cc-empty-ttl { font-size: 1.05rem; font-weight: 700; color: #152540; margin-bottom: 6px; }
-        .cc-empty-sub { font-size: 0.83rem; color: #94a3b8; }
-
-        /* ══════════════════════════════════════════
-           MODALS
-        ══════════════════════════════════════════ */
-        .modal-ov {
-            display: none; position: fixed; inset: 0;
-            background: rgba(15,23,42,0.5); backdrop-filter: blur(4px);
-            z-index: 3000; align-items: center; justify-content: center; padding: 20px;
-        }
-        .modal-ov.open { display: flex; }
-
-        .modal-box {
-            background: #fff; border-radius: 20px; padding: 32px;
-            width: 100%; max-width: 540px; max-height: 90vh; overflow-y: auto;
-            box-shadow: 0 24px 60px rgba(0,0,0,0.18);
-        }
-        .modal-box.modal-wide { max-width: 860px; }
-
-        .modal-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
-        .modal-ttl { font-size: 1.15rem; font-weight: 800; color: #152540; }
-        .modal-x {
-            width: 32px; height: 32px; border-radius: 8px; border: none;
-            background: #f1f5f9; color: #64748b; font-size: 1rem;
-            cursor: pointer; display: flex; align-items: center; justify-content: center;
-        }
-        .modal-x:hover { background: #fee2e2; color: #dc2626; }
-
-        .modal-body { display: flex; flex-direction: column; gap: 16px; }
-
-        .f-field { display: flex; flex-direction: column; gap: 5px; }
-        .f-label { font-size: 0.72rem; font-weight: 700; color: #152540; text-transform: uppercase; letter-spacing: 0.5px; }
-        .f-input, .f-select {
-            padding: 11px 14px; border: 1.5px solid #e2e8f0; border-radius: 10px;
-            font-size: 0.88rem; font-family: inherit; color: #152540;
-            background: #fafafa; transition: border-color .15s; width: 100%;
-        }
-        .f-input:focus, .f-select:focus { outline: none; border-color: #C9A84C; background: #fff; }
-
-        .etapa-block {
-            border: 1.5px solid #e2e8f0; border-radius: 12px;
-            padding: 16px; background: #f8fafc;
-        }
-        .etapa-block-ttl {
-            font-size: 0.79rem; font-weight: 800; color: #152540;
-            margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
-        }
-        .etapa-block-ttl span {
-            background: #152540; color: #C9A84C; width: 22px; height: 22px;
-            border-radius: 6px; display: inline-flex; align-items: center;
-            justify-content: center; font-size: 0.7rem; flex-shrink: 0;
-        }
-        .etapa-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-
-        .modal-ftr {
-            display: flex; gap: 10px; justify-content: flex-end;
-            margin-top: 24px; padding-top: 20px; border-top: 1px solid #f1f5f9;
-        }
-        .btn-cancel-m {
-            padding: 11px 22px; border-radius: 10px; font-size: 0.86rem; font-weight: 700;
-            font-family: inherit; background: #f1f5f9; color: #64748b; border: none; cursor: pointer;
-        }
-        .btn-save-m {
-            padding: 11px 28px; border-radius: 10px; font-size: 0.86rem; font-weight: 700;
-            font-family: inherit; background: #152540; color: #fff; border: none; cursor: pointer;
-            transition: background .15s;
-        }
-        .btn-save-m:hover { background: #C9A84C; }
-
-        /* Detail modal */
-        .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-        .detail-stage-blk {
-            border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 18px; background: #fafafa;
-        }
-        .detail-stage-blk.proc { border-color: #fcd34d; background: #fffdf5; }
-        .detail-stage-blk.done { border-color: #86efac; background: #f0fdf4; }
-        .detail-stage-blk.late { border-color: #fca5a5; background: #fef2f2; }
-        .detail-stage-ttl {
-            font-size: 0.83rem; font-weight: 800; color: #152540;
-            display: flex; align-items: center; justify-content: space-between;
-            margin-bottom: 14px;
-        }
-        .detail-fields { display: flex; flex-direction: column; gap: 10px; }
-        .btn-guardar-et {
-            width: 100%; padding: 10px; border-radius: 10px; font-size: 0.84rem; font-weight: 700;
-            font-family: inherit; background: #152540; color: #fff; border: none; cursor: pointer;
-            margin-top: 4px; transition: background .15s;
-        }
-        .btn-guardar-et:hover { background: #C9A84C; }
-        .saved-flash { color: #16a34a; font-size: 0.78rem; font-weight: 700; text-align: center; margin-top: 4px; display: none; }
-
-        @media (max-width: 960px) {
-            .stages-grid { grid-template-columns: 1fr 1fr; }
-            .detail-grid  { grid-template-columns: 1fr; }
-            .stage-pills  { display: none; }
-        }
-        @media (max-width: 600px) {
-            .cc-wrap { padding: 20px 16px 40px; }
-            .cc-kpis { gap: 8px; }
-            .kpi-card { min-width: 110px; padding: 14px 14px; }
-            .stages-grid { grid-template-columns: 1fr; }
+        @media (max-width:480px) {
+            .cc-kpis { gap:10px; }
+            .kpi-value { font-size:2.2rem; }
         }
     </style>
 </head>
@@ -438,10 +220,8 @@
 <!-- NAV -->
 <nav id="mainNav">
     <a href="index.html" class="logo">Costos&<span>Presupuestos</span></a>
-
     <div class="nav-menu">
         <a href="index.html#proyectos" class="nav-link">Presupuesto</a>
-
         <div class="nav-item" id="dropCronograma">
             <button class="nav-link" onclick="toggleDrop('dropCronograma')">
                 Cronograma <span class="arrow">▾</span>
@@ -456,7 +236,6 @@
             </div>
         </div>
     </div>
-
     <div class="nav-actions">
         <a href="admin.html" class="btn-admin" id="btnAdmin" style="display:none">Admin</a>
         <button onclick="doLogout()" class="btn-logout">Cerrar sesión</button>
@@ -487,50 +266,91 @@
 <div class="page-content">
   <div class="cc-wrap">
 
-    <!-- TOOLBAR -->
-    <div class="cc-toolbar">
-      <div class="cc-kpis">
-        <div class="kpi-card kpi-gray">
-          <div class="kpi-label">Pendientes</div>
-          <div class="kpi-value" id="kpiPend">—</div>
-        </div>
-        <div class="kpi-card kpi-amber">
-          <div class="kpi-label">En Proceso</div>
-          <div class="kpi-value" id="kpiProc">—</div>
-        </div>
-        <div class="kpi-card kpi-green">
-          <div class="kpi-label">Finalizados</div>
-          <div class="kpi-value" id="kpiDone">—</div>
-        </div>
-        <div class="kpi-card kpi-red">
-          <div class="kpi-label">Fuera de Tiempo</div>
-          <div class="kpi-value" id="kpiLate">—</div>
-        </div>
+    <!-- HERO -->
+    <div class="cc-hero">
+      <div class="cc-hero-text">
+        <h2 class="cc-title">Tablero de Cierres</h2>
+        <p class="cc-subtitle">Supervisa y actualiza el estado de los cierres contables a través de todas las etapas para cada sociedad.</p>
       </div>
-      <div class="cc-actions">
+      <div class="cc-hero-controls">
+        <span class="periodo-label">Período:</span>
         <select class="periodo-select" id="periodoSel" onchange="onPeriodoChange()">
-          <option value="">— Seleccionar período —</option>
+          <option value="">— Seleccionar —</option>
         </select>
         <button class="btn-cc btn-cc-outline admin-only" style="display:none" onclick="openModalPeriodo()">+ Período</button>
         <button class="btn-cc btn-cc-primary admin-only" style="display:none" onclick="openModalSociedad()">+ Sociedad</button>
       </div>
     </div>
 
-    <!-- BOARD -->
-    <div class="cc-section-hdr">
-      <span class="cc-section-title">Sociedades</span>
+    <!-- KPI CARDS -->
+    <div class="cc-kpis">
+      <div class="kpi-card kpi-gray">
+        <div class="kpi-top">
+          <span class="kpi-label">Pendientes</span>
+          <span class="kpi-ico">🗂️</span>
+        </div>
+        <div class="kpi-value" id="kpiPend">—</div>
+        <div class="kpi-sub" id="kpiPendSub">de 0 sociedades</div>
+      </div>
+      <div class="kpi-card kpi-amber">
+        <div class="kpi-top">
+          <span class="kpi-label">En Proceso</span>
+          <span class="kpi-ico">🕐</span>
+        </div>
+        <div class="kpi-value" id="kpiProc">—</div>
+        <div class="kpi-sub">&nbsp;</div>
+      </div>
+      <div class="kpi-card kpi-green">
+        <div class="kpi-top">
+          <span class="kpi-label">Finalizados</span>
+          <span class="kpi-ico">✅</span>
+        </div>
+        <div class="kpi-value" id="kpiDone">—</div>
+        <div class="kpi-sub">&nbsp;</div>
+      </div>
+      <div class="kpi-card kpi-red">
+        <div class="kpi-top">
+          <span class="kpi-label">Vencimientos Próx.</span>
+          <span class="kpi-ico">⏰</span>
+        </div>
+        <div class="kpi-value" id="kpiLate">—</div>
+        <div class="kpi-sub">próximos 7 días</div>
+      </div>
     </div>
-    <div class="cc-board" id="ccBoard">
-      <div class="cc-empty">
-        <div class="cc-empty-ico">📋</div>
-        <div class="cc-empty-ttl">Selecciona un período</div>
-        <div class="cc-empty-sub">Elige un período para ver las sociedades y su avance de cierre.</div>
+
+    <!-- BOARD -->
+    <div class="board-wrap">
+      <div class="board-toolbar">
+        <span class="board-count" id="boardCount">0 sociedades</span>
+      </div>
+      <div class="board-scroll">
+        <table class="board-table">
+          <thead class="board-thead">
+            <tr>
+              <th class="th-soc">Sociedad</th>
+              <th>1. Entrega de EEFF</th>
+              <th>2. Integraciones / ID Jobs</th>
+              <th>3. Revisión</th>
+              <th>4. Cuadre Finalizado</th>
+              <th class="th-act">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="ccTbody">
+            <tr><td colspan="6">
+              <div class="cc-empty">
+                <div class="cc-empty-ico">📋</div>
+                <div class="cc-empty-ttl">Selecciona un período</div>
+                <div class="cc-empty-sub">Elige un período para ver las sociedades y su avance de cierre.</div>
+              </div>
+            </td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
   </div><!-- /.cc-wrap -->
 
-  <!-- ── MODAL PERÍODO ── -->
+  <!-- MODAL PERÍODO -->
   <div class="modal-ov" id="modalPeriodo">
     <div class="modal-box">
       <div class="modal-hdr">
@@ -550,7 +370,7 @@
     </div>
   </div>
 
-  <!-- ── MODAL SOCIEDAD ── -->
+  <!-- MODAL SOCIEDAD -->
   <div class="modal-ov" id="modalSociedad">
     <div class="modal-box modal-wide">
       <div class="modal-hdr">
@@ -563,65 +383,45 @@
           <input class="f-input" id="mSocNombre" placeholder="ej. BISTAL" />
         </div>
         <div class="etapa-block">
-          <div class="etapa-block-ttl"><span>1</span> Pre-Cierre</div>
+          <div class="etapa-block-ttl"><span>1</span> Entrega de EEFF</div>
           <div class="etapa-fields">
-            <div class="f-field">
-              <label class="f-label">Responsable</label>
-              <select class="f-select" id="mEt1Resp">
-                <option value="Contabilidad">Contabilidad</option>
-                <option value="Costos">Costos</option>
-              </select>
+            <div class="f-field"><label class="f-label">Responsable</label>
+              <select class="f-select" id="mEt1Resp"><option value="Contabilidad">Contabilidad</option><option value="Costos">Costos</option></select>
             </div>
-            <div class="f-field">
-              <label class="f-label">Fecha límite</label>
+            <div class="f-field"><label class="f-label">Fecha límite</label>
               <input class="f-input" type="date" id="mEt1Fecha" />
             </div>
           </div>
         </div>
         <div class="etapa-block">
-          <div class="etapa-block-ttl"><span>2</span> Cierre</div>
+          <div class="etapa-block-ttl"><span>2</span> Integraciones / ID Jobs</div>
           <div class="etapa-fields">
-            <div class="f-field">
-              <label class="f-label">Responsable</label>
-              <select class="f-select" id="mEt2Resp">
-                <option value="Contabilidad">Contabilidad</option>
-                <option value="Costos">Costos</option>
-              </select>
+            <div class="f-field"><label class="f-label">Responsable</label>
+              <select class="f-select" id="mEt2Resp"><option value="Contabilidad">Contabilidad</option><option value="Costos">Costos</option></select>
             </div>
-            <div class="f-field">
-              <label class="f-label">Fecha límite</label>
+            <div class="f-field"><label class="f-label">Fecha límite</label>
               <input class="f-input" type="date" id="mEt2Fecha" />
             </div>
           </div>
         </div>
         <div class="etapa-block">
-          <div class="etapa-block-ttl"><span>3</span> Conciliación</div>
+          <div class="etapa-block-ttl"><span>3</span> Revisión</div>
           <div class="etapa-fields">
-            <div class="f-field">
-              <label class="f-label">Responsable</label>
-              <select class="f-select" id="mEt3Resp">
-                <option value="Contabilidad">Contabilidad</option>
-                <option value="Costos">Costos</option>
-              </select>
+            <div class="f-field"><label class="f-label">Responsable</label>
+              <select class="f-select" id="mEt3Resp"><option value="Contabilidad">Contabilidad</option><option value="Costos">Costos</option></select>
             </div>
-            <div class="f-field">
-              <label class="f-label">Fecha límite</label>
+            <div class="f-field"><label class="f-label">Fecha límite</label>
               <input class="f-input" type="date" id="mEt3Fecha" />
             </div>
           </div>
         </div>
         <div class="etapa-block">
-          <div class="etapa-block-ttl"><span>4</span> Presentación</div>
+          <div class="etapa-block-ttl"><span>4</span> Cuadre Finalizado</div>
           <div class="etapa-fields">
-            <div class="f-field">
-              <label class="f-label">Responsable</label>
-              <select class="f-select" id="mEt4Resp">
-                <option value="Contabilidad">Contabilidad</option>
-                <option value="Costos">Costos</option>
-              </select>
+            <div class="f-field"><label class="f-label">Responsable</label>
+              <select class="f-select" id="mEt4Resp"><option value="Contabilidad">Contabilidad</option><option value="Costos">Costos</option></select>
             </div>
-            <div class="f-field">
-              <label class="f-label">Fecha límite</label>
+            <div class="f-field"><label class="f-label">Fecha límite</label>
               <input class="f-input" type="date" id="mEt4Fecha" />
             </div>
           </div>
@@ -634,11 +434,11 @@
     </div>
   </div>
 
-  <!-- ── MODAL DETALLE ── -->
+  <!-- MODAL DETALLE -->
   <div class="modal-ov" id="modalDetalle">
     <div class="modal-box modal-wide">
       <div class="modal-hdr">
-        <span class="modal-ttl" id="mDetalleTtl">Detalle</span>
+        <span class="modal-ttl" id="mDetalleTtl">Editar Sociedad</span>
         <button class="modal-x" onclick="closeModal('modalDetalle')">✕</button>
       </div>
       <div class="modal-body">
@@ -652,21 +452,20 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
     const { createClient } = supabase;
-
-    const SUPABASE_URL = 'https://iipgrojliqeyycvgnkrc.supabase.co';
-    const ANON_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlpcGdyb2psaXFleXljdmdua3JjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NzA1NzYsImV4cCI6MjA5MTM0NjU3Nn0.Y6FQ-1qWd7HPMvTnK4alpKxM-YLJ5CsKmkorAZKMJrg';
-    const SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlpcGdyb2psaXFleXljdmdua3JjIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NTc3MDU3NiwiZXhwIjoyMDkxMzQ2NTc2fQ.Geew8Yzwj0FC41Tkc9fNGymOuwopf_DRXcoUuzr4ZLU';
-
+    const SUPABASE_URL  = 'https://iipgrojliqeyycvgnkrc.supabase.co';
+    const ANON_KEY      = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlpcGdyb2psaXFleXljdmdua3JjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NzA1NzYsImV4cCI6MjA5MTM0NjU3Nn0.Y6FQ-1qWd7HPMvTnK4alpKxM-YLJ5CsKmkorAZKMJrg';
+    const SERVICE_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlpcGdyb2psaXFleXljdmdua3JjIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NTc3MDU3NiwiZXhwIjoyMDkxMzQ2NTc2fQ.Geew8Yzwj0FC41Tkc9fNGymOuwopf_DRXcoUuzr4ZLU';
     const client         = createClient(SUPABASE_URL, ANON_KEY);
     const SERVICE_CLIENT = createClient(SUPABASE_URL, SERVICE_KEY);
 
-    const ETAPA_NAMES = ['Pre-Cierre', 'Cierre', 'Conciliación', 'Presentación'];
-    const STATUS_LABEL = { pend: '⚫ Pendiente', proc: '🟡 En Proceso', done: '🟢 Finalizado', late: '🔴 Fuera de Tiempo' };
+    const ETAPA_NAMES  = ['Entrega de EEFF', 'Integraciones / ID Jobs', 'Revisión', 'Cuadre Finalizado'];
+    const STATUS_LABEL = { pend:'Pendiente', proc:'En Proceso', done:'Finalizado', late:'Fuera de Tiempo' };
+    const STATUS_DOT   = { pend:'⚫', proc:'🟡', done:'🟢', late:'🔴' };
 
     let isAdmin = false;
     let currentPeriodoId = null;
 
-    // ── STATUS ───────────────────────────────────────────────────────────────
+    // ── STATUS ───────────────────────────────────────────────────────
     function getEtapaStatus(cierre) {
         if (!cierre || !cierre.id) return 'pend';
         if (cierre.estatus === 'finalizado') return 'done';
@@ -677,44 +476,58 @@
     }
 
     function getSociedadDot(cierres) {
-        const statuses = cierres.map(c => getEtapaStatus(c));
-        if (statuses.includes('late')) return '#ef4444';
-        if (statuses.length > 0 && statuses.every(s => s === 'done')) return '#22c55e';
-        if (statuses.includes('proc') || statuses.includes('done')) return '#f59e0b';
+        const s = cierres.map(c => getEtapaStatus(c));
+        if (s.includes('late')) return '#ef4444';
+        if (s.length > 0 && s.every(x => x === 'done')) return '#22c55e';
+        if (s.includes('proc') || s.includes('done')) return '#f59e0b';
         return '#94a3b8';
     }
 
     function fmtFecha(d) {
         if (!d) return '—';
         const [y, m, day] = d.split('-');
-        return `${day}/${m}/${y}`;
+        const M = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+        return `${parseInt(day)} ${M[parseInt(m)-1]} ${y}`;
     }
 
-    // ── NAV ──────────────────────────────────────────────────────────────────
-    async function doLogout() {
-        await client.auth.signOut();
-        window.location.href = 'login.html';
+    function getDaysLabel(cierre, st) {
+        if (!cierre || !cierre.fecha_limite) return null;
+        const today = new Date(); today.setHours(0,0,0,0);
+        const limit = new Date(cierre.fecha_limite + 'T00:00:00');
+        const diff  = Math.round((limit - today) / 86400000);
+        if (st === 'done') {
+            return diff >= 0
+                ? { text:'Finalizado a tiempo', cls:'days-ok' }
+                : { text:`Finalizó ${Math.abs(diff)}d tarde`, cls:'days-late-fin' };
+        }
+        if (diff < 0)   return { text:`${Math.abs(diff)} días de atraso`, cls:'days-overdue' };
+        if (diff === 0) return { text:'Vence hoy', cls:'days-today' };
+        if (diff <= 3)  return { text:`Faltan ${diff} día${diff===1?'':'s'}`, cls:'days-urgent' };
+        if (diff <= 7)  return { text:`Faltan ${diff} días`, cls:'days-warn' };
+        return { text:`Faltan ${diff} días`, cls:'days-ahead' };
     }
+
+    // ── NAV ──────────────────────────────────────────────────────────
+    async function doLogout() { await client.auth.signOut(); window.location.href = 'login.html'; }
     function toggleDrop(id) {
         const item = document.getElementById(id);
-        const isOpen = item.classList.contains('open');
+        const open = item.classList.contains('open');
         document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('open'));
-        if (!isOpen) item.classList.add('open');
+        if (!open) item.classList.add('open');
     }
     document.addEventListener('click', e => {
         if (!e.target.closest('.nav-item')) document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('open'));
     });
 
-    // ── MODALS ───────────────────────────────────────────────────────────────
+    // ── MODALS ───────────────────────────────────────────────────────
     function openModal(id)  { document.getElementById(id).classList.add('open'); }
     function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
-    // ── PERÍODO ──────────────────────────────────────────────────────────────
+    // ── PERÍODO ──────────────────────────────────────────────────────
     function openModalPeriodo() {
         document.getElementById('mPeriodoNombre').value = '';
         openModal('modalPeriodo');
     }
-
     async function savePeriodo() {
         const nombre = document.getElementById('mPeriodoNombre').value.trim();
         if (!nombre) return alert('Ingresa el nombre del período.');
@@ -723,211 +536,142 @@
         closeModal('modalPeriodo');
         await loadPeriodos(nombre);
     }
-
     async function loadPeriodos(selectNombre = null) {
-        const { data } = await client.from('cc_periodos').select('*').order('id', { ascending: false });
+        const { data } = await client.from('cc_periodos').select('*').order('id', { ascending:false });
         const sel = document.getElementById('periodoSel');
-        sel.innerHTML = '<option value="">— Seleccionar período —</option>';
+        sel.innerHTML = '<option value="">— Seleccionar —</option>';
         (data || []).forEach(p => {
             const opt = document.createElement('option');
-            opt.value = p.id;
-            opt.textContent = p.nombre;
+            opt.value = p.id; opt.textContent = p.nombre;
             if (selectNombre && p.nombre === selectNombre) opt.selected = true;
             sel.appendChild(opt);
         });
-        if (selectNombre && sel.value) {
-            currentPeriodoId = sel.value;
-            await loadBoard();
-        } else if (!selectNombre && sel.options.length > 1) {
-            sel.selectedIndex = 1;
-            currentPeriodoId = sel.value;
-            await loadBoard();
-        }
+        if (selectNombre && sel.value) { currentPeriodoId = sel.value; await loadBoard(); }
+        else if (!selectNombre && sel.options.length > 1) { sel.selectedIndex = 1; currentPeriodoId = sel.value; await loadBoard(); }
     }
+    async function onPeriodoChange() { currentPeriodoId = document.getElementById('periodoSel').value; await loadBoard(); }
 
-    async function onPeriodoChange() {
-        currentPeriodoId = document.getElementById('periodoSel').value;
-        await loadBoard();
-    }
-
-    // ── SOCIEDAD ─────────────────────────────────────────────────────────────
+    // ── SOCIEDAD ─────────────────────────────────────────────────────
     function openModalSociedad() {
         if (!currentPeriodoId) return alert('Selecciona primero un período.');
         document.getElementById('mSocNombre').value = '';
-        ['1','2','3','4'].forEach(n => {
-            document.getElementById(`mEt${n}Resp`).value = 'Contabilidad';
-            document.getElementById(`mEt${n}Fecha`).value = '';
-        });
+        ['1','2','3','4'].forEach(n => { document.getElementById(`mEt${n}Resp`).value = 'Contabilidad'; document.getElementById(`mEt${n}Fecha`).value = ''; });
         openModal('modalSociedad');
     }
-
     async function saveSociedad() {
         const nombre = document.getElementById('mSocNombre').value.trim().toUpperCase();
         if (!nombre) return alert('Ingresa el nombre de la sociedad.');
-        for (let n = 1; n <= 4; n++) {
-            if (!document.getElementById(`mEt${n}Fecha`).value) return alert(`Ingresa la fecha límite para la etapa ${n}.`);
-        }
-        const { data: soc, error: errSoc } = await SERVICE_CLIENT
-            .from('cc_sociedades')
-            .insert({ nombre, periodo_id: parseInt(currentPeriodoId) })
-            .select().single();
-        if (errSoc) { alert('Error al guardar sociedad: ' + errSoc.message); return; }
-
-        const cierres = [1,2,3,4].map(n => ({
-            sociedad_id: soc.id,
-            etapa_num: n,
-            responsable: document.getElementById(`mEt${n}Resp`).value,
-            fecha_limite: document.getElementById(`mEt${n}Fecha`).value,
-            estatus: 'pendiente',
-            notas: ''
-        }));
-        const { error: errC } = await SERVICE_CLIENT.from('cc_cierres').insert(cierres);
-        if (errC) { alert('Error al guardar etapas: ' + errC.message); return; }
+        for (let n = 1; n <= 4; n++) if (!document.getElementById(`mEt${n}Fecha`).value) return alert(`Ingresa la fecha límite para la etapa ${n}.`);
+        const { data:soc, error:errSoc } = await SERVICE_CLIENT.from('cc_sociedades').insert({ nombre, periodo_id:parseInt(currentPeriodoId) }).select().single();
+        if (errSoc) { alert('Error: ' + errSoc.message); return; }
+        const rows = [1,2,3,4].map(n => ({ sociedad_id:soc.id, etapa_num:n, responsable:document.getElementById(`mEt${n}Resp`).value, fecha_limite:document.getElementById(`mEt${n}Fecha`).value, estatus:'pendiente', notas:'' }));
+        const { error:errC } = await SERVICE_CLIENT.from('cc_cierres').insert(rows);
+        if (errC) { alert('Error: ' + errC.message); return; }
         closeModal('modalSociedad');
         await loadBoard();
     }
 
-    // ── BOARD ─────────────────────────────────────────────────────────────────
+    // ── BOARD ─────────────────────────────────────────────────────────
     async function loadBoard() {
-        const board = document.getElementById('ccBoard');
+        const tbody = document.getElementById('ccTbody');
         if (!currentPeriodoId) {
-            board.innerHTML = `<div class="cc-empty"><div class="cc-empty-ico">📋</div><div class="cc-empty-ttl">Selecciona un período</div><div class="cc-empty-sub">Elige un período para ver las sociedades.</div></div>`;
+            tbody.innerHTML = `<tr><td colspan="6"><div class="cc-empty"><div class="cc-empty-ico">📋</div><div class="cc-empty-ttl">Selecciona un período</div><div class="cc-empty-sub">Elige un período para ver las sociedades.</div></div></td></tr>`;
             return;
         }
-        board.innerHTML = '<div class="cc-empty"><div class="cc-empty-ico">⏳</div><div class="cc-empty-ttl">Cargando...</div></div>';
-
-        const { data: socs } = await client.from('cc_sociedades').select('*').eq('periodo_id', currentPeriodoId).order('id');
+        tbody.innerHTML = `<tr><td colspan="6"><div class="cc-empty"><div class="cc-empty-ico">⏳</div><div class="cc-empty-ttl">Cargando...</div></div></td></tr>`;
+        const { data:socs } = await client.from('cc_sociedades').select('*').eq('periodo_id', currentPeriodoId).order('id');
         if (!socs || socs.length === 0) {
-            board.innerHTML = `<div class="cc-empty"><div class="cc-empty-ico">🏢</div><div class="cc-empty-ttl">Sin sociedades en este período</div><div class="cc-empty-sub">El administrador puede agregar sociedades con el botón "+ Sociedad".</div></div>`;
-            updateKpis([]);
-            return;
+            tbody.innerHTML = `<tr><td colspan="6"><div class="cc-empty"><div class="cc-empty-ico">🏢</div><div class="cc-empty-ttl">Sin sociedades en este período</div><div class="cc-empty-sub">El administrador puede agregar sociedades con el botón "+ Sociedad".</div></div></td></tr>`;
+            updateKpis([], []); document.getElementById('boardCount').textContent = '0 sociedades'; return;
         }
-
-        const socIds = socs.map(s => s.id);
-        const { data: cierres } = await client.from('cc_cierres').select('*').in('sociedad_id', socIds).order('etapa_num');
-
-        const cierresBySoc = {};
-        socIds.forEach(id => { cierresBySoc[id] = []; });
-        (cierres || []).forEach(c => { if (cierresBySoc[c.sociedad_id]) cierresBySoc[c.sociedad_id].push(c); });
-
-        const allStatuses = [];
-        socs.forEach(s => cierresBySoc[s.id].forEach(c => allStatuses.push(getEtapaStatus(c))));
-        updateKpis(allStatuses);
-
-        board.innerHTML = '';
-        socs.forEach(soc => board.insertAdjacentHTML('beforeend', renderSociedadCard(soc, cierresBySoc[soc.id])));
+        const { data:cierres } = await client.from('cc_cierres').select('*').in('sociedad_id', socs.map(s=>s.id)).order('etapa_num');
+        const all = cierres || [];
+        updateKpis(socs, all);
+        document.getElementById('boardCount').textContent = `${socs.length} sociedad${socs.length===1?'':'es'}`;
+        tbody.innerHTML = '';
+        socs.forEach(soc => tbody.insertAdjacentHTML('beforeend', renderRow(soc, all.filter(c => c.sociedad_id === soc.id))));
     }
 
-    function updateKpis(statuses) {
-        const count = s => statuses.filter(x => x === s).length;
-        document.getElementById('kpiPend').textContent = count('pend');
-        document.getElementById('kpiProc').textContent = count('proc');
-        document.getElementById('kpiDone').textContent = count('done');
-        document.getElementById('kpiLate').textContent = count('late');
+    function updateKpis(socs, all) {
+        let pend=0, proc=0, done=0, venc=0;
+        const today = new Date().toISOString().split('T')[0];
+        const in7   = new Date(Date.now()+7*86400000).toISOString().split('T')[0];
+        socs.forEach(soc => {
+            const dot = getSociedadDot(all.filter(c=>c.sociedad_id===soc.id));
+            if (dot==='#22c55e') done++; else if (dot==='#f59e0b') proc++; else pend++;
+        });
+        all.forEach(c => { if (c.estatus!=='finalizado' && c.fecha_limite && c.fecha_limite>=today && c.fecha_limite<=in7) venc++; });
+        document.getElementById('kpiPend').textContent    = pend;
+        document.getElementById('kpiPendSub').textContent = `de ${socs.length} sociedad${socs.length===1?'':'es'}`;
+        document.getElementById('kpiProc').textContent    = proc;
+        document.getElementById('kpiDone').textContent    = done;
+        document.getElementById('kpiLate').textContent    = venc;
     }
 
-    function renderSociedadCard(soc, cierres) {
+    function renderRow(soc, cierres) {
         const dot = getSociedadDot(cierres);
-        const pills = ETAPA_NAMES.map((name, i) => {
-            const c = cierres.find(x => x.etapa_num === i+1) || null;
+        const cells = [1,2,3,4].map(n => {
+            const c  = cierres.find(x => x.etapa_num===n) || null;
             const st = getEtapaStatus(c);
-            return `<span class="s-pill ${st}">${name}</span>`;
+            const dl = getDaysLabel(c, st);
+            return `<td class="td-et">
+                <div class="stage-mini ${st}">
+                    <span class="sm-badge ${st}">${STATUS_DOT[st]} ${STATUS_LABEL[st]}</span>
+                    <span class="sm-meta">👤 ${c?.responsable||'—'}</span>
+                    <span class="sm-meta">📅 ${fmtFecha(c?.fecha_limite)}</span>
+                    ${dl ? `<span class="sm-days ${dl.cls}">⏱ ${dl.text}</span>` : ''}
+                </div>
+            </td>`;
         }).join('');
-
-        const stages = ETAPA_NAMES.map((name, i) => {
-            const c = cierres.find(x => x.etapa_num === i+1) || null;
-            const st = getEtapaStatus(c);
-            return `
-            <div class="stage-card ${st}">
-              <div class="stage-card-top">
-                <span class="stage-num-lbl">Etapa ${i+1}</span>
-                <span class="stage-badge ${st}">${STATUS_LABEL[st]}</span>
-              </div>
-              <div class="stage-card-name">${name}</div>
-              <div class="stage-meta">
-                <span>👤 ${c?.responsable || '—'}</span>
-                <span class="${st==='late'?'meta-red':''}">📅 Límite: ${fmtFecha(c?.fecha_limite)}</span>
-                ${c?.notas ? `<span>💬 ${c.notas}</span>` : ''}
-              </div>
-            </div>`;
-        }).join('');
-
-        const editBtn = isAdmin
-            ? `<button class="btn-edit-soc" onclick="openDetalle(${soc.id}, event)">✏️ Editar</button>`
-            : '';
-
-        return `
-        <div class="society-card" id="scard-${soc.id}">
-          <div class="soc-header" onclick="toggleCard(${soc.id})">
-            <div class="soc-left">
-              <div class="soc-dot" style="background:${dot}"></div>
-              <span class="soc-name">${soc.nombre}</span>
-            </div>
-            <div class="soc-right">
-              <div class="stage-pills">${pills}</div>
-              ${editBtn}
-              <span class="soc-arrow">▾</span>
-            </div>
-          </div>
-          <div class="soc-detail">
-            <div class="stages-grid">${stages}</div>
-          </div>
-        </div>`;
+        const act = isAdmin
+            ? `<button class="btn-row-edit" title="Editar" onclick="openDetalle(${soc.id},event)">✏️</button>`
+            : `<span style="color:#94a3b8;font-size:1.2rem;cursor:default">→</span>`;
+        return `<tr class="board-row">
+            <td class="td-soc"><div class="soc-inner"><div class="soc-dot" style="background:${dot}"></div><span class="soc-name">${soc.nombre}</span></div></td>
+            ${cells}
+            <td class="td-act">${act}</td>
+        </tr>`;
     }
 
-    function toggleCard(id) {
-        document.getElementById(`scard-${id}`).classList.toggle('expanded');
-    }
-
-    // ── DETALLE ───────────────────────────────────────────────────────────────
-    let _detalleCache = { socId: null, cierres: [] };
+    // ── DETALLE ───────────────────────────────────────────────────────
+    let _cache = { socId:null, cierres:[] };
 
     async function openDetalle(socId, ev) {
-        ev.stopPropagation();
-        const { data: soc } = await client.from('cc_sociedades').select('nombre').eq('id', socId).single();
-        const { data: cierres } = await client.from('cc_cierres').select('*').eq('sociedad_id', socId).order('etapa_num');
-        _detalleCache = { socId, cierres: cierres || [] };
-        document.getElementById('mDetalleTtl').textContent = soc?.nombre || 'Detalle';
-        renderDetalleGrid(cierres || []);
+        if (ev) ev.stopPropagation();
+        const { data:soc }    = await client.from('cc_sociedades').select('nombre').eq('id', socId).single();
+        const { data:cierres } = await client.from('cc_cierres').select('*').eq('sociedad_id', socId).order('etapa_num');
+        _cache = { socId, cierres: cierres||[] };
+        document.getElementById('mDetalleTtl').textContent = `Editar — ${soc?.nombre||''}`;
+        renderDetalleGrid(cierres||[]);
         openModal('modalDetalle');
     }
 
     function renderDetalleGrid(cierres) {
-        const grid = document.getElementById('mDetalleGrid');
-        grid.innerHTML = ETAPA_NAMES.map((name, i) => {
-            const c = cierres.find(x => x.etapa_num === i+1) || {};
+        document.getElementById('mDetalleGrid').innerHTML = ETAPA_NAMES.map((name, i) => {
+            const c  = cierres.find(x => x.etapa_num===i+1)||{};
             const st = getEtapaStatus(c.id ? c : null);
-            const notasEsc = (c.notas || '').replace(/"/g, '&quot;');
-            return `
-            <div class="detail-stage-blk ${st}" id="dblk-${i+1}">
+            const ne = (c.notas||'').replace(/"/g,'&quot;');
+            return `<div class="detail-stage-blk ${st}" id="dblk-${i+1}">
               <div class="detail-stage-ttl">
                 <span>${i+1}. ${name}</span>
-                <span class="stage-badge ${st}" id="dbadge-${i+1}">${STATUS_LABEL[st]}</span>
+                <span class="stage-badge ${st}" id="dbadge-${i+1}">${STATUS_DOT[st]} ${STATUS_LABEL[st]}</span>
               </div>
               <div class="detail-fields">
-                <div class="f-field">
-                  <label class="f-label">Responsable</label>
-                  <select class="f-select" id="dResp-${i+1}" onchange="updateDetalleStyle(${i+1})">
+                <div class="f-field"><label class="f-label">Responsable</label>
+                  <select class="f-select" id="dResp-${i+1}" onchange="updStyle(${i+1})">
                     <option value="Contabilidad" ${c.responsable==='Contabilidad'?'selected':''}>Contabilidad</option>
                     <option value="Costos" ${c.responsable==='Costos'?'selected':''}>Costos</option>
-                  </select>
-                </div>
-                <div class="f-field">
-                  <label class="f-label">Fecha límite</label>
-                  <input class="f-input" type="date" id="dFecha-${i+1}" value="${c.fecha_limite||''}" onchange="updateDetalleStyle(${i+1})" />
-                </div>
-                <div class="f-field">
-                  <label class="f-label">Estatus</label>
-                  <select class="f-select" id="dEstatus-${i+1}" onchange="updateDetalleStyle(${i+1})">
+                  </select></div>
+                <div class="f-field"><label class="f-label">Fecha límite</label>
+                  <input class="f-input" type="date" id="dFecha-${i+1}" value="${c.fecha_limite||''}" onchange="updStyle(${i+1})" /></div>
+                <div class="f-field"><label class="f-label">Estatus</label>
+                  <select class="f-select" id="dEstatus-${i+1}" onchange="updStyle(${i+1})">
                     <option value="pendiente"  ${c.estatus==='pendiente' ?'selected':''}>⚫ Pendiente</option>
                     <option value="en_proceso" ${c.estatus==='en_proceso'?'selected':''}>🟡 En Proceso</option>
                     <option value="finalizado" ${c.estatus==='finalizado'?'selected':''}>🟢 Finalizado</option>
-                  </select>
-                </div>
-                <div class="f-field">
-                  <label class="f-label">Notas</label>
-                  <input class="f-input" id="dNotas-${i+1}" value="${notasEsc}" placeholder="Observaciones..." />
-                </div>
+                  </select></div>
+                <div class="f-field"><label class="f-label">Notas</label>
+                  <input class="f-input" id="dNotas-${i+1}" value="${ne}" placeholder="Observaciones..." /></div>
                 <button class="btn-guardar-et" onclick="saveEtapa(${i+1})">Guardar Etapa ${i+1}</button>
                 <div class="saved-flash" id="dFlash-${i+1}">✓ Guardado</div>
               </div>
@@ -935,50 +679,34 @@
         }).join('');
     }
 
-    function updateDetalleStyle(n) {
-        const estatus = document.getElementById(`dEstatus-${n}`).value;
-        const fecha   = document.getElementById(`dFecha-${n}`).value;
-        const today   = new Date().toISOString().split('T')[0];
-        let st;
-        if (estatus === 'finalizado')       st = 'done';
-        else if (fecha && today > fecha)    st = 'late';
-        else if (estatus === 'en_proceso')  st = 'proc';
-        else                                st = 'pend';
+    function updStyle(n) {
+        const est   = document.getElementById(`dEstatus-${n}`).value;
+        const fecha = document.getElementById(`dFecha-${n}`).value;
+        const today = new Date().toISOString().split('T')[0];
+        const st    = est==='finalizado' ? 'done' : (fecha && today>fecha) ? 'late' : est==='en_proceso' ? 'proc' : 'pend';
         document.getElementById(`dblk-${n}`).className = `detail-stage-blk ${st}`;
-        const badge = document.getElementById(`dbadge-${n}`);
-        badge.className = `stage-badge ${st}`;
-        badge.textContent = STATUS_LABEL[st];
+        const b = document.getElementById(`dbadge-${n}`);
+        b.className = `stage-badge ${st}`;
+        b.textContent = `${STATUS_DOT[st]} ${STATUS_LABEL[st]}`;
     }
 
     async function saveEtapa(n) {
-        const socId    = _detalleCache.socId;
-        const existing = _detalleCache.cierres.find(c => c.etapa_num === n);
-        const payload  = {
-            sociedad_id: socId,
-            etapa_num: n,
-            responsable: document.getElementById(`dResp-${n}`).value,
-            fecha_limite: document.getElementById(`dFecha-${n}`).value || null,
-            estatus: document.getElementById(`dEstatus-${n}`).value,
-            notas: document.getElementById(`dNotas-${n}`).value
-        };
-        let error;
-        if (existing?.id) {
-            ({ error } = await SERVICE_CLIENT.from('cc_cierres').update(payload).eq('id', existing.id));
-        } else {
-            ({ error } = await SERVICE_CLIENT.from('cc_cierres').insert(payload));
-        }
+        const existing = _cache.cierres.find(c => c.etapa_num===n);
+        const payload  = { sociedad_id:_cache.socId, etapa_num:n, responsable:document.getElementById(`dResp-${n}`).value, fecha_limite:document.getElementById(`dFecha-${n}`).value||null, estatus:document.getElementById(`dEstatus-${n}`).value, notas:document.getElementById(`dNotas-${n}`).value };
+        const { error } = existing?.id
+            ? await SERVICE_CLIENT.from('cc_cierres').update(payload).eq('id', existing.id)
+            : await SERVICE_CLIENT.from('cc_cierres').insert(payload);
         if (error) { alert('Error: ' + error.message); return; }
-        const flash = document.getElementById(`dFlash-${n}`);
-        flash.style.display = 'block';
-        setTimeout(() => { flash.style.display = 'none'; }, 2000);
-        const { data } = await client.from('cc_cierres').select('*').eq('sociedad_id', socId).order('etapa_num');
-        _detalleCache.cierres = data || [];
+        const f = document.getElementById(`dFlash-${n}`);
+        f.style.display = 'block'; setTimeout(()=>{ f.style.display='none'; }, 2000);
+        const { data } = await client.from('cc_cierres').select('*').eq('sociedad_id', _cache.socId).order('etapa_num');
+        _cache.cierres = data||[];
         loadBoard();
     }
 
-    // ── INIT ─────────────────────────────────────────────────────────────────
+    // ── INIT ──────────────────────────────────────────────────────────
     (async () => {
-        const { data: { user } } = await client.auth.getUser();
+        const { data:{ user } } = await client.auth.getUser();
         if (!user) { window.location.href = 'login.html'; return; }
         const { data } = await client.from('usuarios').select('rol').eq('id', user.id).single();
         if (data?.rol === 'admin') {
