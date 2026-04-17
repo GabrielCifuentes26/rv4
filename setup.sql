@@ -50,3 +50,40 @@ CREATE POLICY "auth_delete_solicitudes"
   USING (auth.role() = 'authenticated');
 
 -- ✅ Listo. Ya puedes cerrar esta ventana.
+
+-- ============================================================
+-- CIERRE CONTABLE — Tablas (agregar en la misma sesión)
+-- ============================================================
+
+-- cc_periodos
+CREATE TABLE IF NOT EXISTS cc_periodos (
+  id         BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  nombre     TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+ALTER TABLE cc_periodos DISABLE ROW LEVEL SECURITY;
+
+-- cc_sociedades
+CREATE TABLE IF NOT EXISTS cc_sociedades (
+  id         BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  periodo_id BIGINT REFERENCES cc_periodos(id) ON DELETE CASCADE,
+  nombre     TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+ALTER TABLE cc_sociedades DISABLE ROW LEVEL SECURITY;
+
+-- cc_cierres (4 filas por sociedad — una por etapa)
+CREATE TABLE IF NOT EXISTS cc_cierres (
+  id          BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  sociedad_id BIGINT REFERENCES cc_sociedades(id) ON DELETE CASCADE,
+  etapa_num   INT NOT NULL CHECK (etapa_num BETWEEN 1 AND 4),
+  responsable TEXT NOT NULL DEFAULT 'Contabilidad',
+  fecha_limite DATE,
+  estatus     TEXT NOT NULL DEFAULT 'pendiente'
+              CHECK (estatus IN ('pendiente','en_proceso','finalizado')),
+  notas       TEXT DEFAULT '',
+  updated_at  TIMESTAMPTZ DEFAULT NOW()
+);
+ALTER TABLE cc_cierres DISABLE ROW LEVEL SECURITY;
+
+-- ✅ Cierre Contable listo.
