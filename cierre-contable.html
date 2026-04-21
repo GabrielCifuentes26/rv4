@@ -1208,16 +1208,19 @@
     }
 
     function renderGauge(socs, all) {
-        const total   = all.length;
-        const done    = all.filter(c => getEtapaStatus(c) === 'done').length;
-        const pct     = total > 0 ? Math.round(done / total * 100) : 0;
-        const arc     = 157 - (157 * pct / 100);
-        const color   = pct >= 80 ? '#22c55e' : pct >= 50 ? '#f59e0b' : '#ef4444';
+        const total     = socs.length;
+        const completed = socs.filter(soc => {
+            const cs = all.filter(c => c.sociedad_id === soc.id);
+            return cs.length === 4 && cs.every(c => getEtapaStatus(c) === 'done');
+        }).length;
+        const pct      = total > 0 ? Math.round(completed / total * 100) : 0;
+        const arc      = 157 - (157 * pct / 100);
+        const color    = pct >= 80 ? '#22c55e' : pct >= 50 ? '#f59e0b' : '#ef4444';
         const gaugeArc = document.getElementById('gaugeArc');
         gaugeArc.setAttribute('stroke-dashoffset', arc);
         gaugeArc.setAttribute('stroke', color);
         document.getElementById('gaugePct').textContent = `${pct}%`;
-        document.getElementById('gaugeLbl').textContent = `${done} de ${total} etapas finalizadas`;
+        document.getElementById('gaugeLbl').textContent = `${completed} de ${total} sociedades completadas`;
     }
 
     function renderAvgEtapas(all) {
