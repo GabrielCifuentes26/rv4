@@ -1171,14 +1171,27 @@
         btn.disabled = true; btn.textContent = 'Aprobando...';
 
         try {
-            // Insertar en tabla usuarios
+            // 1. Confirmar email en Supabase Auth (si el usuario se registró solo)
+            if (authId) {
+                await fetch(`${SUPABASE_URL}/auth/v1/admin/users/${authId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${SERVICE_KEY}`,
+                        'apikey': SERVICE_KEY
+                    },
+                    body: JSON.stringify({ email_confirm: true })
+                });
+            }
+
+            // 2. Insertar en tabla usuarios
             const insertData = { nombre, correo, rol, empresa, nivel, estado: 'activo' };
             if (authId) insertData.id = authId;
 
-            const { error: userErr } = await SERVICE_CLIENT.from('usuarios').insert(insertData);
+            const { error: userErr } = await SERVICE_CLIENT.from('usuarios').upsert(insertData, { onConflict: 'id' });
             if (userErr) throw userErr;
 
-            // Actualizar solicitud a aprobada
+            // 3. Actualizar solicitud a aprobada
             await SERVICE_CLIENT.from('solicitudes').update({ estado: 'aprobado' }).eq('id', solId);
 
             closeApproveModal();
