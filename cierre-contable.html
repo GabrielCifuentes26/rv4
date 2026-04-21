@@ -272,6 +272,116 @@
             .cc-kpis { gap:10px; }
             .kpi-value { font-size:2.2rem; }
         }
+        /* ── BOTÓN ANALÍTICA ── */
+        .btn-analitica {
+            background: linear-gradient(135deg, #C9A84C, #A8832A);
+            color: #fff; border: none; font-weight: 700;
+            box-shadow: 0 3px 10px rgba(201,168,76,0.35);
+            display: flex; align-items: center; gap: 6px;
+        }
+        .btn-analitica:hover { opacity: 0.88; transform: translateY(-1px); }
+
+        /* ── VISTA ANALÍTICA ── */
+        #vistaAnalitica { padding: 0 0 40px; }
+        .an-header {
+            display: flex; align-items: center; gap: 18px;
+            margin-bottom: 22px; padding: 18px 0 16px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        .btn-back-tablero {
+            display: flex; align-items: center; gap: 7px;
+            background: #f8fafc; border: 1px solid #e2e8f0;
+            color: #152540; padding: 8px 16px; border-radius: 20px;
+            font-size: 0.8rem; font-weight: 700; cursor: pointer;
+            font-family: inherit; transition: all .2s; white-space: nowrap;
+        }
+        .btn-back-tablero:hover {
+            background: #152540; color: #fff; border-color: #152540;
+        }
+        .an-title { font-size: 1.3rem; font-weight: 900; color: #152540; }
+        .an-sub   { font-size: 0.8rem; color: #64748b; margin-top: 2px; }
+
+        .an-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+        .an-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        @media (max-width: 900px) { .an-row-3, .an-row-2 { grid-template-columns: 1fr; } }
+
+        .an-card {
+            background: #fff; border: 1px solid #e2e8f0;
+            border-radius: 14px; padding: 20px 22px;
+            box-shadow: 0 2px 12px rgba(15,23,42,0.06);
+        }
+        .an-card-title {
+            font-size: 0.82rem; font-weight: 800; color: #152540;
+            margin-bottom: 4px;
+        }
+
+        /* Gauge */
+        .an-gauge-wrap { position: relative; width: 130px; height: 75px; }
+        .an-gauge-svg  { width: 130px; height: 75px; }
+        .an-gauge-pct  {
+            position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+            font-size: 1.6rem; font-weight: 900; color: #152540;
+        }
+        .an-gauge-lbl  { font-size: 0.72rem; color: #64748b; text-align: center; }
+
+        /* Avg etapas bars */
+        .avg-row { display: flex; align-items: center; gap: 10px; }
+        .avg-label { font-size: 0.72rem; color: #64748b; width: 130px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .avg-track { flex: 1; background: #f1f5f9; border-radius: 4px; height: 8px; }
+        .avg-fill  { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #C9A84C, #A8832A); }
+        .avg-val   { font-size: 0.72rem; font-weight: 700; color: #152540; width: 32px; text-align: right; }
+
+        /* Ranking */
+        .rank-row { display: flex; align-items: center; gap: 10px; }
+        .rank-pos  { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.68rem; font-weight: 800; flex-shrink: 0; }
+        .rank-1    { background: #fef3c7; color: #92400e; }
+        .rank-2    { background: #f1f5f9; color: #475569; }
+        .rank-3    { background: #fef8ee; color: #92400e; }
+        .rank-n    { background: #f8fafc; color: #94a3b8; }
+        .rank-name { flex: 1; font-size: 0.78rem; font-weight: 600; color: #152540; }
+        .rank-pct  { font-size: 0.72rem; font-weight: 700; color: #64748b; }
+        .rank-dot  { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+        /* Gantt */
+        .gantt-legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 14px; }
+        .gantt-leg-item { display: flex; align-items: center; gap: 5px; font-size: 0.72rem; color: #64748b; }
+        .gantt-leg-dot  { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+        .gantt-wrap { overflow-x: auto; }
+        .gantt-grid { min-width: 600px; }
+        .gantt-header-row { display: flex; margin-bottom: 4px; }
+        .gantt-soc-col    { width: 130px; flex-shrink: 0; font-size: 0.68rem; color: #94a3b8; }
+        .gantt-dates      { flex: 1; display: flex; position: relative; }
+        .gantt-date-tick  { flex: 1; font-size: 0.62rem; color: #94a3b8; text-align: center; border-left: 1px solid #f1f5f9; padding-bottom: 4px; }
+        .gantt-row        { display: flex; align-items: center; margin-bottom: 6px; }
+        .gantt-soc-name   { width: 130px; flex-shrink: 0; font-size: 0.76rem; font-weight: 700; color: #152540; padding-right: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .gantt-bars       { flex: 1; position: relative; height: 32px; background: #f8fafc; border-radius: 6px; overflow: hidden; }
+        .gantt-today-line { position: absolute; top: 0; bottom: 0; width: 2px; background: rgba(239,68,68,0.7); z-index: 5; }
+        .gantt-bar {
+            position: absolute; height: 24px; top: 4px;
+            border-radius: 4px; display: flex; align-items: center;
+            padding: 0 6px; font-size: 0.62rem; font-weight: 700;
+            color: #fff; white-space: nowrap; overflow: hidden; cursor: default;
+            transition: opacity .2s;
+        }
+        .gantt-bar:hover { opacity: 0.85; }
+        .gantt-bar.done { background: #22c55e; }
+        .gantt-bar.proc { background: #f59e0b; }
+        .gantt-bar.late { background: #ef4444; }
+        .gantt-bar.pend { background: #cbd5e1; color: #64748b; }
+
+        /* Heatmap atrasos */
+        .heat-atraso-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .heat-atraso-label { font-size: 0.75rem; color: #475569; width: 150px; flex-shrink: 0; }
+        .heat-atraso-bar   { flex: 1; background: #f1f5f9; border-radius: 4px; height: 10px; }
+        .heat-atraso-fill  { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #ef4444, #f97316); }
+        .heat-atraso-cnt   { font-size: 0.72rem; font-weight: 700; color: #ef4444; width: 24px; text-align: right; }
+
+        /* Detail table */
+        .an-detail-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
+        .an-detail-table th { padding: 8px 10px; text-align: left; font-size: 0.65rem; color: #94a3b8; text-transform: uppercase; border-bottom: 1px solid #e2e8f0; }
+        .an-detail-table td { padding: 8px 10px; border-bottom: 1px solid #f1f5f9; color: #475569; }
+        .an-detail-table td:first-child { font-weight: 700; color: #152540; }
+        .an-st-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; }
     </style>
 </head>
 <body>
@@ -332,6 +442,7 @@
         <p class="cc-subtitle">Supervisa y actualiza el estado de los cierres contables a través de todas las etapas para cada sociedad.</p>
       </div>
       <div class="cc-hero-controls">
+        <button class="btn-cc btn-analitica" onclick="switchVista('analitica')">📊 Vista Analítica</button>
         <span class="periodo-label">Período:</span>
         <select class="periodo-select" id="periodoSel" onchange="onPeriodoChange()">
           <option value="">— Seleccionar —</option>
@@ -426,6 +537,79 @@
         </table>
       </div>
     </div>
+
+  <!-- VISTA ANALÍTICA -->
+  <div id="vistaAnalitica" style="display:none">
+
+    <div class="an-header">
+      <button class="btn-back-tablero" onclick="switchVista('tablero')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        Volver al Tablero
+      </button>
+      <div>
+        <div class="an-title">Vista Analítica</div>
+        <div class="an-sub" id="anPeriodoLabel">—</div>
+      </div>
+    </div>
+
+    <!-- GAUGE + RESUMEN -->
+    <div class="an-row-3" style="margin-bottom:20px">
+      <div class="an-card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px">
+        <div class="an-card-title">Avance Global</div>
+        <div class="an-gauge-wrap">
+          <svg viewBox="0 0 120 70" class="an-gauge-svg">
+            <path d="M10 65 A50 50 0 0 1 110 65" fill="none" stroke="#e2e8f0" stroke-width="12" stroke-linecap="round"/>
+            <path id="gaugeArc" d="M10 65 A50 50 0 0 1 110 65" fill="none" stroke="#22c55e" stroke-width="12" stroke-linecap="round" stroke-dasharray="157" stroke-dashoffset="157"/>
+          </svg>
+          <div class="an-gauge-pct" id="gaugePct">0%</div>
+        </div>
+        <div class="an-gauge-lbl" id="gaugeLbl">0 de 0 etapas finalizadas</div>
+      </div>
+
+      <div class="an-card">
+        <div class="an-card-title">⏱ Tiempo promedio por etapa</div>
+        <div id="anAvgEtapas" style="display:flex;flex-direction:column;gap:10px;margin-top:8px"></div>
+      </div>
+
+      <div class="an-card">
+        <div class="an-card-title">🏆 Ranking de Sociedades</div>
+        <div id="anRanking" style="display:flex;flex-direction:column;gap:8px;margin-top:8px"></div>
+      </div>
+    </div>
+
+    <!-- GANTT -->
+    <div class="an-card" style="margin-bottom:20px">
+      <div class="an-card-title">📅 Diagrama de Gantt — Etapas por Sociedad</div>
+      <div class="gantt-legend">
+        <span class="gantt-leg-item"><span class="gantt-leg-dot" style="background:#22c55e"></span>Finalizado</span>
+        <span class="gantt-leg-item"><span class="gantt-leg-dot" style="background:#f59e0b"></span>En Proceso</span>
+        <span class="gantt-leg-item"><span class="gantt-leg-dot" style="background:#ef4444"></span>Fuera de Tiempo</span>
+        <span class="gantt-leg-item"><span class="gantt-leg-dot" style="background:#cbd5e1"></span>Pendiente</span>
+        <span class="gantt-leg-item"><span class="gantt-leg-dot" style="background:rgba(239,68,68,0.7);width:2px;height:14px;border-radius:0"></span>Hoy</span>
+      </div>
+      <div class="gantt-wrap" id="ganttWrap">
+        <div style="color:var(--gray2);text-align:center;padding:30px">Selecciona un período para ver el Gantt</div>
+      </div>
+    </div>
+
+    <!-- HEATMAP ATRASOS + ETAPAS MÁS LENTAS -->
+    <div class="an-row-2" style="margin-bottom:20px">
+      <div class="an-card">
+        <div class="an-card-title">🔥 Etapas que más se atrasan</div>
+        <div id="anHeatAtrasos" style="margin-top:10px"></div>
+      </div>
+      <div class="an-card">
+        <div class="an-card-title">📋 Detalle por sociedad</div>
+        <table class="an-detail-table" id="anDetailTable">
+          <thead><tr>
+            <th>Sociedad</th><th>Etapa 1</th><th>Etapa 2</th><th>Etapa 3</th><th>Etapa 4</th><th>Estado</th>
+          </tr></thead>
+          <tbody id="anDetailBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /vistaAnalitica -->
 
   </div><!-- /.cc-wrap -->
 
@@ -673,7 +857,7 @@
         if (selectNombre && sel.value) { currentPeriodoId = sel.value; await loadBoard(); }
         else if (!selectNombre && sel.options.length > 1) { sel.selectedIndex = 1; currentPeriodoId = sel.value; await loadBoard(); }
     }
-    async function onPeriodoChange() { currentPeriodoId = document.getElementById('periodoSel').value; await loadBoard(); }
+    async function onPeriodoChange() { currentPeriodoId = document.getElementById('periodoSel').value; await loadBoard(); if (_vistaActual === 'analitica') renderAnalitica(); }
 
     // ── SOCIEDAD ─────────────────────────────────────────────────────
     function openModalSociedad() {
@@ -953,6 +1137,198 @@
         _cache.cierres = data||[];
         loadBoard();
         setTimeout(() => closeModal('modalDetalle'), 1600);
+    }
+
+    // ── VISTA ANALÍTICA ──────────────────────────────────────────────────
+    let _vistaActual = 'tablero';
+
+    function switchVista(v) {
+        _vistaActual = v;
+        const tableroEls = [
+            document.querySelector('.cc-kpis'),
+            document.getElementById('progressStrip'),
+            document.querySelector('.board-wrap')
+        ];
+        const analitica = document.getElementById('vistaAnalitica');
+        if (v === 'analitica') {
+            tableroEls.forEach(el => { if (el) el.style.display = 'none'; });
+            analitica.style.display = 'block';
+            renderAnalitica();
+        } else {
+            tableroEls.forEach(el => { if (el) el.style.display = ''; });
+            analitica.style.display = 'none';
+        }
+    }
+
+    async function renderAnalitica() {
+        if (!currentPeriodoId) {
+            document.getElementById('anPeriodoLabel').textContent = '— Selecciona un período —';
+            return;
+        }
+        const periodoNombre = document.getElementById('periodoSel').options[document.getElementById('periodoSel').selectedIndex].text;
+        document.getElementById('anPeriodoLabel').textContent = `Período: ${periodoNombre}`;
+
+        const { data: socs }   = await client.from('cc_sociedades').select('*').eq('periodo_id', currentPeriodoId).order('id');
+        const { data: cierres } = await client.from('cc_cierres').select('*').in('sociedad_id', (socs||[]).map(s=>s.id)).order('etapa_num');
+        const all = cierres || [];
+        const sociedades = socs || [];
+
+        renderGauge(sociedades, all);
+        renderAvgEtapas(all);
+        renderRanking(sociedades, all);
+        renderGantt(sociedades, all);
+        renderHeatAtrasos(all);
+        renderDetailTable(sociedades, all);
+    }
+
+    function renderGauge(socs, all) {
+        const total   = all.length;
+        const done    = all.filter(c => getEtapaStatus(c) === 'done').length;
+        const pct     = total > 0 ? Math.round(done / total * 100) : 0;
+        const arc     = 157 - (157 * pct / 100);
+        const color   = pct >= 80 ? '#22c55e' : pct >= 50 ? '#f59e0b' : '#ef4444';
+        const gaugeArc = document.getElementById('gaugeArc');
+        gaugeArc.setAttribute('stroke-dashoffset', arc);
+        gaugeArc.setAttribute('stroke', color);
+        document.getElementById('gaugePct').textContent = `${pct}%`;
+        document.getElementById('gaugeLbl').textContent = `${done} de ${total} etapas finalizadas`;
+    }
+
+    function renderAvgEtapas(all) {
+        const counts = ETAPA_NAMES.map((name, i) => {
+            const etapa = i + 1;
+            const cells = all.filter(c => c.etapa_num === etapa);
+            const done  = cells.filter(c => getEtapaStatus(c) === 'done').length;
+            return { name, done, total: cells.length, pct: cells.length ? Math.round(done/cells.length*100) : 0 };
+        });
+        const maxPct = Math.max(...counts.map(c => c.pct), 1);
+        document.getElementById('anAvgEtapas').innerHTML = counts.map(c => `
+            <div class="avg-row">
+                <div class="avg-label" title="${c.name}">${c.name}</div>
+                <div class="avg-track"><div class="avg-fill" style="width:${Math.round(c.pct/maxPct*100)}%"></div></div>
+                <div class="avg-val">${c.pct}%</div>
+            </div>`).join('');
+    }
+
+    function renderRanking(socs, all) {
+        const ranked = socs.map(soc => {
+            const cs   = all.filter(c => c.sociedad_id === soc.id);
+            const done = cs.filter(c => getEtapaStatus(c) === 'done').length;
+            const pct  = cs.length ? Math.round(done / cs.length * 100) : 0;
+            const dot  = getSociedadDot(cs);
+            return { nombre: soc.nombre, pct, dot };
+        }).sort((a, b) => b.pct - a.pct);
+
+        document.getElementById('anRanking').innerHTML = ranked.map((r, i) => {
+            const posClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : 'rank-n';
+            const medal    = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1;
+            return `<div class="rank-row">
+                <div class="rank-pos ${posClass}">${medal}</div>
+                <div class="rank-name">${r.nombre}</div>
+                <div class="rank-dot" style="background:${r.dot}"></div>
+                <div class="rank-pct">${r.pct}%</div>
+            </div>`;
+        }).join('');
+    }
+
+    function renderGantt(socs, all) {
+        if (!socs.length) {
+            document.getElementById('ganttWrap').innerHTML = '<div style="color:#94a3b8;text-align:center;padding:30px">Sin sociedades en este período</div>';
+            return;
+        }
+        // Calcular rango de fechas
+        const allDates = all.filter(c => c.fecha_limite).map(c => new Date(c.fecha_limite + 'T00:00:00'));
+        if (!allDates.length) { document.getElementById('ganttWrap').innerHTML = '<div style="color:#94a3b8;text-align:center;padding:30px">Sin fechas límite definidas</div>'; return; }
+
+        const minDate = new Date(Math.min(...allDates));
+        const maxDate = new Date(Math.max(...allDates));
+        minDate.setDate(minDate.getDate() - 3);
+        maxDate.setDate(maxDate.getDate() + 3);
+        const totalDays = Math.ceil((maxDate - minDate) / 86400000);
+        const todayPct  = Math.max(0, Math.min(100, (new Date() - minDate) / (maxDate - minDate) * 100));
+
+        // Ticks de fecha (cada ~7 días)
+        const ticks = [];
+        const tickInterval = Math.ceil(totalDays / 8);
+        for (let d = 0; d <= totalDays; d += tickInterval) {
+            const date = new Date(minDate.getTime() + d * 86400000);
+            ticks.push({ pct: d / totalDays * 100, lbl: date.toLocaleDateString('es', { day:'2-digit', month:'short' }) });
+        }
+
+        const barColors = { done:'#22c55e', proc:'#f59e0b', late:'#ef4444', pend:'#cbd5e1' };
+
+        const rows = socs.map(soc => {
+            const cs = all.filter(c => c.sociedad_id === soc.id).sort((a,b) => a.etapa_num - b.etapa_num);
+            const bars = cs.map((c, i) => {
+                if (!c.fecha_limite) return '';
+                const endDate   = new Date(c.fecha_limite + 'T00:00:00');
+                const prevDate  = i > 0 && cs[i-1].fecha_limite ? new Date(cs[i-1].fecha_limite + 'T00:00:00') : minDate;
+                const startDate = prevDate < minDate ? minDate : prevDate;
+                const left  = Math.max(0, (startDate - minDate) / (maxDate - minDate) * 100);
+                const right = Math.min(100, (endDate - minDate) / (maxDate - minDate) * 100);
+                const width = Math.max(0.5, right - left);
+                const st    = getEtapaStatus(c);
+                return `<div class="gantt-bar ${st}" style="left:${left.toFixed(1)}%;width:${width.toFixed(1)}%" title="Etapa ${c.etapa_num}: ${ETAPA_NAMES[c.etapa_num-1]}\n${STATUS_LABEL[st]}\nFecha: ${fmtFecha(c.fecha_limite)}">E${c.etapa_num}</div>`;
+            }).join('');
+
+            return `<div class="gantt-row">
+                <div class="gantt-soc-name" title="${soc.nombre}">${soc.nombre}</div>
+                <div class="gantt-bars">
+                    <div class="gantt-today-line" style="left:${todayPct.toFixed(1)}%"></div>
+                    ${bars}
+                </div>
+            </div>`;
+        }).join('');
+
+        const ticksHtml = ticks.map(t => `<div class="gantt-date-tick" style="position:absolute;left:${t.pct.toFixed(1)}%">${t.lbl}</div>`).join('');
+
+        document.getElementById('ganttWrap').innerHTML = `
+            <div class="gantt-grid">
+                <div class="gantt-header-row">
+                    <div class="gantt-soc-col"></div>
+                    <div style="flex:1;position:relative;height:20px">${ticksHtml}</div>
+                </div>
+                ${rows}
+            </div>`;
+    }
+
+    function renderHeatAtrasos(all) {
+        const counts = ETAPA_NAMES.map((name, i) => {
+            const etapa = i + 1;
+            const late  = all.filter(c => c.etapa_num === etapa && getEtapaStatus(c) === 'late').length;
+            return { name, late };
+        });
+        const max = Math.max(...counts.map(c => c.late), 1);
+        document.getElementById('anHeatAtrasos').innerHTML = counts.length
+            ? counts.map(c => `
+                <div class="heat-atraso-row">
+                    <div class="heat-atraso-label">${c.name}</div>
+                    <div class="heat-atraso-bar"><div class="heat-atraso-fill" style="width:${Math.round(c.late/max*100)}%"></div></div>
+                    <div class="heat-atraso-cnt">${c.late}</div>
+                </div>`).join('')
+            : '<div style="color:#94a3b8;font-size:0.8rem;padding:10px 0">Sin atrasos registrados 🎉</div>';
+    }
+
+    function renderDetailTable(socs, all) {
+        const stColors = { done:'#22c55e', proc:'#f59e0b', late:'#ef4444', pend:'#cbd5e1' };
+        document.getElementById('anDetailBody').innerHTML = socs.map(soc => {
+            const cs   = all.filter(c => c.sociedad_id === soc.id);
+            const dot  = getSociedadDot(cs);
+            const cells = [1,2,3,4].map(n => {
+                const c  = cs.find(x => x.etapa_num === n);
+                const st = getEtapaStatus(c || null);
+                return `<td><span class="an-st-dot" style="background:${stColors[st]}"></span>${STATUS_LABEL[st]}</td>`;
+            }).join('');
+            const allDone = cs.length > 0 && cs.every(c => getEtapaStatus(c) === 'done');
+            const hasLate = cs.some(c => getEtapaStatus(c) === 'late');
+            const globalSt = allDone ? 'Completo' : hasLate ? 'Atrasado' : 'En curso';
+            const globalColor = allDone ? '#22c55e' : hasLate ? '#ef4444' : '#f59e0b';
+            return `<tr>
+                <td>${soc.nombre}</td>
+                ${cells}
+                <td><span class="an-st-dot" style="background:${globalColor}"></span>${globalSt}</td>
+            </tr>`;
+        }).join('');
     }
 
     // ── INIT ──────────────────────────────────────────────────────────
