@@ -119,17 +119,16 @@
         .stat-value { font-size: 2rem; font-weight: 900; color: var(--navy); }
 
         /* ── FILTERS ── */
-        .filters-row {
-            display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap;
+        .filters-row { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+        .filter-select {
+            appearance: none;
+            background: var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%2364748b' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E") no-repeat right 10px center;
+            border: 1px solid var(--border); border-radius: 8px;
+            padding: 7px 30px 7px 12px; font-size: 0.78rem; font-weight: 600;
+            color: var(--gray); font-family: inherit; cursor: pointer;
+            transition: border-color .2s;
         }
-        .filter-btn {
-            padding: 6px 16px; border-radius: 20px; border: 1px solid var(--border);
-            background: var(--surface); color: var(--gray); font-size: 0.75rem;
-            font-weight: 600; cursor: pointer; font-family: inherit;
-            transition: all .2s;
-        }
-        .filter-btn:hover { border-color: var(--blue); color: var(--blue); }
-        .filter-btn.active { background: var(--navy); border-color: var(--navy); color: #fff; }
+        .filter-select:focus { outline: none; border-color: var(--blue); }
 
         /* ── SECTION HEADER ── */
         .section-header {
@@ -519,12 +518,19 @@
             </div>
         </div>
 
-        <!-- Filtros por empresa -->
+        <!-- Filtros por Rol y Nivel -->
         <div class="filters-row">
-            <button class="filter-btn active" onclick="filterEmpresa(this,'todos')">Todos</button>
-            <button class="filter-btn" onclick="filterEmpresa(this,'RV4')">RV4</button>
-            <button class="filter-btn" onclick="filterEmpresa(this,'CONSBA')">CONSBA</button>
-            <button class="filter-btn" onclick="filterEmpresa(this,'Ambas')">Ambas empresas</button>
+            <select class="filter-select" id="filterRol" onchange="applyFilters()">
+                <option value="todos">Todos los roles</option>
+                <option value="admin">Admin</option>
+                <option value="usuario">Usuario</option>
+            </select>
+            <select class="filter-select" id="filterNivel" onchange="applyFilters()">
+                <option value="todos">Todos los niveles</option>
+                <option value="Gold">Gold</option>
+                <option value="Silver">Silver</option>
+                <option value="Bronce">Bronce</option>
+            </select>
         </div>
 
         <!-- Users Table -->
@@ -734,7 +740,7 @@
     const client = createClient(SUPABASE_URL, ANON_KEY);
 
     let allUsers = [];
-    let currentFilter = 'todos';
+    let currentFilter = 'todos'; // kept for backwards compat but unused
     let deleteTargetId = null;
 
     // ── AUTH CHECK ──────────────────────────────────────────────────────────
@@ -783,11 +789,16 @@
     }
 
     function applyFilters() {
-        const q = (document.getElementById('searchInput').value || '').toLowerCase();
+        const q          = (document.getElementById('searchInput').value || '').toLowerCase();
+        const rolFilter  = document.getElementById('filterRol').value;
+        const nivelFilter = document.getElementById('filterNivel').value;
         let filtered = allUsers;
 
-        if (currentFilter !== 'todos') {
-            filtered = filtered.filter(u => (u.empresa || '').toLowerCase() === currentFilter.toLowerCase());
+        if (rolFilter !== 'todos') {
+            filtered = filtered.filter(u => (u.rol || '') === rolFilter);
+        }
+        if (nivelFilter !== 'todos') {
+            filtered = filtered.filter(u => (u.nivel || '') === nivelFilter);
         }
         if (q) {
             filtered = filtered.filter(u =>
@@ -845,14 +856,6 @@
                 </td>
             </tr>`;
         }).join('');
-    }
-
-    // ── FILTRO EMPRESA ──────────────────────────────────────────────────────
-    function filterEmpresa(btn, empresa) {
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        currentFilter = empresa;
-        applyFilters();
     }
 
     // ── SEARCH ──────────────────────────────────────────────────────────────
@@ -1150,7 +1153,8 @@
             closeApproveModal();
             showToast(`✓ ${nombre} aprobado como ${nivel} en ${empresa}`, 'success');
             loadSolicitudes();
-            loadUsers();
+            await loadUsers();
+            switchTab('usuarios');
         } catch (err) {
             showToast(err.message || 'Error al aprobar', 'error');
         } finally {
