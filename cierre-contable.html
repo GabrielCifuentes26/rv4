@@ -1224,7 +1224,7 @@
         renderEeff(sociedades, all);
         renderRanking(sociedades, all);
         renderGantt(sociedades, all);
-        renderHeatAtrasos(all);
+        renderHeatAtrasos(sociedades, all);
         renderDetailTable(sociedades, all);
     }
 
@@ -1382,19 +1382,40 @@
             </div>`;
     }
 
-    function renderHeatAtrasos(all) {
+    function renderHeatAtrasos(socs, all) {
+        const today = new Date(); today.setHours(0,0,0,0);
         const counts = ETAPA_NAMES.map((name, i) => {
             const etapa = i + 1;
-            const late  = all.filter(c => c.etapa_num === etapa && getEtapaStatus(c) === 'late').length;
-            return { name, late };
+            // Solo contar si la etapa anterior ya está finalizada (o es etapa 1)
+            const socIds = socs
+                .filter(soc => {
+                    if (etapa === 1) return true;
+                    const prev = all.find(c => c.sociedad_id === soc.id && c.etapa_num === etapa - 1);
+                    return prev && getEtapaStatus(prev) === 'done';
+                })
+                .map(s => s.id);
+
+            const lateRows = all.filter(c =>
+                c.etapa_num === etapa &&
+                socIds.includes(c.sociedad_id) &&
+                getEtapaStatus(c) === 'late' &&
+                c.fecha_limite
+            );
+            const diasList = lateRows.map(c => Math.round((today - new Date(c.fecha_limite + 'T00:00:00')) / 86400000));
+            const avgDias  = diasList.length ? Math.round(diasList.reduce((a,b)=>a+b,0) / diasList.length) : 0;
+            return { name, count: lateRows.length, avgDias };
         });
-        const max = Math.max(...counts.map(c => c.late), 1);
-        document.getElementById('anHeatAtrasos').innerHTML = counts.length
+        const max = Math.max(...counts.map(c => c.avgDias), 1);
+        document.getElementById('anHeatAtrasos').innerHTML = counts.some(c => c.count > 0)
             ? counts.map(c => `
                 <div class="heat-atraso-row">
                     <div class="heat-atraso-label">${c.name}</div>
-                    <div class="heat-atraso-bar"><div class="heat-atraso-fill" style="width:${Math.round(c.late/max*100)}%"></div></div>
-                    <div class="heat-atraso-cnt">${c.late}</div>
+                    <div class="heat-atraso-bar">
+                        ${c.avgDias > 0 ? `<div class="heat-atraso-fill" style="width:${Math.round(c.avgDias/max*100)}%"></div>` : ''}
+                    </div>
+                    <div class="heat-atraso-cnt" style="color:${c.avgDias>0?'#ef4444':'#94a3b8'};min-width:60px;font-size:0.7rem">
+                        ${c.avgDias > 0 ? `~${c.avgDias}d · ${c.count} soc.` : '—'}
+                    </div>
                 </div>`).join('')
             : '<div style="color:#94a3b8;font-size:0.8rem;padding:10px 0">Sin atrasos registrados 🎉</div>';
     }
