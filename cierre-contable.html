@@ -322,7 +322,17 @@
 
         .an-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
         .an-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-        @media (max-width: 900px) { .an-row-3, .an-row-2 { grid-template-columns: 1fr; } }
+        .an-row-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
+        @media (max-width: 900px) { .an-row-3, .an-row-2 { grid-template-columns: 1fr; } .an-row-4 { grid-template-columns: repeat(2,1fr); } }
+        @media (max-width: 500px)  { .an-row-4 { grid-template-columns: 1fr; } }
+
+        /* Gauge stats */
+        .gauge-stat-row { display:flex;align-items:center;gap:0;width:100%;max-width:260px;margin-top:10px; }
+        .gauge-stat-block { flex:1;text-align:center;padding:6px 4px; }
+        .gauge-stat-div   { width:1px;height:36px;background:#e2e8f0;flex-shrink:0; }
+        .gauge-stat-lbl   { font-size:0.58rem;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:#94a3b8;margin-bottom:3px; }
+        .gauge-stat-val   { font-size:0.95rem;font-weight:900;color:#152540; }
+        .gauge-status-badge { display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:20px;font-size:0.72rem;font-weight:800;letter-spacing:.3px;margin-top:6px; }
 
         .an-card {
             background: #fff; border: 1px solid #e2e8f0;
@@ -584,48 +594,94 @@
   <div id="vistaAnalitica" style="display:none">
     <p id="anPeriodoLabel" style="font-size:0.78rem;color:#94a3b8;font-weight:600;margin-bottom:18px;"></p>
 
-    <!-- 1. ¿CÓMO VAMOS? — Gauge -->
-    <div class="an-card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;margin-bottom:20px">
-      <div class="an-card-title">Avance Global del Período</div>
-      <div class="an-gauge-wrap">
-        <svg viewBox="0 0 120 70" class="an-gauge-svg">
-          <path d="M10 65 A50 50 0 0 1 110 65" fill="none" stroke="#e2e8f0" stroke-width="12" stroke-linecap="round"/>
-          <path id="gaugeArc" d="M10 65 A50 50 0 0 1 110 65" fill="none" stroke="#22c55e" stroke-width="12" stroke-linecap="round" stroke-dasharray="157" stroke-dashoffset="157"/>
-        </svg>
-        <div class="an-gauge-pct" id="gaugePct">0%</div>
-      </div>
-      <div class="an-gauge-lbl" id="gaugeLbl">0 de 0 sociedades completadas</div>
+    <!-- F1: KPI MINI-CARDS -->
+    <div class="an-row-4" style="margin-bottom:20px">
+      <div class="an-card" id="anKpiComp"></div>
+      <div class="an-card" id="anKpiCierre"></div>
+      <div class="an-card" id="anKpiAtraso"></div>
+      <div class="an-card" id="anKpiLenta"></div>
     </div>
 
-    <!-- 2. RANKING -->
+    <!-- F2: GAUGE + TENDENCIA -->
+    <div class="an-row-2" style="margin-bottom:20px">
+      <div class="an-card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px">
+        <div class="an-card-title">Avance Global del Período</div>
+        <div class="an-gauge-wrap">
+          <svg viewBox="0 0 120 70" class="an-gauge-svg">
+            <path d="M10 65 A50 50 0 0 1 110 65" fill="none" stroke="#e2e8f0" stroke-width="12" stroke-linecap="round"/>
+            <path id="gaugeArc" d="M10 65 A50 50 0 0 1 110 65" fill="none" stroke="#22c55e" stroke-width="12" stroke-linecap="round" stroke-dasharray="157" stroke-dashoffset="157"/>
+          </svg>
+          <div class="an-gauge-pct" id="gaugePct">0%</div>
+        </div>
+        <div class="an-gauge-lbl" id="gaugeLbl">0 de 0 sociedades completadas</div>
+        <div class="gauge-stat-row">
+          <div class="gauge-stat-block">
+            <div class="gauge-stat-lbl">Actual</div>
+            <div class="gauge-stat-val" id="gaugeActual">—</div>
+          </div>
+          <div class="gauge-stat-div"></div>
+          <div class="gauge-stat-block">
+            <div class="gauge-stat-lbl">Esperado</div>
+            <div class="gauge-stat-val" id="gaugeEsperado">—</div>
+          </div>
+          <div class="gauge-stat-div"></div>
+          <div class="gauge-stat-block">
+            <div class="gauge-stat-lbl">Gap</div>
+            <div class="gauge-stat-val" id="gaugeGap">—</div>
+          </div>
+        </div>
+        <div id="gaugeStatus"></div>
+      </div>
+      <div class="an-card">
+        <div class="an-card-title">📈 Tendencia de avance</div>
+        <div style="font-size:0.7rem;color:#94a3b8;margin-bottom:14px">Avance real acumulado vs. objetivo lineal del período</div>
+        <div style="position:relative;height:200px"><canvas id="chartTendencia"></canvas></div>
+      </div>
+    </div>
+
+    <!-- F3: TIEMPO POR ETAPA + RANKING ATRASO -->
+    <div class="an-row-2" style="margin-bottom:20px">
+      <div class="an-card">
+        <div class="an-card-title">⏱ Tiempo promedio por etapa</div>
+        <div style="font-size:0.7rem;color:#94a3b8;margin-bottom:14px">Días promedio para completar cada etapa · Solo finalizadas · Hover para detalle</div>
+        <div style="position:relative;height:200px"><canvas id="chartTiempoEtapa"></canvas></div>
+      </div>
+      <div class="an-card">
+        <div class="an-card-title">🚨 Ranking de atraso</div>
+        <div style="font-size:0.7rem;color:#94a3b8;margin-bottom:14px">Sociedades por días de atraso en su etapa activa actual</div>
+        <div id="anRankingAtraso"><div style="position:relative;height:200px"><canvas id="chartRankingAtraso"></canvas></div></div>
+      </div>
+    </div>
+
+    <!-- F4: TIEMPO ENTREGA + TIEMPO EN ESTADO ACTUAL -->
+    <div class="an-row-2" style="margin-bottom:20px">
+      <div class="an-card">
+        <div class="an-card-title">📦 Tiempo de entrega E1 por sociedad</div>
+        <div style="font-size:0.7rem;color:#94a3b8;margin-bottom:14px">Días desde inicio del período hasta completar E1 · Verde = en tiempo · Rojo = fuera de plazo</div>
+        <div id="anTiempoEntrega"><div style="position:relative;height:220px"><canvas id="chartTiempoEntrega"></canvas></div></div>
+      </div>
+      <div class="an-card">
+        <div class="an-card-title">🕐 Tiempo en etapa actual</div>
+        <div style="font-size:0.7rem;color:#94a3b8;margin-bottom:14px">Días que lleva cada sociedad en su etapa activa · Verde &le;3d · Ámbar 4-7d · Rojo &gt;7d</div>
+        <div id="anEstadoActual"><div style="position:relative;height:220px"><canvas id="chartEstadoActual"></canvas></div></div>
+      </div>
+    </div>
+
+    <!-- F5: RANKING POR % -->
     <div class="an-card" style="margin-bottom:20px">
       <div class="an-card-title">🏆 Ranking de Sociedades</div>
       <div style="font-size:0.7rem;color:#94a3b8;margin-bottom:10px">Avance por sociedad — % de etapas completadas</div>
       <div id="anRanking" style="display:flex;flex-direction:column;gap:8px;margin-top:4px"></div>
     </div>
 
-    <!-- 3. ¿QUÉ PASÓ CON LA ENTREGA DE EEFF? -->
-    <div class="an-row-2" style="margin-bottom:20px">
-      <div class="an-card">
-        <div class="an-card-title">✅ EEFF — Entregas Finalizadas</div>
-        <div style="font-size:0.7rem;color:#94a3b8;margin-bottom:12px">Fecha límite vs. fecha real de entrega · Etapa 1</div>
-        <div id="anEeffDone"></div>
-      </div>
-      <div class="an-card">
-        <div class="an-card-title">⚠️ EEFF — Pendientes fuera de plazo</div>
-        <div style="font-size:0.7rem;color:#94a3b8;margin-bottom:12px">Sociedades que no han entregado y ya vencieron · Etapa 1</div>
-        <div id="anEeffLate"></div>
-      </div>
-    </div>
-
-    <!-- 4. ¿HISTÓRICAMENTE CÓMO VAMOS? -->
+    <!-- F6: HISTÓRICO -->
     <div class="an-card" style="margin-bottom:20px">
       <div class="an-card-title">🔥 Histórico de atrasos por etapa y período</div>
       <div style="font-size:0.7rem;color:#94a3b8;margin-bottom:12px">Días promedio de atraso por etapa · Verde = sin atraso · Ámbar = 1-7d · Rojo = +7d</div>
       <div id="anHeatAtrasos" style="overflow-x:auto"></div>
     </div>
 
-    <!-- 6. DETALLE COMPLETO -->
+    <!-- F7: DETALLE COMPLETO -->
     <div class="an-card" style="margin-bottom:20px">
       <div class="an-card-title">📋 Detalle completo por sociedad</div>
       <table class="an-detail-table" id="anDetailTable">
@@ -1223,83 +1279,357 @@
         const all = cierres || [];
         const sociedades = socs || [];
 
+        renderKpiCards(sociedades, all);
         renderGauge(sociedades, all);
+        renderTendencia(sociedades, all);
+        renderTiempoEtapa(sociedades, all);
+        renderRankingAtraso(sociedades, all);
+        renderTiempoEntrega(sociedades, all);
+        renderTiempoEstadoActual(sociedades, all);
         renderRanking(sociedades, all);
-        renderEeff(sociedades, all);
         renderHeatAtrasos();
         renderDetailTable(sociedades, all);
     }
 
+    // ── UTILIDAD: bounds del período (fallback desde fecha_limite) ────
+    function getPeriodoBounds(all) {
+        const e1 = all.filter(c => c.etapa_num === 1 && c.fecha_limite);
+        const e4 = all.filter(c => c.etapa_num === 4 && c.fecha_limite);
+        const start = e1.length ? new Date(Math.min(...e1.map(c => new Date(c.fecha_limite + 'T00:00:00')))) : null;
+        const end   = e4.length ? new Date(Math.max(...e4.map(c => new Date(c.fecha_limite + 'T00:00:00')))) : null;
+        return { start, end };
+    }
+
+    // ── GAUGE MEJORADO ────────────────────────────────────────────────
     function renderGauge(socs, all) {
-        const total     = socs.length;
+        const today = new Date(); today.setHours(0,0,0,0);
+        const total = socs.length;
         const completed = socs.filter(soc => {
             const cs = all.filter(c => c.sociedad_id === soc.id);
             return cs.length === 4 && cs.every(c => getEtapaStatus(c) === 'done');
         }).length;
-        const pct      = total > 0 ? Math.round(completed / total * 100) : 0;
-        const arc      = 157 - (157 * pct / 100);
-        const color    = pct >= 80 ? '#22c55e' : pct >= 50 ? '#f59e0b' : '#ef4444';
-        const gaugeArc = document.getElementById('gaugeArc');
-        gaugeArc.setAttribute('stroke-dashoffset', arc);
-        gaugeArc.setAttribute('stroke', color);
-        document.getElementById('gaugePct').textContent = `${pct}%`;
+        const pctActual = total > 0 ? Math.round(completed / total * 100) : 0;
+
+        const { start, end } = getPeriodoBounds(all);
+        let pctEsperado = 0;
+        if (start && end && end > start) {
+            pctEsperado = Math.max(0, Math.min(100, Math.round((today - start) / (end - start) * 100)));
+        }
+
+        const gap = pctActual - pctEsperado;
+        let estado, color;
+        if (gap >= 0)         { estado = 'En tiempo'; color = '#22c55e'; }
+        else if (gap >= -15)  { estado = 'En riesgo';  color = '#f59e0b'; }
+        else                  { estado = 'Atrasado';   color = '#ef4444'; }
+
+        const arc = 157 - (157 * pctActual / 100);
+        document.getElementById('gaugeArc').setAttribute('stroke-dashoffset', arc);
+        document.getElementById('gaugeArc').setAttribute('stroke', color);
+        const pctEl = document.getElementById('gaugePct');
+        pctEl.textContent = `${pctActual}%`;
+        pctEl.style.color = color;
         document.getElementById('gaugeLbl').textContent = `${completed} de ${total} sociedades completadas`;
+        document.getElementById('gaugeActual').textContent   = `${pctActual}%`;
+        document.getElementById('gaugeEsperado').textContent = `${pctEsperado}%`;
+        const gapEl = document.getElementById('gaugeGap');
+        gapEl.textContent = `${gap >= 0 ? '+' : ''}${gap}%`;
+        gapEl.style.color = color;
+        document.getElementById('gaugeStatus').innerHTML =
+            `<span class="gauge-status-badge" style="background:${color}18;color:${color};border:1.5px solid ${color}40">` +
+            `${gap >= 0 ? '🟢' : gap >= -15 ? '🟡' : '🔴'} ${estado}</span>`;
+    }
+
+    // ── KPI MINI-CARDS ────────────────────────────────────────────────
+    function renderKpiCards(socs, all) {
+        const today = new Date(); today.setHours(0,0,0,0);
+        const total = socs.length;
+
+        const completadas = socs.filter(soc => {
+            const cs = all.filter(c => c.sociedad_id === soc.id);
+            return cs.length === 4 && cs.every(c => getEtapaStatus(c) === 'done');
+        }).length;
+
+        const { start, end } = getPeriodoBounds(all);
+        const diasAlCierre = end ? Math.ceil((end - today) / 86400000) : null;
+
+        const etapasAtrasadas = all.filter(c => getEtapaStatus(c) === 'late').length;
+        const socsConAtraso   = new Set(all.filter(c => getEtapaStatus(c) === 'late').map(c => c.sociedad_id)).size;
+
+        let etapaMasLenta = '—', diasLenta = 0;
+        if (start) {
+            let maxAvg = -1;
+            ETAPA_NAMES.forEach((name, i) => {
+                const etapa = i + 1;
+                const durs = socs.map(soc => {
+                    const cE = all.find(c => c.sociedad_id === soc.id && c.etapa_num === etapa && c.completado_at);
+                    if (!cE) return null;
+                    const inicio = etapa === 1 ? start : (() => {
+                        const prev = all.find(c => c.sociedad_id === soc.id && c.etapa_num === etapa-1 && c.completado_at);
+                        return prev ? new Date(prev.completado_at) : null;
+                    })();
+                    if (!inicio) return null;
+                    return Math.max(0, Math.round((new Date(cE.completado_at) - inicio) / 86400000));
+                }).filter(d => d !== null);
+                const avg = durs.length ? durs.reduce((a,b)=>a+b,0) / durs.length : -1;
+                if (avg > maxAvg) {
+                    maxAvg = avg;
+                    etapaMasLenta = `E${etapa} — ${name.split('/')[0].trim()}`;
+                    diasLenta = Math.round(avg * 10) / 10;
+                }
+            });
+        }
+
+        const compColor   = (completadas === total && total > 0) ? '#22c55e' : completadas > total/2 ? '#f59e0b' : '#ef4444';
+        const cierreColor = diasAlCierre === null ? '#94a3b8' : diasAlCierre > 7 ? '#22c55e' : diasAlCierre >= 0 ? '#f59e0b' : '#ef4444';
+        const atrasoColor = etapasAtrasadas === 0 ? '#22c55e' : '#ef4444';
+        const lentaColor  = diasLenta > 0 ? '#C9A84C' : '#94a3b8';
+
+        const cierreVal = diasAlCierre === null ? '—' : diasAlCierre < 0 ? `${Math.abs(diasAlCierre)}d vencido` : diasAlCierre === 0 ? 'Hoy' : `${diasAlCierre} días`;
+        const cierreSub = end ? end.toLocaleDateString('es-MX',{day:'numeric',month:'short',year:'numeric'}) : '—';
+
+        function kCard(icon, titulo, valor, sub, color) {
+            return `<div style="display:flex;align-items:center;gap:14px">
+                <div style="font-size:1.8rem;line-height:1">${icon}</div>
+                <div style="flex:1;min-width:0">
+                    <div style="font-size:0.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:#94a3b8;margin-bottom:3px">${titulo}</div>
+                    <div style="font-size:1.3rem;font-weight:900;color:${color};line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${valor}</div>
+                    <div style="font-size:0.67rem;color:#64748b;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${sub}</div>
+                </div></div>`;
+        }
+        document.getElementById('anKpiComp').innerHTML   = kCard('✅','Completadas',       `${completadas} / ${total}`,        'con las 4 etapas finalizadas', compColor);
+        document.getElementById('anKpiCierre').innerHTML  = kCard('📅','Días al cierre',    cierreVal,                          cierreSub, cierreColor);
+        document.getElementById('anKpiAtraso').innerHTML  = kCard('⏰','Etapas con atraso', String(etapasAtrasadas),            `en ${socsConAtraso} sociedad${socsConAtraso!==1?'es':''}`, atrasoColor);
+        document.getElementById('anKpiLenta').innerHTML   = kCard('🐢','Etapa más lenta',   diasLenta > 0 ? `${diasLenta}d` : '—', diasLenta > 0 ? etapaMasLenta : 'Sin datos suficientes', lentaColor);
+    }
+
+    // ── TENDENCIA DE AVANCE ───────────────────────────────────────────
+    let _chartTendencia = null;
+    function renderTendencia(socs, all) {
+        const today = new Date(); today.setHours(0,0,0,0);
+        const { start, end } = getPeriodoBounds(all);
+        if (!start || !end) return;
+        const totalEtapas = socs.length * 4;
+        if (!totalEtapas) return;
+
+        const completados = all.filter(c => c.completado_at).map(c => ({ ...c, _d: new Date(c.completado_at) }));
+        const days = Math.ceil((today - start) / 86400000) + 1;
+        const labels = [], dataReal = [], dataObj = [];
+        const rangeMs = end - start;
+
+        for (let i = 0; i < days; i++) {
+            const d = new Date(start.getTime() + i * 86400000);
+            labels.push(d.toLocaleDateString('es', { day:'2-digit', month:'short' }));
+            dataReal.push(Math.round(completados.filter(c => c._d <= d).length / totalEtapas * 100));
+            dataObj.push(rangeMs > 0 ? Math.max(0, Math.min(100, Math.round((d - start) / rangeMs * 100))) : 0);
+        }
+
+        if (_chartTendencia) _chartTendencia.destroy();
+        _chartTendencia = new Chart(document.getElementById('chartTendencia'), {
+            type: 'line',
+            data: { labels, datasets: [
+                { label:'Avance real', data:dataReal, borderColor:'#3b82f6', backgroundColor:'rgba(59,130,246,0.07)', borderWidth:2.5, pointRadius:2.5, fill:true, tension:0.3 },
+                { label:'Objetivo',   data:dataObj,  borderColor:'#94a3b8', borderWidth:1.5, borderDash:[5,4], pointRadius:0, fill:false, tension:0 }
+            ]},
+            options: {
+                responsive:true, maintainAspectRatio:false,
+                plugins: {
+                    legend: { position:'bottom', labels:{ font:{size:11,family:'Inter'}, boxWidth:12, padding:14 } },
+                    tooltip: { callbacks:{ label: ctx => ` ${ctx.dataset.label}: ${ctx.raw}%` } }
+                },
+                scales: {
+                    x: { grid:{display:false}, ticks:{ font:{size:10}, maxTicksLimit:8, maxRotation:0 } },
+                    y: { beginAtZero:true, max:100, ticks:{ callback:v=>`${v}%`, font:{size:11} }, grid:{color:'rgba(0,0,0,0.04)'} }
+                }
+            }
+        });
+    }
+
+    // ── TIEMPO PROMEDIO POR ETAPA ─────────────────────────────────────
+    let _chartTiempoEtapa = null;
+    function renderTiempoEtapa(socs, all) {
+        const today = new Date(); today.setHours(0,0,0,0);
+        const { start } = getPeriodoBounds(all);
+        if (!start) return;
+        const ETAPA_SHORT = ['Entrega EEFF','Integraciones','Revisión','Cuadre'];
+        const etapaColors = ['rgba(34,197,94,0.85)','rgba(59,130,246,0.85)','rgba(249,115,22,0.85)','rgba(201,168,76,0.85)'];
+
+        const promedios = ETAPA_NAMES.map((name, i) => {
+            const etapa = i + 1;
+            const dursF = [], dursP = [];
+            socs.forEach(soc => {
+                const cE = all.find(c => c.sociedad_id === soc.id && c.etapa_num === etapa);
+                if (!cE) return;
+                let inicio;
+                if (etapa === 1) { inicio = start; }
+                else {
+                    const prev = all.find(c => c.sociedad_id === soc.id && c.etapa_num === etapa-1);
+                    inicio = prev?.completado_at ? new Date(prev.completado_at)
+                           : prev?.fecha_limite  ? new Date(prev.fecha_limite + 'T00:00:00') : null;
+                }
+                if (!inicio) return;
+                if (cE.completado_at) {
+                    dursF.push(Math.max(0, Math.round((new Date(cE.completado_at) - inicio) / 86400000)));
+                } else {
+                    dursP.push(Math.max(0, Math.round((today - inicio) / 86400000)));
+                }
+            });
+            const avg     = dursF.length ? Math.round(dursF.reduce((a,b)=>a+b,0)/dursF.length*10)/10 : null;
+            const avgProc = dursP.length ? Math.round(dursP.reduce((a,b)=>a+b,0)/dursP.length*10)/10 : null;
+            return { name:ETAPA_SHORT[i], avg, count:dursF.length, countProc:dursP.length, avgProc };
+        });
+
+        if (_chartTiempoEtapa) _chartTiempoEtapa.destroy();
+        _chartTiempoEtapa = new Chart(document.getElementById('chartTiempoEtapa'), {
+            type:'bar',
+            data: { labels: promedios.map((p,i)=>`E${i+1}: ${p.name}`),
+                    datasets:[{ label:'Días promedio', data:promedios.map(p=>p.avg), backgroundColor:etapaColors, borderRadius:6, borderSkipped:false }] },
+            options: {
+                responsive:true, maintainAspectRatio:false,
+                plugins: {
+                    legend:{display:false},
+                    tooltip:{ callbacks:{ label:(ctx)=>{
+                        const p = promedios[ctx.dataIndex];
+                        const lines = [ctx.raw !== null ? ` ${ctx.raw} días promedio` : ' Sin datos'];
+                        lines.push(` ${p.count} finalizada${p.count!==1?'s':''}`);
+                        if (p.countProc > 0) lines.push(` ${p.countProc} en proceso (avg ${p.avgProc}d)`);
+                        return lines;
+                    }}}
+                },
+                scales: {
+                    x: { grid:{display:false}, ticks:{font:{size:11,family:'Inter'}} },
+                    y: { beginAtZero:true, ticks:{callback:v=>`${v}d`,font:{size:11}}, grid:{color:'rgba(0,0,0,0.04)'} }
+                }
+            }
+        });
+    }
+
+    // ── RANKING DE ATRASO ─────────────────────────────────────────────
+    let _chartRankingAtraso = null;
+    function renderRankingAtraso(socs, all) {
+        const today = new Date(); today.setHours(0,0,0,0);
+        const ETAPA_SHORT = ['Entrega EEFF','Integraciones','Revisión','Cuadre'];
+        const el = document.getElementById('anRankingAtraso');
+
+        const data = socs.map(soc => {
+            const cs = all.filter(c => c.sociedad_id === soc.id).sort((a,b)=>a.etapa_num-b.etapa_num);
+            const activa = cs.find(c => getEtapaStatus(c) !== 'done');
+            if (!activa || !activa.fecha_limite) return null;
+            const limite = new Date(activa.fecha_limite + 'T00:00:00');
+            if (limite >= today) return null;
+            return { nombre:soc.nombre, etapa:activa.etapa_num, etapaNombre:ETAPA_SHORT[activa.etapa_num-1], fechaLimite:fmtFecha(activa.fecha_limite), atraso:Math.round((today-limite)/86400000) };
+        }).filter(Boolean).sort((a,b)=>b.atraso-a.atraso);
+
+        if (_chartRankingAtraso) { _chartRankingAtraso.destroy(); _chartRankingAtraso = null; }
+        if (!data.length) { el.innerHTML = '<div class="eeff-empty">✓ Ninguna sociedad está fuera de plazo.</div>'; return; }
+
+        const maxA = data[0].atraso;
+        const bgColors = data.map(d => { const t = d.atraso/maxA; return `rgba(${Math.round(239-86*t)},${Math.round(68-34*t)},${Math.round(68-34*t)},0.85)`; });
+        const h = Math.max(160, data.length * 44);
+        el.innerHTML = `<div style="position:relative;height:${h}px"><canvas id="chartRankingAtraso"></canvas></div>`;
+        _chartRankingAtraso = new Chart(document.getElementById('chartRankingAtraso'), {
+            type:'bar',
+            data: { labels:data.map(d=>d.nombre), datasets:[{ label:'Días de atraso', data:data.map(d=>d.atraso), backgroundColor:bgColors, borderRadius:5, borderSkipped:false }] },
+            options: {
+                responsive:true, maintainAspectRatio:false, indexAxis:'y',
+                plugins: {
+                    legend:{display:false},
+                    tooltip:{ callbacks:{ label:(ctx)=>{ const d=data[ctx.dataIndex]; return [` ${d.atraso} días de atraso`,` Etapa: E${d.etapa} ${d.etapaNombre}`,` Límite: ${d.fechaLimite}`]; }}}
+                },
+                scales: {
+                    x:{ beginAtZero:true, ticks:{font:{size:11},callback:v=>`${v}d`}, grid:{color:'rgba(0,0,0,0.04)'} },
+                    y:{ grid:{display:false}, ticks:{font:{size:12,family:'Inter',weight:'700'}} }
+                }
+            }
+        });
+    }
+
+    // ── TIEMPO DE ENTREGA E1 POR SOCIEDAD ─────────────────────────────
+    let _chartTiempoEntrega = null;
+    function renderTiempoEntrega(socs, all) {
+        const { start } = getPeriodoBounds(all);
+        const el = document.getElementById('anTiempoEntrega');
+        if (_chartTiempoEntrega) { _chartTiempoEntrega.destroy(); _chartTiempoEntrega = null; }
+        if (!start) { el.innerHTML = '<div class="eeff-empty">Sin fechas límite definidas.</div>'; return; }
+
+        const data = socs.map(soc => {
+            const cE1 = all.find(c => c.sociedad_id === soc.id && c.etapa_num === 1 && c.completado_at);
+            if (!cE1) return null;
+            const dur = Math.max(0, Math.round((new Date(cE1.completado_at) - start) / 86400000));
+            const enTiempo = cE1.fecha_limite ? new Date(cE1.completado_at) <= new Date(cE1.fecha_limite + 'T00:00:00') : true;
+            return { nombre:soc.nombre, dur, enTiempo, completadoAt:cE1.completado_at, fechaLimite:cE1.fecha_limite };
+        }).filter(Boolean).sort((a,b)=>a.dur-b.dur);
+
+        if (!data.length) { el.innerHTML = '<div class="eeff-empty">Ninguna sociedad ha finalizado E1 aún.</div>'; return; }
+
+        const h = Math.max(160, data.length * 44);
+        el.innerHTML = `<div style="position:relative;height:${h}px"><canvas id="chartTiempoEntrega"></canvas></div>`;
+        _chartTiempoEntrega = new Chart(document.getElementById('chartTiempoEntrega'), {
+            type:'bar',
+            data: { labels:data.map(d=>d.nombre), datasets:[{ label:'Días hasta completar E1', data:data.map(d=>d.dur), backgroundColor:data.map(d=>d.enTiempo?'rgba(34,197,94,0.85)':'rgba(239,68,68,0.85)'), borderRadius:5, borderSkipped:false }] },
+            options: {
+                responsive:true, maintainAspectRatio:false, indexAxis:'y',
+                plugins: {
+                    legend:{display:false},
+                    tooltip:{ callbacks:{ label:(ctx)=>{ const d=data[ctx.dataIndex]; return [` ${d.dur} días desde inicio del período`,` Entregó: ${fmtDate(d.completadoAt)}`, d.fechaLimite?` Límite: ${fmtFecha(d.fechaLimite)}`:'',` ${d.enTiempo?'✓ En tiempo':'✗ Fuera de plazo'}`].filter(Boolean); }}}
+                },
+                scales: {
+                    x:{ beginAtZero:true, ticks:{font:{size:11},callback:v=>`${v}d`}, grid:{color:'rgba(0,0,0,0.04)'} },
+                    y:{ grid:{display:false}, ticks:{font:{size:12,family:'Inter',weight:'700'}} }
+                }
+            }
+        });
+    }
+
+    // ── TIEMPO EN ETAPA ACTUAL ────────────────────────────────────────
+    let _chartEstadoActual = null;
+    function renderTiempoEstadoActual(socs, all) {
+        const today = new Date(); today.setHours(0,0,0,0);
+        const { start } = getPeriodoBounds(all);
+        const ETAPA_SHORT = ['Entrega EEFF','Integraciones','Revisión','Cuadre'];
+        const el = document.getElementById('anEstadoActual');
+        if (_chartEstadoActual) { _chartEstadoActual.destroy(); _chartEstadoActual = null; }
+
+        const data = socs.map(soc => {
+            const cs = all.filter(c => c.sociedad_id === soc.id).sort((a,b)=>a.etapa_num-b.etapa_num);
+            const activa = cs.find(c => getEtapaStatus(c) !== 'done');
+            if (!activa) return null;
+            let inicio;
+            if (activa.etapa_num === 1) { inicio = start; }
+            else {
+                const prev = cs.find(c => c.etapa_num === activa.etapa_num - 1);
+                inicio = prev?.completado_at ? new Date(prev.completado_at)
+                       : prev?.fecha_limite  ? new Date(prev.fecha_limite + 'T00:00:00') : start;
+            }
+            if (!inicio) return null;
+            const dias = Math.max(0, Math.round((today - inicio) / 86400000));
+            return { nombre:soc.nombre, dias, etapaNombre:ETAPA_SHORT[activa.etapa_num-1], etapa:activa.etapa_num };
+        }).filter(Boolean).sort((a,b)=>b.dias-a.dias);
+
+        if (!data.length) { el.innerHTML = '<div class="eeff-empty">✓ Todas las sociedades han completado el cierre.</div>'; return; }
+
+        const h = Math.max(160, data.length * 44);
+        el.innerHTML = `<div style="position:relative;height:${h}px"><canvas id="chartEstadoActual"></canvas></div>`;
+        _chartEstadoActual = new Chart(document.getElementById('chartEstadoActual'), {
+            type:'bar',
+            data: { labels:data.map(d=>d.nombre), datasets:[{ label:'Días en etapa actual', data:data.map(d=>d.dias), backgroundColor:data.map(d=>d.dias<=3?'rgba(34,197,94,0.85)':d.dias<=7?'rgba(245,158,11,0.85)':'rgba(239,68,68,0.85)'), borderRadius:5, borderSkipped:false }] },
+            options: {
+                responsive:true, maintainAspectRatio:false, indexAxis:'y',
+                plugins: {
+                    legend:{display:false},
+                    tooltip:{ callbacks:{ label:(ctx)=>{ const d=data[ctx.dataIndex]; return [` ${d.dias} días en E${d.etapa}: ${d.etapaNombre}`,` ${d.dias<=3?'🟢 Normal':d.dias<=7?'🟡 Atención':'🔴 Bloqueado'}`]; }}}
+                },
+                scales: {
+                    x:{ beginAtZero:true, ticks:{font:{size:11},callback:v=>`${v}d`}, grid:{color:'rgba(0,0,0,0.04)'} },
+                    y:{ grid:{display:false}, ticks:{font:{size:12,family:'Inter',weight:'700'}} }
+                }
+            }
+        });
     }
 
     function fmtDate(iso) {
         if (!iso) return '—';
         const d = new Date(iso);
         return d.toLocaleDateString('es-MX', { day:'numeric', month:'short', year:'numeric' });
-    }
-
-    function renderEeff(socs, all) {
-        const today = new Date(); today.setHours(0,0,0,0);
-        const et1   = all.filter(c => c.etapa_num === 1);
-
-        // Card 1: Finalizadas (estatus finalizado, con o sin completado_at)
-        const done = et1.filter(c => getEtapaStatus(c) === 'done');
-        const doneRows = done.map(c => {
-            const soc      = socs.find(s => s.id === c.sociedad_id);
-            const limite   = c.fecha_limite ? new Date(c.fecha_limite + 'T00:00:00') : null;
-            const real     = c.completado_at ? new Date(c.completado_at) : null;
-            const diffDias = (limite && real) ? Math.round((real - limite) / 86400000) : null;
-            const badge    = diffDias === null
-                           ? `<span class="eeff-badge-pend">Finalizado</span>`
-                           : diffDias <= 0
-                           ? `<span class="eeff-badge-ok">✓ ${diffDias === 0 ? 'En fecha' : `${Math.abs(diffDias)}d antes`}</span>`
-                           : `<span class="eeff-badge-late">↑ ${diffDias}d tarde</span>`;
-            return `<tr>
-                <td>${soc?.nombre || '—'}</td>
-                <td>${fmtDate(c.fecha_limite)}</td>
-                <td>${real ? fmtDate(c.completado_at) : '<span style="color:#94a3b8">—</span>'}</td>
-                <td>${badge}</td>
-            </tr>`;
-        }).join('');
-
-        document.getElementById('anEeffDone').innerHTML = done.length ? `
-            <table class="eeff-table">
-                <thead><tr><th>Sociedad</th><th>Fecha límite</th><th>Entrega real</th><th>Resultado</th></tr></thead>
-                <tbody>${doneRows}</tbody>
-            </table>` : `<div class="eeff-empty">Ninguna sociedad ha finalizado la Etapa 1 aún.</div>`;
-
-        // Card 2: Fuera de tiempo (no finalizadas y vencidas)
-        const late = et1.filter(c => getEtapaStatus(c) !== 'done' && c.fecha_limite && new Date(c.fecha_limite + 'T00:00:00') < today);
-        const lateRows = late.map(c => {
-            const soc      = socs.find(s => s.id === c.sociedad_id);
-            const limite   = new Date(c.fecha_limite + 'T00:00:00');
-            const atraso   = Math.round((today - limite) / 86400000);
-            return `<tr>
-                <td>${soc?.nombre || '—'}</td>
-                <td>${fmtDate(c.fecha_limite)}</td>
-                <td><span class="eeff-badge-late">↑ ${atraso} día${atraso===1?'':'s'} de atraso</span></td>
-            </tr>`;
-        }).join('');
-
-        document.getElementById('anEeffLate').innerHTML = late.length ? `
-            <table class="eeff-table">
-                <thead><tr><th>Sociedad</th><th>Fecha límite</th><th>Atraso actual</th></tr></thead>
-                <tbody>${lateRows}</tbody>
-            </table>` : `<div class="eeff-empty">✓ Ninguna sociedad está fuera de tiempo.</div>`;
     }
 
     function renderRanking(socs, all) {
