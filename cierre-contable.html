@@ -38,10 +38,10 @@
         .btn-logout:hover { background:var(--ng); border-color:var(--ng); }
 
         /* ── PAGE HEADER ── */
-        .page-header { margin-top:68px; position:relative; overflow:hidden; background:linear-gradient(135deg,#0d1c31 0%,var(--nn) 55%,#1e3558 100%); min-height:220px; display:flex; align-items:center; padding:0 60px; }
+        .page-header { margin-top:68px; position:relative; overflow:hidden; background:linear-gradient(135deg,#0d1c31 0%,var(--nn) 55%,#1e3558 100%); min-height:200px; display:flex; align-items:center; justify-content:space-between; padding:0 60px; gap:32px; }
         .page-header::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 70% 50%,rgba(201,168,76,0.10) 0%,transparent 65%); }
         .page-header::after { content:''; position:absolute; bottom:0; left:0; right:0; height:3px; background:linear-gradient(90deg,transparent 0%,var(--ng) 40%,var(--ng) 60%,transparent 100%); }
-        .page-header-body { position:relative; z-index:1; display:flex; flex-direction:column; gap:10px; }
+        .page-header-body { position:relative; z-index:1; display:flex; flex-direction:column; gap:10px; flex-shrink:0; }
         .page-breadcrumb { display:flex; align-items:center; gap:7px; font-size:0.78rem; font-weight:600; letter-spacing:.5px; text-transform:uppercase; }
         .page-breadcrumb a { color:rgba(201,168,76,0.75); text-decoration:none; transition:color .18s; }
         .page-breadcrumb a:hover { color:var(--ng); }
@@ -52,6 +52,21 @@
         .page-header-sub { font-size:0.92rem; font-weight:500; color:rgba(255,255,255,0.55); margin-top:2px; }
         .page-header-icon { position:absolute; right:60px; top:50%; transform:translateY(-50%); opacity:0.07; pointer-events:none; line-height:1; }
         .page-header-icon svg { width:160px; height:160px; fill:#ffffff; }
+
+        /* Controles dentro del header oscuro */
+        .ph-controls { position:relative; z-index:1; display:flex; flex-direction:column; align-items:flex-end; gap:10px; flex-shrink:0; }
+        .ph-row { display:flex; align-items:center; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+        .ph-periodo-label { font-size:0.78rem; font-weight:700; color:rgba(255,255,255,0.7); white-space:nowrap; letter-spacing:.3px; }
+        .ph-periodo-select { appearance:none; background:rgba(255,255,255,0.10) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%23ffffff' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E") no-repeat right 12px center; border:1.5px solid rgba(255,255,255,0.25); border-radius:10px; padding:9px 34px 9px 14px; font-size:0.87rem; font-weight:700; color:#fff; font-family:inherit; cursor:pointer; min-width:190px; transition:border-color .15s,background .15s; backdrop-filter:blur(4px); }
+        .ph-periodo-select:focus { outline:none; border-color:var(--ng); }
+        .ph-periodo-select option { background:#152540; color:#fff; }
+        .ph-btn-gear { width:38px; height:38px; border-radius:9px; border:1.5px solid rgba(255,255,255,0.25); background:rgba(255,255,255,0.08); color:rgba(255,255,255,0.75); font-size:0.9rem; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; transition:all .18s; }
+        .ph-btn-gear:hover { border-color:var(--ng); color:var(--ng); background:rgba(201,168,76,0.15); }
+        .ph-btn-outline { display:inline-flex; align-items:center; gap:5px; padding:8px 16px; border-radius:9px; font-size:0.82rem; font-weight:700; font-family:inherit; cursor:pointer; background:rgba(255,255,255,0.08); color:rgba(255,255,255,0.85); border:1.5px solid rgba(255,255,255,0.25); transition:all .18s; white-space:nowrap; }
+        .ph-btn-outline:hover { background:rgba(255,255,255,0.15); border-color:rgba(255,255,255,0.5); color:#fff; }
+        .ph-btn-primary { display:inline-flex; align-items:center; gap:5px; padding:8px 16px; border-radius:9px; font-size:0.82rem; font-weight:700; font-family:inherit; cursor:pointer; background:var(--ng); color:var(--nn); border:none; transition:all .18s; white-space:nowrap; }
+        .ph-btn-primary:hover { background:#d4b050; }
+        .ph-sep { width:1.5px; height:26px; background:rgba(255,255,255,0.18); flex-shrink:0; margin:0 2px; }
 
         /* ── PAGE CONTENT ── */
         .page-content { min-height:calc(100vh - 68px - 220px); background:#f1f5f9; }
@@ -431,6 +446,21 @@
         <h1 class="page-header-title">Cierre <span>Contable</span></h1>
         <p class="page-header-sub">Revisión y consolidación mensual de cuentas</p>
     </div>
+    <div class="ph-controls">
+        <div class="ph-row">
+            <button id="btnVista" class="btn-cc btn-analitica" onclick="switchVista(_vistaActual === 'analitica' ? 'tablero' : 'analitica')">📊 Vista Analítica</button>
+        </div>
+        <div class="ph-row">
+            <span class="ph-periodo-label">Período:</span>
+            <select class="ph-periodo-select" id="periodoSel" onchange="onPeriodoChange()">
+                <option value="">— Seleccionar —</option>
+            </select>
+            <span class="ph-sep admin-only" style="display:none"></span>
+            <button class="ph-btn-gear admin-only" style="display:none" onclick="openGestionPeriodos()" title="Gestionar períodos">⚙️</button>
+            <button class="ph-btn-outline admin-only" style="display:none" onclick="openModalPeriodo()">+ Período</button>
+            <button class="ph-btn-primary admin-only" style="display:none" onclick="openModalSociedad()">+ Sociedad</button>
+        </div>
+    </div>
     <div class="page-header-icon">
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 1.5L18.5 9H13V3.5zM6 20V4h5v7h7v9H6zm2-7h8v1.5H8V13zm0 3h8v1.5H8V16zm0-6h3v1.5H8V10z"/>
@@ -447,17 +477,6 @@
       <div class="cc-hero-text">
         <h2 class="cc-title">Tablero de Cierres</h2>
         <p class="cc-subtitle">Supervisa y actualiza el estado de los cierres contables a través de todas las etapas para cada sociedad.</p>
-      </div>
-      <div class="cc-hero-controls">
-        <button id="btnVista" class="btn-cc btn-analitica" onclick="switchVista(_vistaActual === 'analitica' ? 'tablero' : 'analitica')">📊 Vista Analítica</button>
-        <span class="periodo-label">Período:</span>
-        <select class="periodo-select" id="periodoSel" onchange="onPeriodoChange()">
-          <option value="">— Seleccionar —</option>
-        </select>
-        <span class="ctrl-sep admin-only" style="display:none"></span>
-        <button class="btn-gear admin-only" style="display:none" onclick="openGestionPeriodos()" title="Gestionar períodos">⚙️</button>
-        <button class="btn-cc btn-cc-outline admin-only" style="display:none" onclick="openModalPeriodo()">+ Período</button>
-        <button class="btn-cc btn-cc-primary admin-only" style="display:none" onclick="openModalSociedad()">+ Sociedad</button>
       </div>
     </div>
 
@@ -1351,6 +1370,7 @@
             document.getElementById('btnAdmin').style.display = 'inline-block';
             document.querySelectorAll('.admin-only').forEach(el => {
                 el.style.display = el.tagName === 'SPAN' ? 'block' : 'inline-flex';
+                if (el.classList.contains('ph-sep')) el.style.display = 'block';
             });
         }
         await loadPeriodos();
