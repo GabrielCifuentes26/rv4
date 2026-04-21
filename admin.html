@@ -294,6 +294,13 @@
             transition: opacity .15s; line-height: 1;
         }
         .eye-row-btn:hover { opacity: 1; }
+        .btn-assign-pw {
+            background: rgba(14,165,233,0.07); border: 1px solid rgba(14,165,233,0.2);
+            color: var(--blue-dark); padding: 3px 10px; border-radius: 6px;
+            font-size: 0.68rem; font-weight: 700; cursor: pointer; font-family: inherit;
+            transition: background .15s; white-space: nowrap;
+        }
+        .btn-assign-pw:hover { background: rgba(14,165,233,0.15); }
 
         /* ── SETUP BANNER ── */
         .setup-banner {
@@ -739,6 +746,29 @@
     </div>
 </div>
 
+<!-- Modal: Asignar contraseña -->
+<div class="modal-overlay" id="setPwOverlay">
+    <div class="modal" style="width:380px">
+        <div class="modal-header">
+            <div class="modal-title">Asignar contraseña</div>
+            <button class="modal-close" onclick="closeSetPwModal()">✕</button>
+        </div>
+        <div id="setPwUserInfo" style="background:var(--bg);border-radius:10px;padding:12px 14px;margin-bottom:18px;font-size:0.82rem;color:var(--gray);"></div>
+        <input type="hidden" id="setPwUserId">
+        <div class="form-field">
+            <label>Nueva contraseña</label>
+            <div class="pass-wrap">
+                <input type="password" id="setPwInput" placeholder="Mín. 8 car., mayúscula, número y símbolo">
+                <button type="button" class="eye-btn" onclick="toggleEye('setPwInput','eyeSetPw')" id="eyeSetPw">👁</button>
+            </div>
+        </div>
+        <div class="modal-actions" style="margin-top:20px">
+            <button class="btn-cancel" onclick="closeSetPwModal()">Cancelar</button>
+            <button class="btn-save" id="btnSetPw" onclick="saveSetPw()">Guardar contraseña</button>
+        </div>
+    </div>
+</div>
+
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
@@ -863,8 +893,11 @@
                 <td><span class="role-badge ${rolClass}">${rolLabel}</span></td>
                 <td>
                     <div class="pw-cell">
-                        <span class="pw-mask" id="${pwId}">${pwText ? '••••••••' : '—'}</span>
-                        ${pwText ? `<button class="eye-row-btn" id="${eyeId}" onclick="togglePw('${pwId}','${eyeId}',\`${pwText.replace(/`/g,'\\`')}\`)">👁</button>` : ''}
+                        ${pwText
+                            ? `<span class="pw-mask" id="${pwId}">••••••••</span>
+                               <button class="eye-row-btn" id="${eyeId}" onclick="togglePw('${pwId}','${eyeId}',\`${pwText.replace(/`/g,'\\`')}\`)">👁</button>`
+                            : `<button class="btn-assign-pw" onclick="openSetPwModal('${u.id}','${u.nombre||u.correo}')">🔑 Asignar</button>`
+                        }
                     </div>
                 </td>
                 <td>${fecha}</td>
@@ -924,6 +957,53 @@
         if (!/[^A-Za-z0-9]/.test(p))  return 'Debe incluir al menos un símbolo (!, @, #, $...)';
         return null;
     }
+
+    // ── ASIGNAR CONTRASEÑA ────────────────────────────────────────────────────
+    function openSetPwModal(userId, userName) {
+        document.getElementById('setPwUserId').value   = userId;
+        document.getElementById('setPwInput').value    = '';
+        document.getElementById('setPwInput').type     = 'password';
+        document.getElementById('eyeSetPw').textContent = '👁';
+        document.getElementById('setPwUserInfo').innerHTML = `<strong>${userName}</strong>`;
+        document.getElementById('setPwOverlay').classList.add('open');
+        setTimeout(() => document.getElementById('setPwInput').focus(), 100);
+    }
+    function closeSetPwModal() {
+        document.getElementById('setPwOverlay').classList.remove('open');
+    }
+    async function saveSetPw() {
+        const userId = document.getElementById('setPwUserId').value;
+        const pw     = document.getElementById('setPwInput').value;
+        const btn    = document.getElementById('btnSetPw');
+        const passErr = validatePass(pw);
+        if (passErr) { showToast(passErr, 'error'); return; }
+
+        btn.disabled = true; btn.textContent = 'Guardando...';
+        try {
+            // Update in Auth
+            await fetch(`${SUPABASE_URL}/auth/v1/admin/users/${userId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${SERVICE_KEY}`,
+                    'apikey': SERVICE_KEY
+                },
+                body: JSON.stringify({ password: pw })
+            });
+            // Save visible password in usuarios table
+            await SERVICE_CLIENT.from('usuarios').update({ password_text: pw }).eq('id', userId);
+            showToast('Contraseña asignada correctamente', 'success');
+            closeSetPwModal();
+            loadUsers();
+        } catch (err) {
+            showToast('Error al asignar contraseña', 'error');
+        } finally {
+            btn.disabled = false; btn.textContent = 'Guardar contraseña';
+        }
+    }
+    document.getElementById('setPwOverlay').addEventListener('click', function(e) {
+        if (e.target === this) closeSetPwModal();
+    });
 
     function togglePw(spanId, btnId, plaintext) {
         const span = document.getElementById(spanId);
