@@ -50,23 +50,23 @@
         .page-header-title { font-size:2.6rem; font-weight:900; color:#ffffff; letter-spacing:-0.5px; line-height:1.1; }
         .page-header-title span { color:var(--ng); }
         .page-header-sub { font-size:0.92rem; font-weight:500; color:rgba(255,255,255,0.55); margin-top:2px; }
-        .page-header-icon { position:absolute; right:60px; top:50%; transform:translateY(-50%); opacity:0.07; pointer-events:none; line-height:1; }
-        .page-header-icon svg { width:160px; height:160px; fill:#ffffff; }
+        .page-header-icon { position:absolute; right:20px; top:50%; transform:translateY(-50%); opacity:0.05; pointer-events:none; line-height:1; }
+        .page-header-icon svg { width:140px; height:140px; fill:#ffffff; }
 
-        /* Controles dentro del header oscuro */
-        .ph-controls { position:relative; z-index:1; display:flex; flex-direction:column; align-items:flex-end; gap:10px; flex-shrink:0; }
-        .ph-row { display:flex; align-items:center; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
-        .ph-periodo-label { font-size:0.78rem; font-weight:700; color:rgba(255,255,255,0.7); white-space:nowrap; letter-spacing:.3px; }
-        .ph-periodo-select { appearance:none; background:rgba(255,255,255,0.10) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%23ffffff' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E") no-repeat right 12px center; border:1.5px solid rgba(255,255,255,0.25); border-radius:10px; padding:9px 34px 9px 14px; font-size:0.87rem; font-weight:700; color:#fff; font-family:inherit; cursor:pointer; min-width:190px; transition:border-color .15s,background .15s; backdrop-filter:blur(4px); }
-        .ph-periodo-select:focus { outline:none; border-color:var(--ng); }
+        /* ── CONTROLES EN HEADER ── */
+        .ph-controls { position:relative; z-index:1; display:flex; align-items:center; gap:10px; flex-shrink:0; }
+        .ph-periodo-label { font-size:0.72rem; font-weight:700; color:rgba(255,255,255,0.5); white-space:nowrap; letter-spacing:.8px; text-transform:uppercase; }
+        .ph-periodo-select { appearance:none; background:rgba(255,255,255,0.07) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%23C9A84C' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E") no-repeat right 12px center; border:1.5px solid rgba(201,168,76,0.35); border-radius:10px; padding:10px 34px 10px 14px; font-size:0.88rem; font-weight:700; color:#fff; font-family:inherit; cursor:pointer; min-width:175px; transition:border-color .2s,background .2s; }
+        .ph-periodo-select:hover { background:rgba(255,255,255,0.11); border-color:rgba(201,168,76,0.65); }
+        .ph-periodo-select:focus { outline:none; border-color:var(--ng); background:rgba(255,255,255,0.12); }
         .ph-periodo-select option { background:#152540; color:#fff; }
-        .ph-btn-gear { width:38px; height:38px; border-radius:9px; border:1.5px solid rgba(255,255,255,0.25); background:rgba(255,255,255,0.08); color:rgba(255,255,255,0.75); font-size:0.9rem; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; transition:all .18s; }
-        .ph-btn-gear:hover { border-color:var(--ng); color:var(--ng); background:rgba(201,168,76,0.15); }
-        .ph-btn-outline { display:inline-flex; align-items:center; gap:5px; padding:8px 16px; border-radius:9px; font-size:0.82rem; font-weight:700; font-family:inherit; cursor:pointer; background:rgba(255,255,255,0.08); color:rgba(255,255,255,0.85); border:1.5px solid rgba(255,255,255,0.25); transition:all .18s; white-space:nowrap; }
-        .ph-btn-outline:hover { background:rgba(255,255,255,0.15); border-color:rgba(255,255,255,0.5); color:#fff; }
-        .ph-btn-primary { display:inline-flex; align-items:center; gap:5px; padding:8px 16px; border-radius:9px; font-size:0.82rem; font-weight:700; font-family:inherit; cursor:pointer; background:var(--ng); color:var(--nn); border:none; transition:all .18s; white-space:nowrap; }
-        .ph-btn-primary:hover { background:#d4b050; }
-        .ph-sep { width:1.5px; height:26px; background:rgba(255,255,255,0.18); flex-shrink:0; margin:0 2px; }
+        .ph-div { width:1px; height:28px; background:rgba(255,255,255,0.14); flex-shrink:0; margin:0 2px; }
+        .ph-btn-gear { width:38px; height:38px; border-radius:9px; border:1px solid rgba(255,255,255,0.18); background:transparent; color:rgba(255,255,255,0.6); font-size:0.9rem; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; transition:all .18s; }
+        .ph-btn-gear:hover { border-color:var(--ng); color:var(--ng); background:rgba(201,168,76,0.12); }
+        .ph-btn-outline { display:inline-flex; align-items:center; gap:5px; padding:9px 15px; border-radius:9px; font-size:0.81rem; font-weight:700; font-family:inherit; cursor:pointer; background:transparent; color:rgba(255,255,255,0.75); border:1px solid rgba(255,255,255,0.22); transition:all .18s; white-space:nowrap; }
+        .ph-btn-outline:hover { background:rgba(255,255,255,0.10); border-color:rgba(255,255,255,0.45); color:#fff; }
+        .ph-btn-primary { display:inline-flex; align-items:center; gap:5px; padding:9px 15px; border-radius:9px; font-size:0.81rem; font-weight:700; font-family:inherit; cursor:pointer; background:var(--ng); color:var(--nn); border:none; transition:all .18s; white-space:nowrap; box-shadow:0 2px 10px rgba(201,168,76,0.3); }
+        .ph-btn-primary:hover { background:#d4af52; box-shadow:0 4px 14px rgba(201,168,76,0.45); }
 
         /* ── PAGE CONTENT ── */
         .page-content { min-height:calc(100vh - 68px - 220px); background:#f1f5f9; }
@@ -447,19 +447,16 @@
         <p class="page-header-sub">Revisión y consolidación mensual de cuentas</p>
     </div>
     <div class="ph-controls">
-        <div class="ph-row">
-            <button id="btnVista" class="btn-cc btn-analitica" onclick="switchVista(_vistaActual === 'analitica' ? 'tablero' : 'analitica')">📊 Vista Analítica</button>
-        </div>
-        <div class="ph-row">
-            <span class="ph-periodo-label">Período:</span>
-            <select class="ph-periodo-select" id="periodoSel" onchange="onPeriodoChange()">
-                <option value="">— Seleccionar —</option>
-            </select>
-            <span class="ph-sep admin-only" style="display:none"></span>
-            <button class="ph-btn-gear admin-only" style="display:none" onclick="openGestionPeriodos()" title="Gestionar períodos">⚙️</button>
-            <button class="ph-btn-outline admin-only" style="display:none" onclick="openModalPeriodo()">+ Período</button>
-            <button class="ph-btn-primary admin-only" style="display:none" onclick="openModalSociedad()">+ Sociedad</button>
-        </div>
+        <span class="ph-periodo-label">Período</span>
+        <select class="ph-periodo-select" id="periodoSel" onchange="onPeriodoChange()">
+            <option value="">— Seleccionar —</option>
+        </select>
+        <div class="ph-div"></div>
+        <button id="btnVista" class="btn-cc btn-analitica" onclick="switchVista(_vistaActual === 'analitica' ? 'tablero' : 'analitica')">📊 Vista Analítica</button>
+        <div class="ph-div ph-div-admin admin-only" style="display:none"></div>
+        <button class="ph-btn-gear admin-only" style="display:none" onclick="openGestionPeriodos()" title="Gestionar períodos">⚙️</button>
+        <button class="ph-btn-outline admin-only" style="display:none" onclick="openModalPeriodo()">+ Período</button>
+        <button class="ph-btn-primary admin-only" style="display:none" onclick="openModalSociedad()">+ Sociedad</button>
     </div>
     <div class="page-header-icon">
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
