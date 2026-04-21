@@ -1300,6 +1300,12 @@
         return { start, end };
     }
 
+    // ── UTILIDAD: fecha real de completado (fallback a updated_at) ────
+    function getCompDate(c) {
+        const s = c.completado_at || c.updated_at;
+        return s ? new Date(s) : null;
+    }
+
     // ── GAUGE MEJORADO ────────────────────────────────────────────────
     function renderGauge(socs, all) {
         const today = new Date(); today.setHours(0,0,0,0);
@@ -1317,10 +1323,13 @@
         }
 
         const gap = pctActual - pctEsperado;
-        let estado, color;
-        if (gap >= 0)         { estado = 'En tiempo'; color = '#22c55e'; }
-        else if (gap >= -15)  { estado = 'En riesgo';  color = '#f59e0b'; }
-        else                  { estado = 'Atrasado';   color = '#ef4444'; }
+        const periodoVencido = end && today > end && completed < total;
+        let estado, color, emoji;
+        if (completed === total && total > 0) { estado = 'Completado';      color = '#22c55e'; emoji = '✅'; }
+        else if (periodoVencido)              { estado = 'Período vencido'; color = '#ef4444'; emoji = '🔴'; }
+        else if (gap >= 0)                    { estado = 'En tiempo';       color = '#22c55e'; emoji = '🟢'; }
+        else if (gap >= -15)                  { estado = 'En riesgo';       color = '#f59e0b'; emoji = '🟡'; }
+        else                                  { estado = 'Atrasado';        color = '#ef4444'; emoji = '🔴'; }
 
         const arc = 157 - (157 * pctActual / 100);
         document.getElementById('gaugeArc').setAttribute('stroke-dashoffset', arc);
@@ -1332,11 +1341,19 @@
         document.getElementById('gaugeActual').textContent   = `${pctActual}%`;
         document.getElementById('gaugeEsperado').textContent = `${pctEsperado}%`;
         const gapEl = document.getElementById('gaugeGap');
-        gapEl.textContent = `${gap >= 0 ? '+' : ''}${gap}%`;
+        const gapLbl = document.getElementById('gaugeGap').previousElementSibling;
+        if (periodoVencido) {
+            const diasVencido = Math.ceil((today - end) / 86400000);
+            gapEl.textContent = `+${diasVencido}d`;
+            if (gapLbl) gapLbl.textContent = 'Días vencido';
+        } else {
+            gapEl.textContent = `${gap >= 0 ? '+' : ''}${gap}%`;
+            if (gapLbl) gapLbl.textContent = 'Gap';
+        }
         gapEl.style.color = color;
         document.getElementById('gaugeStatus').innerHTML =
             `<span class="gauge-status-badge" style="background:${color}18;color:${color};border:1.5px solid ${color}40">` +
-            `${gap >= 0 ? '🟢' : gap >= -15 ? '🟡' : '🔴'} ${estado}</span>`;
+            `${emoji} ${estado}</span>`;
     }
 
     // ── KPI MINI-CARDS ────────────────────────────────────────────────
@@ -1355,34 +1372,20 @@
         const etapasAtrasadas = all.filter(c => getEtapaStatus(c) === 'late').length;
         const socsConAtraso   = new Set(all.filter(c => getEtapaStatus(c) === 'late').map(c => c.sociedad_id)).size;
 
-        let etapaMasLenta = '—', diasLenta = 0;
-        if (start) {
-            let maxAvg = -1;
-            ETAPA_NAMES.forEach((name, i) => {
-                const etapa = i + 1;
-                const durs = socs.map(soc => {
-                    const cE = all.find(c => c.sociedad_id === soc.id && c.etapa_num === etapa && c.completado_at);
-                    if (!cE) return null;
-                    const inicio = etapa === 1 ? start : (() => {
-                        const prev = all.find(c => c.sociedad_id === soc.id && c.etapa_num === etapa-1 && c.completado_at);
-                        return prev ? new Date(prev.completado_at) : null;
-                    })();
-                    if (!inicio) return null;
-                    return Math.max(0, Math.round((new Date(cE.completado_at) - inicio) / 86400000));
-                }).filter(d => d !== null);
-                const avg = durs.length ? durs.reduce((a,b)=>a+b,0) / durs.length : -1;
-                if (avg > maxAvg) {
-                    maxAvg = avg;
-                    etapaMasLenta = `E${etapa} — ${name.split('/')[0].trim()}`;
-                    diasLenta = Math.round(avg * 10) / 10;
-                }
-            });
-        }
+        const ETAPA_SHORT_KPI = ['Entrega EEFF','Integraciones','Revisión','Cuadre'];
+        const masAtrasada = socs.map(soc => {
+            const cs = all.filter(c => c.sociedad_id === soc.id).sort((a,b) => a.etapa_num - b.etapa_num);
+            const activa = cs.find(c => getEtapaStatus(c) !== 'done');
+            if (!activa || !activa.fecha_limite) return null;
+            const limite = new Date(activa.fecha_limite + 'T00:00:00');
+            if (limite >= today) return null;
+            return { nombre: soc.nombre, atraso: Math.round((today - limite) / 86400000), etapa: activa.etapa_num };
+        }).filter(Boolean).sort((a,b) => b.atraso - a.atraso)[0] || null;
 
         const compColor   = (completadas === total && total > 0) ? '#22c55e' : completadas > total/2 ? '#f59e0b' : '#ef4444';
         const cierreColor = diasAlCierre === null ? '#94a3b8' : diasAlCierre > 7 ? '#22c55e' : diasAlCierre >= 0 ? '#f59e0b' : '#ef4444';
         const atrasoColor = etapasAtrasadas === 0 ? '#22c55e' : '#ef4444';
-        const lentaColor  = diasLenta > 0 ? '#C9A84C' : '#94a3b8';
+        const atrasadaColor = masAtrasada ? '#ef4444' : '#22c55e';
 
         const cierreVal = diasAlCierre === null ? '—' : diasAlCierre < 0 ? `${Math.abs(diasAlCierre)}d vencido` : diasAlCierre === 0 ? 'Hoy' : `${diasAlCierre} días`;
         const cierreSub = end ? end.toLocaleDateString('es-MX',{day:'numeric',month:'short',year:'numeric'}) : '—';
@@ -1396,10 +1399,12 @@
                     <div style="font-size:0.67rem;color:#64748b;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${sub}</div>
                 </div></div>`;
         }
-        document.getElementById('anKpiComp').innerHTML   = kCard('✅','Completadas',       `${completadas} / ${total}`,        'con las 4 etapas finalizadas', compColor);
-        document.getElementById('anKpiCierre').innerHTML  = kCard('📅','Días al cierre',    cierreVal,                          cierreSub, cierreColor);
-        document.getElementById('anKpiAtraso').innerHTML  = kCard('⏰','Etapas con atraso', String(etapasAtrasadas),            `en ${socsConAtraso} sociedad${socsConAtraso!==1?'es':''}`, atrasoColor);
-        document.getElementById('anKpiLenta').innerHTML   = kCard('🐢','Etapa más lenta',   diasLenta > 0 ? `${diasLenta}d` : '—', diasLenta > 0 ? etapaMasLenta : 'Sin datos suficientes', lentaColor);
+        document.getElementById('anKpiComp').innerHTML   = kCard('✅','Completadas',          `${completadas} / ${total}`,   'con las 4 etapas finalizadas', compColor);
+        document.getElementById('anKpiCierre').innerHTML  = kCard('📅','Días al cierre',       cierreVal,                     cierreSub, cierreColor);
+        document.getElementById('anKpiAtraso').innerHTML  = kCard('⏰','Etapas con atraso',    String(etapasAtrasadas),       `en ${socsConAtraso} sociedad${socsConAtraso!==1?'es':''}`, atrasoColor);
+        document.getElementById('anKpiLenta').innerHTML   = masAtrasada
+            ? kCard('🚨','Más atrasada', masAtrasada.nombre, `${masAtrasada.atraso}d · E${masAtrasada.etapa}: ${ETAPA_SHORT_KPI[masAtrasada.etapa-1]}`, atrasadaColor)
+            : kCard('✅','Sin atrasos críticos', '—', 'Todas las etapas activas están en tiempo', '#22c55e');
     }
 
     // ── TENDENCIA DE AVANCE ───────────────────────────────────────────
@@ -1411,7 +1416,15 @@
         const totalEtapas = socs.length * 4;
         if (!totalEtapas) return;
 
-        const completados = all.filter(c => c.completado_at).map(c => ({ ...c, _d: new Date(c.completado_at) }));
+        // Fecha en que cada sociedad quedó 100% terminada (4 etapas finalizadas)
+        const socDoneDates = socs.map(soc => {
+            const cs = all.filter(c => c.sociedad_id === soc.id && c.estatus === 'finalizado');
+            if (cs.length < 4) return null;
+            const dates = cs.map(c => getCompDate(c)).filter(Boolean);
+            if (dates.length < 4) return null;
+            return new Date(Math.max(...dates.map(d => d.getTime())));
+        }).filter(Boolean);
+
         const days = Math.ceil((today - start) / 86400000) + 1;
         const labels = [], dataReal = [], dataObj = [];
         const rangeMs = end - start;
@@ -1419,7 +1432,7 @@
         for (let i = 0; i < days; i++) {
             const d = new Date(start.getTime() + i * 86400000);
             labels.push(d.toLocaleDateString('es', { day:'2-digit', month:'short' }));
-            dataReal.push(Math.round(completados.filter(c => c._d <= d).length / totalEtapas * 100));
+            dataReal.push(Math.round(socDoneDates.filter(sd => sd <= d).length / socs.length * 100));
             dataObj.push(rangeMs > 0 ? Math.max(0, Math.min(100, Math.round((d - start) / rangeMs * 100))) : 0);
         }
 
@@ -1463,12 +1476,12 @@
                 if (etapa === 1) { inicio = start; }
                 else {
                     const prev = all.find(c => c.sociedad_id === soc.id && c.etapa_num === etapa-1);
-                    inicio = prev?.completado_at ? new Date(prev.completado_at)
-                           : prev?.fecha_limite  ? new Date(prev.fecha_limite + 'T00:00:00') : null;
+                    inicio = getCompDate(prev) || (prev?.fecha_limite ? new Date(prev.fecha_limite + 'T00:00:00') : null);
                 }
                 if (!inicio) return;
-                if (cE.completado_at) {
-                    dursF.push(Math.max(0, Math.round((new Date(cE.completado_at) - inicio) / 86400000)));
+                if (cE.estatus === 'finalizado') {
+                    const cd = getCompDate(cE);
+                    if (cd) dursF.push(Math.max(0, Math.round((cd - inicio) / 86400000)));
                 } else {
                     dursP.push(Math.max(0, Math.round((today - inicio) / 86400000)));
                 }
@@ -1552,11 +1565,13 @@
         if (!start) { el.innerHTML = '<div class="eeff-empty">Sin fechas límite definidas.</div>'; return; }
 
         const data = socs.map(soc => {
-            const cE1 = all.find(c => c.sociedad_id === soc.id && c.etapa_num === 1 && c.completado_at);
+            const cE1 = all.find(c => c.sociedad_id === soc.id && c.etapa_num === 1 && c.estatus === 'finalizado');
             if (!cE1) return null;
-            const dur = Math.max(0, Math.round((new Date(cE1.completado_at) - start) / 86400000));
-            const enTiempo = cE1.fecha_limite ? new Date(cE1.completado_at) <= new Date(cE1.fecha_limite + 'T00:00:00') : true;
-            return { nombre:soc.nombre, dur, enTiempo, completadoAt:cE1.completado_at, fechaLimite:cE1.fecha_limite };
+            const cd = getCompDate(cE1);
+            if (!cd) return null;
+            const dur = Math.max(0, Math.round((cd - start) / 86400000));
+            const enTiempo = cE1.fecha_limite ? cd <= new Date(cE1.fecha_limite + 'T00:00:00') : true;
+            return { nombre:soc.nombre, dur, enTiempo, completadoAt:cd.toISOString(), fechaLimite:cE1.fecha_limite };
         }).filter(Boolean).sort((a,b)=>a.dur-b.dur);
 
         if (!data.length) { el.innerHTML = '<div class="eeff-empty">Ninguna sociedad ha finalizado E1 aún.</div>'; return; }
@@ -1597,8 +1612,7 @@
             if (activa.etapa_num === 1) { inicio = start; }
             else {
                 const prev = cs.find(c => c.etapa_num === activa.etapa_num - 1);
-                inicio = prev?.completado_at ? new Date(prev.completado_at)
-                       : prev?.fecha_limite  ? new Date(prev.fecha_limite + 'T00:00:00') : start;
+                inicio = getCompDate(prev) || (prev?.fecha_limite ? new Date(prev.fecha_limite + 'T00:00:00') : start);
             }
             if (!inicio) return null;
             const dias = Math.max(0, Math.round((today - inicio) / 86400000));
