@@ -581,7 +581,8 @@
       </div>
 
       <div class="an-card">
-        <div class="an-card-title">⏱ Tiempo promedio por etapa</div>
+        <div class="an-card-title">⏱ Días promedio de ejecución por etapa</div>
+        <div style="font-size:0.7rem;color:#94a3b8;margin-bottom:10px">Solo etapas finalizadas con fecha de completado registrada</div>
         <div id="anAvgEtapas" style="display:flex;flex-direction:column;gap:10px;margin-top:8px"></div>
       </div>
 
@@ -1139,8 +1140,18 @@
         btn.textContent = 'Guardando...'; btn.disabled = true;
 
         for (let n = 1; n <= 4; n++) {
-            const existing = _cache.cierres.find(c => c.etapa_num===n);
-            const payload  = { sociedad_id:_cache.socId, etapa_num:n, responsable:document.getElementById(`dResp-${n}`).value, fecha_limite:document.getElementById(`dFecha-${n}`).value||null, estatus:document.getElementById(`dEstatus-${n}`).value, notas:document.getElementById(`dNotas-${n}`).value };
+            const existing  = _cache.cierres.find(c => c.etapa_num===n);
+            const newEstatus = document.getElementById(`dEstatus-${n}`).value;
+            const wasFinished = existing?.estatus === 'finalizado';
+            const nowFinished = newEstatus === 'finalizado';
+            const payload = {
+                sociedad_id: _cache.socId, etapa_num: n,
+                responsable: document.getElementById(`dResp-${n}`).value,
+                fecha_limite: document.getElementById(`dFecha-${n}`).value || null,
+                estatus: newEstatus,
+                notas: document.getElementById(`dNotas-${n}`).value,
+                completado_at: nowFinished ? (wasFinished && existing?.completado_at ? existing.completado_at : new Date().toISOString()) : null
+            };
             const { error } = existing?.id
                 ? await SERVICE_CLIENT.from('cc_cierres').update(payload).eq('id', existing.id)
                 : await SERVICE_CLIENT.from('cc_cierres').insert(payload);
@@ -1226,16 +1237,22 @@
     function renderAvgEtapas(all) {
         const counts = ETAPA_NAMES.map((name, i) => {
             const etapa = i + 1;
-            const cells = all.filter(c => c.etapa_num === etapa);
-            const done  = cells.filter(c => getEtapaStatus(c) === 'done').length;
-            return { name, done, total: cells.length, pct: cells.length ? Math.round(done/cells.length*100) : 0 };
+            const finished = all.filter(c => c.etapa_num === etapa && c.completado_at && c.created_at);
+            const dias = finished.map(c => {
+                const ms = new Date(c.completado_at) - new Date(c.created_at);
+                return Math.max(1, Math.round(ms / 86400000));
+            });
+            const avg = dias.length ? Math.round(dias.reduce((a,b)=>a+b,0) / dias.length) : null;
+            return { name, avg, count: finished.length };
         });
-        const maxPct = Math.max(...counts.map(c => c.pct), 1);
+        const maxAvg = Math.max(...counts.map(c => c.avg || 0), 1);
         document.getElementById('anAvgEtapas').innerHTML = counts.map(c => `
             <div class="avg-row">
                 <div class="avg-label" title="${c.name}">${c.name}</div>
-                <div class="avg-track"><div class="avg-fill" style="width:${Math.round(c.pct/maxPct*100)}%"></div></div>
-                <div class="avg-val">${c.pct}%</div>
+                <div class="avg-track">
+                    ${c.avg ? `<div class="avg-fill" style="width:${Math.round(c.avg/maxAvg*100)}%"></div>` : '<div class="avg-fill" style="width:0%"></div>'}
+                </div>
+                <div class="avg-val">${c.avg ? `${c.avg}d` : '—'}</div>
             </div>`).join('');
     }
 
