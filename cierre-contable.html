@@ -343,12 +343,16 @@
         }
         .an-gauge-lbl  { font-size: 0.72rem; color: #64748b; text-align: center; }
 
-        /* Avg etapas bars */
-        .avg-row { display: flex; align-items: center; gap: 10px; }
-        .avg-label { font-size: 0.72rem; color: #64748b; width: 130px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .avg-track { flex: 1; background: #f1f5f9; border-radius: 4px; height: 8px; }
-        .avg-fill  { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #C9A84C, #A8832A); }
-        .avg-val   { font-size: 0.72rem; font-weight: 700; color: #152540; width: 32px; text-align: right; }
+        /* Tabla EEFF */
+        .eeff-table { width:100%; border-collapse:collapse; font-size:0.75rem; }
+        .eeff-table th { padding:7px 10px; font-size:0.63rem; font-weight:800; text-transform:uppercase; letter-spacing:.7px; color:#94a3b8; border-bottom:1.5px solid #e2e8f0; text-align:left; }
+        .eeff-table td { padding:9px 10px; border-bottom:1px solid #f1f5f9; vertical-align:middle; }
+        .eeff-table tr:last-child td { border-bottom:none; }
+        .eeff-table td:first-child { font-weight:700; color:#152540; }
+        .eeff-badge-ok   { display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:0.67rem;font-weight:800;background:#dcfce7;color:#16a34a; }
+        .eeff-badge-late { display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:0.67rem;font-weight:800;background:#fee2e2;color:#dc2626; }
+        .eeff-badge-pend { display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:0.67rem;font-weight:800;background:#f1f5f9;color:#64748b; }
+        .eeff-empty { text-align:center;padding:24px;color:#94a3b8;font-size:0.8rem; }
 
         /* Ranking */
         .rank-row { display: flex; align-items: center; gap: 10px; }
@@ -581,9 +585,15 @@
       </div>
 
       <div class="an-card">
-        <div class="an-card-title">⏱ Días promedio de ejecución por etapa</div>
-        <div style="font-size:0.7rem;color:#94a3b8;margin-bottom:10px">Solo etapas finalizadas con fecha de completado registrada</div>
-        <div id="anAvgEtapas" style="display:flex;flex-direction:column;gap:10px;margin-top:8px"></div>
+        <div class="an-card-title">✅ Entrega de Estados Financieros — Finalizadas</div>
+        <div style="font-size:0.7rem;color:#94a3b8;margin-bottom:12px">Fecha límite vs. fecha real de entrega · Etapa 1</div>
+        <div id="anEeffDone"></div>
+      </div>
+
+      <div class="an-card">
+        <div class="an-card-title">⚠️ Entrega de Estados Financieros — Fuera de Tiempo</div>
+        <div style="font-size:0.7rem;color:#94a3b8;margin-bottom:12px">Sociedades que no entregaron dentro del plazo · Etapa 1</div>
+        <div id="anEeffLate"></div>
       </div>
 
       <div class="an-card">
@@ -1211,7 +1221,7 @@
         const sociedades = socs || [];
 
         renderGauge(sociedades, all);
-        renderAvgEtapas(all);
+        renderEeff(sociedades, all);
         renderRanking(sociedades, all);
         renderGantt(sociedades, all);
         renderHeatAtrasos(all);
@@ -1234,26 +1244,59 @@
         document.getElementById('gaugeLbl').textContent = `${completed} de ${total} sociedades completadas`;
     }
 
-    function renderAvgEtapas(all) {
-        const counts = ETAPA_NAMES.map((name, i) => {
-            const etapa = i + 1;
-            const finished = all.filter(c => c.etapa_num === etapa && c.completado_at && c.created_at);
-            const dias = finished.map(c => {
-                const ms = new Date(c.completado_at) - new Date(c.created_at);
-                return Math.max(1, Math.round(ms / 86400000));
-            });
-            const avg = dias.length ? Math.round(dias.reduce((a,b)=>a+b,0) / dias.length) : null;
-            return { name, avg, count: finished.length };
-        });
-        const maxAvg = Math.max(...counts.map(c => c.avg || 0), 1);
-        document.getElementById('anAvgEtapas').innerHTML = counts.map(c => `
-            <div class="avg-row">
-                <div class="avg-label" title="${c.name}">${c.name}</div>
-                <div class="avg-track">
-                    ${c.avg ? `<div class="avg-fill" style="width:${Math.round(c.avg/maxAvg*100)}%"></div>` : '<div class="avg-fill" style="width:0%"></div>'}
-                </div>
-                <div class="avg-val">${c.avg ? `${c.avg}d` : '—'}</div>
-            </div>`).join('');
+    function fmtDate(iso) {
+        if (!iso) return '—';
+        const d = new Date(iso);
+        return d.toLocaleDateString('es-MX', { day:'numeric', month:'short', year:'numeric' });
+    }
+
+    function renderEeff(socs, all) {
+        const today = new Date(); today.setHours(0,0,0,0);
+        const et1   = all.filter(c => c.etapa_num === 1);
+
+        // Card 1: Finalizadas
+        const done = et1.filter(c => c.completado_at);
+        const doneRows = done.map(c => {
+            const soc      = socs.find(s => s.id === c.sociedad_id);
+            const limite   = c.fecha_limite ? new Date(c.fecha_limite + 'T00:00:00') : null;
+            const real     = new Date(c.completado_at);
+            const diffMs   = limite ? real - limite : null;
+            const diffDias = diffMs !== null ? Math.round(diffMs / 86400000) : null;
+            const badge    = diffDias === null ? `<span class="eeff-badge-pend">Sin fecha límite</span>`
+                           : diffDias <= 0    ? `<span class="eeff-badge-ok">✓ ${Math.abs(diffDias) === 0 ? 'En fecha' : `${Math.abs(diffDias)}d antes`}</span>`
+                           :                    `<span class="eeff-badge-late">↑ ${diffDias}d tarde</span>`;
+            return `<tr>
+                <td>${soc?.nombre || '—'}</td>
+                <td>${fmtDate(c.fecha_limite)}</td>
+                <td>${fmtDate(c.completado_at)}</td>
+                <td>${badge}</td>
+            </tr>`;
+        }).join('');
+
+        document.getElementById('anEeffDone').innerHTML = done.length ? `
+            <table class="eeff-table">
+                <thead><tr><th>Sociedad</th><th>Fecha límite</th><th>Entrega real</th><th>Resultado</th></tr></thead>
+                <tbody>${doneRows}</tbody>
+            </table>` : `<div class="eeff-empty">Ninguna sociedad ha finalizado la Etapa 1 aún.</div>`;
+
+        // Card 2: Fuera de tiempo (no finalizadas y vencidas)
+        const late = et1.filter(c => !c.completado_at && c.fecha_limite && new Date(c.fecha_limite + 'T00:00:00') < today);
+        const lateRows = late.map(c => {
+            const soc      = socs.find(s => s.id === c.sociedad_id);
+            const limite   = new Date(c.fecha_limite + 'T00:00:00');
+            const atraso   = Math.round((today - limite) / 86400000);
+            return `<tr>
+                <td>${soc?.nombre || '—'}</td>
+                <td>${fmtDate(c.fecha_limite)}</td>
+                <td><span class="eeff-badge-late">↑ ${atraso} día${atraso===1?'':'s'} de atraso</span></td>
+            </tr>`;
+        }).join('');
+
+        document.getElementById('anEeffLate').innerHTML = late.length ? `
+            <table class="eeff-table">
+                <thead><tr><th>Sociedad</th><th>Fecha límite</th><th>Atraso actual</th></tr></thead>
+                <tbody>${lateRows}</tbody>
+            </table>` : `<div class="eeff-empty">✓ Ninguna sociedad está fuera de tiempo.</div>`;
     }
 
     function renderRanking(socs, all) {
