@@ -75,10 +75,16 @@
         .logo {
             font-size: 1.15rem; font-weight: 900; color: #fff;
             letter-spacing: 2px; text-transform: uppercase; flex-shrink: 0;
-            transition: color .4s;
+            transition: color .4s; display: flex; align-items: center; gap: 10px;
         }
         .logo span { color: var(--ng); }
         nav.scrolled .logo { color: var(--nn); }
+        .logo-img {
+            height: 36px; width: auto; object-fit: contain;
+            filter: brightness(0) invert(1);
+            transition: filter .4s;
+        }
+        nav.scrolled .logo-img { filter: none; }
 
         /* menu central */
         .nav-menu { display: flex; align-items: center; gap: 2px; }
@@ -426,7 +432,10 @@
 
 <!-- NAV -->
 <nav id="mainNav">
-    <div class="logo">Costos&<span>Presupuestos</span></div>
+    <div class="logo">
+        <img src="imagenes de proyectos/Logos/LOGO RV4 BLANCO.png" alt="RV4" class="logo-img">
+        Costos&<span>Presupuestos</span>
+    </div>
 
     <div class="nav-menu">
         <a href="#proyectos" class="nav-link">Presupuesto</a>
