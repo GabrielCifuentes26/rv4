@@ -1193,14 +1193,20 @@
                 });
             }
 
-            // 3. Insertar/actualizar en tabla usuarios con el UUID correcto
+            // 3. Leer contraseña guardada en la solicitud
+            const { data: solData } = await SERVICE_CLIENT
+                .from('solicitudes').select('password_text').eq('id', solId).single();
+            const savedPw = solData?.password_text || null;
+
+            // 4. Insertar/actualizar en tabla usuarios con el UUID correcto
             const insertData = { nombre, correo, rol, empresa, nivel, estado: 'activo' };
             if (realAuthId) insertData.id = realAuthId;
+            if (savedPw)    insertData.password_text = savedPw;
 
             const { error: userErr } = await SERVICE_CLIENT.from('usuarios').upsert(insertData, { onConflict: 'id' });
             if (userErr) throw userErr;
 
-            // 4. Actualizar solicitud a aprobada
+            // 5. Actualizar solicitud a aprobada
             await SERVICE_CLIENT.from('solicitudes').update({ estado: 'aprobado' }).eq('id', solId);
 
             closeApproveModal();
