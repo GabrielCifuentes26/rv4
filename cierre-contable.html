@@ -1281,7 +1281,7 @@
             </table>` : `<div class="eeff-empty">Ninguna sociedad ha finalizado la Etapa 1 aún.</div>`;
 
         // Card 2: Fuera de tiempo (no finalizadas y vencidas)
-        const late = et1.filter(c => !c.completado_at && c.fecha_limite && new Date(c.fecha_limite + 'T00:00:00') < today);
+        const late = et1.filter(c => getEtapaStatus(c) !== 'done' && c.fecha_limite && new Date(c.fecha_limite + 'T00:00:00') < today);
         const lateRows = late.map(c => {
             const soc      = socs.find(s => s.id === c.sociedad_id);
             const limite   = new Date(c.fecha_limite + 'T00:00:00');
