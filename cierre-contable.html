@@ -447,12 +447,12 @@
         <p class="page-header-sub">Revisión y consolidación mensual de cuentas</p>
     </div>
     <div class="ph-controls">
+        <button id="btnVista" class="btn-cc btn-analitica" onclick="switchVista(_vistaActual === 'analitica' ? 'tablero' : 'analitica')">📊 Vista Analítica</button>
+        <div class="ph-div"></div>
         <span class="ph-periodo-label">Período</span>
         <select class="ph-periodo-select" id="periodoSel" onchange="onPeriodoChange()">
             <option value="">— Seleccionar —</option>
         </select>
-        <div class="ph-div"></div>
-        <button id="btnVista" class="btn-cc btn-analitica" onclick="switchVista(_vistaActual === 'analitica' ? 'tablero' : 'analitica')">📊 Vista Analítica</button>
         <div class="ph-div ph-div-admin admin-only" style="display:none"></div>
         <button class="ph-btn-gear admin-only" style="display:none" onclick="openGestionPeriodos()" title="Gestionar períodos">⚙️</button>
         <button class="ph-btn-outline admin-only" style="display:none" onclick="openModalPeriodo()">+ Período</button>
