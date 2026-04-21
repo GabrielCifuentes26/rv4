@@ -392,12 +392,17 @@
         .gantt-bar.late { background: #ef4444; }
         .gantt-bar.pend { background: #cbd5e1; color: #64748b; }
 
-        /* Heatmap atrasos */
-        .heat-atraso-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-        .heat-atraso-label { font-size: 0.75rem; color: #475569; width: 150px; flex-shrink: 0; }
-        .heat-atraso-bar   { flex: 1; background: #f1f5f9; border-radius: 4px; height: 10px; }
-        .heat-atraso-fill  { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #ef4444, #f97316); }
-        .heat-atraso-cnt   { font-size: 0.72rem; font-weight: 700; color: #ef4444; width: 24px; text-align: right; }
+        /* Heatmap histórico */
+        .heat-matrix { width:100%; border-collapse:collapse; font-size:0.74rem; min-width:480px; }
+        .heat-matrix th { padding:8px 12px; font-size:0.63rem; font-weight:800; text-transform:uppercase; letter-spacing:.7px; color:#94a3b8; border-bottom:2px solid #e2e8f0; text-align:center; white-space:nowrap; }
+        .heat-matrix th:first-child { text-align:left; }
+        .heat-matrix td { padding:9px 12px; border-bottom:1px solid #f1f5f9; text-align:center; font-weight:600; font-size:0.73rem; }
+        .heat-matrix tr:last-child td { border-bottom:none; }
+        .heat-matrix td:first-child { text-align:left; font-weight:700; color:#152540; font-size:0.78rem; }
+        .hm-cell-ok   { color:#16a34a; background:#f0fdf4; border-radius:6px; padding:4px 8px; }
+        .hm-cell-warn { color:#b45309; background:#fef3c7; border-radius:6px; padding:4px 8px; }
+        .hm-cell-late { color:#dc2626; background:#fee2e2; border-radius:6px; padding:4px 8px; }
+        .hm-cell-na   { color:#cbd5e1; }
 
         /* Detail table */
         .an-detail-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
@@ -617,12 +622,16 @@
       </div>
     </div>
 
-    <!-- HEATMAP ATRASOS + ETAPAS MÁS LENTAS -->
+    <!-- HEATMAP HISTÓRICO -->
+    <div class="an-card" style="margin-bottom:20px">
+      <div class="an-card-title">🔥 Histórico de atrasos por etapa y período</div>
+      <div style="font-size:0.7rem;color:#94a3b8;margin-bottom:12px">Días promedio de atraso por etapa en cada período · Solo si etapa anterior finalizada</div>
+      <div id="anHeatAtrasos" style="overflow-x:auto"></div>
+    </div>
+
+    <!-- DETALLE POR SOCIEDAD -->
     <div class="an-row-2" style="margin-bottom:20px">
-      <div class="an-card">
-        <div class="an-card-title">🔥 Etapas que más se atrasan</div>
-        <div id="anHeatAtrasos" style="margin-top:10px"></div>
-      </div>
+      <div class="an-card" style="display:none"><!-- placeholder --></div>
       <div class="an-card">
         <div class="an-card-title">📋 Detalle por sociedad</div>
         <table class="an-detail-table" id="anDetailTable">
@@ -1224,7 +1233,7 @@
         renderEeff(sociedades, all);
         renderRanking(sociedades, all);
         renderGantt(sociedades, all);
-        renderHeatAtrasos(sociedades, all);
+        renderHeatAtrasos();
         renderDetailTable(sociedades, all);
     }
 
@@ -1382,42 +1391,65 @@
             </div>`;
     }
 
-    function renderHeatAtrasos(socs, all) {
-        const today = new Date(); today.setHours(0,0,0,0);
-        const counts = ETAPA_NAMES.map((name, i) => {
-            const etapa = i + 1;
-            // Solo contar si la etapa anterior ya está finalizada (o es etapa 1)
-            const socIds = socs
-                .filter(soc => {
-                    if (etapa === 1) return true;
-                    const prev = all.find(c => c.sociedad_id === soc.id && c.etapa_num === etapa - 1);
-                    return prev && getEtapaStatus(prev) === 'done';
-                })
-                .map(s => s.id);
+    async function renderHeatAtrasos() {
+        const el = document.getElementById('anHeatAtrasos');
+        el.innerHTML = '<div style="color:#94a3b8;font-size:0.8rem;padding:16px 0">Cargando histórico...</div>';
 
-            const lateRows = all.filter(c =>
-                c.etapa_num === etapa &&
-                socIds.includes(c.sociedad_id) &&
-                getEtapaStatus(c) === 'late' &&
-                c.fecha_limite
-            );
-            const diasList = lateRows.map(c => Math.round((today - new Date(c.fecha_limite + 'T00:00:00')) / 86400000));
-            const avgDias  = diasList.length ? Math.round(diasList.reduce((a,b)=>a+b,0) / diasList.length) : 0;
-            return { name, count: lateRows.length, avgDias };
+        const today = new Date(); today.setHours(0,0,0,0);
+
+        // Traer todos los períodos y sus datos
+        const { data: periodos } = await client.from('cc_periodos').select('*').order('id', { ascending: false });
+        if (!periodos || !periodos.length) { el.innerHTML = '<div class="eeff-empty">Sin períodos registrados.</div>'; return; }
+
+        const { data: allSocs }   = await client.from('cc_sociedades').select('*');
+        const { data: allCierres } = await client.from('cc_cierres').select('*');
+        const socs    = allSocs    || [];
+        const cierres = allCierres || [];
+
+        // Para cada período × etapa, calcular avg días atraso
+        const matrix = periodos.map(p => {
+            const pSocs = socs.filter(s => s.periodo_id === p.id);
+            const pAll  = cierres.filter(c => pSocs.some(s => s.id === c.sociedad_id));
+
+            const etapas = ETAPA_NAMES.map((name, i) => {
+                const etapa = i + 1;
+                const socIds = pSocs.filter(soc => {
+                    if (etapa === 1) return true;
+                    const prev = pAll.find(c => c.sociedad_id === soc.id && c.etapa_num === etapa - 1);
+                    return prev && getEtapaStatus(prev) === 'done';
+                }).map(s => s.id);
+
+                const lateRows = pAll.filter(c =>
+                    c.etapa_num === etapa &&
+                    socIds.includes(c.sociedad_id) &&
+                    getEtapaStatus(c) === 'late' &&
+                    c.fecha_limite
+                );
+                const diasList = lateRows.map(c => Math.round((today - new Date(c.fecha_limite + 'T00:00:00')) / 86400000));
+                const avg = diasList.length ? Math.round(diasList.reduce((a,b)=>a+b,0) / diasList.length) : 0;
+                return { avg, count: lateRows.length, eligible: socIds.length };
+            });
+            return { periodo: p, etapas };
         });
-        const max = Math.max(...counts.map(c => c.avgDias), 1);
-        document.getElementById('anHeatAtrasos').innerHTML = counts.some(c => c.count > 0)
-            ? counts.map(c => `
-                <div class="heat-atraso-row">
-                    <div class="heat-atraso-label">${c.name}</div>
-                    <div class="heat-atraso-bar">
-                        ${c.avgDias > 0 ? `<div class="heat-atraso-fill" style="width:${Math.round(c.avgDias/max*100)}%"></div>` : ''}
-                    </div>
-                    <div class="heat-atraso-cnt" style="color:${c.avgDias>0?'#ef4444':'#94a3b8'};min-width:60px;font-size:0.7rem">
-                        ${c.avgDias > 0 ? `~${c.avgDias}d · ${c.count} soc.` : '—'}
-                    </div>
-                </div>`).join('')
-            : '<div style="color:#94a3b8;font-size:0.8rem;padding:10px 0">Sin atrasos registrados 🎉</div>';
+
+        // Renderizar tabla: filas = etapas, columnas = períodos
+        const headers = matrix.map(m => `<th>${m.periodo.nombre}</th>`).join('');
+        const rows = ETAPA_NAMES.map((name, i) => {
+            const cells = matrix.map(m => {
+                const e = m.etapas[i];
+                if (e.eligible === 0) return `<td><span class="hm-cell-na">—</span></td>`;
+                if (e.avg === 0)      return `<td><span class="hm-cell-ok">✓ 0d</span></td>`;
+                if (e.avg <= 7)       return `<td><span class="hm-cell-warn">~${e.avg}d</span></td>`;
+                return `<td><span class="hm-cell-late">~${e.avg}d</span></td>`;
+            }).join('');
+            return `<tr><td>${name}</td>${cells}</tr>`;
+        }).join('');
+
+        el.innerHTML = `
+            <table class="heat-matrix">
+                <thead><tr><th>Etapa</th>${headers}</tr></thead>
+                <tbody>${rows}</tbody>
+            </table>`;
     }
 
     function renderDetailTable(socs, all) {
