@@ -1254,21 +1254,22 @@
         const today = new Date(); today.setHours(0,0,0,0);
         const et1   = all.filter(c => c.etapa_num === 1);
 
-        // Card 1: Finalizadas
-        const done = et1.filter(c => c.completado_at);
+        // Card 1: Finalizadas (estatus finalizado, con o sin completado_at)
+        const done = et1.filter(c => getEtapaStatus(c) === 'done');
         const doneRows = done.map(c => {
             const soc      = socs.find(s => s.id === c.sociedad_id);
             const limite   = c.fecha_limite ? new Date(c.fecha_limite + 'T00:00:00') : null;
-            const real     = new Date(c.completado_at);
-            const diffMs   = limite ? real - limite : null;
-            const diffDias = diffMs !== null ? Math.round(diffMs / 86400000) : null;
-            const badge    = diffDias === null ? `<span class="eeff-badge-pend">Sin fecha límite</span>`
-                           : diffDias <= 0    ? `<span class="eeff-badge-ok">✓ ${Math.abs(diffDias) === 0 ? 'En fecha' : `${Math.abs(diffDias)}d antes`}</span>`
-                           :                    `<span class="eeff-badge-late">↑ ${diffDias}d tarde</span>`;
+            const real     = c.completado_at ? new Date(c.completado_at) : null;
+            const diffDias = (limite && real) ? Math.round((real - limite) / 86400000) : null;
+            const badge    = diffDias === null
+                           ? `<span class="eeff-badge-pend">Finalizado</span>`
+                           : diffDias <= 0
+                           ? `<span class="eeff-badge-ok">✓ ${diffDias === 0 ? 'En fecha' : `${Math.abs(diffDias)}d antes`}</span>`
+                           : `<span class="eeff-badge-late">↑ ${diffDias}d tarde</span>`;
             return `<tr>
                 <td>${soc?.nombre || '—'}</td>
                 <td>${fmtDate(c.fecha_limite)}</td>
-                <td>${fmtDate(c.completado_at)}</td>
+                <td>${real ? fmtDate(c.completado_at) : '<span style="color:#94a3b8">—</span>'}</td>
                 <td>${badge}</td>
             </tr>`;
         }).join('');
