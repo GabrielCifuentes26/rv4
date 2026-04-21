@@ -68,10 +68,20 @@
         }
         .topbar-left { display: flex; align-items: center; gap: 14px; }
         .back-link {
-            color: var(--gray); text-decoration: none; font-size: 0.73rem;
-            display: flex; align-items: center; gap: 5px; transition: color .2s; font-weight: 500;
+            text-decoration: none; font-size: 0.73rem; font-weight: 700;
+            display: flex; align-items: center; gap: 6px;
+            background: var(--bg); border: 1px solid var(--border);
+            color: var(--navy2); padding: 6px 13px 6px 10px;
+            border-radius: 20px; transition: all .2s;
         }
-        .back-link:hover { color: var(--blue); }
+        .back-link:hover {
+            background: linear-gradient(135deg, var(--blue), var(--blue-dark));
+            color: #fff; border-color: transparent;
+            box-shadow: 0 3px 10px rgba(14,165,233,0.3);
+            transform: translateY(-1px);
+        }
+        .back-link svg { transition: transform .2s; }
+        .back-link:hover svg { transform: scale(1.15); }
         .topbar-brand { font-size: 1rem; font-weight: 900; color: var(--navy); letter-spacing: 0.5px; }
         .topbar-brand span { color: var(--blue); }
         .admin-badge {
@@ -494,7 +504,10 @@
     <!-- Topbar -->
     <div class="topbar">
         <div class="topbar-left">
-            <a href="index.html" class="back-link">⌂ Inicio</a>
+            <a href="index.html" class="back-link">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                Inicio
+            </a>
             <div>
                 <div class="topbar-brand">Costos&<span>Presupuestos</span></div>
             </div>
