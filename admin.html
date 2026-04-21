@@ -285,6 +285,16 @@
         .nivel-silver { background: rgba(100,116,139,0.1); color: var(--gray); border: 1px solid rgba(100,116,139,0.2); }
         .nivel-bronce { background: rgba(180,83,9,0.08);  color: #92400e; border: 1px solid rgba(180,83,9,0.2); }
 
+        /* ── PASSWORD CELL ── */
+        .pw-cell { display: flex; align-items: center; gap: 6px; }
+        .pw-mask { font-family: monospace; font-size: 0.82rem; color: var(--gray); letter-spacing: 1px; }
+        .eye-row-btn {
+            background: none; border: none; cursor: pointer;
+            font-size: 0.9rem; padding: 2px 4px; opacity: 0.5;
+            transition: opacity .15s; line-height: 1;
+        }
+        .eye-row-btn:hover { opacity: 1; }
+
         /* ── SETUP BANNER ── */
         .setup-banner {
             background: rgba(245,158,11,0.06); border: 1px solid rgba(245,158,11,0.25);
@@ -555,13 +565,14 @@
                         <th>Empresa</th>
                         <th>Nivel</th>
                         <th>Rol</th>
+                        <th>Contraseña</th>
                         <th>Creado</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody id="usersBody">
                     <tr>
-                        <td colspan="6">
+                        <td colspan="7">
                             <div class="empty-state">
                                 <div class="empty-icon">⏳</div>
                                 <div class="empty-text">Cargando usuarios...</div>
@@ -814,7 +825,7 @@
     function renderTable(users) {
         const tbody = document.getElementById('usersBody');
         if (users.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="6">
+            tbody.innerHTML = `<tr><td colspan="7">
                 <div class="empty-state">
                     <div class="empty-icon">👥</div>
                     <div class="empty-text">No se encontraron usuarios</div>
@@ -834,6 +845,9 @@
             const nivel      = u.nivel || 'Bronce';
             const nivelClass = nivel === 'Gold' ? 'nivel-gold' : nivel === 'Silver' ? 'nivel-silver' : 'nivel-bronce';
 
+            const pwId   = `pw_${u.id.replace(/-/g,'')}`;
+            const eyeId  = `eye_${u.id.replace(/-/g,'')}`;
+            const pwText = u.password_text || '';
             return `<tr>
                 <td>
                     <div class="user-cell">
@@ -847,6 +861,12 @@
                 <td><span class="empresa-badge ${empClass}">${empresa}</span></td>
                 <td><span class="nivel-badge ${nivelClass}">${nivel}</span></td>
                 <td><span class="role-badge ${rolClass}">${rolLabel}</span></td>
+                <td>
+                    <div class="pw-cell">
+                        <span class="pw-mask" id="${pwId}">${pwText ? '••••••••' : '—'}</span>
+                        ${pwText ? `<button class="eye-row-btn" id="${eyeId}" onclick="togglePw('${pwId}','${eyeId}',\`${pwText.replace(/`/g,'\\`')}\`)">👁</button>` : ''}
+                    </div>
+                </td>
                 <td>${fecha}</td>
                 <td>
                     <div class="actions">
@@ -905,6 +925,16 @@
         return null;
     }
 
+    function togglePw(spanId, btnId, plaintext) {
+        const span = document.getElementById(spanId);
+        const btn  = document.getElementById(btnId);
+        if (!span || !btn) return;
+        const visible = span.dataset.visible === '1';
+        span.textContent   = visible ? '••••••••' : plaintext;
+        span.dataset.visible = visible ? '0' : '1';
+        btn.textContent    = visible ? '👁' : '🙈';
+    }
+
     function toggleEye(inputId, btnId) {
         const inp = document.getElementById(inputId);
         const btn = document.getElementById(btnId);
@@ -938,12 +968,13 @@
 
         try {
             if (editId) {
+                const updatePayload = { nombre, correo, rol, empresa, nivel };
+                if (newPass) updatePayload.password_text = newPass;
                 const { error } = await SERVICE_CLIENT
                     .from('usuarios')
-                    .update({ nombre, correo, rol, empresa, nivel })
+                    .update(updatePayload)
                     .eq('id', editId);
                 if (error) throw error;
-                // Cambiar contraseña si se proporcionó una nueva
                 if (newPass) {
                     await fetch(`${SUPABASE_URL}/auth/v1/admin/users/${editId}`, {
                         method: 'PUT',
@@ -974,7 +1005,7 @@
                 if (!authRes.ok) throw new Error(authData.msg || authData.message || 'Error al crear usuario');
 
                 const { error } = await SERVICE_CLIENT.from('usuarios').insert({
-                    id: authData.id, nombre, correo, rol, empresa, nivel
+                    id: authData.id, nombre, correo, rol, empresa, nivel, password_text: pass
                 });
                 if (error) throw error;
                 showToast('Usuario creado correctamente', 'success');
