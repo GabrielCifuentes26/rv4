@@ -1171,9 +1171,18 @@
         btn.disabled = true; btn.textContent = 'Aprobando...';
 
         try {
-            // 1. Confirmar email en Supabase Auth (si el usuario se registró solo)
-            if (authId) {
-                await fetch(`${SUPABASE_URL}/auth/v1/admin/users/${authId}`, {
+            // 1. Buscar UUID real en Auth por email (evita UUIDs incorrectos guardados en solicitudes)
+            const authListRes = await fetch(
+                `${SUPABASE_URL}/auth/v1/admin/users?page=1&per_page=1000`,
+                { headers: { 'Authorization': `Bearer ${SERVICE_KEY}`, 'apikey': SERVICE_KEY } }
+            );
+            const authListData = await authListRes.json();
+            const authUser  = (authListData.users || []).find(u => u.email === correo);
+            const realAuthId = authUser?.id || authId || null;
+
+            // 2. Confirmar email en Auth para que pueda iniciar sesión
+            if (realAuthId) {
+                await fetch(`${SUPABASE_URL}/auth/v1/admin/users/${realAuthId}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1184,14 +1193,14 @@
                 });
             }
 
-            // 2. Insertar en tabla usuarios
+            // 3. Insertar/actualizar en tabla usuarios con el UUID correcto
             const insertData = { nombre, correo, rol, empresa, nivel, estado: 'activo' };
-            if (authId) insertData.id = authId;
+            if (realAuthId) insertData.id = realAuthId;
 
             const { error: userErr } = await SERVICE_CLIENT.from('usuarios').upsert(insertData, { onConflict: 'id' });
             if (userErr) throw userErr;
 
-            // 3. Actualizar solicitud a aprobada
+            // 4. Actualizar solicitud a aprobada
             await SERVICE_CLIENT.from('solicitudes').update({ estado: 'aprobado' }).eq('id', solId);
 
             closeApproveModal();
