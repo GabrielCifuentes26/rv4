@@ -387,10 +387,19 @@
             transition: opacity .2s;
         }
         .gantt-bar:hover { opacity: 0.85; }
-        .gantt-bar.done { background: #22c55e; }
-        .gantt-bar.proc { background: #f59e0b; }
-        .gantt-bar.late { background: #ef4444; }
-        .gantt-bar.pend { background: #cbd5e1; color: #64748b; }
+        .gantt-bar.t-done    { background: #22c55e; }
+        .gantt-bar.t-active  { background: #f59e0b; }
+        .gantt-bar.t-vencido { background: #ef4444; }
+        .gantt-bar.t-proximo { background: #e2e8f0; color: #64748b; border: 1.5px dashed #94a3b8; }
+        .gantt-est-line { position: absolute; top: 0; bottom: 0; width: 0; border-left: 2px dashed rgba(201,168,76,0.9); z-index: 4; pointer-events: none; }
+
+        /* Fechas clave */
+        .an-fecha-row { display:flex; align-items:center; gap:0; }
+        .an-fecha-block { flex:1; text-align:center; padding:10px 8px; }
+        .an-fecha-divider { width:1px; height:50px; background:#f1f5f9; flex-shrink:0; }
+        .an-fecha-lbl { font-size:0.65rem; font-weight:800; text-transform:uppercase; letter-spacing:.7px; color:#94a3b8; margin-bottom:6px; }
+        .an-fecha-val { font-size:1.05rem; font-weight:900; color:#152540; line-height:1.2; }
+        .an-fecha-est { color:#C9A84C; }
 
         /* Heatmap histórico */
         .heat-matrix { width:100%; border-collapse:collapse; font-size:0.74rem; min-width:480px; }
@@ -573,12 +582,12 @@
 
   <!-- VISTA ANALÍTICA -->
   <div id="vistaAnalitica" style="display:none">
-    <p class="an-periodo-lbl" id="anPeriodoLabel" style="font-size:0.78rem;color:#94a3b8;font-weight:600;margin-bottom:18px;"></p>
+    <p id="anPeriodoLabel" style="font-size:0.78rem;color:#94a3b8;font-weight:600;margin-bottom:18px;"></p>
 
-    <!-- GAUGE + RESUMEN -->
-    <div class="an-row-3" style="margin-bottom:20px">
+    <!-- 1. ¿CÓMO VAMOS? — Gauge + Fechas clave -->
+    <div class="an-row-2" style="margin-bottom:20px">
       <div class="an-card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px">
-        <div class="an-card-title">Avance Global</div>
+        <div class="an-card-title">Avance Global del Período</div>
         <div class="an-gauge-wrap">
           <svg viewBox="0 0 120 70" class="an-gauge-svg">
             <path d="M10 65 A50 50 0 0 1 110 65" fill="none" stroke="#e2e8f0" stroke-width="12" stroke-linecap="round"/>
@@ -586,75 +595,90 @@
           </svg>
           <div class="an-gauge-pct" id="gaugePct">0%</div>
         </div>
-        <div class="an-gauge-lbl" id="gaugeLbl">0 de 0 etapas finalizadas</div>
+        <div class="an-gauge-lbl" id="gaugeLbl">0 de 0 sociedades completadas</div>
       </div>
+      <div class="an-card" style="display:flex;flex-direction:column;gap:16px;justify-content:center">
+        <div class="an-card-title">🗓 Fechas clave del cierre</div>
+        <div class="an-fecha-row">
+          <div class="an-fecha-block">
+            <div class="an-fecha-lbl">Cierre planificado</div>
+            <div class="an-fecha-val" id="anFechaPlan">—</div>
+          </div>
+          <div class="an-fecha-divider"></div>
+          <div class="an-fecha-block">
+            <div class="an-fecha-lbl">Cierre estimado</div>
+            <div class="an-fecha-val an-fecha-est" id="anFechaEst">—</div>
+          </div>
+          <div class="an-fecha-divider"></div>
+          <div class="an-fecha-block">
+            <div class="an-fecha-lbl">Días de diferencia</div>
+            <div class="an-fecha-val" id="anFechaDiff">—</div>
+          </div>
+        </div>
+        <div id="anFechaNote" style="font-size:0.7rem;color:#94a3b8;line-height:1.5"></div>
+      </div>
+    </div>
 
+    <!-- 2. ¿DÓNDE ESTÁ EL PROBLEMA? — Responsable + Ranking -->
+    <div class="an-row-2" style="margin-bottom:20px">
       <div class="an-card">
-        <div class="an-card-title">✅ Entrega de Estados Financieros — Finalizadas</div>
+        <div class="an-card-title">👥 ¿Quién concentra los atrasos?</div>
+        <div style="font-size:0.7rem;color:#94a3b8;margin-bottom:14px">Etapas fuera de tiempo agrupadas por responsable</div>
+        <div style="position:relative;height:200px"><canvas id="chartResp"></canvas></div>
+      </div>
+      <div class="an-card">
+        <div class="an-card-title">🏆 Ranking de Sociedades</div>
+        <div style="font-size:0.7rem;color:#94a3b8;margin-bottom:10px">Avance por sociedad — % de etapas completadas</div>
+        <div id="anRanking" style="display:flex;flex-direction:column;gap:8px;margin-top:4px"></div>
+      </div>
+    </div>
+
+    <!-- 3. ¿QUÉ PASÓ CON LA ENTREGA DE EEFF? -->
+    <div class="an-row-2" style="margin-bottom:20px">
+      <div class="an-card">
+        <div class="an-card-title">✅ EEFF — Entregas Finalizadas</div>
         <div style="font-size:0.7rem;color:#94a3b8;margin-bottom:12px">Fecha límite vs. fecha real de entrega · Etapa 1</div>
         <div id="anEeffDone"></div>
       </div>
-
       <div class="an-card">
-        <div class="an-card-title">⚠️ Entrega de Estados Financieros — Fuera de Tiempo</div>
-        <div style="font-size:0.7rem;color:#94a3b8;margin-bottom:12px">Sociedades que no entregaron dentro del plazo · Etapa 1</div>
+        <div class="an-card-title">⚠️ EEFF — Pendientes fuera de plazo</div>
+        <div style="font-size:0.7rem;color:#94a3b8;margin-bottom:12px">Sociedades que no han entregado y ya vencieron · Etapa 1</div>
         <div id="anEeffLate"></div>
       </div>
-
-      <div class="an-card">
-        <div class="an-card-title">🏆 Ranking de Sociedades</div>
-        <div id="anRanking" style="display:flex;flex-direction:column;gap:8px;margin-top:8px"></div>
-      </div>
     </div>
 
-    <!-- GANTT -->
+    <!-- 4. ¿CÓMO AVANZAMOS EN EL TIEMPO? — Gantt mejorado -->
     <div class="an-card" style="margin-bottom:20px">
-      <div class="an-card-title">📅 Diagrama de Gantt — Etapas por Sociedad</div>
-      <div class="gantt-legend">
-        <span class="gantt-leg-item"><span class="gantt-leg-dot" style="background:#22c55e"></span>Finalizado</span>
-        <span class="gantt-leg-item"><span class="gantt-leg-dot" style="background:#f59e0b"></span>En Proceso</span>
-        <span class="gantt-leg-item"><span class="gantt-leg-dot" style="background:#ef4444"></span>Fuera de Tiempo</span>
-        <span class="gantt-leg-item"><span class="gantt-leg-dot" style="background:#cbd5e1"></span>Pendiente</span>
-        <span class="gantt-leg-item"><span class="gantt-leg-dot" style="background:rgba(239,68,68,0.7);width:2px;height:14px;border-radius:0"></span>Hoy</span>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:10px">
+        <div class="an-card-title" style="margin-bottom:0">📅 Línea de tiempo del cierre</div>
+        <div class="gantt-legend">
+          <span class="gantt-leg-item"><span class="gantt-leg-dot" style="background:#22c55e"></span>Finalizado</span>
+          <span class="gantt-leg-item"><span class="gantt-leg-dot" style="background:#f59e0b"></span>Activo hoy</span>
+          <span class="gantt-leg-item"><span class="gantt-leg-dot" style="background:#ef4444"></span>Vencido</span>
+          <span class="gantt-leg-item"><span class="gantt-leg-dot" style="background:#cbd5e1;border:1px dashed #94a3b8"></span>Próximo</span>
+          <span class="gantt-leg-item"><span style="display:inline-block;width:2px;height:14px;background:rgba(239,68,68,0.8);vertical-align:middle;margin-right:4px;border-radius:1px"></span>Hoy</span>
+          <span class="gantt-leg-item"><span style="display:inline-block;width:2px;height:14px;background:rgba(201,168,76,0.9);vertical-align:middle;margin-right:4px;border-radius:1px;border:none;border-right:2px dashed #C9A84C;background:transparent"></span>Cierre est.</span>
+        </div>
       </div>
-      <div class="gantt-wrap" id="ganttWrap">
-        <div style="color:var(--gray2);text-align:center;padding:30px">Selecciona un período para ver el Gantt</div>
-      </div>
+      <div class="gantt-wrap" id="ganttWrap"></div>
     </div>
 
-    <!-- GRÁFICAS ANALÍTICAS -->
-    <div class="an-row-2" style="margin-bottom:20px">
-      <div class="an-card">
-        <div class="an-card-title">📊 Cumplimiento mensual</div>
-        <div style="font-size:0.7rem;color:#94a3b8;margin-bottom:14px">Sociedades cerradas a tiempo vs con atraso por período</div>
-        <div style="position:relative;height:220px"><canvas id="chartCumplimiento"></canvas></div>
-      </div>
-      <div class="an-card">
-        <div class="an-card-title">⏳ Atraso promedio por etapa</div>
-        <div style="font-size:0.7rem;color:#94a3b8;margin-bottom:14px">Días promedio de atraso por etapa en cada período</div>
-        <div style="position:relative;height:220px"><canvas id="chartEtapas"></canvas></div>
-      </div>
-    </div>
-
-    <!-- HEATMAP HISTÓRICO -->
+    <!-- 5. ¿HISTÓRICAMENTE CÓMO VAMOS? -->
     <div class="an-card" style="margin-bottom:20px">
       <div class="an-card-title">🔥 Histórico de atrasos por etapa y período</div>
-      <div style="font-size:0.7rem;color:#94a3b8;margin-bottom:12px">Días promedio de atraso por etapa en cada período · Solo si etapa anterior finalizada</div>
+      <div style="font-size:0.7rem;color:#94a3b8;margin-bottom:12px">Días promedio de atraso por etapa · Verde = sin atraso · Ámbar = 1-7d · Rojo = +7d</div>
       <div id="anHeatAtrasos" style="overflow-x:auto"></div>
     </div>
 
-    <!-- DETALLE POR SOCIEDAD -->
-    <div class="an-row-2" style="margin-bottom:20px">
-      <div class="an-card" style="display:none"><!-- placeholder --></div>
-      <div class="an-card">
-        <div class="an-card-title">📋 Detalle por sociedad</div>
-        <table class="an-detail-table" id="anDetailTable">
-          <thead><tr>
-            <th>Sociedad</th><th>Etapa 1</th><th>Etapa 2</th><th>Etapa 3</th><th>Etapa 4</th><th>Estado</th>
-          </tr></thead>
-          <tbody id="anDetailBody"></tbody>
-        </table>
-      </div>
+    <!-- 6. DETALLE COMPLETO -->
+    <div class="an-card" style="margin-bottom:20px">
+      <div class="an-card-title">📋 Detalle completo por sociedad</div>
+      <table class="an-detail-table" id="anDetailTable">
+        <thead><tr>
+          <th>Sociedad</th><th>Etapa 1</th><th>Etapa 2</th><th>Etapa 3</th><th>Etapa 4</th><th>Estado</th>
+        </tr></thead>
+        <tbody id="anDetailBody"></tbody>
+      </table>
     </div>
 
   </div><!-- /vistaAnalitica -->
@@ -1245,108 +1269,78 @@
         const sociedades = socs || [];
 
         renderGauge(sociedades, all);
-        renderEeff(sociedades, all);
+        renderFechas(sociedades, all);
+        renderRespChart(sociedades, all);
         renderRanking(sociedades, all);
+        renderEeff(sociedades, all);
         renderGantt(sociedades, all);
-        renderCharts();
         renderHeatAtrasos();
         renderDetailTable(sociedades, all);
     }
 
-    let _chartCumpl = null, _chartEtapas = null;
-
-    async function renderCharts() {
+    // ── FECHAS CLAVE + CIERRE ESTIMADO ───────────────────────────────
+    function renderFechas(socs, all) {
         const today = new Date(); today.setHours(0,0,0,0);
-        const { data: periodos } = await client.from('cc_periodos').select('*').order('id', { ascending: true });
-        if (!periodos?.length) return;
-        const { data: allSocs }    = await client.from('cc_sociedades').select('*');
-        const { data: allCierres } = await client.from('cc_cierres').select('*');
-        const socs    = allSocs    || [];
-        const cierres = allCierres || [];
+        const e4 = all.filter(c => c.etapa_num === 4 && c.fecha_limite);
+        if (!e4.length) return;
+        const planDate = new Date(Math.max(...e4.map(c => new Date(c.fecha_limite + 'T00:00:00'))));
 
-        const labels = periodos.map(p => p.nombre);
+        // Avg delay actual del período
+        const lateRows = all.filter(c => getEtapaStatus(c) === 'late' && c.fecha_limite);
+        const avgDelay = lateRows.length
+            ? Math.round(lateRows.map(c => Math.max(0, Math.round((today - new Date(c.fecha_limite+'T00:00:00'))/86400000))).reduce((a,b)=>a+b,0) / lateRows.length)
+            : 0;
+        const estDate = new Date(planDate); estDate.setDate(estDate.getDate() + avgDelay);
+        const diffDays = Math.round((estDate - planDate) / 86400000);
 
-        // ── Chart 1: cumplimiento mensual ──────────────────────────────
-        const aTiempo = [], conAtraso = [], pendiente = [];
-        periodos.forEach(p => {
-            const pSocs   = socs.filter(s => s.periodo_id === p.id);
-            const pCierres = cierres.filter(c => pSocs.some(s => s.id === c.sociedad_id));
-            let ok = 0, late = 0, pend = 0;
-            pSocs.forEach(soc => {
-                const cs   = pCierres.filter(c => c.sociedad_id === soc.id);
-                const hasLate = cs.some(c => getEtapaStatus(c) === 'late');
-                const allDone = cs.length === 4 && cs.every(c => getEtapaStatus(c) === 'done');
-                if (allDone)       ok++;
-                else if (hasLate)  late++;
-                else               pend++;
+        document.getElementById('anFechaPlan').textContent = planDate.toLocaleDateString('es-MX',{day:'numeric',month:'short',year:'numeric'});
+        document.getElementById('anFechaEst').textContent  = estDate.toLocaleDateString('es-MX',{day:'numeric',month:'short',year:'numeric'});
+        const diffEl = document.getElementById('anFechaDiff');
+        if (diffDays === 0) {
+            diffEl.textContent = '✓ En fecha'; diffEl.style.color = '#16a34a';
+        } else {
+            diffEl.textContent = `+${diffDays} días`; diffEl.style.color = '#dc2626';
+        }
+        document.getElementById('anFechaNote').textContent = avgDelay > 0
+            ? `Basado en el ritmo actual, el cierre se estima con ${avgDelay} días de atraso promedio sobre los plazos definidos.`
+            : 'El período va en tiempo — no se proyectan atrasos adicionales.';
+    }
+
+    // ── GRÁFICA RESPONSABLES ─────────────────────────────────────────
+    let _chartResp = null;
+    function renderRespChart(socs, all) {
+        const today = new Date(); today.setHours(0,0,0,0);
+        const responsables = ['Contabilidad', 'Costos'];
+        const datasets = ETAPA_NAMES.map((name, i) => {
+            const etapa = i + 1;
+            const data = responsables.map(resp => {
+                return all.filter(c =>
+                    c.etapa_num === etapa &&
+                    c.responsable === resp &&
+                    getEtapaStatus(c) === 'late'
+                ).length;
             });
-            aTiempo.push(ok); conAtraso.push(late); pendiente.push(pend);
+            const colors = ['rgba(201,168,76,0.85)','rgba(99,102,241,0.80)','rgba(249,115,22,0.80)','rgba(20,184,166,0.80)'];
+            return { label: `E${etapa}: ${name.split('/')[0].trim()}`, data, backgroundColor: colors[i], borderRadius: 5, borderSkipped: false };
         });
-
-        if (_chartCumpl) _chartCumpl.destroy();
-        _chartCumpl = new Chart(document.getElementById('chartCumplimiento'), {
+        if (_chartResp) _chartResp.destroy();
+        _chartResp = new Chart(document.getElementById('chartResp'), {
             type: 'bar',
-            data: {
-                labels,
-                datasets: [
-                    { label: 'Cerradas a tiempo', data: aTiempo,   backgroundColor: 'rgba(34,197,94,0.85)',  borderRadius: 6, borderSkipped: false },
-                    { label: 'Con atraso',         data: conAtraso, backgroundColor: 'rgba(239,68,68,0.80)', borderRadius: 6, borderSkipped: false },
-                    { label: 'Pendientes',          data: pendiente, backgroundColor: 'rgba(148,163,184,0.6)',borderRadius: 6, borderSkipped: false }
-                ]
-            },
+            data: { labels: responsables, datasets },
             options: {
-                responsive: true, maintainAspectRatio: false,
+                responsive: true, maintainAspectRatio: false, indexAxis: 'y',
                 plugins: {
-                    legend: { position: 'bottom', labels: { font: { size: 11, family: 'Inter' }, boxWidth: 12, padding: 14 } },
-                    tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.raw} sociedad${ctx.raw!==1?'es':''}` } }
+                    legend: { position: 'bottom', labels: { font:{size:11,family:'Inter'}, boxWidth:12, padding:12 } },
+                    tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.raw} etapa${ctx.raw!==1?'s':''} atrasada${ctx.raw!==1?'s':''}` } }
                 },
                 scales: {
-                    x: { stacked: true, grid: { display: false }, ticks: { font: { size: 11, family: 'Inter' } } },
-                    y: { stacked: true, beginAtZero: true, ticks: { stepSize: 1, font: { size: 11 } }, grid: { color: 'rgba(0,0,0,0.05)' } }
-                }
-            }
-        });
-
-        // ── Chart 2: atraso promedio por etapa ────────────────────────
-        const etapaColors = ['rgba(201,168,76,0.85)','rgba(99,102,241,0.80)','rgba(249,115,22,0.80)','rgba(20,184,166,0.80)'];
-        const etapaDatasets = ETAPA_NAMES.map((name, i) => ({
-            label: `E${i+1}: ${name.split(' ')[0]}`,
-            data: periodos.map(p => {
-                const pSocs   = socs.filter(s => s.periodo_id === p.id);
-                const pCierres = cierres.filter(c => pSocs.some(s => s.id === c.sociedad_id));
-                const etapa   = i + 1;
-                const socIds  = pSocs.filter(soc => {
-                    if (etapa === 1) return true;
-                    const prev = pCierres.find(c => c.sociedad_id === soc.id && c.etapa_num === etapa - 1);
-                    return prev && getEtapaStatus(prev) === 'done';
-                }).map(s => s.id);
-                const lateRows = pCierres.filter(c =>
-                    c.etapa_num === etapa && socIds.includes(c.sociedad_id) &&
-                    getEtapaStatus(c) === 'late' && c.fecha_limite
-                );
-                const dias = lateRows.map(c => Math.round((today - new Date(c.fecha_limite + 'T00:00:00')) / 86400000));
-                return dias.length ? Math.round(dias.reduce((a,b)=>a+b,0) / dias.length) : 0;
-            }),
-            backgroundColor: etapaColors[i], borderRadius: 5, borderSkipped: false
-        }));
-
-        if (_chartEtapas) _chartEtapas.destroy();
-        _chartEtapas = new Chart(document.getElementById('chartEtapas'), {
-            type: 'bar',
-            data: { labels, datasets: etapaDatasets },
-            options: {
-                responsive: true, maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'bottom', labels: { font: { size: 11, family: 'Inter' }, boxWidth: 12, padding: 14 } },
-                    tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.raw}d de atraso` } }
-                },
-                scales: {
-                    x: { grid: { display: false }, ticks: { font: { size: 11, family: 'Inter' } } },
-                    y: { beginAtZero: true, ticks: { font: { size: 11 }, callback: v => `${v}d` }, grid: { color: 'rgba(0,0,0,0.05)' } }
+                    x: { beginAtZero:true, ticks:{stepSize:1,font:{size:11}}, grid:{color:'rgba(0,0,0,0.05)'} },
+                    y: { grid:{display:false}, ticks:{font:{size:12,family:'Inter',weight:'700'}} }
                 }
             }
         });
     }
+
 
     function renderGauge(socs, all) {
         const total     = socs.length;
@@ -1446,26 +1440,40 @@
             document.getElementById('ganttWrap').innerHTML = '<div style="color:#94a3b8;text-align:center;padding:30px">Sin sociedades en este período</div>';
             return;
         }
-        // Calcular rango de fechas
         const allDates = all.filter(c => c.fecha_limite).map(c => new Date(c.fecha_limite + 'T00:00:00'));
         if (!allDates.length) { document.getElementById('ganttWrap').innerHTML = '<div style="color:#94a3b8;text-align:center;padding:30px">Sin fechas límite definidas</div>'; return; }
 
+        const today   = new Date(); today.setHours(0,0,0,0);
         const minDate = new Date(Math.min(...allDates));
         const maxDate = new Date(Math.max(...allDates));
         minDate.setDate(minDate.getDate() - 3);
         maxDate.setDate(maxDate.getDate() + 3);
-        const totalDays = Math.ceil((maxDate - minDate) / 86400000);
-        const todayPct  = Math.max(0, Math.min(100, (new Date() - minDate) / (maxDate - minDate) * 100));
 
-        // Ticks de fecha (cada ~7 días)
+        // Cierre estimado
+        const lateRows = all.filter(c => getEtapaStatus(c) === 'late' && c.fecha_limite);
+        const avgDelay = lateRows.length
+            ? Math.round(lateRows.map(c => Math.max(0, Math.round((today - new Date(c.fecha_limite+'T00:00:00'))/86400000))).reduce((a,b)=>a+b,0) / lateRows.length)
+            : 0;
+        const e4 = all.filter(c => c.etapa_num === 4 && c.fecha_limite);
+        let estDate = null;
+        if (e4.length && avgDelay > 0) {
+            const planDate = new Date(Math.max(...e4.map(c => new Date(c.fecha_limite+'T00:00:00'))));
+            estDate = new Date(planDate); estDate.setDate(estDate.getDate() + avgDelay);
+            if (estDate > maxDate) { const ext = new Date(estDate); ext.setDate(ext.getDate() + 3); maxDate.setTime(ext.getTime()); }
+        }
+
+        const totalDays = Math.ceil((maxDate - minDate) / 86400000);
+        const toPct     = d => Math.max(0, Math.min(110, (d - minDate) / (maxDate - minDate) * 100));
+        const todayPct  = toPct(today);
+        const estLinePct = estDate ? toPct(estDate) : null;
+
+        // Ticks de fecha
         const ticks = [];
         const tickInterval = Math.ceil(totalDays / 8);
         for (let d = 0; d <= totalDays; d += tickInterval) {
             const date = new Date(minDate.getTime() + d * 86400000);
             ticks.push({ pct: d / totalDays * 100, lbl: date.toLocaleDateString('es', { day:'2-digit', month:'short' }) });
         }
-
-        const barColors = { done:'#22c55e', proc:'#f59e0b', late:'#ef4444', pend:'#cbd5e1' };
 
         const rows = socs.map(soc => {
             const cs = all.filter(c => c.sociedad_id === soc.id).sort((a,b) => a.etapa_num - b.etapa_num);
@@ -1474,17 +1482,29 @@
                 const endDate   = new Date(c.fecha_limite + 'T00:00:00');
                 const prevDate  = i > 0 && cs[i-1].fecha_limite ? new Date(cs[i-1].fecha_limite + 'T00:00:00') : minDate;
                 const startDate = prevDate < minDate ? minDate : prevDate;
-                const left  = Math.max(0, (startDate - minDate) / (maxDate - minDate) * 100);
-                const right = Math.min(100, (endDate - minDate) / (maxDate - minDate) * 100);
+                const left  = Math.max(0, toPct(startDate));
+                const right = Math.min(100, toPct(endDate));
                 const width = Math.max(0.5, right - left);
-                const st    = getEtapaStatus(c);
-                return `<div class="gantt-bar ${st}" style="left:${left.toFixed(1)}%;width:${width.toFixed(1)}%" title="Etapa ${c.etapa_num}: ${ETAPA_NAMES[c.etapa_num-1]}\n${STATUS_LABEL[st]}\nFecha: ${fmtFecha(c.fecha_limite)}">E${c.etapa_num}</div>`;
+
+                const st = getEtapaStatus(c);
+                let cls, lbl;
+                if (st === 'done') {
+                    cls = 't-done'; lbl = 'Finalizado';
+                } else if (today > endDate) {
+                    cls = 't-vencido'; lbl = 'Vencido';
+                } else if (today >= startDate) {
+                    cls = 't-active'; lbl = 'En curso hoy';
+                } else {
+                    cls = 't-proximo'; lbl = 'Próximo';
+                }
+                return `<div class="gantt-bar ${cls}" style="left:${left.toFixed(1)}%;width:${width.toFixed(1)}%" title="E${c.etapa_num}: ${ETAPA_NAMES[c.etapa_num-1]}\n${lbl}\nFecha límite: ${fmtFecha(c.fecha_limite)}">E${c.etapa_num}</div>`;
             }).join('');
 
             return `<div class="gantt-row">
                 <div class="gantt-soc-name" title="${soc.nombre}">${soc.nombre}</div>
                 <div class="gantt-bars">
                     <div class="gantt-today-line" style="left:${todayPct.toFixed(1)}%"></div>
+                    ${estLinePct !== null ? `<div class="gantt-est-line" style="left:${estLinePct.toFixed(1)}%"></div>` : ''}
                     ${bars}
                 </div>
             </div>`;
