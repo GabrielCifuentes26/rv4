@@ -622,6 +622,20 @@
       </div>
     </div>
 
+    <!-- GRÁFICAS ANALÍTICAS -->
+    <div class="an-row-2" style="margin-bottom:20px">
+      <div class="an-card">
+        <div class="an-card-title">📊 Cumplimiento mensual</div>
+        <div style="font-size:0.7rem;color:#94a3b8;margin-bottom:14px">Sociedades cerradas a tiempo vs con atraso por período</div>
+        <div style="position:relative;height:220px"><canvas id="chartCumplimiento"></canvas></div>
+      </div>
+      <div class="an-card">
+        <div class="an-card-title">⏳ Atraso promedio por etapa</div>
+        <div style="font-size:0.7rem;color:#94a3b8;margin-bottom:14px">Días promedio de atraso por etapa en cada período</div>
+        <div style="position:relative;height:220px"><canvas id="chartEtapas"></canvas></div>
+      </div>
+    </div>
+
     <!-- HEATMAP HISTÓRICO -->
     <div class="an-card" style="margin-bottom:20px">
       <div class="an-card-title">🔥 Histórico de atrasos por etapa y período</div>
@@ -792,6 +806,7 @@
 </div><!-- /.page-content -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
     const { createClient } = supabase;
     const SUPABASE_URL  = 'https://iipgrojliqeyycvgnkrc.supabase.co';
@@ -1233,8 +1248,104 @@
         renderEeff(sociedades, all);
         renderRanking(sociedades, all);
         renderGantt(sociedades, all);
+        renderCharts();
         renderHeatAtrasos();
         renderDetailTable(sociedades, all);
+    }
+
+    let _chartCumpl = null, _chartEtapas = null;
+
+    async function renderCharts() {
+        const today = new Date(); today.setHours(0,0,0,0);
+        const { data: periodos } = await client.from('cc_periodos').select('*').order('id', { ascending: true });
+        if (!periodos?.length) return;
+        const { data: allSocs }    = await client.from('cc_sociedades').select('*');
+        const { data: allCierres } = await client.from('cc_cierres').select('*');
+        const socs    = allSocs    || [];
+        const cierres = allCierres || [];
+
+        const labels = periodos.map(p => p.nombre);
+
+        // ── Chart 1: cumplimiento mensual ──────────────────────────────
+        const aTiempo = [], conAtraso = [], pendiente = [];
+        periodos.forEach(p => {
+            const pSocs   = socs.filter(s => s.periodo_id === p.id);
+            const pCierres = cierres.filter(c => pSocs.some(s => s.id === c.sociedad_id));
+            let ok = 0, late = 0, pend = 0;
+            pSocs.forEach(soc => {
+                const cs   = pCierres.filter(c => c.sociedad_id === soc.id);
+                const hasLate = cs.some(c => getEtapaStatus(c) === 'late');
+                const allDone = cs.length === 4 && cs.every(c => getEtapaStatus(c) === 'done');
+                if (allDone)       ok++;
+                else if (hasLate)  late++;
+                else               pend++;
+            });
+            aTiempo.push(ok); conAtraso.push(late); pendiente.push(pend);
+        });
+
+        if (_chartCumpl) _chartCumpl.destroy();
+        _chartCumpl = new Chart(document.getElementById('chartCumplimiento'), {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [
+                    { label: 'Cerradas a tiempo', data: aTiempo,   backgroundColor: 'rgba(34,197,94,0.85)',  borderRadius: 6, borderSkipped: false },
+                    { label: 'Con atraso',         data: conAtraso, backgroundColor: 'rgba(239,68,68,0.80)', borderRadius: 6, borderSkipped: false },
+                    { label: 'Pendientes',          data: pendiente, backgroundColor: 'rgba(148,163,184,0.6)',borderRadius: 6, borderSkipped: false }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { font: { size: 11, family: 'Inter' }, boxWidth: 12, padding: 14 } },
+                    tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.raw} sociedad${ctx.raw!==1?'es':''}` } }
+                },
+                scales: {
+                    x: { stacked: true, grid: { display: false }, ticks: { font: { size: 11, family: 'Inter' } } },
+                    y: { stacked: true, beginAtZero: true, ticks: { stepSize: 1, font: { size: 11 } }, grid: { color: 'rgba(0,0,0,0.05)' } }
+                }
+            }
+        });
+
+        // ── Chart 2: atraso promedio por etapa ────────────────────────
+        const etapaColors = ['rgba(201,168,76,0.85)','rgba(99,102,241,0.80)','rgba(249,115,22,0.80)','rgba(20,184,166,0.80)'];
+        const etapaDatasets = ETAPA_NAMES.map((name, i) => ({
+            label: `E${i+1}: ${name.split(' ')[0]}`,
+            data: periodos.map(p => {
+                const pSocs   = socs.filter(s => s.periodo_id === p.id);
+                const pCierres = cierres.filter(c => pSocs.some(s => s.id === c.sociedad_id));
+                const etapa   = i + 1;
+                const socIds  = pSocs.filter(soc => {
+                    if (etapa === 1) return true;
+                    const prev = pCierres.find(c => c.sociedad_id === soc.id && c.etapa_num === etapa - 1);
+                    return prev && getEtapaStatus(prev) === 'done';
+                }).map(s => s.id);
+                const lateRows = pCierres.filter(c =>
+                    c.etapa_num === etapa && socIds.includes(c.sociedad_id) &&
+                    getEtapaStatus(c) === 'late' && c.fecha_limite
+                );
+                const dias = lateRows.map(c => Math.round((today - new Date(c.fecha_limite + 'T00:00:00')) / 86400000));
+                return dias.length ? Math.round(dias.reduce((a,b)=>a+b,0) / dias.length) : 0;
+            }),
+            backgroundColor: etapaColors[i], borderRadius: 5, borderSkipped: false
+        }));
+
+        if (_chartEtapas) _chartEtapas.destroy();
+        _chartEtapas = new Chart(document.getElementById('chartEtapas'), {
+            type: 'bar',
+            data: { labels, datasets: etapaDatasets },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { font: { size: 11, family: 'Inter' }, boxWidth: 12, padding: 14 } },
+                    tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.raw}d de atraso` } }
+                },
+                scales: {
+                    x: { grid: { display: false }, ticks: { font: { size: 11, family: 'Inter' } } },
+                    y: { beginAtZero: true, ticks: { font: { size: 11 }, callback: v => `${v}d` }, grid: { color: 'rgba(0,0,0,0.05)' } }
+                }
+            }
+        });
     }
 
     function renderGauge(socs, all) {
