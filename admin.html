@@ -295,6 +295,49 @@
         }
         .eye-row-btn:hover { opacity: 1; }
 
+        /* ── MÉTRICAS ── */
+        .m-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        @media (max-width: 900px) { .m-grid-2 { grid-template-columns: 1fr; } }
+        .m-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 14px; padding: 20px 22px; box-shadow: var(--shadow);
+        }
+        .m-card-title {
+            font-size: 0.82rem; font-weight: 800; color: var(--navy);
+            margin-bottom: 16px; display: flex; align-items: center; gap: 6px;
+        }
+        .online-row {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 0; border-bottom: 1px solid var(--border);
+        }
+        .online-row:last-child { border-bottom: none; }
+        .online-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: var(--green); flex-shrink: 0;
+            box-shadow: 0 0 0 3px rgba(16,185,129,0.2);
+            animation: pulse-dot 2s infinite;
+        }
+        @keyframes pulse-dot { 0%,100%{box-shadow:0 0 0 3px rgba(16,185,129,0.2)} 50%{box-shadow:0 0 0 6px rgba(16,185,129,0.08)} }
+        .online-name { font-size: 0.82rem; font-weight: 600; color: var(--navy); flex: 1; }
+        .online-page { font-size: 0.7rem; color: var(--gray2); }
+        .page-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .page-bar-label { font-size: 0.75rem; color: var(--gray); width: 130px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .page-bar-track { flex: 1; background: var(--bg); border-radius: 4px; height: 8px; overflow: hidden; }
+        .page-bar-fill  { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--blue), var(--blue-dark)); transition: width .6s; }
+        .page-bar-count { font-size: 0.72rem; font-weight: 700; color: var(--navy2); width: 28px; text-align: right; }
+        .heat-grid { display: grid; grid-template-columns: 30px repeat(24,1fr); gap: 3px; font-size: 0.6rem; color: var(--gray2); }
+        .heat-cell {
+            height: 18px; border-radius: 3px; background: var(--bg);
+            transition: background .3s;
+        }
+        .heat-cell.l1 { background: rgba(14,165,233,0.15); }
+        .heat-cell.l2 { background: rgba(14,165,233,0.35); }
+        .heat-cell.l3 { background: rgba(14,165,233,0.6); }
+        .heat-cell.l4 { background: rgba(14,165,233,0.85); }
+        .heat-label { display: flex; align-items: center; justify-content: center; }
+        .day-bar { flex: 1; background: linear-gradient(0deg, var(--blue), rgba(14,165,233,0.4)); border-radius: 4px 4px 0 0; min-width: 6px; cursor: pointer; transition: opacity .2s; position: relative; }
+        .day-bar:hover { opacity: 0.8; }
+
         /* ── SETUP BANNER ── */
         .setup-banner {
             background: rgba(245,158,11,0.06); border: 1px solid rgba(245,158,11,0.25);
@@ -490,6 +533,7 @@
                 🔔 Solicitudes <span class="tab-badge" id="solBadge" style="display:none">0</span>
             </button>
             <button class="tab-btn" onclick="switchTab('usuarios')">👥 Usuarios</button>
+            <button class="tab-btn" onclick="switchTab('metricas')">📊 Métricas</button>
         </div>
 
         <!-- TAB: SOLICITUDES -->
@@ -584,6 +628,92 @@
         </div>
 
         </div><!-- /tabUsuarios -->
+
+        <!-- TAB: MÉTRICAS -->
+        <div class="tab-panel" id="tabMetricas">
+
+            <!-- Filtro de mes -->
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;">
+                <div>
+                    <div class="section-title">Analytics del sistema</div>
+                    <div class="section-sub">Actividad real de usuarios registrados</div>
+                </div>
+                <div style="display:flex;gap:10px;align-items:center;">
+                    <select class="filter-select" id="metricMonth" onchange="loadMetrics()">
+                        <option value="all">Todo el tiempo</option>
+                    </select>
+                    <button class="btn-add" onclick="loadMetrics()" style="padding:8px 16px;font-size:0.78rem;">↺ Actualizar</button>
+                </div>
+            </div>
+
+            <!-- KPIs -->
+            <div class="stats-row" style="margin-bottom:20px;">
+                <div class="stat-card c1">
+                    <div class="stat-label">🟢 En línea ahora</div>
+                    <div class="stat-value" id="m-online">—</div>
+                </div>
+                <div class="stat-card c2">
+                    <div class="stat-label">Sesiones totales</div>
+                    <div class="stat-value" id="m-sessions">—</div>
+                </div>
+                <div class="stat-card c3">
+                    <div class="stat-label">Tiempo promedio / sesión</div>
+                    <div class="stat-value" id="m-avgtime" style="font-size:1.4rem;padding-top:6px">—</div>
+                </div>
+                <div class="stat-card c4">
+                    <div class="stat-label">Páginas vistas</div>
+                    <div class="stat-value" id="m-pageviews">—</div>
+                </div>
+            </div>
+
+            <!-- Fila 1: Online ahora + Páginas más visitadas -->
+            <div class="m-grid-2" style="margin-bottom:20px;">
+
+                <div class="m-card">
+                    <div class="m-card-title">🟢 Usuarios en línea ahora</div>
+                    <div id="m-online-list">
+                        <div class="empty-state"><div class="empty-icon" style="font-size:1.5rem">👤</div><div class="empty-text">Nadie activo en este momento</div></div>
+                    </div>
+                </div>
+
+                <div class="m-card">
+                    <div class="m-card-title">📄 Páginas más visitadas</div>
+                    <div id="m-pages-chart"></div>
+                </div>
+
+            </div>
+
+            <!-- Fila 2: Actividad por usuario + Heatmap -->
+            <div class="m-grid-2" style="margin-bottom:20px;">
+
+                <div class="m-card">
+                    <div class="m-card-title">👤 Actividad por usuario</div>
+                    <table style="width:100%;font-size:0.78rem;border-collapse:collapse;" id="m-user-table">
+                        <thead><tr style="border-bottom:1px solid var(--border);">
+                            <th style="padding:8px 10px;text-align:left;font-size:0.65rem;color:var(--gray2);text-transform:uppercase;">Usuario</th>
+                            <th style="padding:8px 10px;text-align:center;font-size:0.65rem;color:var(--gray2);text-transform:uppercase;">Sesiones</th>
+                            <th style="padding:8px 10px;text-align:center;font-size:0.65rem;color:var(--gray2);text-transform:uppercase;">Tiempo total</th>
+                            <th style="padding:8px 10px;text-align:center;font-size:0.65rem;color:var(--gray2);text-transform:uppercase;">Último acceso</th>
+                        </tr></thead>
+                        <tbody id="m-user-rows"><tr><td colspan="4" style="text-align:center;padding:20px;color:var(--gray2);">Cargando...</td></tr></tbody>
+                    </table>
+                </div>
+
+                <div class="m-card">
+                    <div class="m-card-title">🕐 Horas con más actividad</div>
+                    <div id="m-heatmap"></div>
+                </div>
+
+            </div>
+
+            <!-- Fila 3: Logins por día -->
+            <div class="m-card" style="margin-bottom:20px;">
+                <div class="m-card-title">📈 Sesiones por día</div>
+                <div id="m-daily-chart" style="display:flex;align-items:flex-end;gap:4px;height:100px;padding-top:10px;"></div>
+            </div>
+
+        </div><!-- /tabMetricas -->
+
     </div><!-- /content -->
 </div><!-- /main -->
 
@@ -1060,10 +1190,162 @@
     // ── TABS ─────────────────────────────────────────────────────────────────
     function switchTab(tab) {
         document.querySelectorAll('.tab-btn').forEach((b, i) => {
-            b.classList.toggle('active', (i === 0 && tab === 'solicitudes') || (i === 1 && tab === 'usuarios'));
+            b.classList.toggle('active',
+                (i === 0 && tab === 'solicitudes') ||
+                (i === 1 && tab === 'usuarios') ||
+                (i === 2 && tab === 'metricas'));
         });
         document.getElementById('tabSolicitudes').classList.toggle('active', tab === 'solicitudes');
-        document.getElementById('tabUsuarios').classList.toggle('active', tab === 'usuarios');
+        document.getElementById('tabUsuarios').classList.toggle('active',    tab === 'usuarios');
+        document.getElementById('tabMetricas').classList.toggle('active',    tab === 'metricas');
+        if (tab === 'metricas') loadMetrics();
+    }
+
+    // ── MÉTRICAS ──────────────────────────────────────────────────────────────
+    function buildMonthOptions() {
+        const sel = document.getElementById('metricMonth');
+        const now = new Date();
+        for (let i = 0; i < 12; i++) {
+            const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+            const val = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+            const lbl = d.toLocaleDateString('es', { month: 'long', year: 'numeric' });
+            const opt = document.createElement('option');
+            opt.value = val; opt.textContent = lbl;
+            sel.appendChild(opt);
+        }
+    }
+    buildMonthOptions();
+
+    function getDateFilter() {
+        const val = document.getElementById('metricMonth').value;
+        if (val === 'all') return null;
+        const [y, m] = val.split('-');
+        const from = `${y}-${m}-01T00:00:00`;
+        const to   = new Date(y, m, 0);
+        const toStr = `${y}-${m}-${String(to.getDate()).padStart(2,'0')}T23:59:59`;
+        return { from, to: toStr };
+    }
+
+    async function loadMetrics() {
+        const df = getDateFilter();
+
+        // ── Online ahora (last_seen < 2 min) ──
+        const twoMinAgo = new Date(Date.now() - 2 * 60000).toISOString();
+        const { data: online } = await SERVICE_CLIENT
+            .from('sesiones')
+            .select('user_nombre, last_seen')
+            .gte('last_seen', twoMinAgo)
+            .is('fin', null);
+
+        document.getElementById('m-online').textContent = online?.length ?? 0;
+        const onlineList = document.getElementById('m-online-list');
+        if (!online?.length) {
+            onlineList.innerHTML = `<div class="empty-state" style="padding:20px 0"><div class="empty-icon" style="font-size:1.5rem">👤</div><div class="empty-text">Nadie activo en este momento</div></div>`;
+        } else {
+            onlineList.innerHTML = online.map(s => `
+                <div class="online-row">
+                    <div class="online-dot"></div>
+                    <div class="online-name">${s.user_nombre || '—'}</div>
+                    <div class="online-page">hace ${Math.round((Date.now()-new Date(s.last_seen))/1000)}s</div>
+                </div>`).join('');
+        }
+
+        // ── Sesiones totales y tiempo promedio ──
+        let sesQ = SERVICE_CLIENT.from('sesiones').select('duracion_min, user_nombre, inicio', { count: 'exact' });
+        if (df) sesQ = sesQ.gte('inicio', df.from).lte('inicio', df.to);
+        const { data: sesData, count: sesCount } = await sesQ;
+
+        document.getElementById('m-sessions').textContent = sesCount ?? 0;
+        const validDur = (sesData || []).filter(s => s.duracion_min > 0).map(s => s.duracion_min);
+        const avgMin   = validDur.length ? validDur.reduce((a,b)=>a+b,0)/validDur.length : 0;
+        document.getElementById('m-avgtime').textContent = avgMin < 1
+            ? `${Math.round(avgMin*60)}s`
+            : `${Math.round(avgMin)}m`;
+
+        // ── Page views totales ──
+        let pvQ = SERVICE_CLIENT.from('page_views').select('pagina, titulo, user_nombre, entrada_at, tiempo_seg', { count: 'exact' });
+        if (df) pvQ = pvQ.gte('entrada_at', df.from).lte('entrada_at', df.to);
+        const { data: pvData, count: pvCount } = await pvQ;
+        document.getElementById('m-pageviews').textContent = pvCount ?? 0;
+
+        // ── Páginas más visitadas ──
+        const pageCounts = {};
+        (pvData || []).forEach(p => {
+            const key = p.titulo || p.pagina;
+            pageCounts[key] = (pageCounts[key] || 0) + 1;
+        });
+        const sortedPages = Object.entries(pageCounts).sort((a,b)=>b[1]-a[1]).slice(0,6);
+        const maxPV = sortedPages[0]?.[1] || 1;
+        document.getElementById('m-pages-chart').innerHTML = sortedPages.length
+            ? sortedPages.map(([name, count]) => `
+                <div class="page-bar-row">
+                    <div class="page-bar-label" title="${name}">${name}</div>
+                    <div class="page-bar-track"><div class="page-bar-fill" style="width:${Math.round(count/maxPV*100)}%"></div></div>
+                    <div class="page-bar-count">${count}</div>
+                </div>`).join('')
+            : `<div style="color:var(--gray2);font-size:0.8rem;padding:20px 0;text-align:center">Sin datos aún</div>`;
+
+        // ── Actividad por usuario ──
+        const userStats = {};
+        (sesData || []).forEach(s => {
+            const n = s.user_nombre || '—';
+            if (!userStats[n]) userStats[n] = { sesiones: 0, minutos: 0, ultimo: null };
+            userStats[n].sesiones++;
+            userStats[n].minutos += s.duracion_min || 0;
+            const t = new Date(s.inicio);
+            if (!userStats[n].ultimo || t > userStats[n].ultimo) userStats[n].ultimo = t;
+        });
+        const userRows = Object.entries(userStats).sort((a,b)=>b[1].sesiones-a[1].sesiones);
+        document.getElementById('m-user-rows').innerHTML = userRows.length
+            ? userRows.map(([name, d]) => `
+                <tr style="border-bottom:1px solid var(--border);">
+                    <td style="padding:9px 10px;font-weight:600;color:var(--navy)">${name}</td>
+                    <td style="padding:9px 10px;text-align:center;color:var(--gray)">${d.sesiones}</td>
+                    <td style="padding:9px 10px;text-align:center;color:var(--gray)">${d.minutos < 1 ? '<1m' : Math.round(d.minutos)+'m'}</td>
+                    <td style="padding:9px 10px;text-align:center;color:var(--gray2);font-size:0.72rem">${d.ultimo ? d.ultimo.toLocaleDateString('es',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '—'}</td>
+                </tr>`).join('')
+            : `<tr><td colspan="4" style="text-align:center;padding:20px;color:var(--gray2)">Sin datos aún</td></tr>`;
+
+        // ── Heatmap horas ──
+        const heatData = Array(7).fill(null).map(() => Array(24).fill(0));
+        (pvData || []).forEach(p => {
+            const d = new Date(p.entrada_at);
+            heatData[d.getDay()][d.getHours()]++;
+        });
+        const maxHeat = Math.max(...heatData.flat(), 1);
+        const days = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+        let heatHtml = `<div class="heat-grid">
+            <div></div>${Array.from({length:24},(_,h)=>`<div class="heat-label">${h}</div>`).join('')}`;
+        heatData.forEach((row, di) => {
+            heatHtml += `<div class="heat-label">${days[di]}</div>`;
+            row.forEach(v => {
+                const pct = v/maxHeat;
+                const lvl = pct === 0 ? '' : pct < 0.25 ? 'l1' : pct < 0.5 ? 'l2' : pct < 0.75 ? 'l3' : 'l4';
+                heatHtml += `<div class="heat-cell ${lvl}" title="${v} visitas"></div>`;
+            });
+        });
+        heatHtml += '</div>';
+        document.getElementById('m-heatmap').innerHTML = heatHtml;
+
+        // ── Sesiones por día (últimos 30 días) ──
+        const dailyCounts = {};
+        const limit = df ? new Date(df.from) : new Date(Date.now() - 30*86400000);
+        (sesData || []).forEach(s => {
+            const d = new Date(s.inicio);
+            if (d >= limit) {
+                const key = d.toISOString().slice(0,10);
+                dailyCounts[key] = (dailyCounts[key] || 0) + 1;
+            }
+        });
+        const dailyEntries = Object.entries(dailyCounts).sort((a,b)=>a[0]>b[0]?1:-1);
+        const maxDaily = Math.max(...dailyEntries.map(e=>e[1]), 1);
+        document.getElementById('m-daily-chart').innerHTML = dailyEntries.length
+            ? dailyEntries.map(([date, count]) => {
+                const h = Math.max(8, Math.round(count/maxDaily*90));
+                const lbl = new Date(date+'T12:00:00').toLocaleDateString('es',{day:'2-digit',month:'short'});
+                return `<div class="day-bar" style="height:${h}px" title="${lbl}: ${count} sesiones"></div>`;
+              }).join('')
+            : `<div style="color:var(--gray2);font-size:0.8rem;margin:auto">Sin datos aún</div>`;
     }
 
     // ── SOLICITUDES ───────────────────────────────────────────────────────────
@@ -1259,5 +1541,6 @@
 
     // Cargar solicitudes al iniciar (se llama dentro del auth check después de loadUsers)
 </script>
+<script src="tracker.js"></script>
 </body>
 </html>
