@@ -442,7 +442,7 @@
         <p class="cc-subtitle">Supervisa y actualiza el estado de los cierres contables a través de todas las etapas para cada sociedad.</p>
       </div>
       <div class="cc-hero-controls">
-        <button class="btn-cc btn-analitica" onclick="switchVista('analitica')">📊 Vista Analítica</button>
+        <button id="btnVista" class="btn-cc btn-analitica" onclick="switchVista(_vistaActual === 'analitica' ? 'tablero' : 'analitica')">📊 Vista Analítica</button>
         <span class="periodo-label">Período:</span>
         <select class="periodo-select" id="periodoSel" onchange="onPeriodoChange()">
           <option value="">— Seleccionar —</option>
@@ -542,10 +542,6 @@
   <div id="vistaAnalitica" style="display:none">
 
     <div class="an-header">
-      <button class="btn-back-tablero" onclick="switchVista('tablero')">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
-        Volver al Tablero
-      </button>
       <div>
         <div class="an-title">Vista Analítica</div>
         <div class="an-sub" id="anPeriodoLabel">—</div>
@@ -1144,6 +1140,7 @@
 
     function switchVista(v) {
         _vistaActual = v;
+        const btn = document.getElementById('btnVista');
         const tableroEls = [
             document.querySelector('.cc-kpis'),
             document.getElementById('progressStrip'),
@@ -1153,10 +1150,12 @@
         if (v === 'analitica') {
             tableroEls.forEach(el => { if (el) el.style.display = 'none'; });
             analitica.style.display = 'block';
+            if (btn) btn.textContent = '📋 Tablero';
             renderAnalitica();
         } else {
             tableroEls.forEach(el => { if (el) el.style.display = ''; });
             analitica.style.display = 'none';
+            if (btn) btn.textContent = '📊 Vista Analítica';
         }
     }
 
