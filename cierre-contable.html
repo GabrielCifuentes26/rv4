@@ -567,13 +567,7 @@
 
   <!-- VISTA ANALÍTICA -->
   <div id="vistaAnalitica" style="display:none">
-
-    <div class="an-header">
-      <div>
-        <div class="an-title">Vista Analítica</div>
-        <div class="an-sub" id="anPeriodoLabel">—</div>
-      </div>
-    </div>
+    <p class="an-periodo-lbl" id="anPeriodoLabel" style="font-size:0.78rem;color:#94a3b8;font-weight:600;margin-bottom:18px;"></p>
 
     <!-- GAUGE + RESUMEN -->
     <div class="an-row-3" style="margin-bottom:20px">
@@ -1170,7 +1164,9 @@
 
     function switchVista(v) {
         _vistaActual = v;
-        const btn = document.getElementById('btnVista');
+        const btn     = document.getElementById('btnVista');
+        const title   = document.querySelector('.cc-title');
+        const sub     = document.querySelector('.cc-subtitle');
         const tableroEls = [
             document.querySelector('.cc-kpis'),
             document.getElementById('progressStrip'),
@@ -1180,12 +1176,16 @@
         if (v === 'analitica') {
             tableroEls.forEach(el => { if (el) el.style.display = 'none'; });
             analitica.style.display = 'block';
-            if (btn) btn.textContent = '📋 Tablero';
+            if (btn)   btn.textContent   = '📋 Tablero';
+            if (title) title.textContent = 'Vista Analítica';
+            if (sub)   sub.textContent   = 'Visualiza el avance global del período: progreso por sociedad, Gantt de etapas y ranking de cumplimiento.';
             renderAnalitica();
         } else {
             tableroEls.forEach(el => { if (el) el.style.display = ''; });
             analitica.style.display = 'none';
-            if (btn) btn.textContent = '📊 Vista Analítica';
+            if (btn)   btn.textContent   = '📊 Vista Analítica';
+            if (title) title.textContent = 'Tablero de Cierres';
+            if (sub)   sub.textContent   = 'Supervisa y actualiza el estado de los cierres contables a través de todas las etapas para cada sociedad.';
         }
     }
 
