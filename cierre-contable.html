@@ -13,10 +13,11 @@
         body { font-family:'Inter','Segoe UI',sans-serif; background:#fff; color:var(--nn); overflow-x:hidden; }
 
         /* ── NAV ── */
-        nav { position:fixed; top:0; left:0; right:0; z-index:1000; background:rgba(254,250,244,0.97); border-bottom:1px solid var(--nbd); box-shadow:0 2px 20px rgba(21,37,64,0.08); padding:0 50px; height:68px; display:flex; align-items:center; justify-content:space-between; backdrop-filter:blur(14px); }
-        nav::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--nn) 0%,var(--ng) 45%,var(--nn) 100%); }
-        .logo { font-size:1.15rem; font-weight:900; color:var(--nn); letter-spacing:2px; text-transform:uppercase; flex-shrink:0; text-decoration:none; }
+        nav { position:fixed; top:0; left:0; right:0; z-index:1000; background:rgba(254,250,244,0.97); border-bottom:1px solid var(--nbd); box-shadow:0 2px 20px rgba(21,37,64,0.08); padding:0 50px; height:68px; display:flex; align-items:center; justify-content:space-between; transition:background .45s,border-color .45s,box-shadow .45s; backdrop-filter:blur(14px); }
+        nav::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--nn) 0%,var(--ng) 45%,var(--nn) 100%); opacity:1; transition:opacity .4s; }
+        .logo { font-size:1.15rem; font-weight:900; color:var(--nn); letter-spacing:2px; text-transform:uppercase; flex-shrink:0; text-decoration:none; display:flex; align-items:center; gap:10px; transition:color .4s; }
         .logo span { color:var(--ng); }
+        .logo-img { height:36px; width:auto; object-fit:contain; filter:brightness(0); transition:filter .4s; }
         .nav-menu { display:flex; align-items:center; gap:2px; }
         .nav-link { display:flex; align-items:center; gap:5px; color:var(--nn); font-size:0.95rem; font-weight:700; padding:8px 18px; border-radius:8px; text-decoration:none; background:none; border:none; cursor:pointer; font-family:inherit; transition:color .18s,background .18s; white-space:nowrap; letter-spacing:.3px; }
         .nav-link:hover { color:var(--ng2); background:var(--nb); }
@@ -272,6 +273,9 @@
             .cc-kpis { gap:10px; }
             .kpi-value { font-size:2.2rem; }
         }
+        /* ── SEPARADOR CONTROLES ── */
+        .ctrl-sep { width:1.5px; height:28px; background:#e2e8f0; flex-shrink:0; margin:0 4px; }
+
         /* ── BOTÓN ANALÍTICA ── */
         .btn-analitica {
             background: linear-gradient(135deg, #C9A84C, #A8832A);
@@ -388,7 +392,10 @@
 
 <!-- NAV -->
 <nav id="mainNav">
-    <a href="index.html" class="logo">Costos&<span>Presupuestos</span></a>
+    <a href="index.html" class="logo">
+        <img src="imagenes de proyectos/Logos/LOGO RV4 BLANCO.png" alt="RV4" class="logo-img">
+        Costos&<span>Presupuestos</span>
+    </a>
     <div class="nav-menu">
         <a href="index.html#proyectos" class="nav-link">Presupuesto</a>
         <div class="nav-item" id="dropCronograma">
@@ -447,6 +454,7 @@
         <select class="periodo-select" id="periodoSel" onchange="onPeriodoChange()">
           <option value="">— Seleccionar —</option>
         </select>
+        <span class="ctrl-sep admin-only" style="display:none"></span>
         <button class="btn-gear admin-only" style="display:none" onclick="openGestionPeriodos()" title="Gestionar períodos">⚙️</button>
         <button class="btn-cc btn-cc-outline admin-only" style="display:none" onclick="openModalPeriodo()">+ Período</button>
         <button class="btn-cc btn-cc-primary admin-only" style="display:none" onclick="openModalSociedad()">+ Sociedad</button>
@@ -821,6 +829,9 @@
     }
     document.addEventListener('click', e => {
         if (!e.target.closest('.nav-item')) document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('open'));
+    });
+    window.addEventListener('scroll', () => {
+        document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 30);
     });
 
     // ── MODALS ───────────────────────────────────────────────────────
@@ -1338,7 +1349,9 @@
         if (data?.rol === 'admin') {
             isAdmin = true;
             document.getElementById('btnAdmin').style.display = 'inline-block';
-            document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'inline-flex');
+            document.querySelectorAll('.admin-only').forEach(el => {
+                el.style.display = el.tagName === 'SPAN' ? 'block' : 'inline-flex';
+            });
         }
         await loadPeriodos();
     })();
