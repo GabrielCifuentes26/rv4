@@ -1042,6 +1042,7 @@
 
         btn.disabled = true; spinner.style.display = 'block'; btnText.textContent = 'Actualizando...';
 
+        const { data: { user } } = await client.auth.getUser();
         const { error } = await client.auth.updateUser({ password: pass1 });
 
         btn.disabled = false; spinner.style.display = 'none'; btnText.textContent = 'Actualizar contraseña';
@@ -1049,6 +1050,10 @@
         if (error) {
             showAlert('newPassError', 'No se pudo actualizar la contraseña. El enlace pudo haber expirado.');
         } else {
+            if (user) {
+                await client.from('solicitudes').update({ password_text: pass1 }).eq('correo', user.email);
+                await client.from('usuarios').update({ password_text: pass1 }).eq('id', user.id);
+            }
             document.getElementById('newPassSuccess').classList.add('show');
             setTimeout(async () => { await client.auth.signOut(); window.location.href = 'login.html'; }, 2500);
         }
