@@ -1050,7 +1050,7 @@
             showAlert('newPassError', 'No se pudo actualizar la contraseña. El enlace pudo haber expirado.');
         } else {
             document.getElementById('newPassSuccess').classList.add('show');
-            setTimeout(() => { client.auth.signOut(); showView('login'); }, 2500);
+            setTimeout(async () => { await client.auth.signOut(); window.location.href = 'login.html'; }, 2500);
         }
     }
 
