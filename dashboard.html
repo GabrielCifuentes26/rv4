@@ -4,6 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard — Control Presupuestario</title>
+    <style>html{visibility:hidden}</style>
+    <script>
+    (function(){
+        try {
+            var s=JSON.parse(localStorage.getItem('sb-iipgrojliqeyycvgnkrc-auth-token')||'null');
+            if(s&&s.access_token&&(!s.expires_at||Date.now()/1000<s.expires_at)){
+                document.documentElement.style.visibility='visible';
+            } else { window.location.replace('login.html'); }
+        } catch(e){ window.location.replace('login.html'); }
+    })();
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
