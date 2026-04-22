@@ -729,7 +729,7 @@
                                     <button type="button" class="eye-btn" id="eyeLoginPass" onclick="toggleEye('loginPassword','eyeLoginPass')">👁</button>
                                 </div>
                             </div>
-                            <a href="#" class="field-hint">¿Olvidaste tu contraseña?</a>
+                            <a href="#" class="field-hint" onclick="event.preventDefault();showView('reset')">¿Olvidaste tu contraseña?</a>
                         </div>
 
                         <div class="alert error"   id="loginError"><span>⚠</span><span id="loginErrorText"></span></div>
@@ -819,6 +819,70 @@
                         </button>
                         <div class="divider"><div class="divider-line"></div><span class="divider-text">o</span><div class="divider-line"></div></div>
                         <div class="toggle-link">¿Ya tienes cuenta? <a onclick="showView('login')">Iniciar sesión</a></div>
+                    </div>
+                </div>
+
+                <!-- ── RECUPERAR CONTRASEÑA ── -->
+                <div class="form-view hidden" id="viewReset">
+                    <div class="form-header">
+                        <div class="form-tag"><div class="form-tag-dot"></div>Recuperar acceso</div>
+                        <div class="form-title">¿Olvidaste tu contraseña?</div>
+                        <div class="form-subtitle">Ingresa tu correo y te enviaremos un enlace para restablecerla</div>
+                    </div>
+                    <div class="form-body">
+                        <div class="float-field" id="ff-resetEmail">
+                            <input type="email" id="resetEmail" autocomplete="email" placeholder="correo@ejemplo.com"
+                                onfocus="activateField('ff-resetEmail')"
+                                onblur="deactivateField('ff-resetEmail','resetEmail')"
+                                oninput="checkFilled('ff-resetEmail','resetEmail','email')">
+                            <label>Correo electrónico</label>
+                            <div class="field-right"><div class="field-check">✓</div></div>
+                        </div>
+                        <div class="alert error"   id="resetError"><span>⚠</span><span></span></div>
+                        <div class="alert success" id="resetSuccess"><span>✓</span><span>Revisa tu correo, te enviamos el enlace para restablecer tu contraseña.</span></div>
+                        <button class="btn-main" id="btnReset" onclick="doResetPassword()">
+                            <div class="spinner" id="resetSpinner"></div>
+                            <span id="resetBtnText">Enviar enlace</span>
+                        </button>
+                        <div class="divider"><div class="divider-line"></div><span class="divider-text">o</span><div class="divider-line"></div></div>
+                        <div class="toggle-link">¿Recordaste tu contraseña? <a onclick="showView('login')">Iniciar sesión</a></div>
+                    </div>
+                </div>
+
+                <!-- ── NUEVA CONTRASEÑA ── -->
+                <div class="form-view hidden" id="viewNewPassword">
+                    <div class="form-header">
+                        <div class="form-tag"><div class="form-tag-dot"></div>Nueva contraseña</div>
+                        <div class="form-title">Elige una nueva contraseña</div>
+                        <div class="form-subtitle">Ingresa y confirma tu nueva contraseña</div>
+                    </div>
+                    <div class="form-body">
+                        <div class="float-field has-eye" id="ff-newPass">
+                            <input type="password" id="newPassword" autocomplete="new-password" placeholder="••••••••"
+                                onfocus="activateField('ff-newPass')"
+                                onblur="deactivateField('ff-newPass','newPassword')"
+                                oninput="checkFilled('ff-newPass','newPassword','pass')">
+                            <label>Nueva contraseña</label>
+                            <div class="field-right">
+                                <button type="button" class="eye-btn" id="eyeNewPass" onclick="toggleEye('newPassword','eyeNewPass')">👁</button>
+                            </div>
+                        </div>
+                        <div class="float-field has-eye" id="ff-newPass2">
+                            <input type="password" id="newPassword2" autocomplete="new-password" placeholder="••••••••"
+                                onfocus="activateField('ff-newPass2')"
+                                onblur="deactivateField('ff-newPass2','newPassword2')"
+                                oninput="checkFilled('ff-newPass2','newPassword2','pass')">
+                            <label>Confirmar contraseña</label>
+                            <div class="field-right">
+                                <button type="button" class="eye-btn" id="eyeNewPass2" onclick="toggleEye('newPassword2','eyeNewPass2')">👁</button>
+                            </div>
+                        </div>
+                        <div class="alert error"   id="newPassError"><span>⚠</span><span></span></div>
+                        <div class="alert success" id="newPassSuccess"><span>✓</span><span>Contraseña actualizada. Redirigiendo al inicio de sesión...</span></div>
+                        <button class="btn-main" id="btnNewPass" onclick="doNewPassword()">
+                            <div class="spinner" id="newPassSpinner"></div>
+                            <span id="newPassBtnText">Actualizar contraseña</span>
+                        </button>
                     </div>
                 </div>
 
@@ -916,13 +980,16 @@
         }
         glass.style.display = '';
         success.classList.remove('show');
-        document.getElementById('viewLogin').className    = 'form-view ' + (view === 'login'    ? 'visible' : 'hidden');
-        document.getElementById('viewRegister').className = 'form-view ' + (view === 'register' ? 'visible' : 'hidden');
+        document.getElementById('viewLogin').className       = 'form-view ' + (view === 'login'       ? 'visible' : 'hidden');
+        document.getElementById('viewRegister').className    = 'form-view ' + (view === 'register'    ? 'visible' : 'hidden');
+        document.getElementById('viewReset').className       = 'form-view ' + (view === 'reset'       ? 'visible' : 'hidden');
+        document.getElementById('viewNewPassword').className = 'form-view ' + (view === 'newPassword' ? 'visible' : 'hidden');
         hideAllAlerts();
     }
 
     function hideAllAlerts() {
-        ['loginError','loginPending','loginRejected','loginSuccess','regError']
+        ['loginError','loginPending','loginRejected','loginSuccess','regError',
+         'resetError','resetSuccess','newPassError','newPassSuccess']
             .forEach(id => { const el = document.getElementById(id); if (el) el.classList.remove('show'); });
     }
 
@@ -933,6 +1000,65 @@
         if (span && msg) span.textContent = msg;
         el.classList.add('show');
     }
+
+    // ── RESET PASSWORD ───────────────────────────────────────────────────────
+    async function doResetPassword() {
+        const email   = document.getElementById('resetEmail').value.trim();
+        const btn     = document.getElementById('btnReset');
+        const spinner = document.getElementById('resetSpinner');
+        const btnText = document.getElementById('resetBtnText');
+
+        hideAllAlerts();
+        if (!email) { showAlert('resetError', 'Ingresa tu correo electrónico.'); return; }
+
+        btn.disabled = true; spinner.style.display = 'block'; btnText.textContent = 'Enviando...';
+
+        const { error } = await client.auth.resetPasswordForEmail(email, {
+            redirectTo: 'https://gabrielcifuentes26.github.io/rv4/login.html'
+        });
+
+        btn.disabled = false; spinner.style.display = 'none'; btnText.textContent = 'Enviar enlace';
+
+        if (error) {
+            showAlert('resetError', 'No se pudo enviar el enlace. Verifica el correo e intenta de nuevo.');
+        } else {
+            document.getElementById('resetSuccess').classList.add('show');
+        }
+    }
+
+    async function doNewPassword() {
+        const pass1   = document.getElementById('newPassword').value;
+        const pass2   = document.getElementById('newPassword2').value;
+        const btn     = document.getElementById('btnNewPass');
+        const spinner = document.getElementById('newPassSpinner');
+        const btnText = document.getElementById('newPassBtnText');
+
+        hideAllAlerts();
+        if (pass1.length < 8)             { showAlert('newPassError', 'La contraseña debe tener mínimo 8 caracteres.'); return; }
+        if (!/[A-Z]/.test(pass1))         { showAlert('newPassError', 'Incluye al menos una mayúscula.'); return; }
+        if (!/[0-9]/.test(pass1))         { showAlert('newPassError', 'Incluye al menos un número.'); return; }
+        if (!/[^A-Za-z0-9]/.test(pass1))  { showAlert('newPassError', 'Incluye al menos un símbolo (!@#$...).'); return; }
+        if (pass1 !== pass2)              { showAlert('newPassError', 'Las contraseñas no coinciden.'); return; }
+
+        btn.disabled = true; spinner.style.display = 'block'; btnText.textContent = 'Actualizando...';
+
+        const { error } = await client.auth.updateUser({ password: pass1 });
+
+        btn.disabled = false; spinner.style.display = 'none'; btnText.textContent = 'Actualizar contraseña';
+
+        if (error) {
+            showAlert('newPassError', 'No se pudo actualizar la contraseña. El enlace pudo haber expirado.');
+        } else {
+            document.getElementById('newPassSuccess').classList.add('show');
+            setTimeout(() => { client.auth.signOut(); showView('login'); }, 2500);
+        }
+    }
+
+    // Detectar token de recuperación en la URL
+    (function() {
+        const hash = new URLSearchParams(window.location.hash.slice(1));
+        if (hash.get('type') === 'recovery') { showView('newPassword'); }
+    })();
 
     // ── EMPRESA ──────────────────────────────────────────────────────────────
     function selectEmpresa(empresa) {
