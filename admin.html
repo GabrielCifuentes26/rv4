@@ -1540,6 +1540,7 @@
         const solId  = document.getElementById('resetSolId').value;
         const userId = document.getElementById('resetUserId').value;
         const email  = document.getElementById('resetUserEmail').value;
+        const nombre = document.getElementById('resetUserInfo').querySelector('strong')?.textContent || '';
         const pass   = document.getElementById('resetNewPass').value.trim();
         const btn    = document.getElementById('btnResetSave');
 
@@ -1557,18 +1558,19 @@
             });
             if (!authRes.ok) throw new Error('Error al actualizar la contraseña en Auth');
 
-            // 2. Actualizar password_text en tabla usuarios
+            // 2. Actualizar password_text en tabla usuarios y en solicitudes
             await SERVICE_CLIENT.from('usuarios').update({ password_text: pass }).eq('id', userId);
+            await SERVICE_CLIENT.from('solicitudes').update({ password_text: pass }).eq('correo', email);
 
-            // 3. Enviar correo automático al usuario vía Resend
-            const emailSent = await sendPasswordEmail(email, pass);
-
-            // 4. Marcar solicitud como atendida
+            // 3. Marcar solicitud como atendida
             await SERVICE_CLIENT.from('solicitudes_reset').update({ estado: 'atendido' }).eq('id', solId);
 
+            // 4. Abrir Outlook del admin con correo pre-llenado para enviar al usuario
+            abrirCorreoAdmin(email, nombre, pass);
+
             closeResetModal();
-            await loadSolicitudesReset();
-            showToast(emailSent ? `Contraseña actualizada y correo enviado a ${email}` : `Contraseña actualizada. No se pudo enviar el correo automático.`, emailSent ? 'success' : 'warning');
+            await Promise.all([loadSolicitudesReset(), loadUsers()]);
+            showToast(`✓ Contraseña actualizada. Se abrió tu correo para notificar a ${email}`, 'success');
         } catch (err) {
             showToast('Error: ' + err.message, 'error');
         } finally {
@@ -1576,30 +1578,23 @@
         }
     }
 
-    async function sendPasswordEmail(toEmail, password) {
-        try {
-            const res = await fetch('https://api.resend.com/emails', {
-                method: 'POST',
-                headers: { 'Content-Type':'application/json', 'Authorization':'Bearer re_HrJCXpZo_9Fw3CW8p9R4j6t5SKAhYnkyC' },
-                body: JSON.stringify({
-                    from: 'Costos&Presupuestos <onboarding@resend.dev>',
-                    to: [toEmail],
-                    subject: 'Tu nueva contraseña — Costos&Presupuestos',
-                    html: `<div style="font-family:Inter,sans-serif;max-width:480px;margin:0 auto;padding:32px 24px;background:#fff;border-radius:12px;border:1px solid #e2e8f0">
-                        <h2 style="color:#152540;font-size:1.2rem;margin-bottom:8px">Tu contraseña ha sido actualizada</h2>
-                        <p style="color:#64748b;font-size:0.9rem;margin-bottom:24px">El administrador ha establecido una nueva contraseña para tu cuenta.</p>
-                        <div style="background:#f8f9fc;border-radius:8px;padding:16px 20px;border-left:4px solid #C9A84C;margin-bottom:24px">
-                            <div style="font-size:0.75rem;color:#8a9ab5;font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px">Tu nueva contraseña</div>
-                            <div style="font-size:1.4rem;font-weight:900;color:#152540;letter-spacing:2px">${password}</div>
-                        </div>
-                        <p style="color:#64748b;font-size:0.82rem">Ingresa con esta contraseña en el sistema. Se recomienda cambiarla después de iniciar sesión.</p>
-                        <hr style="border:none;border-top:1px solid #e2e8f0;margin:24px 0">
-                        <p style="color:#94a3b8;font-size:0.75rem">Costos&Presupuestos — Sistema interno</p>
-                    </div>`
-                })
-            });
-            return res.ok;
-        } catch { return false; }
+    function abrirCorreoAdmin(email, nombre, pass) {
+        const asunto = encodeURIComponent('Tu nueva contraseña — Costos&Presupuestos');
+        const cuerpo = encodeURIComponent(
+`Hola ${nombre || ''},
+
+El administrador ha establecido una nueva contraseña para tu cuenta en el sistema Costos&Presupuestos.
+
+Tu nueva contraseña es:
+
+${pass}
+
+Ingresa al sistema con esta contraseña. Se recomienda cambiarla después de iniciar sesión.
+
+Saludos,
+Administración — Costos&Presupuestos`
+        );
+        window.open(`mailto:${email}?subject=${asunto}&body=${cuerpo}`, '_blank');
     }
 
     // ── MODAL APROBAR ─────────────────────────────────────────────────────────

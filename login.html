@@ -839,7 +839,10 @@
                             <div class="field-right"><div class="field-check">✓</div></div>
                         </div>
                         <div class="alert error"   id="resetError"><span>⚠</span><span></span></div>
-                        <div class="alert success" id="resetSuccess"><span>✓</span><span>Solicitud enviada. El administrador te enviará tu nueva contraseña pronto.</span></div>
+                        <div class="alert success" id="resetSuccess"><span>✓</span><span>Tu solicitud fue enviada. El administrador revisará y te enviará la nueva contraseña a tu correo electrónico.</span></div>
+                        <div id="resetExtraMsg" style="display:none;background:#f0f7ff;border:1px solid #bee3f8;border-radius:10px;padding:12px 14px;font-size:0.83rem;color:#2b6cb0;margin-bottom:12px;line-height:1.5">
+                            Si necesitas enviar otra solicitud de reinicio de contraseña, puedes hacerlo nuevamente ingresando tu correo.
+                        </div>
                         <button class="btn-main" id="btnReset" onclick="doResetPassword()">
                             <div class="spinner" id="resetSpinner"></div>
                             <span id="resetBtnText">Enviar solicitud</span>
@@ -983,6 +986,7 @@
         document.getElementById('viewLogin').className       = 'form-view ' + (view === 'login'       ? 'visible' : 'hidden');
         document.getElementById('viewRegister').className    = 'form-view ' + (view === 'register'    ? 'visible' : 'hidden');
         document.getElementById('viewReset').className       = 'form-view ' + (view === 'reset'       ? 'visible' : 'hidden');
+        if (view !== 'reset') document.getElementById('resetExtraMsg').style.display = 'none';
         document.getElementById('viewNewPassword').className = 'form-view ' + (view === 'newPassword' ? 'visible' : 'hidden');
         hideAllAlerts();
     }
@@ -1034,6 +1038,8 @@
             showAlert('resetError', 'No se pudo enviar la solicitud. Intenta de nuevo.');
         } else {
             document.getElementById('resetSuccess').classList.add('show');
+            document.getElementById('resetExtraMsg').style.display = 'block';
+            document.getElementById('resetEmail').value = '';
         }
     }
 
