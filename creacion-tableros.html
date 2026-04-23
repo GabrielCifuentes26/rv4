@@ -603,7 +603,7 @@ function renderGantt(list) {
             lHTML += `<div class="g-row-l" title="${t.actividad}">${t.actividad.substring(0,26)}${t.actividad.length>26?'…':''}</div>`;
             rHTML += `<div class="g-row-r" style="width:${TW}px">
                 ${cols}
-                <div class="g-bar ${t.estado.toLowerCase()}" style="left:${bL}px;width:${bW}px" title="${t.actividad} | ${fmtDDMMYYYY(t._s)} → ${fmtDDMMYYYY(t._e)} | ${t.dias}d hábiles">${t.actividad}</div>
+                <div class="g-bar ${t.estado.toLowerCase()}" style="left:${bL}px;width:${bW}px" title="${t.actividad} | ${fmtDDMMYYYY(t._s)} → ${fmtDDMMYYYY(t._e)} | ${t.dias}d hábiles"></div>
             </div>`;
         });
     });
