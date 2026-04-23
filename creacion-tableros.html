@@ -128,10 +128,11 @@
         .gantt-container { display:flex; }
         .gantt-left { flex-shrink:0; width:260px; border-right:2px solid var(--nbd); }
         .gantt-right { flex:1; overflow-x:auto; }
-        .g-head-l { height:54px; background:#f8f9fc; border-bottom:2px solid var(--nbd); display:flex; align-items:center; padding:0 16px; font-size:0.75rem; font-weight:700; letter-spacing:.6px; text-transform:uppercase; color:#7a8aab; }
-        .g-head-r { height:54px; background:#f8f9fc; border-bottom:2px solid var(--nbd); position:relative; overflow:hidden; }
-        .g-month { position:absolute; top:5px; font-size:0.7rem; font-weight:800; color:var(--nn); letter-spacing:.4px; text-transform:capitalize; white-space:nowrap; }
-        .g-day-row { position:absolute; bottom:0; left:0; display:flex; height:26px; }
+        .g-head-l { height:54px; background:#f8f9fc; border-bottom:2px solid var(--nbd); display:flex; align-items:flex-end; padding:0 16px 8px; font-size:0.75rem; font-weight:700; letter-spacing:.6px; text-transform:uppercase; color:#7a8aab; }
+        .g-head-r { background:#f8f9fc; border-bottom:2px solid var(--nbd); display:flex; flex-direction:column; }
+        .g-month-row { display:flex; height:28px; border-bottom:1px solid var(--nbd); overflow:hidden; }
+        .g-month-cell { display:flex; align-items:center; padding-left:10px; font-size:.72rem; font-weight:800; color:var(--nn); letter-spacing:.4px; text-transform:capitalize; border-right:1px solid #e0e4ed; overflow:hidden; white-space:nowrap; flex-shrink:0; background:#f0f4fa; }
+        .g-day-row { display:flex; height:26px; }
         .g-day { display:flex; align-items:center; justify-content:center; font-size:0.65rem; font-weight:700; color:#8a9ab5; border-left:1px solid #eef0f4; flex-shrink:0; }
         .g-day.we { background:#f4f5f8; }
         .g-day.td { background:rgba(201,168,76,0.15); color:var(--ng2); font-weight:900; }
@@ -345,7 +346,7 @@ const sb = createClient(
 let isAdmin = false, currentProject = null, activeView = 'tabla';
 let projects = [], phases = [], tasks = [];
 let editProyecto = null, editFase = null, editTarea = null;
-const DPX = 34;
+const DPX = 38;
 
 // ── INIT ──
 (async () => {
@@ -442,6 +443,7 @@ function calcDates(raw) {
 }
 
 function getTipo(r) { return r === 'Costos' ? 'Interna' : 'Externa'; }
+function cleanFaseName(nombre) { return nombre.replace(/^fase[:\s]*/i, '').toUpperCase(); }
 
 // ── STATS ──
 function updateStats(list) {
@@ -506,7 +508,7 @@ function renderTable(list) {
 
     phs.forEach(ph => {
         const ptasks = list.filter(t => t.fase_id === ph.id);
-        html += `<tr class="phase-row"><td colspan="${cols}">FASE: ${ph.nombre.toUpperCase()}
+        html += `<tr class="phase-row"><td colspan="${cols}">FASE: ${cleanFaseName(ph.nombre)}
             ${isAdmin ? `&nbsp;<button onclick="openModalFase('${ph.id}')" style="font-size:.7rem;color:#8a9ab5;background:none;border:none;cursor:pointer">✏️</button>
             <button onclick="deleteFase('${ph.id}')" style="font-size:.7rem;color:#c0392b;background:none;border:none;cursor:pointer">🗑</button>` : ''}
         </td></tr>`;
@@ -571,15 +573,17 @@ function renderGantt(list) {
     days.forEach((d, i) => {
         const k = `${d.getFullYear()}-${d.getMonth()}`;
         if (!months.length || months[months.length-1].k !== k)
-            months.push({ k, lbl: d.toLocaleString('es',{month:'long',year:'numeric'}), si: i });
-        else months[months.length-1].cnt = (months[months.length-1].cnt || 1) + 1;
+            months.push({ k, lbl: d.toLocaleString('es',{month:'long',year:'numeric'}), si: i, count: 1 });
+        else months[months.length-1].count++;
     });
 
     const dayHtml = days.map(d => {
         const we = isWE(d), td = d.toDateString() === today.toDateString();
         return `<div class="g-day ${we?'we':''} ${td?'td':''}" style="width:${DPX}px">${d.getDate()}</div>`;
     }).join('');
-    const mHtml = months.map(m => `<div class="g-month" style="left:${m.si*DPX+8}px">${m.lbl.charAt(0).toUpperCase()+m.lbl.slice(1)}</div>`).join('');
+    const mHtml = `<div class="g-month-row">` +
+        months.map(m => `<div class="g-month-cell" style="width:${m.count*DPX}px">${m.lbl.charAt(0).toUpperCase()+m.lbl.slice(1)}</div>`).join('') +
+        `</div>`;
     const todayI = di(today);
     const todayLine = todayI >= 0 && todayI < days.length ? `<div class="g-today" style="left:${todayI*DPX+DPX/2}px"></div>` : '';
 
@@ -590,7 +594,7 @@ function renderGantt(list) {
     phs.forEach(ph => {
         const ptasks = list.filter(t => t.fase_id === ph.id && t._s && t._e);
         if (!ptasks.length) return;
-        lHTML += `<div class="g-row-l ph">FASE: ${ph.nombre.toUpperCase()}</div>`;
+        lHTML += `<div class="g-row-l ph">FASE: ${cleanFaseName(ph.nombre)}</div>`;
         const cols = days.map(d => `<div class="g-col ${isWE(d)?'we':''} ${d.toDateString()===today.toDateString()?'td-col':''}" style="width:${DPX}px"></div>`).join('');
         rHTML += `<div class="g-row-r ph" style="width:${TW}px">${cols}</div>`;
         ptasks.forEach(t => {
