@@ -111,6 +111,11 @@
         .badge-completada { background:#d4edda; color:#1a6b32; }
         .badge-pendiente { background:#e8ecf2; color:#4a5a7a; }
         .badge-bloqueada { background:#fde8d0; color:#b35a10; }
+        .status-sel { padding:3px 10px; border-radius:20px; font-size:0.75rem; font-weight:700; border:none; cursor:pointer; font-family:inherit; appearance:none; -webkit-appearance:none; outline:none; transition:opacity .15s; }
+        .status-sel:hover { opacity:.8; }
+        .status-sel.pendiente { background:#e8ecf2; color:#4a5a7a; }
+        .status-sel.completada { background:#d4edda; color:#1a6b32; }
+        .status-sel.bloqueada { background:#fde8d0; color:#b35a10; }
         .badge-interna { background:#e8f0fe; color:#1a4bab; }
         .badge-externa { background:#fff3e0; color:#b06000; }
         .date-chip { font-size:0.8rem; font-weight:700; color:var(--ng2); }
@@ -557,7 +562,14 @@ function renderTable(list) {
                 <td style="font-size:.8rem;color:#8a9ab5">${dep ? dep.actividad.substring(0,22)+'…' : '—'}</td>
                 <td><span class="badge badge-${tipo.toLowerCase()}">${tipo}</span></td>
                 <td style="font-weight:700">${t.dias}</td>
-                <td><span class="badge badge-${t.estado.toLowerCase()}">${t.estado}</span></td>
+                <td>${isAdmin
+                    ? `<select class="status-sel ${t.estado.toLowerCase()}" onchange="updateEstado('${t.id}', this)">
+                        <option value="Pendiente" ${t.estado==='Pendiente'?'selected':''}>Pendiente</option>
+                        <option value="Completada" ${t.estado==='Completada'?'selected':''}>Completada</option>
+                        <option value="Bloqueada" ${t.estado==='Bloqueada'?'selected':''}>Bloqueada</option>
+                       </select>`
+                    : `<span class="badge badge-${t.estado.toLowerCase()}">${t.estado}</span>`
+                }</td>
                 <td><span class="date-chip ${hasD?'dep':''}">${hasD?'🔒 ':''}${t._s ? fmtDDMMYYYY(t._s) : '—'}</span></td>
                 <td><span class="date-chip">${t._e ? fmtDDMMYYYY(t._e) : '—'}</span></td>
                 ${isAdmin ? `<td style="white-space:nowrap;display:flex;gap:4px;padding-top:11px">
@@ -781,6 +793,14 @@ async function saveTarea() {
     }
     closeModal('mTarea');
     await loadProjectData();
+}
+
+async function updateEstado(id, sel) {
+    const estado = sel.value;
+    sel.className = `status-sel ${estado.toLowerCase()}`;
+    await sb.from('ct_tareas').update({ estado }).eq('id', id);
+    const t = tasks.find(x => x.id === id);
+    if (t) { t.estado = estado; updateStats(getFilteredTasks ? filtered() : tasks); }
 }
 
 async function deleteTarea(id) {
