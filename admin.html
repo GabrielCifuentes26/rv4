@@ -563,6 +563,18 @@
             <div id="solContainer">
                 <div class="empty-state"><div class="empty-icon">⏳</div><div class="empty-text">Cargando solicitudes...</div></div>
             </div>
+
+            <!-- Sección reinicio de contraseña -->
+            <div class="section-header" style="margin-top:32px;padding-top:24px;border-top:2px solid #eef0f4">
+                <div>
+                    <div class="section-title">Solicitudes de reinicio de contraseña</div>
+                    <div class="section-sub">Establece una nueva contraseña y se enviará automáticamente al usuario.</div>
+                </div>
+                <span class="tab-badge" id="resetBadge" style="display:none;background:#e67e22;color:#fff;padding:3px 10px;border-radius:12px;font-size:0.8rem;font-weight:700">0</span>
+            </div>
+            <div id="resetContainer">
+                <div class="empty-state"><div class="empty-icon">⏳</div><div class="empty-text">Cargando...</div></div>
+            </div>
         </div>
 
         <!-- TAB: USUARIOS -->
@@ -805,6 +817,35 @@
     </div>
 </div>
 
+<!-- Modal: Reinicio de contraseña -->
+<div class="modal-overlay" id="resetOverlay">
+    <div class="modal">
+        <div class="modal-header">
+            <div class="modal-title">Establecer nueva contraseña</div>
+            <button class="modal-close" onclick="closeResetModal()">✕</button>
+        </div>
+        <input type="hidden" id="resetSolId">
+        <input type="hidden" id="resetUserId">
+        <input type="hidden" id="resetUserEmail">
+        <div id="resetUserInfo" style="background:var(--bg);border-radius:10px;padding:14px;margin-bottom:20px;font-size:0.85rem;color:var(--gray);line-height:1.7;"></div>
+        <div class="form-grid">
+            <div class="form-field">
+                <label>Nueva contraseña</label>
+                <input type="text" id="resetNewPass" placeholder="Ingresa la nueva contraseña">
+            </div>
+        </div>
+        <div style="font-size:0.78rem;color:var(--gray);margin-bottom:16px;padding:10px 14px;background:#fffbf0;border-radius:8px;border-left:3px solid #f59e0b">
+            Al guardar: se actualizará la contraseña en el sistema y se enviará automáticamente al correo del usuario.
+        </div>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeResetModal()">Cancelar</button>
+            <button class="btn-save" id="btnResetSave" onclick="confirmResetPassword()" style="background:linear-gradient(135deg,#f59e0b,#d97706)">
+                🔑 Guardar y enviar contraseña
+            </button>
+        </div>
+    </div>
+</div>
+
 <!-- Modal: Agregar / Editar -->
 <div class="modal-overlay" id="modalOverlay">
     <div class="modal">
@@ -917,6 +958,7 @@
         }
         loadUsers();
         loadSolicitudes();
+        loadSolicitudesReset();
     });
 
     document.getElementById('btn-logout').addEventListener('click', () => {
@@ -1437,6 +1479,127 @@
                 </div>
             </div>`;
         }).join('');
+    }
+
+    // ── SOLICITUDES REINICIO ──────────────────────────────────────────────────
+    let allResets = [];
+
+    async function loadSolicitudesReset() {
+        const { data } = await SERVICE_CLIENT
+            .from('solicitudes_reset')
+            .select('*')
+            .eq('estado', 'pendiente')
+            .order('created_at', { ascending: false });
+        allResets = data || [];
+        renderResets();
+        const badge = document.getElementById('resetBadge');
+        if (allResets.length > 0) { badge.textContent = allResets.length; badge.style.display = 'inline-block'; }
+        else badge.style.display = 'none';
+    }
+
+    function renderResets() {
+        const container = document.getElementById('resetContainer');
+        if (allResets.length === 0) {
+            container.innerHTML = `<div class="empty-state"><div class="empty-icon">✅</div><div class="empty-text">No hay solicitudes de reinicio pendientes.</div></div>`;
+            return;
+        }
+        container.innerHTML = allResets.map((s, i) => {
+            const inicial = (s.nombre || s.email)[0].toUpperCase();
+            const fecha = s.created_at ? new Date(s.created_at).toLocaleDateString('es',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
+            return `
+            <div class="sol-card" style="animation-delay:${i*0.06}s;border-left:3px solid #f59e0b">
+                <div class="sol-info">
+                    <div class="sol-avatar" style="background:linear-gradient(135deg,#f59e0b,#d97706)">${inicial}</div>
+                    <div>
+                        <div class="sol-name">${s.nombre || '—'} <span style="font-size:0.72rem;background:#fff3cd;color:#856404;padding:2px 8px;border-radius:10px;font-weight:700;margin-left:6px">🔑 Reinicio</span></div>
+                        <div class="sol-email">${s.email}</div>
+                        <div class="sol-meta"><span class="sol-date">📅 ${fecha}</span></div>
+                    </div>
+                </div>
+                <div class="sol-actions">
+                    <button class="btn-approve" onclick="openResetModal('${s.id}','${s.email}','${(s.nombre||'').replace(/'/g,"\\'")}')">🔑 Establecer contraseña</button>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    async function openResetModal(solId, email, nombre) {
+        document.getElementById('resetSolId').value    = solId;
+        document.getElementById('resetUserEmail').value = email;
+        document.getElementById('resetNewPass').value  = '';
+        document.getElementById('resetUserInfo').innerHTML = `<strong>${nombre || email}</strong><br>${email}`;
+        // Buscar el userId en la tabla usuarios para poder actualizar auth
+        const { data: u } = await SERVICE_CLIENT.from('usuarios').select('id').eq('correo', email).single();
+        document.getElementById('resetUserId').value = u?.id || '';
+        document.getElementById('resetOverlay').classList.add('open');
+    }
+
+    function closeResetModal() { document.getElementById('resetOverlay').classList.remove('open'); }
+
+    async function confirmResetPassword() {
+        const solId  = document.getElementById('resetSolId').value;
+        const userId = document.getElementById('resetUserId').value;
+        const email  = document.getElementById('resetUserEmail').value;
+        const pass   = document.getElementById('resetNewPass').value.trim();
+        const btn    = document.getElementById('btnResetSave');
+
+        if (!pass || pass.length < 6) { showToast('La contraseña debe tener al menos 6 caracteres', 'error'); return; }
+        if (!userId) { showToast('No se encontró el usuario en el sistema', 'error'); return; }
+
+        btn.disabled = true; btn.textContent = 'Procesando...';
+
+        try {
+            // 1. Cambiar contraseña en Supabase Auth
+            const authRes = await fetch(`${SUPABASE_URL}/auth/v1/admin/users/${userId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type':'application/json', 'Authorization':`Bearer ${SERVICE_KEY}`, 'apikey': SERVICE_KEY },
+                body: JSON.stringify({ password: pass })
+            });
+            if (!authRes.ok) throw new Error('Error al actualizar la contraseña en Auth');
+
+            // 2. Actualizar password_text en tabla usuarios
+            await SERVICE_CLIENT.from('usuarios').update({ password_text: pass }).eq('id', userId);
+
+            // 3. Enviar correo automático al usuario vía Resend
+            const emailSent = await sendPasswordEmail(email, pass);
+
+            // 4. Marcar solicitud como atendida
+            await SERVICE_CLIENT.from('solicitudes_reset').update({ estado: 'atendido' }).eq('id', solId);
+
+            closeResetModal();
+            await loadSolicitudesReset();
+            showToast(emailSent ? `Contraseña actualizada y correo enviado a ${email}` : `Contraseña actualizada. No se pudo enviar el correo automático.`, emailSent ? 'success' : 'warning');
+        } catch (err) {
+            showToast('Error: ' + err.message, 'error');
+        } finally {
+            btn.disabled = false; btn.textContent = '🔑 Guardar y enviar contraseña';
+        }
+    }
+
+    async function sendPasswordEmail(toEmail, password) {
+        try {
+            const res = await fetch('https://api.resend.com/emails', {
+                method: 'POST',
+                headers: { 'Content-Type':'application/json', 'Authorization':'Bearer re_HrJCXpZo_9Fw3CW8p9R4j6t5SKAhYnkyC' },
+                body: JSON.stringify({
+                    from: 'Costos&Presupuestos <onboarding@resend.dev>',
+                    to: [toEmail],
+                    subject: 'Tu nueva contraseña — Costos&Presupuestos',
+                    html: `<div style="font-family:Inter,sans-serif;max-width:480px;margin:0 auto;padding:32px 24px;background:#fff;border-radius:12px;border:1px solid #e2e8f0">
+                        <h2 style="color:#152540;font-size:1.2rem;margin-bottom:8px">Tu contraseña ha sido actualizada</h2>
+                        <p style="color:#64748b;font-size:0.9rem;margin-bottom:24px">El administrador ha establecido una nueva contraseña para tu cuenta.</p>
+                        <div style="background:#f8f9fc;border-radius:8px;padding:16px 20px;border-left:4px solid #C9A84C;margin-bottom:24px">
+                            <div style="font-size:0.75rem;color:#8a9ab5;font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px">Tu nueva contraseña</div>
+                            <div style="font-size:1.4rem;font-weight:900;color:#152540;letter-spacing:2px">${password}</div>
+                        </div>
+                        <p style="color:#64748b;font-size:0.82rem">Ingresa con esta contraseña en el sistema. Se recomienda cambiarla después de iniciar sesión.</p>
+                        <hr style="border:none;border-top:1px solid #e2e8f0;margin:24px 0">
+                        <p style="color:#94a3b8;font-size:0.75rem">Costos&Presupuestos — Sistema interno</p>
+                    </div>`
+                })
+            });
+            return res.ok;
+        } catch { return false; }
     }
 
     // ── MODAL APROBAR ─────────────────────────────────────────────────────────

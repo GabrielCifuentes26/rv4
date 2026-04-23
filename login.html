@@ -839,10 +839,10 @@
                             <div class="field-right"><div class="field-check">✓</div></div>
                         </div>
                         <div class="alert error"   id="resetError"><span>⚠</span><span></span></div>
-                        <div class="alert success" id="resetSuccess"><span>✓</span><span>Revisa tu correo, te enviamos el enlace para restablecer tu contraseña.</span></div>
+                        <div class="alert success" id="resetSuccess"><span>✓</span><span>Solicitud enviada. El administrador te enviará tu nueva contraseña pronto.</span></div>
                         <button class="btn-main" id="btnReset" onclick="doResetPassword()">
                             <div class="spinner" id="resetSpinner"></div>
-                            <span id="resetBtnText">Enviar enlace</span>
+                            <span id="resetBtnText">Enviar solicitud</span>
                         </button>
                         <div class="divider"><div class="divider-line"></div><span class="divider-text">o</span><div class="divider-line"></div></div>
                         <div class="toggle-link">¿Recordaste tu contraseña? <a onclick="showView('login')">Iniciar sesión</a></div>
@@ -1013,14 +1013,25 @@
 
         btn.disabled = true; spinner.style.display = 'block'; btnText.textContent = 'Enviando...';
 
-        const { error } = await client.auth.resetPasswordForEmail(email, {
-            redirectTo: 'https://gabrielcifuentes26.github.io/rv4/login.html'
+        // Verificar que el correo existe en la tabla de usuarios
+        const { data: usuario } = await client.from('usuarios').select('nombre').eq('correo', email).single();
+        if (!usuario) {
+            btn.disabled = false; spinner.style.display = 'none'; btnText.textContent = 'Enviar solicitud';
+            showAlert('resetError', 'No encontramos una cuenta con ese correo.');
+            return;
+        }
+
+        // Crear solicitud de reinicio (no envía email al usuario, va al admin)
+        const { error } = await client.from('solicitudes_reset').insert({
+            email,
+            nombre: usuario.nombre || email,
+            estado: 'pendiente'
         });
 
-        btn.disabled = false; spinner.style.display = 'none'; btnText.textContent = 'Enviar enlace';
+        btn.disabled = false; spinner.style.display = 'none'; btnText.textContent = 'Enviar solicitud';
 
         if (error) {
-            showAlert('resetError', 'No se pudo enviar el enlace. Verifica el correo e intenta de nuevo.');
+            showAlert('resetError', 'No se pudo enviar la solicitud. Intenta de nuevo.');
         } else {
             document.getElementById('resetSuccess').classList.add('show');
         }
