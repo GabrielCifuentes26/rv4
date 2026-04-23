@@ -70,6 +70,8 @@
         .ct-proj-label { font-size:0.85rem; font-weight:700; letter-spacing:.3px; }
         .ct-select { padding:8px 14px; border:1.5px solid var(--nbd); border-radius:8px; font-size:0.9rem; font-weight:600; color:var(--nn); background:#fff; cursor:pointer; font-family:inherit; min-width:220px; }
         .ct-select:focus { outline:none; border-color:var(--ng); }
+        .btn-edit-proj { padding:7px 13px; border-radius:8px; font-size:0.82rem; font-weight:700; color:var(--ng2); background:var(--nb); border:1.5px solid var(--nbd); cursor:pointer; font-family:inherit; transition:all .18s; white-space:nowrap; }
+        .btn-edit-proj:hover { background:var(--ng); color:#fff; border-color:var(--ng); }
         .btn-primary { padding:8px 18px; border-radius:8px; font-size:0.85rem; font-weight:700; color:#fff; background:var(--nn); border:none; cursor:pointer; font-family:inherit; transition:background .18s; }
         .btn-primary:hover { background:var(--ng); }
         .btn-secondary { padding:8px 16px; border-radius:8px; font-size:0.83rem; font-weight:700; color:var(--nn); background:var(--nb); border:1.5px solid var(--nbd); cursor:pointer; font-family:inherit; transition:all .18s; }
@@ -237,6 +239,7 @@
             <select class="ct-select" id="selProject" onchange="onProjectChange()">
                 <option value="">— Seleccionar proyecto —</option>
             </select>
+            <button class="btn-edit-proj" id="btnEditProyecto" style="display:none" onclick="openModalProyecto(currentProject)" title="Renombrar proyecto">✏️ Renombrar</button>
         </div>
         <button class="btn-primary" id="btnNuevoProyecto" style="display:none" onclick="openModalProyecto()">＋ Nuevo Proyecto</button>
     </div>
@@ -403,6 +406,7 @@ async function loadProjects() {
 
 async function onProjectChange() {
     currentProject = document.getElementById('selProject').value || null;
+    document.getElementById('btnEditProyecto').style.display = (currentProject && isAdmin) ? '' : 'none';
     if (currentProject) await loadProjectData(); else clearView();
 }
 
@@ -423,6 +427,7 @@ function clearView() {
     document.getElementById('tableContent').innerHTML = '<div class="empty-box"><div class="ei">📋</div><h3>Selecciona un proyecto</h3><p>Elige o crea un proyecto para comenzar</p></div>';
     document.getElementById('ganttContent').innerHTML = '';
     document.getElementById('ctLegend').style.display = 'none';
+    document.getElementById('btnEditProyecto').style.display = 'none';
     updateStats([]);
 }
 
