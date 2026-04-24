@@ -361,9 +361,65 @@ const SEED = [
 })();
 
 // ── DATA ─────────────────────────────────────────────────────────────────────
+const SETUP_SQL = `-- Ejecutar en Supabase → SQL Editor
+create table if not exists al_proyectos (
+  id uuid default gen_random_uuid() primary key,
+  numero int,
+  nombre text not null,
+  status_receta text default 'PROCESO',
+  fecha_receta date,
+  dias_receta_cod int default 0,
+  fecha_codificacion date,
+  dias_cod_fin int default 0,
+  fecha_fin date,
+  responsable text default 'CONSBA',
+  carga_sistema boolean default false,
+  observaciones text,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+alter table al_proyectos enable row level security;
+do $$ begin
+  if not exists (select 1 from pg_policies where tablename='al_proyectos' and policyname='al_sel') then create policy "al_sel" on al_proyectos for select using (true); end if;
+  if not exists (select 1 from pg_policies where tablename='al_proyectos' and policyname='al_ins') then create policy "al_ins" on al_proyectos for insert with check (true); end if;
+  if not exists (select 1 from pg_policies where tablename='al_proyectos' and policyname='al_upd') then create policy "al_upd" on al_proyectos for update using (true); end if;
+  if not exists (select 1 from pg_policies where tablename='al_proyectos' and policyname='al_del') then create policy "al_del" on al_proyectos for delete using (true); end if;
+end $$;`;
+
+function showSetupModal() {
+  const existing = document.getElementById('setupModal');
+  if (existing) return;
+  const m = document.createElement('div');
+  m.id = 'setupModal';
+  m.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:900;display:flex;align-items:center;justify-content:center;';
+  m.innerHTML = `<div style="background:#fff;border-radius:20px;padding:32px;width:640px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.3)">
+    <div style="font-size:1.4rem;font-weight:900;color:var(--navy);margin-bottom:8px">⚙️ Configuración inicial requerida</div>
+    <p style="color:var(--gray);font-size:.87rem;margin-bottom:18px;line-height:1.6">La tabla <strong>al_proyectos</strong> aún no existe en Supabase. Cópiala el SQL de abajo, pégala en <strong>Supabase → SQL Editor</strong> y ejecútala. Luego recarga esta página.</p>
+    <pre id="setupSqlPre" style="background:#0f172a;color:#7dd3fc;border-radius:12px;padding:16px;font-size:.75rem;line-height:1.6;overflow-x:auto;white-space:pre-wrap;margin-bottom:14px">${SETUP_SQL}</pre>
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button onclick="navigator.clipboard.writeText(document.getElementById('setupSqlPre').textContent).then(()=>{ this.textContent='✓ Copiado!'; setTimeout(()=>this.textContent='📋 Copiar SQL',2000) })"
+        style="background:linear-gradient(135deg,#C9A84C,#A8832A);border:none;border-radius:10px;padding:10px 22px;font-size:.85rem;font-weight:700;color:#fff;cursor:pointer">
+        📋 Copiar SQL
+      </button>
+      <button onclick="location.reload()"
+        style="background:#1e293b;border:none;border-radius:10px;padding:10px 18px;font-size:.85rem;font-weight:700;color:#fff;cursor:pointer">
+        🔄 Recargar página
+      </button>
+    </div>
+  </div>`;
+  document.body.appendChild(m);
+}
+
 async function loadData() {
   let { data, error } = await cli.from('al_proyectos').select('*').order('numero');
-  if (error) { toast('Error al cargar datos', 'e'); return; }
+  if (error) {
+    if (error.code === 'PGRST205' || error.message?.includes('al_proyectos')) {
+      showSetupModal();
+    } else {
+      toast('Error al cargar datos: ' + error.message, 'e');
+    }
+    return;
+  }
   if (!data?.length && isAdmin) {
     await cli.from('al_proyectos').insert(SEED.map(s => ({ ...s, dias_receta_cod:0, dias_cod_fin:0 })));
     ({ data } = await cli.from('al_proyectos').select('*').order('numero'));
