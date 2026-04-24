@@ -1189,23 +1189,41 @@
         btn.disabled = true; spinner.style.display = 'block'; btnText.textContent = 'Enviando...';
 
         try {
-            const { data: authData, error: authError } = await client.auth.signUp({
-                email: correo, password,
-                options: { data: { nombre, empresa } }
-            });
+            const { data: usuarioExistente } = await client
+                .from('usuarios')
+                .select('id')
+                .eq('correo', correo)
+                .maybeSingle();
 
-            if (authError) {
-                showAlert('regError', authError.message.includes('already registered')
-                    ? 'Este correo ya tiene una solicitud registrada.'
-                    : authError.message);
+            if (usuarioExistente) {
+                showAlert('regError', 'Este correo ya tiene acceso al sistema. Inicia sesion.');
+                return;
+            }
+
+            const { data: solicitudExistente } = await client
+                .from('solicitudes')
+                .select('estado')
+                .eq('correo', correo)
+                .order('creado_en', { ascending: false })
+                .limit(1)
+                .maybeSingle();
+
+            if (solicitudExistente?.estado === 'pendiente') {
+                document.getElementById('loginPending').classList.add('show');
+                showAlert('regError', 'Ya tienes una solicitud pendiente de aprobacion.');
+                return;
+            }
+
+            if (solicitudExistente?.estado === 'aprobado') {
+                showAlert('regError', 'Este correo ya fue aprobado. Inicia sesion.');
                 return;
             }
 
             const { error: solError } = await client.from('solicitudes').insert({
-                auth_user_id: authData.user?.id || null,
+                auth_user_id: null,
                 nombre, correo, empresa, estado: 'pendiente', password_text: password
             });
-            if (solError) console.warn('solicitudes error:', solError.message);
+            if (solError) throw solError;
 
             await client.auth.signOut();
 

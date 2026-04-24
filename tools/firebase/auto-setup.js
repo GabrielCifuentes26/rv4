@@ -1,6 +1,6 @@
 /**
  * auto-setup.js — Configuración automática de Firebase
- * Ejecutado por INICIAR-FIREBASE.bat
+ * Ejecutado por tools/firebase/INICIAR-FIREBASE.bat
  */
 
 const { execSync } = require('child_process');
@@ -8,7 +8,8 @@ const fs   = require('fs');
 const path = require('path');
 const os   = require('os');
 
-const DIR         = __dirname;
+const SCRIPT_DIR  = __dirname;
+const ROOT_DIR    = path.resolve(SCRIPT_DIR, '..', '..');
 const PROJECT_ID  = `douglas-consba-${Math.random().toString(36).slice(2, 7)}`;
 const USER_EMAIL  = 'gcifuentes@rvcuatro.com';
 const USER_PASS   = '4nalista';
@@ -17,7 +18,7 @@ const FIREBASE    = path.join(os.homedir(), 'AppData', 'Roaming', 'npm', 'fireba
 const NODE_PATH   = 'C:\\Program Files\\nodejs';
 
 const env = { ...process.env, PATH: `${NODE_PATH};${process.env.PATH}`, CI: '1' };
-const run = (cmd) => execSync(cmd, { encoding: 'utf8', env, cwd: DIR }).trim();
+const run = (cmd) => execSync(cmd, { encoding: 'utf8', env, cwd: ROOT_DIR }).trim();
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
@@ -50,7 +51,7 @@ function getStoredToken() {
 }
 
 function replaceFirebaseConfig(file, config) {
-    const fp = path.join(DIR, file);
+    const fp = path.join(ROOT_DIR, file);
     if (!fs.existsSync(fp)) return;
     let html = fs.readFileSync(fp, 'utf8');
     const configStr = `const firebaseConfig = ${JSON.stringify(config, null, 12)};`;
@@ -89,7 +90,7 @@ async function main() {
 
     // 3. Configurar .firebaserc
     fs.writeFileSync(
-        path.join(DIR, '.firebaserc'),
+        path.join(ROOT_DIR, '.firebaserc'),
         JSON.stringify({ projects: { default: PROJECT_ID } }, null, 2)
     );
 
@@ -213,9 +214,9 @@ async function main() {
     console.log('🚀  Subiendo a GitHub...');
     try {
         const GH = '"C:\\Program Files\\GitHub CLI\\gh.exe"';
-        execSync(`git add login.html dashboard.html .firebaserc`, { cwd: DIR });
-        execSync(`git commit -m "Add Firebase config and Firestore setup"`, { cwd: DIR });
-        execSync(`git push`, { cwd: DIR });
+        execSync(`git add login.html dashboard.html .firebaserc`, { cwd: ROOT_DIR });
+        execSync(`git commit -m "Add Firebase config and Firestore setup"`, { cwd: ROOT_DIR });
+        execSync(`git push`, { cwd: ROOT_DIR });
         console.log('✅  Push a GitHub completado\n');
     } catch (e) {
         console.log('⚠️   Push manual: git add -A && git commit -m "Firebase config" && git push\n');

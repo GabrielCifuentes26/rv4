@@ -4,11 +4,15 @@
     "ignore": [
       "firebase.json",
       "**/.*",
+      "archive/**",
+      "database/**",
       "memory/**",
+      "tools/**",
       "*.bat",
-      "*.js",
       "*.log",
-      "node_modules/**"
+      "*.md",
+      "node_modules/**",
+      "package*.json"
     ],
     "rewrites": [],
     "headers": [

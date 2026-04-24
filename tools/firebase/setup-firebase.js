@@ -1,7 +1,7 @@
 /**
  * setup-firebase.js
  * Ejecutar UNA SOLA VEZ para configurar Firebase:
- *   node setup-firebase.js
+ *   node tools/firebase/setup-firebase.js
  *
  * Requisitos previos:
  *   1. Haber ejecutado: firebase login
@@ -12,9 +12,10 @@ const admin = require('firebase-admin');
 const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
+const ROOT_DIR = path.resolve(__dirname, '..', '..');
 
 // ── Lee el serviceAccount generado por firebase-admin init ─────────────────
-const SA_PATH = path.join(__dirname, 'serviceAccountKey.json');
+const SA_PATH = path.join(ROOT_DIR, 'serviceAccountKey.json');
 
 if (!fs.existsSync(SA_PATH)) {
     console.error('\n❌  No se encontró serviceAccountKey.json');

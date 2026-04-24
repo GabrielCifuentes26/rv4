@@ -22,7 +22,7 @@ echo  Paso 2: Ejecutando configuracion...
 echo  ========================================
 echo.
 
-node auto-setup.js
+node "%~dp0auto-setup.js"
 
 echo.
 pause
