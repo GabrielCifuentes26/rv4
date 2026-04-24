@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Avance Lotes — Costos&Presupuestos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --navy:#0f172a; --navy2:#1e293b; --gold:#C9A84C; --gold-dk:#A8832A;
+      --blue:#2563eb; --green:#16a34a; --amber:#d97706; --red:#dc2626;
+      --sky:#0ea5e9; --gray:#64748b; --gray2:#94a3b8;
+    }
+    body { font-family:'Inter',sans-serif; background:#f1f5f9; color:#1e293b; min-height:100vh; }
+
+    /* ── NAV ── */
+    nav#mainNav { background:var(--navy); height:64px; display:flex; align-items:center; padding:0 28px; gap:0; position:sticky; top:0; z-index:100; box-shadow:0 2px 16px rgba(0,0,0,.3); }
+    .logo { color:#fff; font-size:1.05rem; font-weight:800; text-decoration:none; letter-spacing:-.3px; display:flex; align-items:center; gap:10px; flex-shrink:0; }
+    .logo span { color:var(--gold); }
+    .logo-img { height:26px; width:auto; }
+    .nav-menu { display:flex; align-items:center; gap:4px; flex:1; padding-left:24px; }
+    .nav-link { background:none; border:none; color:rgba(255,255,255,.75); font-size:.88rem; font-weight:600; padding:8px 14px; border-radius:8px; cursor:pointer; font-family:inherit; text-decoration:none; transition:color .15s,background .15s; }
+    .nav-link:hover { color:#fff; background:rgba(255,255,255,.08); }
+    .nav-item { position:relative; }
+    .arrow { font-size:.7rem; margin-left:2px; transition:transform .2s; display:inline-block; }
+    .nav-item.open .arrow { transform:rotate(180deg); }
+    .drop-panel { position:absolute; top:calc(100% + 8px); left:0; background:#fff; border-radius:14px; min-width:220px; box-shadow:0 8px 32px rgba(0,0,0,.15); border:1px solid #e2e8f0; display:none; flex-direction:column; gap:2px; padding:8px; z-index:200; }
+    .nav-item.open .drop-panel { display:flex; }
+    .drop-item { display:flex; align-items:center; gap:10px; padding:10px 14px; border-radius:9px; text-decoration:none; color:var(--navy2); font-size:.85rem; font-weight:600; transition:background .15s; }
+    .drop-item:hover { background:#f1f5f9; }
+    .drop-item.active { color:var(--gold); background:rgba(201,168,76,.08); }
+    .nav-actions { display:flex; align-items:center; gap:10px; margin-left:auto; }
+    .btn-admin { background:none; border:1.5px solid var(--gold); color:var(--gold); padding:7px 16px; border-radius:9px; font-size:.82rem; font-weight:700; cursor:pointer; font-family:inherit; text-decoration:none; transition:all .15s; }
+    .btn-admin:hover { background:var(--gold); color:#fff; }
+    .btn-logout { background:var(--navy2); border:none; color:#fff; padding:8px 18px; border-radius:9px; font-size:.83rem; font-weight:700; cursor:pointer; font-family:inherit; transition:background .15s; }
+    .btn-logout:hover { background:#334155; }
+
+    /* ── HERO ── */
+    .hero { background:linear-gradient(135deg,var(--navy) 0%,#1a3a5c 100%); padding:36px 40px 28px; position:relative; overflow:hidden; }
+    .hero::after { content:''; position:absolute; inset:0; background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E"); pointer-events:none; }
+    .breadcrumb { font-size:.72rem; font-weight:600; color:rgba(255,255,255,.4); letter-spacing:.5px; text-transform:uppercase; margin-bottom:10px; }
+    .breadcrumb span { color:var(--gold); }
+    .hero-title { font-size:2.2rem; font-weight:900; color:#fff; letter-spacing:-1px; margin-bottom:6px; }
+    .hero-title em { color:var(--gold); font-style:normal; }
+    .hero-sub { font-size:.86rem; color:rgba(255,255,255,.5); }
+    .hero-updated { position:absolute; top:20px; right:40px; font-size:.72rem; color:rgba(255,255,255,.35); font-weight:600; }
+
+    /* ── STATS ── */
+    .stats-row { display:flex; gap:12px; padding:20px 40px 0; flex-wrap:wrap; }
+    .sc {
+      flex:1; min-width:110px; background:#fff; border-radius:14px; padding:16px 18px;
+      border:2px solid transparent; cursor:pointer; transition:all .2s;
+      box-shadow:0 2px 8px rgba(0,0,0,.05); position:relative; overflow:hidden;
+    }
+    .sc::after { content:''; position:absolute; bottom:0; left:0; right:0; height:3px; background:var(--c,#cbd5e1); border-radius:0 0 14px 14px; }
+    .sc:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,0,0,.1); }
+    .sc.af { border-color:var(--c,#cbd5e1); }
+    .sc.s-tot { --c:var(--navy); }
+    .sc.s-fin { --c:var(--blue); }
+    .sc.s-ok  { --c:var(--green); }
+    .sc.s-wrn { --c:var(--amber); }
+    .sc.s-venc{ --c:var(--red); }
+    .sc.s-proc{ --c:#f59e0b; }
+    .sc-num { font-size:1.9rem; font-weight:900; color:var(--c,var(--navy)); line-height:1; }
+    .sc-lbl { font-size:.68rem; font-weight:600; color:var(--gray); text-transform:uppercase; letter-spacing:.5px; margin-top:4px; }
+
+    /* ── TOOLBAR ── */
+    .toolbar { padding:14px 40px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+    .srch { position:relative; flex:1; min-width:180px; }
+    .srch input { width:100%; border:1.5px solid #e2e8f0; border-radius:10px; padding:9px 14px 9px 34px; font-size:.84rem; font-family:inherit; outline:none; background:#fff; transition:border-color .2s; }
+    .srch input:focus { border-color:var(--gold); }
+    .srch-icon { position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--gray2); font-size:.85rem; pointer-events:none; }
+    .toolbar select { border:1.5px solid #e2e8f0; border-radius:10px; padding:9px 12px; font-size:.83rem; font-family:inherit; background:#fff; cursor:pointer; outline:none; }
+    .vt { display:flex; border:1.5px solid #e2e8f0; border-radius:10px; overflow:hidden; background:#fff; }
+    .vt button { background:none; border:none; padding:8px 15px; font-size:.8rem; font-weight:600; color:var(--gray); cursor:pointer; font-family:inherit; transition:all .15s; }
+    .vt button.on { background:var(--navy); color:#fff; }
+    .btn-exp { background:#fff; border:1.5px solid #e2e8f0; border-radius:10px; padding:9px 15px; font-size:.82rem; font-weight:600; color:var(--gray); cursor:pointer; font-family:inherit; transition:all .15s; }
+    .btn-exp:hover { border-color:var(--gold); color:var(--gold-dk); }
+    .btn-add { background:linear-gradient(135deg,var(--gold),var(--gold-dk)); border:none; border-radius:10px; padding:9px 18px; font-size:.83rem; font-weight:700; color:#fff; cursor:pointer; font-family:inherit; display:none; }
+    .btn-add:hover { opacity:.88; }
+
+    /* ── LEGEND ── */
+    .legend { padding:0 40px 10px; display:flex; gap:18px; flex-wrap:wrap; align-items:center; }
+    .li { display:flex; align-items:center; gap:5px; font-size:.72rem; color:var(--gray); }
+    .lb { font-size:.62rem; font-weight:800; padding:2px 8px; border-radius:20px; }
+
+    /* ── TABLE ── */
+    .tw { padding:0 40px 32px; overflow-x:auto; }
+    table.alt { width:100%; border-collapse:collapse; background:#fff; border-radius:14px; overflow:hidden; box-shadow:0 2px 12px rgba(0,0,0,.07); font-size:.82rem; }
+    table.alt thead th { background:var(--navy); color:rgba(255,255,255,.85); font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.5px; padding:12px 10px; text-align:left; cursor:pointer; user-select:none; white-space:nowrap; }
+    table.alt thead th:hover { background:#1e3a5c; }
+    table.alt thead th.sa::after { content:' ▲'; font-size:.58rem; }
+    table.alt thead th.sd::after { content:' ▼'; font-size:.58rem; }
+    table.alt tbody tr { border-bottom:1px solid #f1f5f9; transition:background .12s; }
+    table.alt tbody tr:hover { background:#f8fafc !important; }
+    table.alt tbody tr.rv { background:rgba(220,38,38,.04); }
+    table.alt tbody tr.rw { background:rgba(217,119,6,.03); }
+    table.alt td { padding:10px; vertical-align:middle; }
+    .tn { color:var(--gray2); font-weight:700; font-size:.76rem; text-align:center; }
+    .tnom { font-weight:700; color:var(--navy); white-space:nowrap; font-size:.83rem; }
+    .tobs { max-width:240px; color:var(--gray); font-size:.78rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .tobs.editable:hover { background:rgba(201,168,76,.08); border-radius:6px; cursor:pointer; }
+    .tdias { text-align:center; font-weight:700; }
+    .dv { color:var(--red); } .dw { color:var(--amber); } .dok { color:var(--green); } .df { color:var(--blue); }
+    .dias-wrap { display:flex; align-items:center; gap:5px; justify-content:center; }
+    .dbar { width:36px; height:4px; border-radius:2px; background:#e2e8f0; overflow:hidden; flex-shrink:0; }
+    .dbar-f { height:100%; border-radius:2px; }
+
+    /* ── BADGES ── */
+    .badge { display:inline-flex; align-items:center; font-size:.66rem; font-weight:800; padding:3px 9px; border-radius:20px; letter-spacing:.3px; white-space:nowrap; }
+    .ck { cursor:pointer; transition:opacity .15s,transform .1s; }
+    .ck:hover { opacity:.78; transform:scale(1.05); }
+    .b-entregado { background:rgba(14,165,233,.1); color:#0369a1; border:1px solid rgba(14,165,233,.25); }
+    .b-proceso   { background:rgba(245,158,11,.1); color:#b45309; border:1px solid rgba(245,158,11,.25); }
+    .b-vencido   { background:rgba(220,38,38,.1);  color:#b91c1c; border:1px solid rgba(220,38,38,.25); }
+    .b-finalizado{ background:rgba(37,99,235,.1);  color:#1d4ed8; border:1px solid rgba(37,99,235,.25); }
+    .b-en-tiempo { background:rgba(22,163,74,.1);  color:#15803d; border:1px solid rgba(22,163,74,.25); }
+    .b-por-vencer{ background:rgba(217,119,6,.1);  color:#b45309; border:1px solid rgba(217,119,6,.25); }
+    .b-rv4   { background:rgba(139,92,246,.1); color:#6d28d9; border:1px solid rgba(139,92,246,.2); }
+    .b-consba{ background:rgba(14,165,233,.1); color:#0369a1; border:1px solid rgba(14,165,233,.2); }
+    .b-carga { background:rgba(37,99,235,.1);  color:#1d4ed8; border:1px solid rgba(37,99,235,.2); }
+    .b-pend  { background:#f8fafc; color:var(--gray2); border:1px solid #e2e8f0; }
+    .b-hoy   { background:rgba(220,38,38,.12); color:var(--red); border:1px solid rgba(220,38,38,.4); animation:bpulse 1.5s infinite; }
+    @keyframes bpulse { 0%,100%{opacity:1} 50%{opacity:.6} }
+
+    /* ── DATE CELLS ── */
+    .dc { white-space:nowrap; display:inline-block; }
+    .dc.adm { cursor:pointer; padding:3px 7px; border-radius:7px; transition:background .15s; }
+    .dc.adm:hover { background:rgba(201,168,76,.15); outline:1.5px dashed var(--gold); }
+    .dem { color:#cbd5e1; font-style:italic; font-size:.76rem; }
+
+    /* ── DATEPICKER OVERLAY ── */
+    #dpOvr { position:fixed; z-index:600; display:none; }
+    #dpOvr.show { display:block; }
+    #dpInp { border:2px solid var(--gold); border-radius:9px; padding:7px 11px; font-size:.84rem; font-family:inherit; outline:none; background:#fff; box-shadow:0 4px 20px rgba(0,0,0,.18); cursor:pointer; }
+
+    /* ── OBS INLINE ── */
+    .obs-wrap textarea { width:100%; min-height:56px; border:1.5px solid var(--gold); border-radius:8px; padding:6px 9px; font-size:.79rem; font-family:inherit; resize:vertical; outline:none; }
+    .obs-save { margin-top:3px; background:var(--gold); border:none; border-radius:6px; padding:3px 10px; font-size:.7rem; font-weight:700; color:#fff; cursor:pointer; }
+
+    /* ── GANTT ── */
+    .gw { padding:0 40px 32px; overflow-x:auto; }
+    .g-inner { min-width:800px; }
+    .g-hdr { display:flex; border-bottom:2px solid #e2e8f0; margin-bottom:2px; }
+    .g-lbl-hdr { width:240px; flex-shrink:0; font-size:.68rem; font-weight:700; color:var(--gray); text-transform:uppercase; letter-spacing:.4px; padding:6px 0; }
+    .g-months { display:flex; flex:1; }
+    .g-month { font-size:.66rem; font-weight:700; color:var(--gray); text-transform:uppercase; letter-spacing:.4px; text-align:center; border-left:1px dashed #e2e8f0; padding:6px 0; overflow:hidden; }
+    .g-row { display:flex; align-items:center; border-bottom:1px solid #f1f5f9; min-height:34px; }
+    .g-lbl { width:240px; flex-shrink:0; font-size:.76rem; font-weight:600; color:var(--navy); padding-right:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .g-tl { position:relative; flex:1; height:34px; }
+    .g-bar { position:absolute; top:50%; transform:translateY(-50%); height:16px; border-radius:8px; min-width:6px; opacity:.88; }
+    .g-today { position:absolute; top:0; bottom:0; width:2px; background:rgba(220,38,38,.7); z-index:2; }
+    .g-today-lbl { position:absolute; top:0; left:0; right:0; }
+    .g-today-tag { position:absolute; top:-18px; font-size:.6rem; font-weight:700; color:var(--red); transform:translateX(-50%); white-space:nowrap; }
+
+    /* ── ACTIONS ── */
+    .btn-del { background:none; border:none; color:#e2e8f0; cursor:pointer; font-size:.95rem; padding:4px 6px; border-radius:6px; transition:color .15s,background .15s; }
+    .btn-del:hover { color:var(--red); background:rgba(220,38,38,.08); }
+
+    /* ── MODAL ── */
+    .mo { position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:400; display:none; align-items:center; justify-content:center; }
+    .mo.open { display:flex; }
+    .mb { background:#fff; border-radius:20px; padding:30px; width:560px; max-width:95vw; max-height:90vh; overflow-y:auto; box-shadow:0 24px 80px rgba(0,0,0,.25); }
+    .mt { font-size:1.15rem; font-weight:800; color:var(--navy); margin-bottom:22px; }
+    .fg { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .fgg { display:flex; flex-direction:column; gap:4px; }
+    .fgg label { font-size:.68rem; font-weight:700; color:var(--gray); text-transform:uppercase; letter-spacing:.4px; }
+    .fgg input, .fgg select, .fgg textarea { border:1.5px solid #e2e8f0; border-radius:9px; padding:9px 11px; font-size:.84rem; font-family:inherit; outline:none; transition:border-color .2s; }
+    .fgg input:focus, .fgg select:focus, .fgg textarea:focus { border-color:var(--gold); }
+    .fgg textarea { resize:vertical; min-height:60px; }
+    .mhint { font-size:.73rem; color:var(--gray2); background:#f8fafc; border-radius:8px; padding:9px 12px; margin:8px 0; line-height:1.5; }
+    .ma { display:flex; gap:10px; justify-content:flex-end; margin-top:18px; }
+    .bcancel { background:#f1f5f9; border:none; border-radius:9px; padding:10px 20px; font-size:.84rem; font-weight:600; color:var(--gray); cursor:pointer; font-family:inherit; }
+    .bsave { background:linear-gradient(135deg,var(--gold),var(--gold-dk)); border:none; border-radius:9px; padding:10px 22px; font-size:.84rem; font-weight:700; color:#fff; cursor:pointer; font-family:inherit; }
+
+    /* ── TOAST ── */
+    .toast { position:fixed; bottom:24px; right:24px; background:var(--navy); color:#fff; padding:11px 18px; border-radius:12px; font-size:.83rem; font-weight:600; z-index:700; transform:translateY(60px); opacity:0; transition:all .3s; box-shadow:0 8px 28px rgba(0,0,0,.2); }
+    .toast.show { transform:translateY(0); opacity:1; }
+    .toast.s { background:var(--green); }
+    .toast.e { background:var(--red); }
+
+    /* ── EMPTY ── */
+    .empty { text-align:center; padding:48px; color:var(--gray2); }
+    .empty .ei { font-size:2.5rem; margin-bottom:10px; }
+
+    @media(max-width:768px) {
+      .stats-row,.toolbar,.tw,.gw,.legend { padding-left:16px; padding-right:16px; }
+      .hero { padding:24px 16px 20px; }
+      .hero-updated { display:none; }
+    }
+  </style>
+</head>
+<body>
+
+<nav id="mainNav">
+  <a href="index.html" class="logo">
+    <img src="imagenes de proyectos/Logos/LOGO RV4 BLANCO.png" alt="RV4" class="logo-img">
+    Costos&<span>Presupuestos</span>
+  </a>
+  <div class="nav-menu">
+    <a href="index.html#proyectos" class="nav-link">Presupuesto</a>
+    <div class="nav-item" id="dropCronograma">
+      <button class="nav-link" onclick="toggleDrop('dropCronograma')">Cronograma <span class="arrow">▾</span></button>
+      <div class="drop-panel">
+        <a href="cierre-contable.html" class="drop-item"><span>📋</span> Cierre Contable</a>
+        <a href="creacion-tableros.html" class="drop-item"><span>📊</span> Creación de Tableros</a>
+        <a href="avance-lotes.html" class="drop-item active"><span>🏗️</span> Avance Lotes</a>
+      </div>
+    </div>
+  </div>
+  <div class="nav-actions">
+    <a href="admin.html" class="btn-admin" id="btnAdmin" style="display:none">Admin</a>
+    <button onclick="doLogout()" class="btn-logout">Cerrar sesión</button>
+  </div>
+</nav>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="breadcrumb">Inicio › Cronograma › <span>Avance Lotes</span></div>
+  <h1 class="hero-title">Avance <em>Lotes</em></h1>
+  <p class="hero-sub">Seguimiento de proyectos — Control de Recetas y Carga a SAP</p>
+  <div class="hero-updated" id="heroUpdated"></div>
+</div>
+
+<!-- Stats -->
+<div class="stats-row">
+  <div class="sc s-tot" onclick="setFilter(null,null)"><div class="sc-num" id="sT">—</div><div class="sc-lbl">Total Proyectos</div></div>
+  <div class="sc s-fin" onclick="setFilter('FINALIZADO','alerta')"><div class="sc-num" id="sF">—</div><div class="sc-lbl">Finalizados</div></div>
+  <div class="sc s-ok"  onclick="setFilter('EN TIEMPO','alerta')"><div class="sc-num" id="sO">—</div><div class="sc-lbl">En Tiempo</div></div>
+  <div class="sc s-wrn" onclick="setFilter('POR VENCER','alerta')"><div class="sc-num" id="sW">—</div><div class="sc-lbl">Por Vencer</div></div>
+  <div class="sc s-venc" onclick="setFilter('VENCIDO','alerta')"><div class="sc-num" id="sV">—</div><div class="sc-lbl">Vencidos</div></div>
+  <div class="sc s-proc" onclick="setFilter('PROCESO','status')"><div class="sc-num" id="sP">—</div><div class="sc-lbl">En Proceso</div></div>
+</div>
+
+<!-- Toolbar -->
+<div class="toolbar">
+  <div class="srch"><span class="srch-icon">🔍</span><input type="text" placeholder="Buscar proyecto..." id="srchInp" oninput="applyFilters()"></div>
+  <select id="rfilt" onchange="applyFilters()">
+    <option value="">Todos los responsables</option>
+    <option>CONSBA</option><option>RV4</option>
+  </select>
+  <div class="vt">
+    <button class="on" id="vtTabla" onclick="switchView('tabla')">📋 Tabla</button>
+    <button id="vtGantt" onclick="switchView('gantt')">📊 Gantt</button>
+  </div>
+  <button class="btn-exp" onclick="exportCSV()">⬇ Exportar CSV</button>
+  <button class="btn-add" id="btnAdd" onclick="openModal()">+ Nuevo Proyecto</button>
+</div>
+
+<!-- Legend -->
+<div class="legend">
+  <strong style="font-size:.68rem;color:var(--gray);text-transform:uppercase;letter-spacing:.4px">Leyenda:</strong>
+  <div class="li"><span class="badge b-finalizado lb">FINALIZADO</span> Proyecto completado y cargado</div>
+  <div class="li"><span class="badge b-en-tiempo lb">EN TIEMPO</span> Dentro del plazo</div>
+  <div class="li"><span class="badge b-por-vencer lb">POR VENCER</span> Próximo (≤10 días háb.)</div>
+  <div class="li"><span class="badge b-vencido lb">VENCIDO</span> Fuera de plazo</div>
+  <div class="li"><span class="badge b-entregado lb">ENTREGADO</span> Receta entregada</div>
+  <div class="li"><span class="badge b-proceso lb">PROCESO</span> Receta en proceso</div>
+</div>
+
+<!-- TABLE VIEW -->
+<div id="vTabla" class="tw">
+  <table class="alt" id="alTab">
+    <thead>
+      <tr>
+        <th onclick="sortBy('numero')" style="width:36px">No.</th>
+        <th onclick="sortBy('nombre')">Proyecto</th>
+        <th onclick="sortBy('status_receta')">Status Receta</th>
+        <th onclick="sortBy('fecha_receta')">Fecha Receta</th>
+        <th onclick="sortBy('fecha_codificacion')">Fecha Codif.</th>
+        <th onclick="sortBy('fecha_fin')">Fecha Fin</th>
+        <th onclick="sortBy('responsable')">Responsable</th>
+        <th onclick="sortBy('carga_sistema')">Carga SAP</th>
+        <th onclick="sortBy('_dias')" style="min-width:90px">Días Háb.</th>
+        <th onclick="sortBy('_alerta')">Alerta</th>
+        <th>Observaciones</th>
+        <th id="thAcc" style="display:none;width:36px"></th>
+      </tr>
+    </thead>
+    <tbody id="tbody"><tr><td colspan="12"><div class="empty"><div class="ei">⏳</div><p>Cargando datos...</p></div></td></tr></tbody>
+  </table>
+</div>
+
+<!-- GANTT VIEW -->
+<div id="vGantt" class="gw" style="display:none">
+  <div class="g-inner" id="gInner"></div>
+</div>
+
+<!-- Datepicker overlay -->
+<div id="dpOvr"><input type="date" id="dpInp"></div>
+
+<!-- Modal -->
+<div class="mo" id="modal">
+  <div class="mb">
+    <div class="mt" id="modalTit">➕ Nuevo Proyecto</div>
+    <div class="fg">
+      <div class="fgg"><label>No. Orden</label><input type="number" id="mNum" min="1" placeholder="14"></div>
+      <div class="fgg"><label>Responsable</label><select id="mResp"><option>CONSBA</option><option>RV4</option></select></div>
+      <div class="fgg" style="grid-column:1/-1"><label>Nombre del Proyecto</label><input type="text" id="mNom" placeholder="Nombre del proyecto o lote"></div>
+      <div class="fgg"><label>Status Receta</label><select id="mStat"><option>PROCESO</option><option>ENTREGADO</option><option>VENCIDO</option></select></div>
+      <div class="fgg"><label>Carga SAP</label><select id="mCarga"><option value="false">Pendiente</option><option value="true">FINALIZADO</option></select></div>
+      <div class="fgg"><label>Fecha Receta</label><input type="date" id="mFR" oninput="rcDates()"></div>
+      <div class="fgg"><label>Días háb. Receta→Codif.</label><input type="number" id="mD1" min="0" placeholder="0" oninput="rcDates()"></div>
+      <div class="fgg"><label>Fecha Codificación</label><input type="date" id="mFC" oninput="rcDates2()"></div>
+      <div class="fgg"><label>Días háb. Codif.→Fin</label><input type="number" id="mD2" min="0" placeholder="0" oninput="rcDates2()"></div>
+      <div class="fgg" style="grid-column:1/-1"><label>Fecha Fin</label><input type="date" id="mFF"></div>
+      <div class="fgg" style="grid-column:1/-1"><label>Observaciones</label><textarea id="mObs" placeholder="Notas adicionales..."></textarea></div>
+    </div>
+    <div class="mhint">💡 Ingresa Fecha Receta y los días hábiles de cada intervalo para calcular automáticamente las fechas siguientes. Puedes ajustar cualquier fecha manualmente.</div>
+    <div class="ma">
+      <button class="bcancel" onclick="closeModal()">Cancelar</button>
+      <button class="bsave" onclick="saveProject()">Guardar Proyecto</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const { createClient } = supabase;
+const cli = createClient(
+  'https://iipgrojliqeyycvgnkrc.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlpcGdyb2psaXFleXljdmdua3JjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NzA1NzYsImV4cCI6MjA5MTM0NjU3Nn0.Y6FQ-1qWd7HPMvTnK4alpKxM-YLJ5CsKmkorAZKMJrg'
+);
+
+let ALL = [], isAdmin = false, editId = null;
+let sf = 'numero', sd = 1, afVal = null, afType = null;
+
+const SEED = [
+  { numero:1,  nombre:'CONDADO LA CEIBA',        status_receta:'ENTREGADO', fecha_receta:null,         fecha_codificacion:'2025-12-16', fecha_fin:'2026-02-06', responsable:'CONSBA', carga_sistema:true,  observaciones:'Confirmación de IT, carga de homologación en SAP.' },
+  { numero:2,  nombre:'HACIENDA JUMAY',           status_receta:'ENTREGADO', fecha_receta:null,         fecha_codificacion:'2026-03-09', fecha_fin:'2026-04-22', responsable:'CONSBA', carga_sistema:false, observaciones:null },
+  { numero:3,  nombre:'CONDADO JUTIAPA',          status_receta:'ENTREGADO', fecha_receta:null,         fecha_codificacion:'2026-04-01', fecha_fin:'2026-05-06', responsable:'CONSBA', carga_sistema:false, observaciones:null },
+  { numero:4,  nombre:'CONDADO ZACAPA (OASIS)',   status_receta:'ENTREGADO', fecha_receta:null,         fecha_codificacion:'2026-03-10', fecha_fin:'2026-05-13', responsable:'RV4',    carga_sistema:false, observaciones:'Receta codificada, IT confirmó que ya es posible realizar las compras conforme a la receta.' },
+  { numero:5,  nombre:'HACIENDA SOL',             status_receta:'ENTREGADO', fecha_receta:null,         fecha_codificacion:'2025-11-17', fecha_fin:'2025-12-09', responsable:'CONSBA', carga_sistema:true,  observaciones:null },
+  { numero:6,  nombre:'CLUB CAMPESTRE JUMAY',     status_receta:'ENTREGADO', fecha_receta:null,         fecha_codificacion:'2026-02-23', fecha_fin:'2026-03-06', responsable:'CONSBA', carga_sistema:true,  observaciones:null },
+  { numero:7,  nombre:'CLUB DEL BOSQUE',          status_receta:'ENTREGADO', fecha_receta:null,         fecha_codificacion:'2026-02-06', fecha_fin:'2026-02-20', responsable:'CONSBA', carga_sistema:true,  observaciones:null },
+  { numero:8,  nombre:'HACIENDA SANTA LUCIA',     status_receta:'ENTREGADO', fecha_receta:null,         fecha_codificacion:'2026-02-09', fecha_fin:'2026-02-23', responsable:'RV4',    carga_sistema:true,  observaciones:'Homologación enviada a Consba para validación 18/03/2026' },
+  { numero:9,  nombre:'CELAJES DE TECPAN***',     status_receta:'ENTREGADO', fecha_receta:null,         fecha_codificacion:'2026-02-23', fecha_fin:'2026-03-06', responsable:'RV4',    carga_sistema:true,  observaciones:'Homologación enviada a Consba para validación 19/03/2026' },
+  { numero:10, nombre:'ARBOLERA DE SANTA ELENA',  status_receta:'VENCIDO',   fecha_receta:'2026-04-24', fecha_codificacion:'2026-05-01', fecha_fin:'2026-05-30', responsable:'CONSBA', carga_sistema:false, observaciones:null },
+  { numero:11, nombre:'HACIENDA EL CAFETAL',      status_receta:'PROCESO',   fecha_receta:'2026-04-30', fecha_codificacion:'2026-05-05', fecha_fin:'2026-05-27', responsable:'RV4',    carga_sistema:false, observaciones:'Se modificó el envío de la receta, inicialmente programado para el 13 de marzo, atendiendo la solicitud de CONSBA enviada por correo el 26 de marzo.' },
+  { numero:12, nombre:'CLUB PROGRESO JUTIAPA***', status_receta:'PROCESO',   fecha_receta:'2026-05-15', fecha_codificacion:'2026-05-20', fecha_fin:'2026-06-12', responsable:'CONSBA', carga_sistema:false, observaciones:'"Se realizó el cambio de carga en el sistema (originalmente para el 25 de marzo), atendiendo la solicitud enviada por CONSBA vía correo el 26 de marzo."' },
+  { numero:13, nombre:'CAÑADAS DE JALAPA',        status_receta:'VENCIDO',   fecha_receta:'2026-04-20', fecha_codificacion:'2026-04-25', fecha_fin:'2026-05-17', responsable:'RV4',    carga_sistema:false, observaciones:'Se modificó el envío de la receta, inicialmente programado para el 13 de marzo, atendiendo la solicitud de CONSBA enviada por correo el 26 de marzo; posteriormente, tras una llamada de CONSBA, se realizó un nuevo cambio, quedando su entrega programada para el 20 de abril.' }
+];
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+(async () => {
+  const { data:{ user } } = await cli.auth.getUser();
+  if (!user) { location.href = 'login.html'; return; }
+  const { data: usr } = await cli.from('usuarios').select('rol').eq('id', user.id).single();
+  isAdmin = usr?.rol === 'admin';
+  if (isAdmin) {
+    document.getElementById('btnAdmin').style.display = '';
+    document.getElementById('btnAdd').style.display = '';
+    document.getElementById('thAcc').style.display = '';
+  }
+  document.getElementById('heroUpdated').textContent = 'Actualizado: ' + new Date().toLocaleDateString('es-GT');
+  await loadData();
+})();
+
+// ── DATA ─────────────────────────────────────────────────────────────────────
+async function loadData() {
+  let { data, error } = await cli.from('al_proyectos').select('*').order('numero');
+  if (error) { toast('Error al cargar datos', 'e'); return; }
+  if (!data?.length && isAdmin) {
+    await cli.from('al_proyectos').insert(SEED.map(s => ({ ...s, dias_receta_cod:0, dias_cod_fin:0 })));
+    ({ data } = await cli.from('al_proyectos').select('*').order('numero'));
+  }
+  ALL = (data||[]).map(p => ({ ...p, _alerta: alerta(p), _dias: dias(p) }));
+  updateStats();
+  applyFilters();
+}
+
+// ── BUSINESS DAYS ─────────────────────────────────────────────────────────────
+function addBiz(dateStr, n) {
+  if (!dateStr || !n) return dateStr;
+  let d = new Date(dateStr + 'T12:00:00'), c = 0, dir = n > 0 ? 1 : -1, t = Math.abs(n);
+  while (c < t) { d.setDate(d.getDate() + dir); if (d.getDay() !== 0 && d.getDay() !== 6) c++; }
+  return d.toISOString().slice(0,10);
+}
+
+function dias(p) {
+  if (!p.fecha_fin || p.carga_sistema) return 0;
+  const t = new Date(); t.setHours(12,0,0,0);
+  const f = new Date(p.fecha_fin + 'T12:00:00');
+  if (t.toDateString() === f.toDateString()) return 0;
+  let c = 0, dir = f > t ? 1 : -1, cur = new Date(t);
+  while (cur.toDateString() !== f.toDateString()) {
+    cur.setDate(cur.getDate() + dir);
+    if (cur.getDay() !== 0 && cur.getDay() !== 6) c += dir;
+  }
+  return c;
+}
+
+function alerta(p) {
+  if (p.carga_sistema) return 'FINALIZADO';
+  if (!p.fecha_fin) return '—';
+  const d = dias(p);
+  if (d < 0) return 'VENCIDO';
+  if (d <= 10) return 'POR VENCER';
+  return 'EN TIEMPO';
+}
+
+// ── STATS ─────────────────────────────────────────────────────────────────────
+function updateStats() {
+  document.getElementById('sT').textContent = ALL.length;
+  document.getElementById('sF').textContent = ALL.filter(p => p._alerta==='FINALIZADO').length;
+  document.getElementById('sO').textContent = ALL.filter(p => p._alerta==='EN TIEMPO').length;
+  document.getElementById('sW').textContent = ALL.filter(p => p._alerta==='POR VENCER').length;
+  document.getElementById('sV').textContent = ALL.filter(p => p._alerta==='VENCIDO').length;
+  document.getElementById('sP').textContent = ALL.filter(p => p.status_receta==='PROCESO').length;
+}
+
+function setFilter(val, type) {
+  if (afVal === val) { afVal = null; afType = null; }
+  else { afVal = val; afType = type; }
+  document.querySelectorAll('.sc').forEach(c => c.classList.remove('af'));
+  if (afVal) {
+    const m = { 'FINALIZADO':'s-fin','EN TIEMPO':'s-ok','POR VENCER':'s-wrn','VENCIDO':'s-venc','PROCESO':'s-proc' };
+    document.querySelector('.' + m[afVal])?.classList.add('af');
+  }
+  applyFilters();
+}
+
+// ── FILTER / SORT ─────────────────────────────────────────────────────────────
+function applyFilters() {
+  const q = document.getElementById('srchInp').value.toLowerCase();
+  const resp = document.getElementById('rfilt').value;
+  let d = ALL.filter(p => {
+    if (q && !p.nombre.toLowerCase().includes(q)) return false;
+    if (resp && p.responsable !== resp) return false;
+    if (afVal) return afType === 'status' ? p.status_receta === afVal : p._alerta === afVal;
+    return true;
+  });
+  d.sort((a,b) => {
+    let av = a[sf] ?? (sf==='_dias'?a._dias:sf==='_alerta'?a._alerta:'');
+    let bv = b[sf] ?? (sf==='_dias'?b._dias:sf==='_alerta'?b._alerta:'');
+    if (typeof av === 'string') return sd * av.localeCompare(bv);
+    return sd * (av - bv);
+  });
+  renderTable(d);
+  renderGantt(d);
+}
+
+function sortBy(f) {
+  if (sf===f) sd*=-1; else { sf=f; sd=1; }
+  document.querySelectorAll('.alt thead th').forEach(th => th.classList.remove('sa','sd'));
+  const fi = ['numero','nombre','status_receta','fecha_receta','fecha_codificacion','fecha_fin','responsable','carga_sistema','_dias','_alerta'];
+  const idx = fi.indexOf(f);
+  const ths = document.querySelectorAll('.alt thead th');
+  if (ths[idx]) ths[idx].classList.add(sd===1?'sa':'sd');
+  applyFilters();
+}
+
+// ── TABLE ─────────────────────────────────────────────────────────────────────
+function fd(s) { if(!s) return '<span class="dem">—</span>'; const[y,m,d]=s.split('-'); return `${d}/${m}/${y}`; }
+
+function renderTable(data) {
+  const tb = document.getElementById('tbody');
+  if (!data.length) {
+    tb.innerHTML = '<tr><td colspan="12"><div class="empty"><div class="ei">📋</div><p>No se encontraron proyectos</p></div></td></tr>';
+    return;
+  }
+  const today = new Date().toISOString().slice(0,10);
+  tb.innerHTML = data.map(p => {
+    const al = p._alerta, di = p._dias;
+    let rc = '';
+    if (al === 'VENCIDO') rc = 'rv';
+    else if (al === 'POR VENCER') rc = 'rw';
+
+    const adm = isAdmin;
+    const sCls = `badge b-${p.status_receta.toLowerCase()}${adm?' ck':''}`;
+    const sBadge = `<span class="${sCls}" ${adm?`onclick="cycleStatus('${p.id}','${p.status_receta}')" title="Click para cambiar"`:''}">${p.status_receta}</span>`;
+
+    const cBadge = p.carga_sistema
+      ? `<span class="badge b-carga${adm?' ck':''}" ${adm?`onclick="toggleCarga('${p.id}',true)"`:''}>FINALIZADO</span>`
+      : `<span class="badge b-pend${adm?' ck':''}" ${adm?`onclick="toggleCarga('${p.id}',false)"`:''}>—</span>`;
+
+    const rBadge = `<span class="badge b-${(p.responsable||'').toLowerCase()}${adm?' ck':''}" ${adm?`onclick="toggleResp('${p.id}','${p.responsable}')"`:''}">${p.responsable||'—'}</span>`;
+
+    const isHoy = p.fecha_fin === today && !p.carga_sistema;
+    const alBadge = isHoy
+      ? `<span class="badge b-hoy">⚠ HOY</span>`
+      : `<span class="badge b-${al.toLowerCase().replace(/ /g,'-')}">${al}</span>`;
+
+    const mkD = (field, val) => adm
+      ? `<span class="dc adm" onclick="openDP('${p.id}','${field}',this,'${val||''}')">${fd(val)}</span>`
+      : `<span class="dc">${fd(val)}</span>`;
+
+    let diasHtml;
+    if (al === 'FINALIZADO') {
+      diasHtml = `<span class="tdias df">✓</span>`;
+    } else {
+      const dc = di < 0 ? 'dv' : di <= 10 ? 'dw' : 'dok';
+      const pct = Math.max(0, Math.min(100, (Math.abs(di)/60)*100));
+      const bc = di < 0 ? 'var(--red)' : di <= 10 ? 'var(--amber)' : 'var(--green)';
+      diasHtml = `<div class="dias-wrap"><span class="tdias ${dc}">${di}</span><div class="dbar"><div class="dbar-f" style="width:${pct}%;background:${bc}"></div></div></div>`;
+    }
+
+    const obsCls = adm ? 'tobs editable' : 'tobs';
+    const obsAttr = adm ? `ondblclick="editObs('${p.id}',this)" title="Doble click para editar"` : `title="${(p.observaciones||'').replace(/"/g,'&quot;')}"`;
+    const obsHtml = `<td class="${obsCls}" ${obsAttr}>${p.observaciones||''}</td>`;
+
+    const actCell = adm
+      ? `<td><button class="btn-del" onclick="delRow('${p.id}','${p.nombre.replace(/'/g,"\\'")}')">🗑</button></td>`
+      : '<td></td>';
+
+    return `<tr class="${rc}" id="row-${p.id}">
+      <td class="tn">${p.numero||''}</td>
+      <td class="tnom">${p.nombre}</td>
+      <td>${sBadge}</td>
+      <td>${mkD('fecha_receta',p.fecha_receta)}</td>
+      <td>${mkD('fecha_codificacion',p.fecha_codificacion)}</td>
+      <td>${mkD('fecha_fin',p.fecha_fin)}</td>
+      <td>${rBadge}</td>
+      <td>${cBadge}</td>
+      <td>${diasHtml}</td>
+      <td>${alBadge}</td>
+      ${obsHtml}
+      ${actCell}
+    </tr>`;
+  }).join('');
+}
+
+// ── INLINE EDITS ──────────────────────────────────────────────────────────────
+const SCYCLE = ['PROCESO','ENTREGADO','VENCIDO'];
+async function cycleStatus(id, cur) {
+  await upd(id, { status_receta: SCYCLE[(SCYCLE.indexOf(cur)+1) % SCYCLE.length] });
+}
+async function toggleCarga(id, cur) { await upd(id, { carga_sistema: !cur }); }
+async function toggleResp(id, cur)  { await upd(id, { responsable: cur==='CONSBA'?'RV4':'CONSBA' }); }
+
+// Datepicker
+let dpCtx = null;
+function openDP(id, field, el, cur) {
+  dpCtx = { id, field };
+  const r = el.getBoundingClientRect();
+  const o = document.getElementById('dpOvr');
+  const i = document.getElementById('dpInp');
+  i.value = cur;
+  o.style.top  = (r.bottom + window.scrollY + 4) + 'px';
+  o.style.left = (r.left  + window.scrollX) + 'px';
+  o.classList.add('show');
+  setTimeout(() => { i.focus(); i.showPicker?.(); }, 50);
+}
+
+document.getElementById('dpInp').addEventListener('change', async function() {
+  if (!dpCtx) return;
+  const { id, field } = dpCtx;
+  const nv = this.value || null;
+  document.getElementById('dpOvr').classList.remove('show');
+  const p = ALL.find(x => x.id === id);
+  if (!p) return;
+  const updates = { [field]: nv };
+  if (field === 'fecha_receta' && nv && p.dias_receta_cod > 0) {
+    updates.fecha_codificacion = addBiz(nv, p.dias_receta_cod);
+    if (p.dias_cod_fin > 0) updates.fecha_fin = addBiz(updates.fecha_codificacion, p.dias_cod_fin);
+  } else if (field === 'fecha_codificacion' && nv && p.dias_cod_fin > 0) {
+    updates.fecha_fin = addBiz(nv, p.dias_cod_fin);
+  }
+  dpCtx = null;
+  await upd(id, updates);
+});
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('#dpOvr') && !e.target.classList.contains('dc'))
+    document.getElementById('dpOvr').classList.remove('show');
+});
+
+function editObs(id, td) {
+  const cur = td.textContent;
+  const wrap = document.createElement('div'); wrap.className = 'obs-wrap';
+  const ta = document.createElement('textarea'); ta.value = cur;
+  const btn = document.createElement('button'); btn.className = 'obs-save'; btn.textContent = '✓ Guardar';
+  btn.onclick = async () => { await upd(id, { observaciones: ta.value||null }); };
+  ta.onkeydown = e => { if (e.key==='Escape') { td.textContent = cur; td.ondblclick = () => editObs(id,td); } };
+  wrap.append(ta, btn);
+  td.textContent = '';
+  td.appendChild(wrap);
+  ta.focus();
+}
+
+// ── CRUD ──────────────────────────────────────────────────────────────────────
+async function upd(id, fields) {
+  const { error } = await cli.from('al_proyectos').update({ ...fields, updated_at: new Date().toISOString() }).eq('id', id);
+  if (error) { toast('Error: ' + error.message, 'e'); return; }
+  await loadData();
+  toast('Guardado', 's');
+}
+
+async function delRow(id, nom) {
+  if (!confirm(`¿Eliminar "${nom}"?`)) return;
+  const { error } = await cli.from('al_proyectos').delete().eq('id', id);
+  if (error) { toast('Error al eliminar', 'e'); return; }
+  toast('Proyecto eliminado', 's');
+  await loadData();
+}
+
+// ── GANTT ─────────────────────────────────────────────────────────────────────
+const DPX = 13;
+function renderGantt(data) {
+  const el = document.getElementById('gInner');
+  const dates = data.flatMap(p => [p.fecha_receta, p.fecha_codificacion, p.fecha_fin].filter(Boolean));
+  if (!dates.length) { el.innerHTML = '<div class="empty"><p>No hay fechas para mostrar en Gantt</p></div>'; return; }
+
+  let mn = new Date(dates.reduce((a,b)=>a<b?a:b)+'T12:00:00');
+  let mx = new Date(dates.reduce((a,b)=>a>b?a:b)+'T12:00:00');
+  mn = new Date(mn.getFullYear(), mn.getMonth(), 1);
+  mx = new Date(mx.getFullYear(), mx.getMonth()+1, 0);
+
+  const td = new Date(); td.setHours(12,0,0,0);
+  const tdOff = Math.ceil((td - mn) / 86400000) * DPX;
+  const totalW = Math.ceil((mx - mn) / 86400000) * DPX;
+
+  let months = '';
+  let cur = new Date(mn);
+  while (cur <= mx) {
+    const end = new Date(cur.getFullYear(), cur.getMonth()+1, 0);
+    const mDays = Math.ceil((Math.min(end,mx) - cur) / 86400000) + 1;
+    const mW = mDays * DPX;
+    const lbl = cur.toLocaleString('es-GT',{month:'short',year:'2-digit'}).toUpperCase();
+    months += `<div class="g-month" style="width:${mW}px">${lbl}</div>`;
+    cur = new Date(cur.getFullYear(), cur.getMonth()+1, 1);
+  }
+
+  const colorMap = { 'FINALIZADO':'var(--blue)','EN TIEMPO':'var(--green)','POR VENCER':'var(--amber)','VENCIDO':'var(--red)','—':'var(--gray2)' };
+
+  const rows = data.map((p, i) => {
+    const s = p.fecha_receta || p.fecha_codificacion;
+    const e = p.fecha_fin;
+    let bar = '';
+    if (s && e) {
+      const sd = new Date(s+'T12:00:00'), ed = new Date(e+'T12:00:00');
+      const left = Math.ceil((sd - mn)/86400000) * DPX;
+      const w = Math.max(6, Math.ceil((ed - sd)/86400000) * DPX);
+      const color = colorMap[p._alerta] || 'var(--gray2)';
+      bar = `<div class="g-bar" style="left:${left}px;width:${w}px;background:${color}"></div>`;
+    }
+    const todayLbl = i === 0 ? `<div class="g-today-tag" style="left:${tdOff}px">Hoy</div>` : '';
+    return `<div class="g-row">
+      <div class="g-lbl" title="${p.nombre}">${p.numero}. ${p.nombre}</div>
+      <div class="g-tl" style="width:${totalW}px">
+        ${bar}
+        <div class="g-today" style="left:${tdOff}px"></div>
+        ${todayLbl}
+      </div>
+    </div>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div class="g-hdr">
+      <div class="g-lbl-hdr">Proyecto</div>
+      <div class="g-months">${months}</div>
+    </div>
+    ${rows}`;
+}
+
+// ── VIEW SWITCH ────────────────────────────────────────────────────────────────
+function switchView(v) {
+  document.getElementById('vTabla').style.display = v==='tabla' ? '' : 'none';
+  document.getElementById('vGantt').style.display = v==='gantt' ? '' : 'none';
+  document.getElementById('vtTabla').classList.toggle('on', v==='tabla');
+  document.getElementById('vtGantt').classList.toggle('on', v==='gantt');
+}
+
+// ── MODAL ─────────────────────────────────────────────────────────────────────
+function openModal(p = null) {
+  editId = p?.id || null;
+  document.getElementById('modalTit').textContent = p ? '✏️ Editar Proyecto' : '➕ Nuevo Proyecto';
+  const maxNum = Math.max(0, ...ALL.map(x => x.numero||0));
+  document.getElementById('mNum').value  = p?.numero  || maxNum + 1;
+  document.getElementById('mNom').value  = p?.nombre  || '';
+  document.getElementById('mStat').value = p?.status_receta || 'PROCESO';
+  document.getElementById('mCarga').value = p?.carga_sistema ? 'true' : 'false';
+  document.getElementById('mResp').value = p?.responsable || 'CONSBA';
+  document.getElementById('mFR').value   = p?.fecha_receta || '';
+  document.getElementById('mD1').value   = p?.dias_receta_cod || 0;
+  document.getElementById('mFC').value   = p?.fecha_codificacion || '';
+  document.getElementById('mD2').value   = p?.dias_cod_fin || 0;
+  document.getElementById('mFF').value   = p?.fecha_fin || '';
+  document.getElementById('mObs').value  = p?.observaciones || '';
+  document.getElementById('modal').classList.add('open');
+}
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+
+function rcDates() {
+  const fr = document.getElementById('mFR').value;
+  const d1 = parseInt(document.getElementById('mD1').value)||0;
+  if (fr && d1 > 0) { document.getElementById('mFC').value = addBiz(fr, d1); rcDates2(); }
+}
+function rcDates2() {
+  const fc = document.getElementById('mFC').value;
+  const d2 = parseInt(document.getElementById('mD2').value)||0;
+  if (fc && d2 > 0) document.getElementById('mFF').value = addBiz(fc, d2);
+}
+
+async function saveProject() {
+  const nom = document.getElementById('mNom').value.trim();
+  if (!nom) { toast('Ingresa el nombre del proyecto', 'e'); return; }
+  const payload = {
+    numero: parseInt(document.getElementById('mNum').value)||null,
+    nombre: nom,
+    status_receta:      document.getElementById('mStat').value,
+    carga_sistema:      document.getElementById('mCarga').value === 'true',
+    responsable:        document.getElementById('mResp').value,
+    fecha_receta:       document.getElementById('mFR').value || null,
+    dias_receta_cod:    parseInt(document.getElementById('mD1').value)||0,
+    fecha_codificacion: document.getElementById('mFC').value || null,
+    dias_cod_fin:       parseInt(document.getElementById('mD2').value)||0,
+    fecha_fin:          document.getElementById('mFF').value || null,
+    observaciones:      document.getElementById('mObs').value.trim() || null,
+    updated_at:         new Date().toISOString()
+  };
+  const { error } = editId
+    ? await cli.from('al_proyectos').update(payload).eq('id', editId)
+    : await cli.from('al_proyectos').insert(payload);
+  if (error) { toast('Error: ' + error.message, 'e'); return; }
+  closeModal();
+  toast(editId ? 'Proyecto actualizado' : 'Proyecto creado ✓', 's');
+  await loadData();
+}
+
+// ── EXPORT CSV ────────────────────────────────────────────────────────────────
+function exportCSV() {
+  const h = ['No.','Proyecto','Status Receta','Fecha Receta','Fecha Codif.','Fecha Fin','Responsable','Carga SAP','Días Háb.','Alerta','Observaciones'];
+  const r = ALL.map(p => [
+    p.numero||'', `"${p.nombre}"`, p.status_receta, p.fecha_receta||'',
+    p.fecha_codificacion||'', p.fecha_fin||'', p.responsable||'',
+    p.carga_sistema?'FINALIZADO':'', p._dias, p._alerta,
+    `"${(p.observaciones||'').replace(/"/g,'""')}"`
+  ]);
+  const csv = [h,...r].map(x=>x.join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,﻿' + encodeURIComponent(csv);
+  a.download = `avance-lotes-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
+
+// ── NAV ───────────────────────────────────────────────────────────────────────
+function toggleDrop(id) {
+  document.querySelectorAll('.nav-item.open').forEach(el => { if(el.id!==id) el.classList.remove('open'); });
+  document.getElementById(id).classList.toggle('open');
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('.nav-item')) document.querySelectorAll('.nav-item.open').forEach(el => el.classList.remove('open'));
+});
+async function doLogout() { await cli.auth.signOut(); location.href = 'login.html'; }
+
+// ── TOAST ─────────────────────────────────────────────────────────────────────
+let tt;
+function toast(msg, type='') {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = 'toast show ' + type;
+  clearTimeout(tt); tt = setTimeout(() => el.classList.remove('show'), 2800);
+}
+</script>
+</body>
+</html>
