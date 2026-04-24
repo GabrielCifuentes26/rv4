@@ -31,6 +31,7 @@ Resumen:
 - Se creo memoria interna para que Claude, Codex u otro asistente pueda retomar rapido sin releer todo.
 - Se ordeno la estructura del proyecto moviendo soporte interno a carpetas dedicadas.
 - Se corrigio el registro publico para que no dependa del correo de confirmacion de Supabase.
+- Se ajusto el navbar de `index.html` para que al bajar cambie a azul oscuro en lugar de beige/crema.
 
 Archivos modificados:
 - `CLAUDE.md`
@@ -38,6 +39,7 @@ Archivos modificados:
 - `cierre-contable.html`
 - `dashboard.html`
 - `login.html`
+- `index.html`
 - `firebase.json`
 - `assets/js/tracker.js`
 - `database/setup.sql`
