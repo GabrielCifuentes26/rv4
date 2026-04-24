@@ -1581,29 +1581,28 @@
     function abrirCorreoAdmin(email, nombre, pass) {
         const asunto = encodeURIComponent('Acceso restaurado — Costos & Presupuestos');
         const cuerpo = encodeURIComponent(
-`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  COSTOS & PRESUPUESTOS  |  Notificación de Seguridad
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+`Hola ${nombre || ''},
 
-Hola ${nombre || ''},
+Tu acceso al sistema ha sido restablecido correctamente por el administrador.
 
-Tu acceso al sistema ha sido restablecido por el administrador.
-A continuación encontrarás tus nuevas credenciales de ingreso.
+A continuación, encontrarás tu nueva contraseña de ingreso:
 
 ─────────────────────────────────────────
-  NUEVA CONTRASEÑA
+🔐 NUEVA CONTRASEÑA
 ─────────────────────────────────────────
 
-  ▶  ${pass}
+${pass}
 
 ─────────────────────────────────────────
 
-Guarda este correo en un lugar seguro.
-Por motivos de seguridad, no compartas tu contraseña con nadie.
+Por tu seguridad:
+• Guarda este correo en un lugar seguro
+• No compartas tu contraseña con nadie
+
+Si no solicitaste este cambio, por favor contacta de inmediato al área de Costos & Presupuestos.
 
 Saludos,
-Administración — Costos & Presupuestos
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`
+Administración — Costos & Presupuestos`
         );
         window.open(`mailto:${email}?subject=${asunto}&body=${cuerpo}`, '_blank');
     }
