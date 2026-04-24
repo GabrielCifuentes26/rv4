@@ -839,6 +839,7 @@
                             <div class="field-right"><div class="field-check">✓</div></div>
                         </div>
                         <div class="alert error"   id="resetError"><span>⚠</span><span></span></div>
+                        <div class="alert warning" id="resetRateLimit"><span>⏳</span><span>Ya solicitaste un reinicio de contraseña. El administrador te enviará tu nueva contraseña por correo electrónico. Si no recibes respuesta, intenta nuevamente después de 1 hora.</span></div>
                         <div class="alert success" id="resetSuccess"><span>✓</span><span>Tu solicitud fue enviada. El administrador revisará y te enviará la nueva contraseña a tu correo electrónico.</span></div>
                         <div id="resetExtraMsg" style="display:none;background:#f0f7ff;border:1px solid #bee3f8;border-radius:10px;padding:12px 14px;font-size:0.83rem;color:#2b6cb0;margin-bottom:12px;line-height:1.5">
                             Si necesitas enviar otra solicitud de reinicio de contraseña, puedes hacerlo nuevamente ingresando tu correo.
@@ -993,7 +994,7 @@
 
     function hideAllAlerts() {
         ['loginError','loginPending','loginRejected','loginSuccess','regError',
-         'resetError','resetSuccess','newPassError','newPassSuccess']
+         'resetError','resetRateLimit','resetSuccess','newPassError','newPassSuccess']
             .forEach(id => { const el = document.getElementById(id); if (el) el.classList.remove('show'); });
     }
 
@@ -1022,6 +1023,23 @@
         if (!usuario) {
             btn.disabled = false; spinner.style.display = 'none'; btnText.textContent = 'Enviar solicitud';
             showAlert('resetError', 'No encontramos una cuenta con ese correo.');
+            return;
+        }
+
+        // Rate limit: máx 1 solicitud pendiente por hora
+        const unaHoraAtras = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+        const { data: solicitudReciente } = await client
+            .from('solicitudes_reset')
+            .select('id')
+            .eq('email', email)
+            .eq('estado', 'pendiente')
+            .gte('created_at', unaHoraAtras)
+            .limit(1)
+            .maybeSingle();
+
+        if (solicitudReciente) {
+            btn.disabled = false; spinner.style.display = 'none'; btnText.textContent = 'Enviar solicitud';
+            document.getElementById('resetRateLimit').classList.add('show');
             return;
         }
 

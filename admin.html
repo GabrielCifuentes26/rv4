@@ -1579,20 +1579,31 @@
     }
 
     function abrirCorreoAdmin(email, nombre, pass) {
-        const asunto = encodeURIComponent('Tu nueva contraseña — Costos&Presupuestos');
+        const asunto = encodeURIComponent('Acceso restaurado — Costos & Presupuestos');
         const cuerpo = encodeURIComponent(
-`Hola ${nombre || ''},
+`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  COSTOS & PRESUPUESTOS  |  Notificación de Seguridad
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-El administrador ha establecido una nueva contraseña para tu cuenta en el sistema Costos&Presupuestos.
+Hola ${nombre || ''},
 
-Tu nueva contraseña es:
+Tu acceso al sistema ha sido restablecido por el administrador.
+A continuación encontrarás tus nuevas credenciales de ingreso.
 
-${pass}
+─────────────────────────────────────────
+  NUEVA CONTRASEÑA
+─────────────────────────────────────────
 
-Ingresa al sistema con esta contraseña. Se recomienda cambiarla después de iniciar sesión.
+  ▶  ${pass}
+
+─────────────────────────────────────────
+
+Guarda este correo en un lugar seguro.
+Por motivos de seguridad, no compartas tu contraseña con nadie.
 
 Saludos,
-Administración — Costos&Presupuestos`
+Administración — Costos & Presupuestos
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`
         );
         window.open(`mailto:${email}?subject=${asunto}&body=${cuerpo}`, '_blank');
     }
