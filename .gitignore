@@ -2,3 +2,9 @@ node_modules/
 .claude/
 *.log
 serviceAccountKey.json
+data/powerbi/*.log
+data/powerbi/*.json
+data/powerbi/metadata-*.json
+data/powerbi/prueba.json
+data/powerbi/service-report-export.pbix
+data/powerbi/service-report-extract/

@@ -27,6 +27,7 @@
         // Leer proyecto desde URL
         const params = new URLSearchParams(window.location.search);
         const PROJECT_NAME = params.get('project') || 'RV4';
+        const POWERBI_PROJECT_KEY = params.get('pbi') || 'bse';
 
         client.auth.getSession().then(({ data: { session } }) => {
             if (!session) { window.location.href = 'login.html'; }
@@ -347,7 +348,7 @@
             <div class="hm-icon blue">📋</div>
             <div>
                 <div class="hm-label">Presupuesto Inicial / RDI</div>
-                <div class="hm-value">162.08 <span>mill.</span></div>
+                <div class="hm-value" id="hm-rdi">162.08 <span>mill.</span></div>
                 <div class="hm-sub">Presupuesto aprobado</div>
             </div>
         </div>
@@ -355,7 +356,7 @@
             <div class="hm-icon orange">🔨</div>
             <div>
                 <div class="hm-label">Ejecutado</div>
-                <div class="hm-value">129.38 <span>mill.</span></div>
+                <div class="hm-value" id="hm-ejecutado">129.38 <span>mill.</span></div>
                 <div class="hm-sub">Acumulado a la fecha</div>
             </div>
         </div>
@@ -363,7 +364,7 @@
             <div class="hm-icon green">📈</div>
             <div>
                 <div class="hm-label">% de Ejecución</div>
-                <div class="hm-value">91.98 <span>%</span></div>
+                <div class="hm-value" id="hm-avance">91.98 <span>%</span></div>
                 <div class="hm-sub">Del presupuesto asignado</div>
             </div>
         </div>
@@ -371,11 +372,11 @@
 
     <!-- KPIs secundarios -->
     <div class="kpi-row">
-        <div class="kpi-card c1"><div class="kpi-label">PPTO RSI</div><div class="kpi-value">162.08 <span>mill.</span></div></div>
-        <div class="kpi-card c2"><div class="kpi-label">PPTO ESL</div><div class="kpi-value">162.39 <span>mill.</span></div></div>
-        <div class="kpi-card c3"><div class="kpi-label">Comprometido</div><div class="kpi-value">19.95 <span>mill.</span></div></div>
-        <div class="kpi-card c5"><div class="kpi-label">Asignado</div><div class="kpi-value">149.33 <span>mill.</span></div></div>
-        <div class="kpi-card c6"><div class="kpi-label">Disponible Imputable</div><div class="kpi-value">13.06 <span>mill.</span></div></div>
+        <div class="kpi-card c1"><div class="kpi-label">PPTO RDI</div><div class="kpi-value" id="kpi-rdi">162.08 <span>mill.</span></div></div>
+        <div class="kpi-card c2"><div class="kpi-label">PPTO ER</div><div class="kpi-value" id="kpi-ppto-er">162.39 <span>mill.</span></div></div>
+        <div class="kpi-card c3"><div class="kpi-label">Comprometido</div><div class="kpi-value" id="kpi-comprometido">19.95 <span>mill.</span></div></div>
+        <div class="kpi-card c5"><div class="kpi-label">Asignado</div><div class="kpi-value" id="kpi-asignado">149.33 <span>mill.</span></div></div>
+        <div class="kpi-card c6"><div class="kpi-label">Disponible Erequester</div><div class="kpi-value" id="kpi-disponible">13.06 <span>mill.</span></div></div>
     </div>
 
     <!-- Table -->
@@ -390,7 +391,7 @@
                         <th>% Asignado</th><th>% Disponible</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="resumen-area-body">
                     <tr><td>Construcción</td><td>120,477,476.11</td><td>123,454,431.78</td><td>98,168,770.89</td><td>16,540,708.91</td><td>114,709,479.80</td><td>8,744,951.98</td><td class="pct-asig">92.92%</td><td class="pct-disp">7.08%</td></tr>
                     <tr><td>Urbanización</td><td>29,837,668.62</td><td>29,939,366.88</td><td>25,195,463.25</td><td>1,984,100.25</td><td>27,179,563.50</td><td>2,759,803.38</td><td class="pct-asig">90.79%</td><td class="pct-disp">9.21%</td></tr>
                     <tr><td>I.7a Construcción</td><td>4,122,589.34</td><td>2,840,245.67</td><td>1,950,423.18</td><td>441,209.56</td><td>2,391,632.74</td><td>448,612.93</td><td class="pct-asig">84.20%</td><td class="pct-disp">15.80%</td></tr>
@@ -411,14 +412,14 @@
             <div class="gauge-wrap">
                 <canvas id="gaugeChart"></canvas>
                 <div class="gauge-overlay">
-                    <div class="gauge-val">149.33</div>
+                    <div class="gauge-val" id="gauge-asignado">149.33</div>
                     <div class="gauge-sub">mill. asignado</div>
                 </div>
             </div>
             <div class="gauge-stats">
-                <div class="gstat"><div class="gstat-val" style="color:var(--orange)">129.38M</div><div class="gstat-lbl">Ejecutado</div></div>
-                <div class="gstat"><div class="gstat-val" style="color:var(--blue)">91.98%</div><div class="gstat-lbl">% Asignado</div></div>
-                <div class="gstat"><div class="gstat-val" style="color:var(--green)">13.06M</div><div class="gstat-lbl">Disponible</div></div>
+                <div class="gstat"><div class="gstat-val" id="gauge-ejecutado" style="color:var(--orange)">129.38M</div><div class="gstat-lbl">Ejecutado</div></div>
+                <div class="gstat"><div class="gstat-val" id="gauge-avance" style="color:var(--blue)">91.98%</div><div class="gstat-lbl">% Asignado</div></div>
+                <div class="gstat"><div class="gstat-val" id="gauge-disponible" style="color:var(--green)">13.06M</div><div class="gstat-lbl">Disponible</div></div>
             </div>
         </div>
 
@@ -428,7 +429,7 @@
         </div>
 
         <div class="chart-card">
-            <div class="chart-title">Avance por Fase</div>
+            <div class="chart-title">Avance por Area</div>
             <canvas id="faseChart"></canvas>
         </div>
     </div>
@@ -436,7 +437,7 @@
     <!-- Footer -->
     <div class="footer-bar">
         <span id="footer-project">Control Presupuestario de Obra</span>
-        <span>Actualizado: 2026</span>
+        <span id="powerbi-updated">Actualizado: 2026</span>
     </div>
 
 </div><!-- /main -->
@@ -461,8 +462,24 @@
         bg:     '#f0f4f8'
     };
 
+    const field = (row, name) => row?.[`[${name}]`] ?? row?.[name] ?? 0;
+    const dimension = (row, name) => row?.[name] ?? '';
+    const toMillions = value => Number(value || 0) / 1000000;
+    const fmtMillions = value => `${toMillions(value).toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span>mill.</span>`;
+    const fmtMillionsText = value => `${toMillions(value).toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}M`;
+    const fmtMoney = value => Number(value || 0).toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const fmtPct = value => `${(Number(value || 0) * 100).toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%`;
+    const setHtml = (id, html) => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = html;
+    };
+    const setText = (id, text) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = text;
+    };
+
     // Gauge
-    new Chart(document.getElementById('gaugeChart'), {
+    const gaugeChart = new Chart(document.getElementById('gaugeChart'), {
         type: 'doughnut',
         data: {
             datasets: [{ data:[91.98, 8.02], backgroundColor:[C.blue, '#e2e8f0'], borderWidth:0, circumference:240, rotation:240 }]
@@ -471,7 +488,7 @@
     });
 
     // Etapa
-    new Chart(document.getElementById('etapaChart'), {
+    const etapaChart = new Chart(document.getElementById('etapaChart'), {
         type: 'bar',
         data: {
             labels: ['Gas\nCombustión','Acero\nEst.','Plomería\nAC','Pisos/\nRev.','Muros\nDiv.','Fachada\nExt.','Acabados\nFin.','Eléctrico\nGral.'],
@@ -492,7 +509,7 @@
     });
 
     // Fase
-    new Chart(document.getElementById('faseChart'), {
+    const areaChart = new Chart(document.getElementById('faseChart'), {
         type: 'bar',
         data: {
             labels:['Fase 1','Fase 2','Fase 3','Fase 4','Fase 5'],
@@ -510,6 +527,130 @@
             }
         }
     });
+
+    function renderPowerBIResumen(data) {
+        const datasets = data.datasets || {};
+        const totals = datasets.totales?.[0];
+        if (!totals) return;
+
+        const rdi = field(totals, 'RdiTotal');
+        const pptoEr = field(totals, 'PresupuestoErequester');
+        const ejecutado = field(totals, 'EjecutadoErequester');
+        const comprometido = field(totals, 'ComprometidoErequester');
+        const asignado = field(totals, 'AsignadoErequester');
+        const disponible = field(totals, 'DisponibleErequester');
+        const pctAsignado = field(totals, 'PorcentajeAsignado');
+        const pctDisponible = field(totals, 'PorcentajeDisponible');
+
+        setHtml('hm-rdi', fmtMillions(rdi));
+        setHtml('hm-ejecutado', fmtMillions(ejecutado));
+        setHtml('hm-avance', `${(pctAsignado * 100).toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span>%</span>`);
+        setHtml('kpi-rdi', fmtMillions(rdi));
+        setHtml('kpi-ppto-er', fmtMillions(pptoEr));
+        setHtml('kpi-comprometido', fmtMillions(comprometido));
+        setHtml('kpi-asignado', fmtMillions(asignado));
+        setHtml('kpi-disponible', fmtMillions(disponible));
+        setText('gauge-asignado', toMillions(asignado).toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+        setText('gauge-ejecutado', fmtMillionsText(ejecutado));
+        setText('gauge-avance', fmtPct(pctAsignado));
+        setText('gauge-disponible', fmtMillionsText(disponible));
+
+        gaugeChart.data.datasets[0].data = [pctAsignado * 100, Math.max(0, pctDisponible * 100)];
+        gaugeChart.update();
+
+        const areaBody = document.getElementById('resumen-area-body');
+        if (areaBody) {
+            const areaRows = (datasets.porArea || []).map(row => `
+                <tr>
+                    <td>${dimension(row, 'Rubros[Area]')}</td>
+                    <td>${fmtMoney(field(row, 'RdiTotal'))}</td>
+                    <td>${fmtMoney(field(row, 'PresupuestoErequester'))}</td>
+                    <td>${fmtMoney(field(row, 'EjecutadoErequester'))}</td>
+                    <td>${fmtMoney(field(row, 'ComprometidoErequester'))}</td>
+                    <td>${fmtMoney(field(row, 'AsignadoErequester'))}</td>
+                    <td>${fmtMoney(field(row, 'DisponibleErequester'))}</td>
+                    <td class="pct-asig">${fmtPct(field(row, 'PorcentajeAsignado'))}</td>
+                    <td class="pct-disp">${fmtPct(field(row, 'PorcentajeDisponible'))}</td>
+                </tr>
+            `).join('');
+            const totalRow = `
+                <tr class="total-row">
+                    <td>Total</td>
+                    <td>${fmtMoney(rdi)}</td>
+                    <td>${fmtMoney(pptoEr)}</td>
+                    <td>${fmtMoney(ejecutado)}</td>
+                    <td>${fmtMoney(comprometido)}</td>
+                    <td>${fmtMoney(asignado)}</td>
+                    <td>${fmtMoney(disponible)}</td>
+                    <td class="pct-asig">${fmtPct(pctAsignado)}</td>
+                    <td class="pct-disp">${fmtPct(pctDisponible)}</td>
+                </tr>
+            `;
+            areaBody.innerHTML = areaRows + totalRow;
+        }
+
+        const etapaRows = (datasets.porEtapa || [])
+            .filter(row => field(row, 'AsignadoErequester') > 0 || field(row, 'EjecutadoErequester') > 0)
+            .sort((a, b) => field(b, 'AsignadoErequester') - field(a, 'AsignadoErequester'))
+            .slice(0, 8);
+        etapaChart.data.labels = etapaRows.map(row => dimension(row, 'Rubros[Etapa]').replace(/\s+/g, ' ').slice(0, 18));
+        etapaChart.data.datasets[0].label = 'PPTO ER';
+        etapaChart.data.datasets[0].data = etapaRows.map(row => toMillions(field(row, 'PresupuestoErequester')));
+        etapaChart.data.datasets[1].data = etapaRows.map(row => toMillions(field(row, 'EjecutadoErequester')));
+        etapaChart.data.datasets[2].data = etapaRows.map(row => toMillions(field(row, 'ComprometidoErequester')));
+        etapaChart.options.scales.y.ticks.callback = value => `${value}M`;
+        etapaChart.update();
+
+        const areaRows = datasets.porArea || [];
+        areaChart.data.labels = areaRows.map(row => dimension(row, 'Rubros[Area]'));
+        areaChart.data.datasets[0].label = 'PPTO ER';
+        areaChart.data.datasets[0].data = areaRows.map(row => toMillions(field(row, 'PresupuestoErequester')));
+        areaChart.data.datasets[1].data = areaRows.map(row => toMillions(field(row, 'AsignadoErequester')));
+        areaChart.options.scales.y.ticks.callback = value => `${value}M`;
+        areaChart.update();
+
+        if (data.metadata?.generatedAt) {
+            const updated = new Date(data.metadata.generatedAt);
+            const month = data.metadata.filters?.mesA || '';
+            setText('powerbi-updated', `Power BI Service: ${month} - ${updated.toLocaleString('es-GT')}`);
+        }
+    }
+
+    async function loadPowerBIResumenFromSupabase() {
+        try {
+            const { data, error } = await client
+                .from('powerbi_resumen_cache')
+                .select('payload, mes_a, generated_at, updated_at')
+                .eq('project_key', POWERBI_PROJECT_KEY)
+                .single();
+
+            if (error || !data?.payload) return false;
+            renderPowerBIResumen(data.payload);
+            return true;
+        } catch (error) {
+            console.warn('No se pudieron cargar datos de Power BI desde Supabase.', error);
+            return false;
+        }
+    }
+
+    async function loadPowerBIResumenFromLocalJson() {
+        try {
+            const response = await fetch('data/powerbi/resumen-powerbi.json', { cache: 'no-store' });
+            if (!response.ok) return false;
+            renderPowerBIResumen(await response.json());
+            return true;
+        } catch (error) {
+            console.warn('No se pudieron cargar datos locales de Power BI.', error);
+            return false;
+        }
+    }
+
+    async function loadPowerBIResumen() {
+        const loadedFromSupabase = await loadPowerBIResumenFromSupabase();
+        if (!loadedFromSupabase) await loadPowerBIResumenFromLocalJson();
+    }
+
+    loadPowerBIResumen();
 </script>
 <script src="assets/js/tracker.js"></script>
 </body>
