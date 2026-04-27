@@ -229,19 +229,6 @@
         }
         .btn-primary:hover { background: var(--ng2); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(201,168,76,0.5); }
         .btn-primary:active { transform: translateY(0); }
-        .btn-secondary {
-            background: transparent; color: #fff;
-            padding: 13px 30px; border-radius: 9px; font-weight: 600;
-            font-size: 0.9rem; text-decoration: none; border: 2px solid rgba(255,255,255,0.4);
-            transition: border-color .2s, color .2s, background .2s;
-        }
-        .btn-secondary:hover { border-color: var(--ng); color: var(--ng); background: rgba(201,168,76,0.1); }
-        .slider-stats {
-            display: flex; gap: 40px; margin-top: 48px;
-            animation: fadeInUp .7s ease .4s both;
-        }
-        .stat-num   { font-size: 1.8rem; font-weight: 900; color: #fff; }
-        .stat-label { font-size: 0.72rem; color: rgba(255,255,255,0.65); margin-top: 2px; }
         .slider-dots {
             position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%);
             z-index: 3; display: flex; gap: 8px;
@@ -486,12 +473,7 @@
             <p class="slider-p">Gestiona el presupuesto, avance y ejecución de todos tus proyectos inmobiliarios desde un solo lugar.</p>
             <div class="slider-cta">
                 <a href="login.html" class="btn-primary">Acceder al sistema</a>
-                <a href="#proyectos" class="btn-secondary">Ver proyectos</a>
-            </div>
-            <div class="slider-stats">
-                <div><div class="stat-num">17</div><div class="stat-label">Proyectos activos</div></div>
-                <div><div class="stat-num">2</div><div class="stat-label">Empresas</div></div>
-                <div><div class="stat-num">91%</div><div class="stat-label">Avance promedio</div></div>
+                <a href="#proyectos" class="btn-primary">Ver proyectos</a>
             </div>
         </div>
     </div>
@@ -611,8 +593,6 @@
             if (countEl) countEl.textContent = formatProjectCount(count);
         });
 
-        const heroCount = document.querySelector('.slider-stats .stat-num');
-        if (heroCount) heroCount.textContent = PROJECTS.length;
     }
 
     // ── MAPA ─────────────────────────────────────────────────────────────────
