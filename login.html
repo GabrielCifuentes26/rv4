@@ -169,10 +169,44 @@
                        floatCard 5s ease-in-out 1s infinite,
                        glowPulse 4s ease-in-out 1s infinite !important;
         }
-        .panel-sub { font-size:0.96rem; color:rgba(255,255,255,0.72); line-height:1.8; max-width:380px; margin-bottom:52px; }
-        .panel-stats { display:flex; gap:44px; }
-        .p-stat-num { font-size:1.85rem; font-weight:900; color:#fff; }
-        .p-stat-lbl { font-size:0.68rem; color:rgba(255,255,255,0.32); margin-top:3px; letter-spacing:0.5px; text-transform:uppercase; }
+        .panel-sub { font-size:0.96rem; color:rgba(255,255,255,0.72); line-height:1.8; max-width:380px; margin-bottom:30px; }
+        .project-overview { width:100%; max-width:420px; }
+        .project-kicker {
+            display:inline-flex; align-items:center; gap:8px;
+            color:#7dd3fc; font-size:0.68rem; font-weight:800;
+            letter-spacing:1.8px; text-transform:uppercase;
+            margin-bottom:12px;
+        }
+        .project-kicker::before {
+            content:''; width:28px; height:2px; border-radius:2px;
+            background:linear-gradient(90deg,#7dd3fc,var(--amber));
+        }
+        .project-title {
+            color:#fff; font-size:1.28rem; font-weight:900;
+            letter-spacing:-0.4px; margin-bottom:14px;
+        }
+        .project-grid {
+            display:grid; grid-template-columns:repeat(2,minmax(0,1fr));
+            gap:10px; width:100%;
+        }
+        .project-chip {
+            display:flex; align-items:center; gap:10px;
+            min-height:68px; padding:13px 14px;
+            background:rgba(255,255,255,0.075);
+            border:1px solid rgba(255,255,255,0.13);
+            border-left:3px solid var(--chip-c,#7dd3fc);
+            border-radius:12px;
+            box-shadow:0 10px 28px rgba(0,0,0,0.16);
+            backdrop-filter:blur(14px);
+        }
+        .project-chip-icon {
+            width:34px; height:34px; border-radius:10px;
+            display:flex; align-items:center; justify-content:center;
+            background:color-mix(in srgb, var(--chip-c,#7dd3fc) 18%, transparent);
+            color:#fff; font-size:1.05rem; flex-shrink:0;
+        }
+        .project-chip-name { color:#fff; font-size:0.84rem; font-weight:800; line-height:1.2; }
+        .project-chip-count { color:rgba(255,255,255,0.48); font-size:0.68rem; font-weight:700; margin-top:3px; }
 
         /* Mini floating card */
         .mini-card {
@@ -432,7 +466,7 @@
             .panel-heading { font-size: 2.2rem; letter-spacing: -1px; }
             .panel-logo { margin-bottom: 36px; }
             .panel-sub { margin-bottom: 24px; font-size: 0.88rem; }
-            .panel-stats { gap: 28px; }
+            .project-grid { gap: 8px; }
             .right-panel { width: 400px; padding: 32px 24px 32px 16px; }
             .mini-card { width: 220px; right: 16px; bottom: 16px; padding: 16px; }
         }
@@ -683,10 +717,39 @@
         </div>
         <div class="panel-heading">Costos &amp;<br><em>Presupuestos</em></div>
         <p class="panel-sub">Gestiona y controla el presupuesto de todos los proyectos desde un solo lugar.</p>
-        <div class="panel-stats">
-            <div><div class="p-stat-num">22</div><div class="p-stat-lbl">Proyectos</div></div>
-            <div><div class="p-stat-num">91.98%</div><div class="p-stat-lbl">Avance</div></div>
-            <div><div class="p-stat-num">2</div><div class="p-stat-lbl">Empresas</div></div>
+        <div class="project-overview">
+            <div class="project-kicker">Nuestros desarrollos</div>
+            <div class="project-title">Proyectos</div>
+            <div class="project-grid">
+                <div class="project-chip" style="--chip-c:#0ea5e9">
+                    <div class="project-chip-icon">🏠</div>
+                    <div>
+                        <div class="project-chip-name">Casas</div>
+                        <div class="project-chip-count">6 proyectos</div>
+                    </div>
+                </div>
+                <div class="project-chip" style="--chip-c:#10b981">
+                    <div class="project-chip-icon">🌿</div>
+                    <div>
+                        <div class="project-chip-name">Lotes</div>
+                        <div class="project-chip-count">9 proyectos</div>
+                    </div>
+                </div>
+                <div class="project-chip" style="--chip-c:#f97316">
+                    <div class="project-chip-icon">🏢</div>
+                    <div>
+                        <div class="project-chip-name">Edificios</div>
+                        <div class="project-chip-count">2 proyectos</div>
+                    </div>
+                </div>
+                <div class="project-chip" style="--chip-c:#f59e0b">
+                    <div class="project-chip-icon">⚙️</div>
+                    <div>
+                        <div class="project-chip-name">Maquinaria</div>
+                        <div class="project-chip-count">0 proyectos</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
