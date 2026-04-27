@@ -489,7 +489,7 @@
                 <a href="#proyectos" class="btn-secondary">Ver proyectos</a>
             </div>
             <div class="slider-stats">
-                <div><div class="stat-num">22</div><div class="stat-label">Proyectos activos</div></div>
+                <div><div class="stat-num">17</div><div class="stat-label">Proyectos activos</div></div>
                 <div><div class="stat-num">2</div><div class="stat-label">Empresas</div></div>
                 <div><div class="stat-num">91%</div><div class="stat-label">Avance promedio</div></div>
             </div>
@@ -509,22 +509,22 @@
         <div class="cat-card active" data-cat="todos" style="--cat-c:#0f172a" onclick="selectCategory(this, 'todos')">
             <div class="cat-icon">🗂️</div>
             <div class="cat-name">Todos</div>
-            <div class="cat-count">22 proyectos</div>
+            <div class="cat-count">17 proyectos</div>
         </div>
         <div class="cat-card" data-cat="casas" style="--cat-c:#0ea5e9" onclick="selectCategory(this, 'casas')">
             <div class="cat-icon">🏠</div>
             <div class="cat-name">Casas</div>
-            <div class="cat-count">8 proyectos</div>
+            <div class="cat-count">6 proyectos</div>
         </div>
         <div class="cat-card" data-cat="lotes" style="--cat-c:#10b981" onclick="selectCategory(this, 'lotes')">
             <div class="cat-icon">🌿</div>
             <div class="cat-name">Lotes</div>
-            <div class="cat-count">13 proyectos</div>
+            <div class="cat-count">9 proyectos</div>
         </div>
         <div class="cat-card" data-cat="edificios" style="--cat-c:#f97316" onclick="selectCategory(this, 'edificios')">
             <div class="cat-icon">🏢</div>
             <div class="cat-name">Edificios</div>
-            <div class="cat-count">1 proyecto</div>
+            <div class="cat-count">2 proyectos</div>
         </div>
         <div class="cat-card" data-cat="maquinaria" style="--cat-c:#f59e0b" onclick="selectCategory(this, 'maquinaria')">
             <div class="cat-icon">⚙️</div>
@@ -572,34 +572,48 @@
     // ── DATA ─────────────────────────────────────────────────────────────────
     const PROJECTS = [
         // CASAS
-        { id:'providencia',        cat:'casas',    name:'Providencia',             icon:'🏠', bg:'#dbeafe', loc:'Guatemala, GT',  price:'Q 1,250,000', hab:'3', banos:'2', m2:'145', lat:14.6400, lng:-90.5100 },
-        { id:'armonia',            cat:'casas',    name:'Armonía',                 icon:'🏡', bg:'#dcfce7', loc:'Guatemala, GT',  price:'Q 980,000',   hab:'3', banos:'2', m2:'130', lat:14.6200, lng:-90.5300 },
-        { id:'condadosantaelena',  cat:'casas',    name:'Condado Santa Elena',     icon:'🏘️', bg:'#fef3c7', loc:'Santa Elena, PT', price:'Q 750,000',  hab:'2', banos:'2', m2:'110', lat:16.9200, lng:-89.8900 },
-        { id:'reservadelbosque',   cat:'casas',    name:'Reserva del Bosque',      icon:'🌲', bg:'#d1fae5', loc:'Villa Nueva, GT', price:'Q 1,100,000', hab:'4', banos:'3', m2:'180', lat:14.5800, lng:-90.6200 },
         { id:'bosquesdejalapa',    cat:'casas',    name:'Bosques de Jalapa',       icon:'🏠', bg:'#ede9fe', loc:'Jalapa, JA',     price:'Q 680,000',   hab:'3', banos:'2', m2:'120', lat:14.6340, lng:-89.9880 },
-        { id:'serenidad',          cat:'casas',    name:'La Serenidad / Querencia',icon:'🌄', bg:'#fee2e2', loc:'Guatemala, GT',  price:'Q 1,450,000', hab:'4', banos:'3', m2:'200', lat:14.6100, lng:-90.5800 },
         { id:'bosquesdepinula',    cat:'casas',    name:'Bosques de Pinula',       icon:'🌳', bg:'#ecfdf5', loc:'San José Pinula', price:'Q 890,000',  hab:'3', banos:'2', m2:'135', lat:14.5600, lng:-90.4700 },
         { id:'bosquessantaelena',  cat:'casas',    name:'Bosques de Santa Elena',  icon:'🏡', bg:'#f0fdf4', loc:'Santa Elena, PT', price:'Q 720,000',  hab:'3', banos:'2', m2:'125', lat:14.6500, lng:-90.5200 },
+        { id:'condadosantaelena',  cat:'casas',    name:'Condado Santa Elena',     icon:'🏘️', bg:'#fef3c7', loc:'Santa Elena, PT', price:'Q 750,000',  hab:'2', banos:'2', m2:'110', lat:16.9200, lng:-89.8900 },
+        { id:'haciendalaquerencia',cat:'casas',    name:'Hacienda La Querencia',   icon:'🏡', bg:'#fee2e2', loc:'Guatemala, GT',  price:'Q 1,450,000', hab:'4', banos:'3', m2:'200', lat:14.6100, lng:-90.5800 },
+        { id:'reservadelbosque',   cat:'casas',    name:'Reserva del Bosque',      icon:'🌲', bg:'#d1fae5', loc:'Villa Nueva, GT', price:'Q 1,100,000', hab:'4', banos:'3', m2:'180', lat:14.5800, lng:-90.6200 },
         // LOTES
-        { id:'condadolaceiba',     cat:'lotes',    name:'Condado La Ceiba',        icon:'🌿', bg:'#ecfdf5', loc:'Guatemala, GT',  price:'Q 320,000',   hab:'—', banos:'—', m2:'300', lat:14.6800, lng:-90.4800 },
-        { id:'haciendajumay',      cat:'lotes',    name:'Hacienda Jumay',          icon:'🌾', bg:'#fef9c3', loc:'Jalapa, JA',     price:'Q 280,000',   hab:'—', banos:'—', m2:'450', lat:14.6340, lng:-89.9780 },
-        { id:'condadojutiapa',     cat:'lotes',    name:'Condado Jutiapa',         icon:'🌿', bg:'#d1fae5', loc:'Jutiapa, JU',   price:'Q 240,000',   hab:'—', banos:'—', m2:'380', lat:14.2900, lng:-89.9000 },
-        { id:'condadozacapa',      cat:'lotes',    name:'Condado Zacapa (Oasis)',  icon:'☀️', bg:'#fef3c7', loc:'Zacapa, ZA',    price:'Q 260,000',   hab:'—', banos:'—', m2:'420', lat:14.9700, lng:-89.5300 },
-        { id:'haciendosol',        cat:'lotes',    name:'Hacienda Sol',            icon:'🌻', bg:'#fffbeb', loc:'Guatemala, GT',  price:'Q 310,000',   hab:'—', banos:'—', m2:'360', lat:14.7000, lng:-90.4500 },
         { id:'clubcampestrejumay', cat:'lotes',    name:'Club Campestre Jumay',    icon:'⛳', bg:'#ecfdf5', loc:'Jalapa, JA',    price:'Q 350,000',   hab:'—', banos:'—', m2:'500', lat:14.6200, lng:-89.9700 },
         { id:'clubbosque',         cat:'lotes',    name:'Club del Bosque',         icon:'🌲', bg:'#d1fae5', loc:'Villa Nueva, GT', price:'Q 290,000',  hab:'—', banos:'—', m2:'400', lat:14.5900, lng:-90.6000 },
-        { id:'haciendastlucia',    cat:'lotes',    name:'Hacienda Santa Lucía',    icon:'🌄', bg:'#fce7f3', loc:'Escuintla, ES',  price:'Q 275,000',   hab:'—', banos:'—', m2:'480', lat:14.3500, lng:-90.6600 },
-        { id:'celajetecpan',       cat:'lotes',    name:'Celajes de Tecpán',       icon:'🏔️', bg:'#e0e7ff', loc:'Tecpán, CM',    price:'Q 230,000',   hab:'—', banos:'—', m2:'350', lat:14.7700, lng:-91.0000 },
-        { id:'arbolerasantaelena', cat:'lotes',    name:'Arbolera de Santa Elena', icon:'🌳', bg:'#ecfdf5', loc:'Santa Elena, PT', price:'Q 210,000',  hab:'—', banos:'—', m2:'320', lat:16.9200, lng:-89.8700 },
-        { id:'haciendacafetal',    cat:'lotes',    name:'Hacienda El Cafetal',     icon:'☕', bg:'#fef3c7', loc:'Amatitlán, GT',  price:'Q 295,000',   hab:'—', banos:'—', m2:'440', lat:14.4500, lng:-90.7500 },
-        { id:'progresojutiapa',    cat:'lotes',    name:'Club Progreso Jutiapa',   icon:'🏡', bg:'#f0fdf4', loc:'Jutiapa, JU',   price:'Q 220,000',   hab:'—', banos:'—', m2:'390', lat:14.2800, lng:-89.9100 },
-        { id:'canadasjalapa',      cat:'lotes',    name:'Cañadas de Jalapa',       icon:'🏞️', bg:'#e0f2fe', loc:'Jalapa, JA',    price:'Q 245,000',   hab:'—', banos:'—', m2:'410', lat:14.6200, lng:-89.9600 },
+        { id:'celajesdetecpan',    cat:'lotes',    name:'Celajes de Tecpan',       icon:'🏔️', bg:'#e0e7ff', loc:'Tecpan, CM',    price:'Q 230,000',   hab:'—', banos:'—', m2:'350', lat:14.7700, lng:-91.0000 },
+        { id:'condadolaceiba',     cat:'lotes',    name:'Condado La Ceiba',        icon:'🌿', bg:'#ecfdf5', loc:'Guatemala, GT',  price:'Q 320,000',   hab:'—', banos:'—', m2:'300', lat:14.6800, lng:-90.4800 },
+        { id:'condadojutiapa',     cat:'lotes',    name:'Condado Jutiapa',         icon:'🌿', bg:'#d1fae5', loc:'Jutiapa, JU',   price:'Q 240,000',   hab:'—', banos:'—', m2:'380', lat:14.2900, lng:-89.9000 },
+        { id:'condadozacapa',      cat:'lotes',    name:'Condado Zacapa',          icon:'☀️', bg:'#fef3c7', loc:'Zacapa, ZA',    price:'Q 260,000',   hab:'—', banos:'—', m2:'420', lat:14.9700, lng:-89.5300 },
+        { id:'haciendajumay',      cat:'lotes',    name:'Hacienda Jumay',          icon:'🌾', bg:'#fef9c3', loc:'Jalapa, JA',     price:'Q 280,000',   hab:'—', banos:'—', m2:'450', lat:14.6340, lng:-89.9780 },
+        { id:'haciendasantalucia', cat:'lotes',    name:'Hacienda Santa Lucia',    icon:'🌄', bg:'#fce7f3', loc:'Escuintla, ES',  price:'Q 275,000',   hab:'—', banos:'—', m2:'480', lat:14.3500, lng:-90.6600 },
+        { id:'haciendasol',        cat:'lotes',    name:'Hacienda Sol',            icon:'🌻', bg:'#fffbeb', loc:'Guatemala, GT',  price:'Q 310,000',   hab:'—', banos:'—', m2:'360', lat:14.7000, lng:-90.4500 },
         // EDIFICIOS
-        { id:'salucentrozacapa',   cat:'edificios',name:'Salucentro Zacapa',       icon:'🏥', bg:'#ede9fe', loc:'Zacapa, ZA',    price:'Q 8,500,000', hab:'—', banos:'—', m2:'2500', lat:14.9750, lng:-89.5350 },
+        { id:'armonia',            cat:'edificios',name:'Armonia',                 icon:'🏢', bg:'#dcfce7', loc:'Guatemala, GT',  price:'Q 980,000',   hab:'—', banos:'—', m2:'130', lat:14.6200, lng:-90.5300 },
+        { id:'providencia',        cat:'edificios',name:'Providencia',             icon:'🏢', bg:'#dbeafe', loc:'Guatemala, GT',  price:'Q 1,250,000', hab:'—', banos:'—', m2:'145', lat:14.6400, lng:-90.5100 },
     ];
 
     const CAT_LABELS = { todos:'Todos los proyectos', casas:'Casas', lotes:'Lotes', edificios:'Edificios', maquinaria:'Maquinaria' };
     const CAT_ICONS  = { todos:'🗂️', casas:'🏠', lotes:'🌿', edificios:'🏢', maquinaria:'⚙️' };
+
+    function sortByName(projects) {
+        return projects.slice().sort((a, b) => a.name.localeCompare(b.name, 'es', { sensitivity: 'base' }));
+    }
+
+    function formatProjectCount(count) {
+        return `${count} ${count === 1 ? 'proyecto' : 'proyectos'}`;
+    }
+
+    function updateCategoryCounts() {
+        Object.keys(CAT_LABELS).forEach(cat => {
+            const count = cat === 'todos' ? PROJECTS.length : PROJECTS.filter(p => p.cat === cat).length;
+            const countEl = document.querySelector(`.cat-card[data-cat="${cat}"] .cat-count`);
+            if (countEl) countEl.textContent = formatProjectCount(count);
+        });
+
+        const heroCount = document.querySelector('.slider-stats .stat-num');
+        if (heroCount) heroCount.textContent = PROJECTS.length;
+    }
 
     // ── MAPA ─────────────────────────────────────────────────────────────────
     const map = L.map('map', { zoomControl: true, scrollWheelZoom: true })
@@ -647,7 +661,7 @@
     // ── TARJETAS ─────────────────────────────────────────────────────────────
     function renderCards(cat) {
         const grid = document.getElementById('propsGrid');
-        const filtered = cat === 'todos' ? PROJECTS : PROJECTS.filter(p => p.cat === cat);
+        const filtered = sortByName(cat === 'todos' ? PROJECTS : PROJECTS.filter(p => p.cat === cat));
 
         grid.innerHTML = '';
 
@@ -720,6 +734,7 @@
     }
 
     // ── INIT ──────────────────────────────────────────────────────────────────
+    updateCategoryCounts();
     renderCards('todos');
 
     // ── HERO SLIDER ──────────────────────────────────────────────────────────
