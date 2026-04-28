@@ -53,42 +53,44 @@ Deno.serve(async (req) => {
       .eq('project_key', project_key)
       .single()
 
+    let systemPrompt: string
+
     if (error || !data?.payload) {
-      return new Response(
-        JSON.stringify({ reply: 'No encontré datos para este proyecto. Por favor sincroniza primero desde Power BI.' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
-    }
+      systemPrompt = `Eres un asistente financiero del sistema Costos & Presupuestos para el proyecto "${project_key === 'hlq' ? 'Hacienda La Querencia' : project_key}".
+Aún no tienes datos sincronizados desde Power BI para este proyecto.
+Responde siempre en español, de forma clara y profesional.
+Puedes responder preguntas generales sobre lo que puedes hacer, explicar cómo funciona el sistema, o indicar qué tipo de datos podrás consultar una vez que se sincronicen desde Power BI (presupuesto, ejecutado, comprometido, disponible, desglose por área, etapa y segmento).
+Si te preguntan datos específicos del proyecto, explica amablemente que los datos aún no han sido sincronizados y que deben correr el script de sincronización de Power BI.`
+    } else {
+      const datasets = data.payload?.datasets || {}
+      const totales: Record<string, number> = datasets.totales?.[0] || {}
+      const porArea: Record<string, number>[] = datasets.porArea || []
+      const porEtapa: Record<string, number>[] = datasets.porEtapa || []
+      const porSegmento: Record<string, number>[] = datasets.porSegmento || []
+      const projectName: string = data.project_name
+      const mesA: string = data.mes_a
 
-    const datasets = data.payload?.datasets || {}
-    const totales: Record<string, number> = datasets.totales?.[0] || {}
-    const porArea: Record<string, number>[] = datasets.porArea || []
-    const porEtapa: Record<string, number>[] = datasets.porEtapa || []
-    const porSegmento: Record<string, number>[] = datasets.porSegmento || []
-    const projectName: string = data.project_name
-    const mesA: string = data.mes_a
+      const fmt = (n: number | null | undefined) =>
+        n != null ? `Q ${(n / 1_000_000).toFixed(2)}M` : 'N/D'
+      const fmtPct = (n: number | null | undefined) =>
+        n != null ? `${(n * 100).toFixed(1)}%` : 'N/D'
 
-    const fmt = (n: number | null | undefined) =>
-      n != null ? `Q ${(n / 1_000_000).toFixed(2)}M` : 'N/D'
-    const fmtPct = (n: number | null | undefined) =>
-      n != null ? `${(n * 100).toFixed(1)}%` : 'N/D'
-
-    const areaLines = porArea.map(r =>
-      `  ${r['Rubros[Area]'] ?? 'Área'}: Ejecutado ${fmt(r.EjecutadoErequester)}, Asignado ${fmt(r.AsignadoErequester)}, Disponible ${fmt(r.DisponibleErequester)}`
-    ).join('\n') || '  No disponible'
-
-    const etapaLines = [...porEtapa]
-      .sort((a, b) => (b.AsignadoErequester ?? 0) - (a.AsignadoErequester ?? 0))
-      .slice(0, 10)
-      .map(r =>
-        `  ${r['Rubros[Etapa]'] ?? 'Etapa'}: Presupuesto ${fmt(r.PresupuestoErequester)}, Ejecutado ${fmt(r.EjecutadoErequester)}, Asignado ${fmt(r.AsignadoErequester)}`
+      const areaLines = porArea.map(r =>
+        `  ${r['Rubros[Area]'] ?? 'Área'}: Ejecutado ${fmt(r.EjecutadoErequester)}, Asignado ${fmt(r.AsignadoErequester)}, Disponible ${fmt(r.DisponibleErequester)}`
       ).join('\n') || '  No disponible'
 
-    const segmentoLines = porSegmento.map(r =>
-      `  ${r['Rubros[Segmento]'] ?? 'Segmento'}: Presupuesto ${fmt(r.PresupuestoErequester)}, Ejecutado ${fmt(r.EjecutadoErequester)}`
-    ).join('\n') || '  No disponible'
+      const etapaLines = [...porEtapa]
+        .sort((a, b) => (b.AsignadoErequester ?? 0) - (a.AsignadoErequester ?? 0))
+        .slice(0, 10)
+        .map(r =>
+          `  ${r['Rubros[Etapa]'] ?? 'Etapa'}: Presupuesto ${fmt(r.PresupuestoErequester)}, Ejecutado ${fmt(r.EjecutadoErequester)}, Asignado ${fmt(r.AsignadoErequester)}`
+        ).join('\n') || '  No disponible'
 
-    const systemPrompt = `Eres un asistente financiero para el proyecto "${projectName}".
+      const segmentoLines = porSegmento.map(r =>
+        `  ${r['Rubros[Segmento]'] ?? 'Segmento'}: Presupuesto ${fmt(r.PresupuestoErequester)}, Ejecutado ${fmt(r.EjecutadoErequester)}`
+      ).join('\n') || '  No disponible'
+
+      systemPrompt = `Eres un asistente financiero para el proyecto "${projectName}".
 Tienes acceso a datos actualizados desde Power BI correspondientes al mes ${mesA}.
 Responde siempre en español, de forma clara, concisa y profesional.
 Cuando menciones montos usa el formato Q X.XXM (millones de Quetzales).
@@ -112,6 +114,7 @@ ${etapaLines}
 
 DESGLOSE POR SEGMENTO:
 ${segmentoLines}`
+    }
 
     const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
