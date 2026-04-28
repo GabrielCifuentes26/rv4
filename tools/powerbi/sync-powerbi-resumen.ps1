@@ -252,7 +252,7 @@ if ($ModelProfile -eq "hlq") {
     $pctDisponibleMeasureDax = ConvertTo-DaxIdentifier -TableName "Medidas" -ObjectName "% Disponible"
 
     if ($AreaFilterValues.Count -eq 0) {
-        $AreaFilterValues = @(("CONSTRUCCI" + $accentUpperO + "N"), ("URBANIZACI" + $accentUpperO + "N"))
+        $AreaFilterValues = @(("CONSTRUCCI" + $accentUpperO + "N"), "FUERA DE PROYECTO", ("URBANIZACI" + $accentUpperO + "N"))
     }
 } else {
     $areaColumnDax = ConvertTo-DaxIdentifier -TableName "Rubros" -ObjectName "Area"
@@ -279,6 +279,7 @@ if ($ModelProfile -eq "hlq") {
 $areaFilterListDax = ($AreaFilterValues | ForEach-Object { ConvertTo-DaxStringLiteral $_ }) -join ", "
 $areaFilterDax = "TREATAS({$areaFilterListDax}, $areaColumnDax)"
 $monthFilterDax = "TREATAS({$(ConvertTo-DaxStringLiteral $MesA)}, $monthColumnDax)"
+$mainFilterDax = if ($ModelProfile -eq "hlq") { "" } else { "$monthFilterDax," }
 $metadata.filters.areas = @($AreaFilterValues)
 
 $queries = [ordered]@{
@@ -286,7 +287,7 @@ $queries = [ordered]@{
 EVALUATE
 SUMMARIZECOLUMNS(
     $areaFilterDax,
-    $monthFilterDax,
+    $mainFilterDax
     "RdiTotal", $rdiMeasureDax,
     "PresupuestoErequester", $pptoErMeasureDax,
     "EjecutadoErequester", $ejecutadoMeasureDax,
@@ -302,7 +303,7 @@ EVALUATE
 SUMMARIZECOLUMNS(
     $areaColumnDax,
     $areaFilterDax,
-    $monthFilterDax,
+    $mainFilterDax
     "RdiTotal", $rdiMeasureDax,
     "PresupuestoErequester", $pptoErMeasureDax,
     "EjecutadoErequester", $ejecutadoMeasureDax,
@@ -319,7 +320,7 @@ EVALUATE
 SUMMARIZECOLUMNS(
     $etapaColumnDax,
     $areaFilterDax,
-    $monthFilterDax,
+    $mainFilterDax
     "RdiTotal", $rdiMeasureDax,
     "PresupuestoErequester", $pptoErMeasureDax,
     "EjecutadoErequester", $ejecutadoMeasureDax,
@@ -336,7 +337,7 @@ EVALUATE
 SUMMARIZECOLUMNS(
     $segmentoColumnDax,
     $areaFilterDax,
-    $monthFilterDax,
+    $mainFilterDax
     "RdiTotal", $rdiMeasureDax,
     "PresupuestoErequester", $pptoErMeasureDax,
     "EjecutadoErequester", $ejecutadoMeasureDax,
@@ -381,7 +382,7 @@ EVALUATE
 SUMMARIZECOLUMNS(
     $faseColumnDax,
     $areaFilterDax,
-    $monthFilterDax,
+    $mainFilterDax
     "RdiTotal", $rdiMeasureDax,
     "PresupuestoErequester", $pptoErMeasureDax,
     "EjecutadoErequester", $ejecutadoMeasureDax,

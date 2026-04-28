@@ -242,7 +242,7 @@
         }
         .filters-grid {
             display: grid;
-            grid-template-columns: repeat(5, minmax(150px, 1fr));
+            grid-template-columns: repeat(4, minmax(150px, 1fr));
             gap: 14px;
             align-items: end;
         }
@@ -505,18 +505,13 @@
                 <button class="filter-trigger" type="button" id="filter-segmento-button"><span id="filter-segmento-label">Seleccion multiple</span></button>
                 <div class="filter-menu" id="filter-segmento-menu"></div>
             </div>
-            <div class="filter-card" id="etapa-filter-card">
-                <label class="filter-label">Etapa</label>
-                <button class="filter-trigger" type="button" id="filter-etapa-button"><span id="filter-etapa-label">Seleccion multiple</span></button>
-                <div class="filter-menu" id="filter-etapa-menu"></div>
-            </div>
             <div class="filter-card" id="fase-filter-card">
                 <label class="filter-label">Fase</label>
                 <button class="filter-trigger" type="button" id="filter-fase-button"><span id="filter-fase-label">Seleccion multiple</span></button>
                 <div class="filter-menu" id="filter-fase-menu"></div>
             </div>
             <div class="filter-card" id="mes-filter-card">
-                <label class="filter-label">Mes</label>
+                <label class="filter-label">Todos los meses</label>
                 <button class="filter-trigger" type="button" id="filter-mes-button"><span id="filter-mes-label">Seleccion multiple</span></button>
                 <div class="filter-menu" id="filter-mes-menu"></div>
             </div>
@@ -696,17 +691,19 @@
         'AsignadoErequester',
         'DisponibleErequester'
     ];
+    const BUDGET_METRIC_NAMES = ['RdiTotal', 'PresupuestoErequester'];
+    const FLOW_METRIC_NAMES = ['EjecutadoErequester', 'ComprometidoErequester', 'AsignadoErequester'];
+    const BUDGET_KEY_DIMENSIONS = ['Rubros[Area]', 'Rubros[Segmento]', 'Rubros[Etapa]'];
     const MONTH_ORDER = { ene: 0, feb: 1, mar: 2, abr: 3, may: 4, jun: 5, jul: 6, ago: 7, sep: 8, oct: 9, nov: 10, dic: 11 };
     const powerBIState = {
         data: null,
-        filters: { areas: [], segmentos: [], etapas: [], fases: [], meses: [] },
-        options: { areas: [], segmentos: [], etapas: [], fases: [], meses: [] },
+        filters: { areas: [], segmentos: [], fases: [], meses: [] },
+        options: { areas: [], segmentos: [], fases: [], meses: [] },
         bound: false
     };
     const FILTER_CONFIG = [
         { key: 'areas', optionKey: 'areas', cardId: 'area-filter-card', buttonId: 'filter-area-button', menuId: 'filter-area-menu', labelId: 'filter-area-label' },
         { key: 'segmentos', optionKey: 'segmentos', cardId: 'segmento-filter-card', buttonId: 'filter-segmento-button', menuId: 'filter-segmento-menu', labelId: 'filter-segmento-label' },
-        { key: 'etapas', optionKey: 'etapas', cardId: 'etapa-filter-card', buttonId: 'filter-etapa-button', menuId: 'filter-etapa-menu', labelId: 'filter-etapa-label' },
         { key: 'fases', optionKey: 'fases', cardId: 'fase-filter-card', buttonId: 'filter-fase-button', menuId: 'filter-fase-menu', labelId: 'filter-fase-label' },
         { key: 'meses', optionKey: 'meses', cardId: 'mes-filter-card', buttonId: 'filter-mes-button', menuId: 'filter-mes-menu', labelId: 'filter-mes-label' }
     ];
@@ -750,16 +747,35 @@
         METRIC_NAMES.forEach(name => { acc[name] += field(row, name); });
         return acc;
     }, makeEmptyMetrics()));
+    const budgetKey = row => BUDGET_KEY_DIMENSIONS.map(name => cleanDimension(dimension(row, name))).join('|');
+    const finalizeDetailMetrics = metrics => {
+        metrics.DisponibleErequester = asNumber(metrics.PresupuestoErequester) - asNumber(metrics.AsignadoErequester);
+        return finalizeMetrics(metrics);
+    };
+    const addDetailMetrics = (metrics, row, seenBudgetKeys) => {
+        const key = budgetKey(row);
+        if (!seenBudgetKeys.has(key)) {
+            BUDGET_METRIC_NAMES.forEach(name => { metrics[name] += field(row, name); });
+            seenBudgetKeys.add(key);
+        }
+        FLOW_METRIC_NAMES.forEach(name => { metrics[name] += field(row, name); });
+    };
+    const aggregateDetailRows = rows => {
+        const metrics = makeEmptyMetrics();
+        const seenBudgetKeys = new Set();
+        rows.forEach(row => addDetailMetrics(metrics, row, seenBudgetKeys));
+        return finalizeDetailMetrics(metrics);
+    };
     const groupRowsBy = (rows, dimensionName) => {
         const groups = new Map();
         rows.forEach(row => {
             const key = cleanDimension(dimension(row, dimensionName));
-            if (!groups.has(key)) groups.set(key, { label: key, metrics: makeEmptyMetrics() });
-            const current = groups.get(key).metrics;
-            METRIC_NAMES.forEach(name => { current[name] += field(row, name); });
+            if (!groups.has(key)) groups.set(key, { label: key, metrics: makeEmptyMetrics(), seenBudgetKeys: new Set() });
+            const current = groups.get(key);
+            addDetailMetrics(current.metrics, row, current.seenBudgetKeys);
         });
         return [...groups.values()]
-            .map(item => ({ label: item.label, ...finalizeMetrics(item.metrics) }))
+            .map(item => ({ label: item.label, ...finalizeDetailMetrics(item.metrics) }))
             .sort((a, b) => a.label.localeCompare(b.label, 'es', { sensitivity: 'base', numeric: true }));
     };
     const hasValue = row => METRIC_NAMES.some(name => Math.abs(field(row, name)) > 0);
@@ -770,18 +786,8 @@
         if (detailRows.length) return uniqueSorted(detailRows.map(row => dimension(row, detailName)));
         return uniqueSorted((data?.datasets?.[fallbackDataset] || []).map(row => dimension(row, fallbackDimension || detailName)));
     };
-    const defaultMonth = data => {
-        const metadataMonth = data?.metadata?.filters?.mesA;
-        if (metadataMonth) return metadataMonth;
-        const activeMonths = getMonthRows(data)
-            .filter(hasValue)
-            .map(row => dimension(row, 'Calendario[MesA]'));
-        return sortMonths(activeMonths).pop() || powerBIState.options.meses[0] || '';
-    };
-
-    function defaultMonthSelection(data) {
-        const month = defaultMonth(data);
-        return month ? [month] : [];
+    function defaultMonthSelection() {
+        return [...powerBIState.options.meses];
     }
 
     function closeFilterMenus() {
@@ -794,7 +800,7 @@
         const selected = powerBIState.filters[config.key] || [];
         const options = powerBIState.options[config.optionKey] || [];
         if (!selected.length) label.textContent = 'Ninguna';
-        else if (selected.length === options.length) label.textContent = 'Todas';
+        else if (selected.length === options.length) label.textContent = config.key === 'meses' ? 'Todos' : 'Todas';
         else if (selected.length <= 2) label.textContent = selected.join(', ');
         else label.textContent = `${selected.length} seleccionadas`;
     }
@@ -841,9 +847,8 @@
         document.getElementById('filter-clear')?.addEventListener('click', () => {
             powerBIState.filters.areas = [...powerBIState.options.areas];
             powerBIState.filters.segmentos = [...powerBIState.options.segmentos];
-            powerBIState.filters.etapas = [...powerBIState.options.etapas];
             powerBIState.filters.fases = [...powerBIState.options.fases];
-            powerBIState.filters.meses = defaultMonthSelection(powerBIState.data);
+            powerBIState.filters.meses = defaultMonthSelection();
             populateFilterControls();
             renderPowerBIView();
         });
@@ -853,13 +858,14 @@
         const data = powerBIState.data;
         powerBIState.options.areas = optionValues(data, 'Rubros[Area]', 'porArea');
         powerBIState.options.segmentos = optionValues(data, 'Rubros[Segmento]', 'porSegmento');
-        powerBIState.options.etapas = optionValues(data, 'Rubros[Etapa]', 'porEtapa');
         powerBIState.options.fases = optionValues(data, 'Rubros[Fase]', 'porFase');
-        powerBIState.options.meses = sortMonths(getMonthRows(data).map(row => dimension(row, 'Calendario[MesA]')));
+        powerBIState.options.meses = sortMonths(getMonthRows(data)
+            .map(row => dimension(row, 'Calendario[MesA]'))
+            .filter(value => String(value || '').trim()));
 
         FILTER_CONFIG.forEach(config => {
             const options = powerBIState.options[config.optionKey] || [];
-            const defaults = config.key === 'meses' ? defaultMonthSelection(data) : options;
+            const defaults = options;
             const current = powerBIState.filters[config.key] || [];
             const selected = current.filter(value => options.includes(value));
             powerBIState.filters[config.key] = selected.length ? selected : defaults.filter(value => options.includes(value));
@@ -869,18 +875,22 @@
 
     function filteredDetailRows() {
         const filters = powerBIState.filters;
+        const hasNoSelection = (key, value) => {
+            const options = powerBIState.options[key] || [];
+            const selected = filters[key] || [];
+            return options.length && (!selected.length || !selected.includes(value));
+        };
         return getDetailRows(powerBIState.data).filter(row => {
             const area = cleanDimension(dimension(row, 'Rubros[Area]'));
             const segmento = cleanDimension(dimension(row, 'Rubros[Segmento]'));
-            const etapa = cleanDimension(dimension(row, 'Rubros[Etapa]'));
             const fase = cleanDimension(dimension(row, 'Rubros[Fase]'));
-            const mes = cleanDimension(dimension(row, 'Calendario[MesA]'));
+            const mesRaw = String(dimension(row, 'Calendario[MesA]') || '').trim();
+            const mes = cleanDimension(mesRaw);
 
-            if (filters.areas.length && !filters.areas.includes(area)) return false;
-            if (filters.segmentos.length && !filters.segmentos.includes(segmento)) return false;
-            if (filters.etapas.length && !filters.etapas.includes(etapa)) return false;
-            if (filters.fases.length && !filters.fases.includes(fase)) return false;
-            if (filters.meses.length && !filters.meses.includes(mes)) return false;
+            if (hasNoSelection('areas', area)) return false;
+            if (hasNoSelection('segmentos', segmento)) return false;
+            if (hasNoSelection('fases', fase)) return false;
+            if ((powerBIState.options.meses || []).length && (!mesRaw || hasNoSelection('meses', mes))) return false;
             return true;
         });
     }
@@ -982,7 +992,7 @@
 
         if (detailRows.length) {
             const rows = filteredDetailRows();
-            totals = sumRows(rows);
+            totals = aggregateDetailRows(rows);
             areaRows = groupRowsBy(rows, 'Rubros[Area]');
             etapaRows = groupRowsBy(rows, 'Rubros[Etapa]');
         } else if (powerBIState.filters.meses.length) {
@@ -997,9 +1007,11 @@
 
         if (data?.metadata?.generatedAt) {
             const updated = new Date(data.metadata.generatedAt);
-            const month = powerBIState.filters.meses.length
-                ? powerBIState.filters.meses.join(', ')
-                : data.metadata.filters?.mesA || '';
+            const allMonthsSelected = powerBIState.options.meses.length
+                && powerBIState.filters.meses.length === powerBIState.options.meses.length;
+            const month = allMonthsSelected
+                ? 'Todos los meses'
+                : (powerBIState.filters.meses.length ? powerBIState.filters.meses.join(', ') : '');
             setText('powerbi-updated', `Power BI Service: ${month} - ${updated.toLocaleString('es-GT')}`);
         }
     }
