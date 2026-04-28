@@ -131,6 +131,15 @@
         .add-inline { background:none; border:none; font-size:0.8rem; font-weight:700; color:#8a9ab5; cursor:pointer; font-family:inherit; padding:0; transition:color .15s; }
         .add-inline:hover { color:var(--ng2); }
 
+        /* DRAG & DROP */
+        .task-row[draggable] { cursor: grab; user-select: none; }
+        .task-row[draggable]:active { cursor: grabbing; }
+        .task-row.dragging { opacity: .35; }
+        .task-row.drag-over-top,
+        .phase-row.drag-over-top { box-shadow: inset 0 3px 0 var(--ng); }
+        .task-row.drag-over-bottom,
+        .phase-row.drag-over-bottom { box-shadow: inset 0 -3px 0 var(--ng); }
+
         /* LEGEND */
         .ct-legend { display:flex; align-items:center; justify-content:flex-end; gap:20px; background:#fff; border:1px solid var(--nbd); border-radius:8px; padding:9px 18px; margin-bottom:10px; box-shadow:0 1px 4px rgba(21,37,64,0.04); flex-wrap:wrap; }
         .legend-sep { width:1px; height:16px; background:var(--nbd); }
@@ -378,6 +387,7 @@ const sb = createClient(
 let isAdmin = false, currentProject = null, activeView = 'tabla';
 let projects = [], phases = [], tasks = [];
 let editProyecto = null, editFase = null, editTarea = null;
+let dragState = null;
 const DPX = 38;
 
 // ── INIT ──
@@ -544,7 +554,7 @@ function renderTable(list) {
 
     phs.forEach(ph => {
         const ptasks = list.filter(t => t.fase_id === ph.id);
-        html += `<tr class="phase-row"><td colspan="${cols}">FASE: ${cleanFaseName(ph.nombre)}
+        html += `<tr class="phase-row" data-fase-id="${ph.id}"><td colspan="${cols}">FASE: ${cleanFaseName(ph.nombre)}
             ${isAdmin ? `&nbsp;<button onclick="openModalFase('${ph.id}')" style="font-size:.7rem;color:#8a9ab5;background:none;border:none;cursor:pointer">✏️</button>
             <button onclick="deleteFase('${ph.id}')" style="font-size:.7rem;color:#c0392b;background:none;border:none;cursor:pointer">🗑</button>` : ''}
         </td></tr>`;
@@ -560,7 +570,7 @@ function renderTable(list) {
             const dep = tasks.find(x => x.id === t.dependencia_id);
             const tipo = getTipo(t.responsable);
             const hasD = !!t.dependencia_id;
-            html += `<tr class="task-row">
+            html += `<tr class="task-row"${isAdmin ? ` draggable="true" data-task-id="${t.id}" data-fase-id="${ph.id}"` : ''}>
                 <td><span class="task-num">${n}</span></td>
                 <td style="font-weight:600">${t.actividad}</td>
                 <td>${t.responsable}</td>
@@ -592,6 +602,119 @@ function renderTable(list) {
     html += '</tbody></table>';
     if (isAdmin && phs.length) html += `<button class="add-fase-bar" onclick="openModalFase()">＋ Agregar nueva fase</button>`;
     document.getElementById('tableContent').innerHTML = html;
+    if (isAdmin) setupDragDrop();
+}
+
+// ── DRAG & DROP ──
+function setupDragDrop() {
+    dragState = null;
+    const tbody = document.querySelector('.ct-table tbody');
+    if (!tbody) return;
+
+    tbody.addEventListener('dragstart', e => {
+        const row = e.target.closest('tr[data-task-id]');
+        if (!row) { e.preventDefault(); return; }
+        dragState = { taskId: row.dataset.taskId };
+        row.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', row.dataset.taskId);
+    });
+
+    tbody.addEventListener('dragend', () => {
+        tbody.querySelectorAll('.dragging,.drag-over-top,.drag-over-bottom')
+            .forEach(el => el.classList.remove('dragging','drag-over-top','drag-over-bottom'));
+        dragState = null;
+    });
+
+    tbody.addEventListener('dragover', e => {
+        e.preventDefault();
+        if (!dragState) return;
+        const row = e.target.closest('tr');
+        tbody.querySelectorAll('.drag-over-top,.drag-over-bottom')
+            .forEach(el => el.classList.remove('drag-over-top','drag-over-bottom'));
+        if (!row || row.dataset.taskId === dragState.taskId) return;
+        if (row.classList.contains('phase-row')) {
+            row.classList.add('drag-over-bottom');
+        } else if (row.classList.contains('task-row') && row.dataset.taskId) {
+            const rect = row.getBoundingClientRect();
+            row.classList.add(e.clientY < rect.top + rect.height / 2 ? 'drag-over-top' : 'drag-over-bottom');
+        }
+    });
+
+    tbody.addEventListener('dragleave', e => {
+        if (!tbody.contains(e.relatedTarget)) {
+            tbody.querySelectorAll('.drag-over-top,.drag-over-bottom')
+                .forEach(el => el.classList.remove('drag-over-top','drag-over-bottom'));
+        }
+    });
+
+    tbody.addEventListener('drop', e => {
+        e.preventDefault();
+        if (!dragState) return;
+        const row = e.target.closest('tr');
+        if (!row) return;
+        if (row.classList.contains('phase-row') && row.dataset.faseId) {
+            handleDrop(dragState.taskId, null, 'phase-top', row.dataset.faseId);
+        } else if (row.classList.contains('task-row') && row.dataset.taskId && row.dataset.taskId !== dragState.taskId) {
+            const rect = row.getBoundingClientRect();
+            const pos = e.clientY < rect.top + rect.height / 2 ? 'before' : 'after';
+            handleDrop(dragState.taskId, row.dataset.taskId, pos, row.dataset.faseId);
+        }
+    });
+}
+
+async function handleDrop(draggedId, targetTaskId, position, targetFaseId) {
+    // Build flat ordered list: phases by orden, tasks within each phase by orden
+    let ordered = [];
+    [...phases].sort((a, b) => a.orden - b.orden).forEach(ph => {
+        tasks.filter(t => t.fase_id === ph.id)
+            .sort((a, b) => a.orden - b.orden)
+            .forEach(t => ordered.push({ ...t }));
+    });
+
+    // Remove dragged task and reinsert at new position
+    const dragged = tasks.find(t => t.id === draggedId);
+    if (!dragged) return;
+    ordered = ordered.filter(t => t.id !== draggedId);
+    const movedTask = { ...dragged, fase_id: targetFaseId };
+
+    if (position === 'phase-top') {
+        const firstIdx = ordered.findIndex(t => t.fase_id === targetFaseId);
+        if (firstIdx === -1) ordered.push(movedTask);
+        else ordered.splice(firstIdx, 0, movedTask);
+    } else {
+        const targetIdx = ordered.findIndex(t => t.id === targetTaskId);
+        if (targetIdx === -1) return;
+        ordered.splice(position === 'before' ? targetIdx : targetIdx + 1, 0, movedTask);
+    }
+
+    // Revalidate dependencies: clear if dependency now comes after the task or doesn't exist
+    for (let i = 0; i < ordered.length; i++) {
+        const t = ordered[i];
+        if (t.dependencia_id) {
+            const depIdx = ordered.findIndex(x => x.id === t.dependencia_id);
+            if (depIdx === -1 || depIdx >= i) ordered[i] = { ...t, dependencia_id: null };
+        }
+    }
+
+    // Collect only changed tasks
+    const taskMap = {};
+    tasks.forEach(t => taskMap[t.id] = t);
+    const updates = ordered
+        .map((t, idx) => ({ t, idx }))
+        .filter(({ t, idx }) => {
+            const orig = taskMap[t.id];
+            return orig && (orig.orden !== idx || orig.fase_id !== t.fase_id || orig.dependencia_id !== t.dependencia_id);
+        })
+        .map(({ t, idx }) => ({ id: t.id, orden: idx, fase_id: t.fase_id, dependencia_id: t.dependencia_id }));
+
+    if (!updates.length) return;
+
+    await Promise.all(updates.map(u =>
+        sb.from('ct_tareas').update({ orden: u.orden, fase_id: u.fase_id, dependencia_id: u.dependencia_id }).eq('id', u.id)
+    ));
+
+    await loadProjectData();
 }
 
 // ── GANTT ──
