@@ -235,6 +235,115 @@
         .kpi-value span { font-size: 0.68rem; font-weight: 400; color: var(--gray2); }
 
         /* ── TABLE ── */
+        /* --- FILTERS --- */
+        .filters-section {
+            background: linear-gradient(135deg, #13233a 0%, #102039 100%);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            padding: 18px 22px;
+            flex-shrink: 0;
+        }
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(150px, 1fr));
+            gap: 14px;
+            align-items: end;
+        }
+        .filter-card {
+            position: relative;
+            background: rgba(8,18,35,0.62);
+            border: 1px solid rgba(148,163,184,0.14);
+            box-shadow: 0 10px 24px rgba(2,8,23,0.28);
+            padding: 10px 12px 12px;
+            min-width: 0;
+        }
+        .filter-label {
+            display: block;
+            color: #f4a261;
+            font-size: 0.78rem;
+            font-weight: 800;
+            margin-bottom: 7px;
+        }
+        .filter-select,
+        .filter-trigger {
+            appearance: none;
+            width: 100%;
+            height: 34px;
+            border: 1px solid rgba(226,232,240,0.82);
+            background: #243a59;
+            color: #fff;
+            font: 500 0.78rem 'Inter', 'Segoe UI', sans-serif;
+            padding: 0 34px 0 9px;
+            outline: none;
+            cursor: pointer;
+            text-align: left;
+            border-radius: 0;
+        }
+        .filter-select {
+            background-image: linear-gradient(45deg, transparent 50%, #e5e7eb 50%), linear-gradient(135deg, #e5e7eb 50%, transparent 50%);
+            background-position: calc(100% - 17px) 13px, calc(100% - 10px) 13px;
+            background-size: 8px 8px, 8px 8px;
+            background-repeat: no-repeat;
+        }
+        .filter-select option { background: #172842; color: #fff; }
+        .filter-trigger span:first-child {
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .filter-trigger::after {
+            content: '';
+            position: absolute;
+            right: 20px;
+            bottom: 25px;
+            width: 11px;
+            height: 11px;
+            border-right: 2px solid #e5e7eb;
+            border-bottom: 2px solid #e5e7eb;
+            transform: rotate(45deg);
+            pointer-events: none;
+        }
+        .filter-menu {
+            display: none;
+            position: absolute;
+            z-index: 30;
+            left: 12px;
+            right: 12px;
+            top: calc(100% - 6px);
+            max-height: 220px;
+            overflow: auto;
+            background: #101f36;
+            border: 1px solid rgba(226,232,240,0.55);
+            box-shadow: 0 16px 32px rgba(2,8,23,0.34);
+            padding: 6px;
+        }
+        .filter-card.open .filter-menu { display: block; }
+        .filter-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 6px;
+            color: rgba(255,255,255,0.86);
+            font-size: 0.74rem;
+            cursor: pointer;
+        }
+        .filter-option:hover { background: rgba(255,255,255,0.07); }
+        .filter-option input { accent-color: var(--blue); }
+        .filter-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 12px;
+        }
+        .filter-clear {
+            background: rgba(14,165,233,0.13);
+            border: 1px solid rgba(14,165,233,0.38);
+            color: #bae6fd;
+            font: 700 0.72rem 'Inter', 'Segoe UI', sans-serif;
+            padding: 7px 14px;
+            cursor: pointer;
+        }
+        .filter-clear:hover { background: rgba(14,165,233,0.24); }
+
         .table-section { padding: 12px 22px 8px; flex-shrink: 0; overflow-x: auto; }
         .section-label {
             font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px;
@@ -296,6 +405,12 @@
             padding: 7px 22px; font-size: 0.62rem;
             display: flex; justify-content: space-between; flex-shrink: 0;
             color: var(--gray2);
+        }
+        @media (max-width: 1100px) {
+            .filters-grid { grid-template-columns: repeat(3, minmax(150px, 1fr)); }
+        }
+        @media (max-width: 720px) {
+            .filters-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -377,6 +492,36 @@
         <div class="kpi-card c3"><div class="kpi-label">Comprometido</div><div class="kpi-value" id="kpi-comprometido">19.95 <span>mill.</span></div></div>
         <div class="kpi-card c5"><div class="kpi-label">Asignado</div><div class="kpi-value" id="kpi-asignado">149.33 <span>mill.</span></div></div>
         <div class="kpi-card c6"><div class="kpi-label">Disponible Erequester</div><div class="kpi-value" id="kpi-disponible">13.06 <span>mill.</span></div></div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-section">
+        <div class="filters-grid">
+            <div class="filter-card" id="area-filter-card">
+                <label class="filter-label">Area</label>
+                <button class="filter-trigger" type="button" id="filter-area-button"><span id="filter-area-label">Seleccion multiple</span></button>
+                <div class="filter-menu" id="filter-area-menu"></div>
+            </div>
+            <div class="filter-card">
+                <label class="filter-label" for="filter-segmento">Segmento</label>
+                <select class="filter-select" id="filter-segmento"><option value="">Todas</option></select>
+            </div>
+            <div class="filter-card">
+                <label class="filter-label" for="filter-etapa">Etapa</label>
+                <select class="filter-select" id="filter-etapa"><option value="">Todas</option></select>
+            </div>
+            <div class="filter-card">
+                <label class="filter-label" for="filter-fase">Fase</label>
+                <select class="filter-select" id="filter-fase"><option value="">Todas</option></select>
+            </div>
+            <div class="filter-card">
+                <label class="filter-label" for="filter-mes">Mes</label>
+                <select class="filter-select" id="filter-mes"></select>
+            </div>
+        </div>
+        <div class="filter-actions">
+            <button class="filter-clear" type="button" id="filter-clear">Limpiar filtros</button>
+        </div>
     </div>
 
     <!-- Table -->
@@ -528,19 +673,221 @@
         }
     });
 
-    function renderPowerBIResumen(data) {
-        const datasets = data.datasets || {};
-        const totals = datasets.totales?.[0];
-        if (!totals) return;
+    const METRIC_NAMES = [
+        'RdiTotal',
+        'PresupuestoErequester',
+        'EjecutadoErequester',
+        'ComprometidoErequester',
+        'AsignadoErequester',
+        'DisponibleErequester'
+    ];
+    const MONTH_ORDER = { ene: 0, feb: 1, mar: 2, abr: 3, may: 4, jun: 5, jul: 6, ago: 7, sep: 8, oct: 9, nov: 10, dic: 11 };
+    const powerBIState = {
+        data: null,
+        filters: { areas: [], segmento: '', etapa: '', fase: '', mes: '' },
+        options: { areas: [], segmentos: [], etapas: [], fases: [], meses: [] },
+        bound: false
+    };
 
-        const rdi = field(totals, 'RdiTotal');
-        const pptoEr = field(totals, 'PresupuestoErequester');
-        const ejecutado = field(totals, 'EjecutadoErequester');
-        const comprometido = field(totals, 'ComprometidoErequester');
-        const asignado = field(totals, 'AsignadoErequester');
-        const disponible = field(totals, 'DisponibleErequester');
-        const pctAsignado = field(totals, 'PorcentajeAsignado');
-        const pctDisponible = field(totals, 'PorcentajeDisponible');
+    const asNumber = value => Number(value || 0);
+    const cleanDimension = value => String(value || '').trim() || 'Sin clasificar';
+    const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+    }[char]));
+    const uniqueSorted = values => [...new Set(values.map(cleanDimension).filter(Boolean))]
+        .sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base', numeric: true }));
+    const parseMonthKey = value => {
+        const match = String(value || '').trim().toLowerCase().match(/^([a-z]{3})\s+(\d{2})$/);
+        if (!match) return { year: 0, month: 0 };
+        return { year: Number(`20${match[2]}`), month: MONTH_ORDER[match[1]] ?? 0 };
+    };
+    const sortMonths = values => uniqueSorted(values).sort((a, b) => {
+        const ma = parseMonthKey(a);
+        const mb = parseMonthKey(b);
+        return (ma.year - mb.year) || (ma.month - mb.month) || a.localeCompare(b);
+    });
+    const makeEmptyMetrics = () => METRIC_NAMES.reduce((acc, name) => {
+        acc[name] = 0;
+        return acc;
+    }, { PorcentajeAsignado: 0, PorcentajeDisponible: 0 });
+    const finalizeMetrics = metrics => {
+        const ppto = asNumber(metrics.PresupuestoErequester);
+        metrics.PorcentajeAsignado = ppto ? asNumber(metrics.AsignadoErequester) / ppto : 0;
+        metrics.PorcentajeDisponible = ppto ? asNumber(metrics.DisponibleErequester) / ppto : 0;
+        return metrics;
+    };
+    const metricFromRow = row => finalizeMetrics(METRIC_NAMES.reduce((acc, name) => {
+        acc[name] = field(row, name);
+        return acc;
+    }, makeEmptyMetrics()));
+    const sumRows = rows => finalizeMetrics(rows.reduce((acc, row) => {
+        METRIC_NAMES.forEach(name => { acc[name] += field(row, name); });
+        return acc;
+    }, makeEmptyMetrics()));
+    const groupRowsBy = (rows, dimensionName) => {
+        const groups = new Map();
+        rows.forEach(row => {
+            const key = cleanDimension(dimension(row, dimensionName));
+            if (!groups.has(key)) groups.set(key, { label: key, metrics: makeEmptyMetrics() });
+            const current = groups.get(key).metrics;
+            METRIC_NAMES.forEach(name => { current[name] += field(row, name); });
+        });
+        return [...groups.values()]
+            .map(item => ({ label: item.label, ...finalizeMetrics(item.metrics) }))
+            .sort((a, b) => a.label.localeCompare(b.label, 'es', { sensitivity: 'base', numeric: true }));
+    };
+    const hasValue = row => METRIC_NAMES.some(name => Math.abs(field(row, name)) > 0);
+    const getDetailRows = data => Array.isArray(data?.datasets?.detalleFiltros) ? data.datasets.detalleFiltros : [];
+    const getMonthRows = data => Array.isArray(data?.datasets?.porMesResumen) ? data.datasets.porMesResumen : [];
+    const optionValues = (data, detailName, fallbackDataset, fallbackDimension) => {
+        const detailRows = getDetailRows(data);
+        if (detailRows.length) return uniqueSorted(detailRows.map(row => dimension(row, detailName)));
+        return uniqueSorted((data?.datasets?.[fallbackDataset] || []).map(row => dimension(row, fallbackDimension || detailName)));
+    };
+    const selectedAreas = () => powerBIState.filters.areas;
+    const defaultMonth = data => {
+        const metadataMonth = data?.metadata?.filters?.mesA;
+        if (metadataMonth) return metadataMonth;
+        const activeMonths = getMonthRows(data)
+            .filter(hasValue)
+            .map(row => dimension(row, 'Calendario[MesA]'));
+        return sortMonths(activeMonths).pop() || powerBIState.options.meses[0] || '';
+    };
+
+    function updateAreaLabel() {
+        const label = document.getElementById('filter-area-label');
+        if (!label) return;
+        const areas = selectedAreas();
+        if (!areas.length) label.textContent = 'Ninguna';
+        else if (areas.length === powerBIState.options.areas.length) label.textContent = 'Seleccion multiple';
+        else if (areas.length <= 2) label.textContent = areas.join(', ');
+        else label.textContent = `${areas.length} seleccionadas`;
+    }
+
+    function populateAreaMenu() {
+        const menu = document.getElementById('filter-area-menu');
+        if (!menu) return;
+        menu.innerHTML = powerBIState.options.areas.map(area => `
+            <label class="filter-option">
+                <input type="checkbox" value="${escapeHtml(area)}" ${selectedAreas().includes(area) ? 'checked' : ''}>
+                <span>${escapeHtml(area)}</span>
+            </label>
+        `).join('');
+        menu.querySelectorAll('input[type="checkbox"]').forEach(input => {
+            input.addEventListener('change', () => {
+                powerBIState.filters.areas = [...menu.querySelectorAll('input:checked')].map(item => item.value);
+                updateAreaLabel();
+                renderPowerBIView();
+            });
+        });
+        updateAreaLabel();
+    }
+
+    function populateSelect(id, options, value, includeAll = true) {
+        const select = document.getElementById(id);
+        if (!select) return '';
+        const hasValueOption = options.includes(value);
+        const nextValue = hasValueOption ? value : (includeAll ? '' : options[0] || '');
+        select.innerHTML = [
+            includeAll ? '<option value="">Todas</option>' : '',
+            ...options.map(option => `<option value="${escapeHtml(option)}">${escapeHtml(option)}</option>`)
+        ].join('');
+        select.value = nextValue;
+        return nextValue;
+    }
+
+    function bindPowerBIFilters() {
+        if (powerBIState.bound) return;
+        powerBIState.bound = true;
+
+        const areaCard = document.getElementById('area-filter-card');
+        const areaButton = document.getElementById('filter-area-button');
+        const areaMenu = document.getElementById('filter-area-menu');
+        areaButton?.addEventListener('click', event => {
+            event.stopPropagation();
+            areaCard?.classList.toggle('open');
+        });
+        areaMenu?.addEventListener('click', event => event.stopPropagation());
+        document.addEventListener('click', () => areaCard?.classList.remove('open'));
+
+        [
+            ['filter-segmento', 'segmento'],
+            ['filter-etapa', 'etapa'],
+            ['filter-fase', 'fase'],
+            ['filter-mes', 'mes']
+        ].forEach(([id, key]) => {
+            document.getElementById(id)?.addEventListener('change', event => {
+                powerBIState.filters[key] = event.target.value;
+                renderPowerBIView();
+            });
+        });
+
+        document.getElementById('filter-clear')?.addEventListener('click', () => {
+            powerBIState.filters.areas = [...powerBIState.options.areas];
+            powerBIState.filters.segmento = '';
+            powerBIState.filters.etapa = '';
+            powerBIState.filters.fase = '';
+            powerBIState.filters.mes = defaultMonth(powerBIState.data);
+            populateFilterControls();
+            renderPowerBIView();
+        });
+    }
+
+    function populateFilterControls() {
+        const data = powerBIState.data;
+        powerBIState.options.areas = optionValues(data, 'Rubros[Area]', 'porArea');
+        powerBIState.options.segmentos = optionValues(data, 'Rubros[Segmento]', 'porSegmento');
+        powerBIState.options.etapas = optionValues(data, 'Rubros[Etapa]', 'porEtapa');
+        powerBIState.options.fases = optionValues(data, 'Rubros[Fase]', 'porFase');
+        powerBIState.options.meses = sortMonths(getMonthRows(data).map(row => dimension(row, 'Calendario[MesA]')));
+
+        if (!powerBIState.filters.areas.length) powerBIState.filters.areas = [...powerBIState.options.areas];
+        powerBIState.filters.areas = powerBIState.filters.areas.filter(area => powerBIState.options.areas.includes(area));
+        if (!powerBIState.filters.areas.length && powerBIState.options.areas.length) powerBIState.filters.areas = [...powerBIState.options.areas];
+        if (!powerBIState.filters.mes) powerBIState.filters.mes = defaultMonth(data);
+
+        populateAreaMenu();
+        powerBIState.filters.segmento = populateSelect('filter-segmento', powerBIState.options.segmentos, powerBIState.filters.segmento);
+        powerBIState.filters.etapa = populateSelect('filter-etapa', powerBIState.options.etapas, powerBIState.filters.etapa);
+        powerBIState.filters.fase = populateSelect('filter-fase', powerBIState.options.fases, powerBIState.filters.fase);
+        powerBIState.filters.mes = populateSelect('filter-mes', powerBIState.options.meses, powerBIState.filters.mes, false);
+    }
+
+    function filteredDetailRows() {
+        const filters = powerBIState.filters;
+        return getDetailRows(powerBIState.data).filter(row => {
+            const area = cleanDimension(dimension(row, 'Rubros[Area]'));
+            const segmento = cleanDimension(dimension(row, 'Rubros[Segmento]'));
+            const etapa = cleanDimension(dimension(row, 'Rubros[Etapa]'));
+            const fase = cleanDimension(dimension(row, 'Rubros[Fase]'));
+            const mes = cleanDimension(dimension(row, 'Calendario[MesA]'));
+
+            if (filters.areas.length && !filters.areas.includes(area)) return false;
+            if (filters.segmento && filters.segmento !== segmento) return false;
+            if (filters.etapa && filters.etapa !== etapa) return false;
+            if (filters.fase && filters.fase !== fase) return false;
+            if (filters.mes && filters.mes !== mes) return false;
+            return true;
+        });
+    }
+
+    function rowMetric(row, name) {
+        return Object.prototype.hasOwnProperty.call(row, name) ? row[name] : field(row, name);
+    }
+
+    function renderMetrics(totals) {
+        const rdi = rowMetric(totals, 'RdiTotal');
+        const pptoEr = rowMetric(totals, 'PresupuestoErequester');
+        const ejecutado = rowMetric(totals, 'EjecutadoErequester');
+        const comprometido = rowMetric(totals, 'ComprometidoErequester');
+        const asignado = rowMetric(totals, 'AsignadoErequester');
+        const disponible = rowMetric(totals, 'DisponibleErequester');
+        const pctAsignado = rowMetric(totals, 'PorcentajeAsignado');
+        const pctDisponible = rowMetric(totals, 'PorcentajeDisponible');
 
         setHtml('hm-rdi', fmtMillions(rdi));
         setHtml('hm-ejecutado', fmtMillions(ejecutado));
@@ -555,65 +902,100 @@
         setText('gauge-avance', fmtPct(pctAsignado));
         setText('gauge-disponible', fmtMillionsText(disponible));
 
-        gaugeChart.data.datasets[0].data = [pctAsignado * 100, Math.max(0, pctDisponible * 100)];
+        const assignedPct = Math.max(0, pctAsignado * 100);
+        const availablePct = assignedPct || pctDisponible ? Math.max(0, pctDisponible * 100) : 100;
+        gaugeChart.data.datasets[0].data = [assignedPct, availablePct];
         gaugeChart.update();
+    }
 
+    function renderAreaTable(rows, totals) {
         const areaBody = document.getElementById('resumen-area-body');
-        if (areaBody) {
-            const areaRows = (datasets.porArea || []).map(row => `
-                <tr>
-                    <td>${dimension(row, 'Rubros[Area]')}</td>
-                    <td>${fmtMoney(field(row, 'RdiTotal'))}</td>
-                    <td>${fmtMoney(field(row, 'PresupuestoErequester'))}</td>
-                    <td>${fmtMoney(field(row, 'EjecutadoErequester'))}</td>
-                    <td>${fmtMoney(field(row, 'ComprometidoErequester'))}</td>
-                    <td>${fmtMoney(field(row, 'AsignadoErequester'))}</td>
-                    <td>${fmtMoney(field(row, 'DisponibleErequester'))}</td>
-                    <td class="pct-asig">${fmtPct(field(row, 'PorcentajeAsignado'))}</td>
-                    <td class="pct-disp">${fmtPct(field(row, 'PorcentajeDisponible'))}</td>
-                </tr>
-            `).join('');
-            const totalRow = `
-                <tr class="total-row">
-                    <td>Total</td>
-                    <td>${fmtMoney(rdi)}</td>
-                    <td>${fmtMoney(pptoEr)}</td>
-                    <td>${fmtMoney(ejecutado)}</td>
-                    <td>${fmtMoney(comprometido)}</td>
-                    <td>${fmtMoney(asignado)}</td>
-                    <td>${fmtMoney(disponible)}</td>
-                    <td class="pct-asig">${fmtPct(pctAsignado)}</td>
-                    <td class="pct-disp">${fmtPct(pctDisponible)}</td>
-                </tr>
-            `;
-            areaBody.innerHTML = areaRows + totalRow;
-        }
+        if (!areaBody) return;
+        const bodyRows = rows.map(row => `
+            <tr>
+                <td>${escapeHtml(row.label || dimension(row, 'Rubros[Area]'))}</td>
+                <td>${fmtMoney(rowMetric(row, 'RdiTotal'))}</td>
+                <td>${fmtMoney(rowMetric(row, 'PresupuestoErequester'))}</td>
+                <td>${fmtMoney(rowMetric(row, 'EjecutadoErequester'))}</td>
+                <td>${fmtMoney(rowMetric(row, 'ComprometidoErequester'))}</td>
+                <td>${fmtMoney(rowMetric(row, 'AsignadoErequester'))}</td>
+                <td>${fmtMoney(rowMetric(row, 'DisponibleErequester'))}</td>
+                <td class="pct-asig">${fmtPct(rowMetric(row, 'PorcentajeAsignado'))}</td>
+                <td class="${rowMetric(row, 'PorcentajeDisponible') < 0 ? 'pct-neg' : 'pct-disp'}">${fmtPct(rowMetric(row, 'PorcentajeDisponible'))}</td>
+            </tr>
+        `).join('');
+        const emptyRow = '<tr><td colspan="9">No hay datos para los filtros seleccionados.</td></tr>';
+        const totalRow = `
+            <tr class="total-row">
+                <td>Total</td>
+                <td>${fmtMoney(rowMetric(totals, 'RdiTotal'))}</td>
+                <td>${fmtMoney(rowMetric(totals, 'PresupuestoErequester'))}</td>
+                <td>${fmtMoney(rowMetric(totals, 'EjecutadoErequester'))}</td>
+                <td>${fmtMoney(rowMetric(totals, 'ComprometidoErequester'))}</td>
+                <td>${fmtMoney(rowMetric(totals, 'AsignadoErequester'))}</td>
+                <td>${fmtMoney(rowMetric(totals, 'DisponibleErequester'))}</td>
+                <td class="pct-asig">${fmtPct(rowMetric(totals, 'PorcentajeAsignado'))}</td>
+                <td class="${rowMetric(totals, 'PorcentajeDisponible') < 0 ? 'pct-neg' : 'pct-disp'}">${fmtPct(rowMetric(totals, 'PorcentajeDisponible'))}</td>
+            </tr>
+        `;
+        areaBody.innerHTML = (bodyRows || emptyRow) + totalRow;
+    }
 
-        const etapaRows = (datasets.porEtapa || [])
-            .filter(row => field(row, 'AsignadoErequester') > 0 || field(row, 'EjecutadoErequester') > 0)
-            .sort((a, b) => field(b, 'AsignadoErequester') - field(a, 'AsignadoErequester'))
+    function renderCharts(etapaRows, areaRows) {
+        const topEtapas = etapaRows
+            .filter(row => rowMetric(row, 'AsignadoErequester') > 0 || rowMetric(row, 'EjecutadoErequester') > 0)
+            .sort((a, b) => rowMetric(b, 'AsignadoErequester') - rowMetric(a, 'AsignadoErequester'))
             .slice(0, 8);
-        etapaChart.data.labels = etapaRows.map(row => dimension(row, 'Rubros[Etapa]').replace(/\s+/g, ' ').slice(0, 18));
+        etapaChart.data.labels = topEtapas.map(row => (row.label || dimension(row, 'Rubros[Etapa]')).replace(/\s+/g, ' ').slice(0, 18));
         etapaChart.data.datasets[0].label = 'PPTO ER';
-        etapaChart.data.datasets[0].data = etapaRows.map(row => toMillions(field(row, 'PresupuestoErequester')));
-        etapaChart.data.datasets[1].data = etapaRows.map(row => toMillions(field(row, 'EjecutadoErequester')));
-        etapaChart.data.datasets[2].data = etapaRows.map(row => toMillions(field(row, 'ComprometidoErequester')));
+        etapaChart.data.datasets[0].data = topEtapas.map(row => toMillions(rowMetric(row, 'PresupuestoErequester')));
+        etapaChart.data.datasets[1].data = topEtapas.map(row => toMillions(rowMetric(row, 'EjecutadoErequester')));
+        etapaChart.data.datasets[2].data = topEtapas.map(row => toMillions(rowMetric(row, 'ComprometidoErequester')));
         etapaChart.options.scales.y.ticks.callback = value => `${value}M`;
         etapaChart.update();
 
-        const areaRows = datasets.porArea || [];
-        areaChart.data.labels = areaRows.map(row => dimension(row, 'Rubros[Area]'));
+        areaChart.data.labels = areaRows.map(row => row.label || dimension(row, 'Rubros[Area]'));
         areaChart.data.datasets[0].label = 'PPTO ER';
-        areaChart.data.datasets[0].data = areaRows.map(row => toMillions(field(row, 'PresupuestoErequester')));
-        areaChart.data.datasets[1].data = areaRows.map(row => toMillions(field(row, 'AsignadoErequester')));
+        areaChart.data.datasets[0].data = areaRows.map(row => toMillions(rowMetric(row, 'PresupuestoErequester')));
+        areaChart.data.datasets[1].data = areaRows.map(row => toMillions(rowMetric(row, 'AsignadoErequester')));
         areaChart.options.scales.y.ticks.callback = value => `${value}M`;
         areaChart.update();
+    }
 
-        if (data.metadata?.generatedAt) {
+    function renderPowerBIView() {
+        const data = powerBIState.data;
+        const datasets = data?.datasets || {};
+        const detailRows = getDetailRows(data);
+        let totals = datasets.totales?.[0] ? metricFromRow(datasets.totales[0]) : makeEmptyMetrics();
+        let areaRows = datasets.porArea || [];
+        let etapaRows = datasets.porEtapa || [];
+
+        if (detailRows.length) {
+            const rows = filteredDetailRows();
+            totals = sumRows(rows);
+            areaRows = groupRowsBy(rows, 'Rubros[Area]');
+            etapaRows = groupRowsBy(rows, 'Rubros[Etapa]');
+        } else if (powerBIState.filters.mes) {
+            const monthTotal = getMonthRows(data).find(row => dimension(row, 'Calendario[MesA]') === powerBIState.filters.mes);
+            if (monthTotal) totals = metricFromRow(monthTotal);
+        }
+
+        renderMetrics(totals);
+        renderAreaTable(areaRows, totals);
+        renderCharts(etapaRows, areaRows);
+
+        if (data?.metadata?.generatedAt) {
             const updated = new Date(data.metadata.generatedAt);
-            const month = data.metadata.filters?.mesA || '';
+            const month = powerBIState.filters.mes || data.metadata.filters?.mesA || '';
             setText('powerbi-updated', `Power BI Service: ${month} - ${updated.toLocaleString('es-GT')}`);
         }
+    }
+
+    function renderPowerBIResumen(data) {
+        powerBIState.data = data;
+        bindPowerBIFilters();
+        populateFilterControls();
+        renderPowerBIView();
     }
 
     async function loadPowerBIResumenFromSupabase() {
