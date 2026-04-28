@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — Control Presupuestario</title>
+    <style>html{visibility:hidden}</style>
+    <script>
+    (function(){
+        try {
+            var s=JSON.parse(localStorage.getItem('sb-iipgrojliqeyycvgnkrc-auth-token')||'null');
+            if(s&&s.access_token&&(!s.expires_at||Date.now()/1000<s.expires_at)){
+                document.documentElement.style.visibility='visible';
+            } else { window.location.replace('login.html'); }
+        } catch(e){ window.location.replace('login.html'); }
+    })();
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const { createClient } = supabase;
+        const client = createClient(
+            'https://iipgrojliqeyycvgnkrc.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlpcGdyb2psaXFleXljdmdua3JjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NzA1NzYsImV4cCI6MjA5MTM0NjU3Nn0.Y6FQ-1qWd7HPMvTnK4alpKxM-YLJ5CsKmkorAZKMJrg'
+        );
+
+        const PROJECT_NAME = 'Hacienda La Querencia';
+        const POWERBI_PROJECT_KEY = 'hlq';
+
+        client.auth.getSession().then(({ data: { session } }) => {
+            if (!session) { window.location.href = 'login.html'; }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('project-title').textContent = PROJECT_NAME;
+            document.title = `${PROJECT_NAME} — Dashboard`;
+            document.getElementById('btn-logout').addEventListener('click', () => {
+                client.auth.signOut().then(() => window.location.href = 'login.html');
+            });
+        });
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg:        #f0f4f8;
+            --surface:   #ffffff;
+            --navy:      #0f172a;
+            --navy2:     #1e293b;
+            --gray:      #64748b;
+            --gray2:     #94a3b8;
+            --border:    #e2e8f0;
+            --blue:      #0ea5e9;
+            --blue-dark: #0284c7;
+            --orange:    #f97316;
+            --green:     #10b981;
+            --amber:     #f59e0b;
+            --red:       #ef4444;
+            --purple:    #8b5cf6;
+            --shadow:    0 2px 12px rgba(15,23,42,0.08);
+            --shadow-lg: 0 8px 32px rgba(15,23,42,0.12);
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--navy);
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            font-size: 13px;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ── SIDEBAR ── */
+        .sidebar {
+            width: 58px; background: var(--navy); flex-shrink: 0;
+            display: flex; flex-direction: column; align-items: center;
+            padding: 18px 0; gap: 6px;
+            border-right: 1px solid rgba(255,255,255,0.06);
+        }
+        .s-logo {
+            width: 38px; height: 38px; border-radius: 10px;
+            background: linear-gradient(135deg, var(--blue), var(--blue-dark));
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 900; font-size: 11px; color: #fff;
+            letter-spacing: 0.5px; margin-bottom: 16px;
+        }
+        .s-icon {
+            width: 38px; height: 38px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            color: rgba(255,255,255,0.35); font-size: 15px; cursor: pointer;
+            transition: background .15s, color .15s; text-decoration: none;
+        }
+        .s-icon:hover { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.8); }
+        .s-icon.active { background: rgba(14,165,233,0.2); color: var(--blue); }
+        .s-divider { width: 28px; height: 1px; background: rgba(255,255,255,0.08); margin: 4px 0; }
+
+        /* ── MAIN ── */
+        .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+        /* ── TOPBAR ── */
+        .topbar {
+            position: relative;
+            background: #0f172a;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            padding: 0 22px;
+            height: 56px;
+            display: flex; align-items: center; justify-content: space-between;
+            flex-shrink: 0;
+            box-shadow: 0 2px 16px rgba(15,23,42,0.25);
+        }
+        .topbar::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 2px;
+            background: linear-gradient(90deg, transparent 0%, #C9A84C 35%, #C9A84C 65%, transparent 100%);
+        }
+
+        /* ── izquierda ── */
+        .topbar-left { display: flex; align-items: center; gap: 0; }
+        .home-link {
+            display: flex; align-items: center; justify-content: center;
+            width: 36px; height: 36px; border-radius: 8px;
+            background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
+            color: rgba(255,255,255,0.6); text-decoration: none;
+            transition: background .18s, color .18s;
+            flex-shrink: 0; margin-right: 14px;
+        }
+        .home-link:hover { background: #C9A84C; color: #fff; border-color: #C9A84C; }
+        .home-link svg { width: 15px; height: 15px; fill: currentColor; }
+
+        .topbar-divider {
+            width: 1px; height: 28px;
+            background: rgba(255,255,255,0.12);
+            margin: 0 16px; flex-shrink: 0;
+        }
+        .topbar-brand { font-size: 0.95rem; font-weight: 900; color: #fff; letter-spacing: 0.5px; white-space: nowrap; }
+        .topbar-brand span { color: #C9A84C; }
+        .topbar-sub { font-size: 0.62rem; color: rgba(255,255,255,0.38); margin-top: 1px; letter-spacing: 0.2px; }
+
+        .project-badge {
+            display: inline-flex; align-items: center; gap: 7px;
+            background: rgba(201,168,76,0.13); border: 1px solid rgba(201,168,76,0.35);
+            color: #C9A84C; padding: 5px 14px; border-radius: 20px;
+            font-size: 0.73rem; font-weight: 700; letter-spacing: 0.2px;
+            white-space: nowrap;
+        }
+        .project-badge svg { width: 13px; height: 13px; fill: currentColor; flex-shrink: 0; }
+
+        /* ── derecha ── */
+        .topbar-right { display: flex; align-items: center; gap: 10px; }
+
+        .period-select {
+            appearance: none; -webkit-appearance: none;
+            background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.15);
+            color: rgba(255,255,255,0.75); padding: 5px 28px 5px 11px;
+            border-radius: 7px; font-size: 0.72rem; font-family: inherit;
+            font-weight: 600; outline: none; cursor: pointer;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='rgba(255,255,255,0.45)' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 9px center;
+            transition: border-color .18s, background-color .18s;
+        }
+        .period-select:hover { border-color: rgba(201,168,76,0.5); background-color: rgba(255,255,255,0.10); }
+        .period-select option { background: #0f172a; color: #fff; }
+
+        .btn-logout {
+            display: flex; align-items: center; gap: 6px;
+            background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3);
+            color: #f87171; padding: 5px 14px; border-radius: 7px;
+            font-size: 0.72rem; font-weight: 700; cursor: pointer;
+            font-family: inherit; transition: background .18s, border-color .18s, color .18s;
+        }
+        .btn-logout:hover { background: rgba(239,68,68,0.22); border-color: rgba(239,68,68,0.55); color: #fca5a5; }
+        .btn-logout svg { width: 13px; height: 13px; fill: currentColor; }
+
+        /* ── HERO KPI (3 métricas principales) ── */
+        .hero-kpi {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 20px 22px;
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 16px; flex-shrink: 0;
+        }
+        .hero-metric {
+            background: var(--bg); border-radius: 14px;
+            padding: 20px 22px; border: 1px solid var(--border);
+            display: flex; align-items: center; gap: 16px;
+            transition: transform .2s, box-shadow .2s;
+            animation: slideUp .5s ease both;
+        }
+        .hero-metric:nth-child(1) { animation-delay: .05s; }
+        .hero-metric:nth-child(2) { animation-delay: .12s; }
+        .hero-metric:nth-child(3) { animation-delay: .19s; }
+        .hero-metric:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+        @keyframes slideUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+
+        .hm-icon {
+            width: 50px; height: 50px; border-radius: 14px; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem;
+        }
+        .hm-icon.blue   { background: rgba(14,165,233,0.1);  }
+        .hm-icon.orange { background: rgba(249,115,22,0.1);  }
+        .hm-icon.green  { background: rgba(16,185,129,0.1);  }
+        .hm-label { font-size: 0.65rem; font-weight: 700; color: var(--gray2); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 5px; }
+        .hm-value { font-size: 1.6rem; font-weight: 900; color: var(--navy); letter-spacing: -0.5px; }
+        .hm-value span { font-size: 0.75rem; font-weight: 500; color: var(--gray2); }
+        .hm-sub { font-size: 0.68rem; color: var(--gray2); margin-top: 3px; }
+
+        /* ── SECONDARY KPI ROW ── */
+        .kpi-row {
+            display: flex; gap: 8px; padding: 12px 22px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+        .kpi-card {
+            flex: 1; background: var(--bg);
+            border-radius: 10px; padding: 12px 14px;
+            border-left: 3px solid transparent;
+            border: 1px solid var(--border); border-left-width: 3px;
+            transition: transform .2s;
+        }
+        .kpi-card:hover { transform: translateY(-2px); }
+        .kpi-card.c1 { border-left-color: var(--blue); }
+        .kpi-card.c2 { border-left-color: var(--orange); }
+        .kpi-card.c3 { border-left-color: var(--amber); }
+        .kpi-card.c4 { border-left-color: var(--red); }
+        .kpi-card.c5 { border-left-color: var(--green); }
+        .kpi-card.c6 { border-left-color: var(--purple); }
+        .kpi-label { font-size: 0.6rem; color: var(--gray2); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px; font-weight: 600; }
+        .kpi-value { font-size: 1.1rem; font-weight: 800; color: var(--navy); white-space: nowrap; }
+        .kpi-value span { font-size: 0.68rem; font-weight: 400; color: var(--gray2); }
+
+        /* ── TABLE ── */
+        /* --- FILTERS --- */
+        .filters-section {
+            background: linear-gradient(135deg, #13233a 0%, #102039 100%);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            padding: 18px 22px;
+            flex-shrink: 0;
+        }
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(150px, 1fr));
+            gap: 14px;
+            align-items: end;
+        }
+        .filter-card {
+            position: relative;
+            background: rgba(8,18,35,0.62);
+            border: 1px solid rgba(148,163,184,0.14);
+            box-shadow: 0 10px 24px rgba(2,8,23,0.28);
+            padding: 10px 12px 12px;
+            min-width: 0;
+        }
+        .filter-label {
+            display: block;
+            color: #f4a261;
+            font-size: 0.78rem;
+            font-weight: 800;
+            margin-bottom: 7px;
+        }
+        .filter-select,
+        .filter-trigger {
+            appearance: none;
+            width: 100%;
+            height: 34px;
+            border: 1px solid rgba(226,232,240,0.82);
+            background: #243a59;
+            color: #fff;
+            font: 500 0.78rem 'Inter', 'Segoe UI', sans-serif;
+            padding: 0 34px 0 9px;
+            outline: none;
+            cursor: pointer;
+            text-align: left;
+            border-radius: 0;
+        }
+        .filter-select {
+            background-image: linear-gradient(45deg, transparent 50%, #e5e7eb 50%), linear-gradient(135deg, #e5e7eb 50%, transparent 50%);
+            background-position: calc(100% - 17px) 13px, calc(100% - 10px) 13px;
+            background-size: 8px 8px, 8px 8px;
+            background-repeat: no-repeat;
+        }
+        .filter-select option { background: #172842; color: #fff; }
+        .filter-trigger span:first-child {
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .filter-trigger::after {
+            content: '';
+            position: absolute;
+            right: 20px;
+            bottom: 25px;
+            width: 11px;
+            height: 11px;
+            border-right: 2px solid #e5e7eb;
+            border-bottom: 2px solid #e5e7eb;
+            transform: rotate(45deg);
+            pointer-events: none;
+        }
+        .filter-menu {
+            display: none;
+            position: absolute;
+            z-index: 30;
+            left: 12px;
+            right: 12px;
+            top: calc(100% - 6px);
+            max-height: 220px;
+            overflow: auto;
+            background: #101f36;
+            border: 1px solid rgba(226,232,240,0.55);
+            box-shadow: 0 16px 32px rgba(2,8,23,0.34);
+            padding: 6px;
+        }
+        .filter-card.open .filter-menu { display: block; }
+        .filter-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 6px;
+            color: rgba(255,255,255,0.86);
+            font-size: 0.74rem;
+            cursor: pointer;
+        }
+        .filter-option:hover { background: rgba(255,255,255,0.07); }
+        .filter-option input { accent-color: var(--blue); }
+        .filter-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 12px;
+        }
+        .filter-clear {
+            background: rgba(14,165,233,0.13);
+            border: 1px solid rgba(14,165,233,0.38);
+            color: #bae6fd;
+            font: 700 0.72rem 'Inter', 'Segoe UI', sans-serif;
+            padding: 7px 14px;
+            cursor: pointer;
+        }
+        .filter-clear:hover { background: rgba(14,165,233,0.24); }
+
+        .table-section { padding: 12px 22px 8px; flex-shrink: 0; overflow-x: auto; }
+        .section-label {
+            font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px;
+            color: var(--gray2); margin-bottom: 8px; font-weight: 700;
+        }
+        .table-wrap {
+            overflow-x: auto; border-radius: 12px;
+            border: 1px solid var(--border); background: var(--surface);
+            box-shadow: var(--shadow);
+        }
+        table { width: 100%; border-collapse: collapse; font-size: 0.73rem; }
+        thead tr { background: var(--bg); }
+        th {
+            padding: 10px 14px; text-align: right; font-weight: 700;
+            color: var(--navy2); white-space: nowrap;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        th:first-child { text-align: left; color: var(--gray); }
+        tbody tr { border-bottom: 1px solid var(--border); transition: background .15s; }
+        tbody tr:nth-child(even) { background: var(--bg); }
+        tbody tr:hover { background: rgba(14,165,233,0.04); }
+        td { padding: 8px 14px; text-align: right; color: var(--gray); white-space: nowrap; }
+        td:first-child { text-align: left; color: var(--navy); font-weight: 500; }
+        .pct-asig { color: var(--amber); font-weight: 700; }
+        .pct-disp { color: var(--green); font-weight: 700; }
+        .pct-neg  { color: var(--red); font-weight: 700; }
+        tr.total-row { background: rgba(14,165,233,0.04) !important; border-top: 2px solid var(--blue); }
+        tr.total-row td { color: var(--navy); font-weight: 700; }
+
+        /* ── CHARTS ── */
+        .charts-row {
+            display: grid; grid-template-columns: 200px 1fr 1fr;
+            gap: 10px; padding: 0 22px 16px;
+            height: 250px; flex-shrink: 0;
+        }
+        .chart-card {
+            background: var(--surface); border-radius: 12px; padding: 14px;
+            border: 1px solid var(--border); box-shadow: var(--shadow);
+            display: flex; flex-direction: column; overflow: hidden;
+        }
+        .chart-card canvas { flex: 1; min-height: 0; }
+        .chart-title {
+            font-size: 0.63rem; text-transform: uppercase; letter-spacing: 0.8px;
+            color: var(--gray2); margin-bottom: 8px; font-weight: 700;
+        }
+        .gauge-wrap { position: relative; flex: 1; display: flex; align-items: center; justify-content: center; }
+        .gauge-overlay { position: absolute; text-align: center; bottom: 18%; }
+        .gauge-val { font-size: 1.1rem; font-weight: 900; color: var(--navy); }
+        .gauge-sub { font-size: 0.58rem; color: var(--gray2); margin-top: 1px; }
+        .gauge-stats { display: flex; justify-content: space-around; margin-top: 6px; }
+        .gstat { text-align: center; }
+        .gstat-val { font-size: 0.75rem; font-weight: 700; }
+        .gstat-lbl { font-size: 0.55rem; color: var(--gray2); }
+
+        /* ── FOOTER ── */
+        .footer-bar {
+            background: var(--surface); border-top: 1px solid var(--border);
+            padding: 7px 22px; font-size: 0.62rem;
+            display: flex; justify-content: space-between; flex-shrink: 0;
+            color: var(--gray2);
+        }
+        @media (max-width: 1100px) {
+            .filters-grid { grid-template-columns: repeat(3, minmax(150px, 1fr)); }
+        }
+        @media (max-width: 720px) {
+            .filters-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+    <div class="s-logo">C&P</div>
+    <a href="index.html" class="s-icon" title="Inicio">⌂</a>
+    <div class="s-icon active">▦</div>
+    <div class="s-divider"></div>
+    <div class="s-icon">◈</div>
+    <div class="s-icon">◉</div>
+    <div class="s-icon" style="margin-top:auto" id="btn-logout" title="Cerrar sesión">⏻</div>
+</div>
+
+<!-- Main -->
+<div class="main">
+
+    <!-- Topbar -->
+    <div class="topbar">
+        <div class="topbar-left">
+            <a href="index.html" class="home-link" title="Ir a Inicio">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+            </a>
+            <div>
+                <div class="topbar-brand">Costos&<span>Presupuestos</span></div>
+                <div class="topbar-sub">Control Presupuestario de Obra</div>
+            </div>
+            <div class="topbar-divider"></div>
+            <div class="project-badge">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 6h-2.18c.07-.44.18-.86.18-1a3 3 0 0 0-6 0c0 .14.11.56.18 1H10c0-.6-.04-1-.1-1.38A3 3 0 0 0 4 5v1H2v14h20V6zm-10-.93a1 1 0 0 1 2 0c0 .34-.33 1.22-.54 1.88L11 7.67c-.21-.67-.54-1.55-.54-1.88-.02-.21.27-.72.54-.72zm8 12.93H6V8h2v1h8V8h2v10z"/></svg>
+                <span id="project-title">Proyecto</span>
+            </div>
+        </div>
+        <div class="topbar-right">
+            <select class="period-select">
+                <option>Periodo: 2026</option>
+            </select>
+            <button class="btn-logout" id="btn-logout">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5-5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
+                Salir
+            </button>
+        </div>
+    </div>
+
+    <!-- Hero KPIs: 3 métricas principales -->
+    <div class="hero-kpi">
+        <div class="hero-metric">
+            <div class="hm-icon blue">📋</div>
+            <div>
+                <div class="hm-label">Presupuesto Inicial / RDI</div>
+                <div class="hm-value" id="hm-rdi">162.08 <span>mill.</span></div>
+                <div class="hm-sub">Presupuesto aprobado</div>
+            </div>
+        </div>
+        <div class="hero-metric">
+            <div class="hm-icon orange">🔨</div>
+            <div>
+                <div class="hm-label">Ejecutado</div>
+                <div class="hm-value" id="hm-ejecutado">129.38 <span>mill.</span></div>
+                <div class="hm-sub">Acumulado a la fecha</div>
+            </div>
+        </div>
+        <div class="hero-metric">
+            <div class="hm-icon green">📈</div>
+            <div>
+                <div class="hm-label">% de Ejecución</div>
+                <div class="hm-value" id="hm-avance">91.98 <span>%</span></div>
+                <div class="hm-sub">Del presupuesto asignado</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- KPIs secundarios -->
+    <div class="kpi-row">
+        <div class="kpi-card c1"><div class="kpi-label">PPTO RDI</div><div class="kpi-value" id="kpi-rdi">162.08 <span>mill.</span></div></div>
+        <div class="kpi-card c2"><div class="kpi-label">PPTO ER</div><div class="kpi-value" id="kpi-ppto-er">162.39 <span>mill.</span></div></div>
+        <div class="kpi-card c3"><div class="kpi-label">Comprometido</div><div class="kpi-value" id="kpi-comprometido">19.95 <span>mill.</span></div></div>
+        <div class="kpi-card c5"><div class="kpi-label">Asignado</div><div class="kpi-value" id="kpi-asignado">149.33 <span>mill.</span></div></div>
+        <div class="kpi-card c6"><div class="kpi-label">Disponible Erequester</div><div class="kpi-value" id="kpi-disponible">13.06 <span>mill.</span></div></div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-section">
+        <div class="filters-grid">
+            <div class="filter-card" id="area-filter-card">
+                <label class="filter-label">Area</label>
+                <button class="filter-trigger" type="button" id="filter-area-button"><span id="filter-area-label">Seleccion multiple</span></button>
+                <div class="filter-menu" id="filter-area-menu"></div>
+            </div>
+            <div class="filter-card" id="segmento-filter-card">
+                <label class="filter-label">Segmento</label>
+                <button class="filter-trigger" type="button" id="filter-segmento-button"><span id="filter-segmento-label">Seleccion multiple</span></button>
+                <div class="filter-menu" id="filter-segmento-menu"></div>
+            </div>
+            <div class="filter-card" id="etapa-filter-card">
+                <label class="filter-label">Etapa</label>
+                <button class="filter-trigger" type="button" id="filter-etapa-button"><span id="filter-etapa-label">Seleccion multiple</span></button>
+                <div class="filter-menu" id="filter-etapa-menu"></div>
+            </div>
+            <div class="filter-card" id="fase-filter-card">
+                <label class="filter-label">Fase</label>
+                <button class="filter-trigger" type="button" id="filter-fase-button"><span id="filter-fase-label">Seleccion multiple</span></button>
+                <div class="filter-menu" id="filter-fase-menu"></div>
+            </div>
+            <div class="filter-card" id="mes-filter-card">
+                <label class="filter-label">Mes</label>
+                <button class="filter-trigger" type="button" id="filter-mes-button"><span id="filter-mes-label">Seleccion multiple</span></button>
+                <div class="filter-menu" id="filter-mes-menu"></div>
+            </div>
+        </div>
+        <div class="filter-actions">
+            <button class="filter-clear" type="button" id="filter-clear">Limpiar filtros</button>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-section">
+        <div class="section-label">Resumen por Área</div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Área</th><th>PPTO RSI</th><th>PPTO ESL</th><th>Ejecutado</th>
+                        <th>Comprometido</th><th>Asignado</th><th>Disponible Imputable</th>
+                        <th>% Asignado</th><th>% Disponible</th>
+                    </tr>
+                </thead>
+                <tbody id="resumen-area-body">
+                    <tr><td>Construcción</td><td>120,477,476.11</td><td>123,454,431.78</td><td>98,168,770.89</td><td>16,540,708.91</td><td>114,709,479.80</td><td>8,744,951.98</td><td class="pct-asig">92.92%</td><td class="pct-disp">7.08%</td></tr>
+                    <tr><td>Urbanización</td><td>29,837,668.62</td><td>29,939,366.88</td><td>25,195,463.25</td><td>1,984,100.25</td><td>27,179,563.50</td><td>2,759,803.38</td><td class="pct-asig">90.79%</td><td class="pct-disp">9.21%</td></tr>
+                    <tr><td>I.7a Construcción</td><td>4,122,589.34</td><td>2,840,245.67</td><td>1,950,423.18</td><td>441,209.56</td><td>2,391,632.74</td><td>448,612.93</td><td class="pct-asig">84.20%</td><td class="pct-disp">15.80%</td></tr>
+                    <tr><td>I.7a Urbanización</td><td>2,358,147.25</td><td>1,640,198.45</td><td>1,278,456.83</td><td>218,643.21</td><td>1,497,100.04</td><td>143,098.41</td><td class="pct-asig">91.28%</td><td class="pct-disp">8.72%</td></tr>
+                    <tr><td>I.7a Infraestructura</td><td>1,036,089.81</td><td>299,982.34</td><td>584,814.64</td><td>165,579.51</td><td>750,394.15</td><td>-450,411.81</td><td class="pct-asig">250.15%</td><td class="pct-neg">-150.15%</td></tr>
+                    <tr><td>Megaproyecto Urbanización</td><td>1,000,000.00</td><td>980,000.00</td><td>789,234.56</td><td>140,000.00</td><td>929,234.56</td><td>50,765.44</td><td class="pct-asig">94.82%</td><td class="pct-disp">5.18%</td></tr>
+                    <tr><td>Megaproyecto Infraestructura</td><td>3,245,344.76</td><td>3,129,066.57</td><td>1,402,996.62</td><td>464,803.01</td><td>1,867,799.63</td><td>1,261,266.94</td><td class="pct-asig">59.69%</td><td class="pct-disp">40.31%</td></tr>
+                    <tr class="total-row"><td>Total</td><td>162,077,315.89</td><td>162,283,291.69</td><td>129,370,159.97</td><td>19,955,044.45</td><td>149,325,204.42</td><td>13,064,142.32</td><td class="pct-asig">91.98%</td><td class="pct-disp">8.04%</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="charts-row">
+        <div class="chart-card">
+            <div class="chart-title">Avance General</div>
+            <div class="gauge-wrap">
+                <canvas id="gaugeChart"></canvas>
+                <div class="gauge-overlay">
+                    <div class="gauge-val" id="gauge-asignado">149.33</div>
+                    <div class="gauge-sub">mill. asignado</div>
+                </div>
+            </div>
+            <div class="gauge-stats">
+                <div class="gstat"><div class="gstat-val" id="gauge-ejecutado" style="color:var(--orange)">129.38M</div><div class="gstat-lbl">Ejecutado</div></div>
+                <div class="gstat"><div class="gstat-val" id="gauge-avance" style="color:var(--blue)">91.98%</div><div class="gstat-lbl">% Asignado</div></div>
+                <div class="gstat"><div class="gstat-val" id="gauge-disponible" style="color:var(--green)">13.06M</div><div class="gstat-lbl">Disponible</div></div>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <div class="chart-title">Ejecutado por Etapa</div>
+            <canvas id="etapaChart"></canvas>
+        </div>
+
+        <div class="chart-card">
+            <div class="chart-title">Avance por Area</div>
+            <canvas id="faseChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer-bar">
+        <span id="footer-project">Control Presupuestario de Obra</span>
+        <span id="powerbi-updated">Actualizado: 2026</span>
+    </div>
+
+</div><!-- /main -->
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('footer-project').textContent =
+            `${PROJECT_NAME} — Control Presupuestario de Obra`;
+    });
+
+    // Chart defaults: ajustados para tema claro
+    Chart.defaults.color = '#64748b';
+    Chart.defaults.borderColor = '#e2e8f0';
+
+    const C = {
+        blue:   '#0ea5e9',
+        orange: '#f97316',
+        amber:  '#f59e0b',
+        green:  '#10b981',
+        red:    '#ef4444',
+        purple: '#8b5cf6',
+        bg:     '#f0f4f8'
+    };
+
+    const field = (row, name) => row?.[`[${name}]`] ?? row?.[name] ?? 0;
+    const dimension = (row, name) => row?.[name] ?? '';
+    const toMillions = value => Number(value || 0) / 1000000;
+    const fmtMillions = value => `${toMillions(value).toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span>mill.</span>`;
+    const fmtMillionsText = value => `${toMillions(value).toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}M`;
+    const fmtMoney = value => Number(value || 0).toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const fmtPct = value => `${(Number(value || 0) * 100).toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%`;
+    const setHtml = (id, html) => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = html;
+    };
+    const setText = (id, text) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = text;
+    };
+
+    // Gauge
+    const gaugeChart = new Chart(document.getElementById('gaugeChart'), {
+        type: 'doughnut',
+        data: {
+            datasets: [{ data:[91.98, 8.02], backgroundColor:[C.blue, '#e2e8f0'], borderWidth:0, circumference:240, rotation:240 }]
+        },
+        options: { responsive:true, cutout:'74%', plugins:{ legend:{display:false}, tooltip:{enabled:false} } }
+    });
+
+    // Etapa
+    const etapaChart = new Chart(document.getElementById('etapaChart'), {
+        type: 'bar',
+        data: {
+            labels: ['Gas\nCombustión','Acero\nEst.','Plomería\nAC','Pisos/\nRev.','Muros\nDiv.','Fachada\nExt.','Acabados\nFin.','Eléctrico\nGral.'],
+            datasets: [
+                { label:'PPTO ESL',    data:[15200,22400,18600,12800,9400,16500,11200,8900], backgroundColor:C.blue,   borderRadius:3, barPercentage:0.72 },
+                { label:'Ejecutado',   data:[13800,20100,16200,11400,8600,14900,9800,7200],  backgroundColor:C.orange, borderRadius:3, barPercentage:0.72 },
+                { label:'Comprometido',data:[800,  1200, 1400, 900,  600, 1100, 800, 600],   backgroundColor:C.green,  borderRadius:3, barPercentage:0.72 }
+            ]
+        },
+        options: {
+            responsive:true, maintainAspectRatio:false,
+            plugins:{ legend:{ position:'top', labels:{font:{size:9}, boxWidth:10, padding:8, color:'#64748b'} } },
+            scales:{
+                x:{ ticks:{font:{size:8}, color:'#94a3b8'}, grid:{display:false} },
+                y:{ ticks:{font:{size:9}, color:'#94a3b8', callback:v=>v+'K'}, grid:{color:'#e2e8f0'} }
+            }
+        }
+    });
+
+    // Fase
+    const areaChart = new Chart(document.getElementById('faseChart'), {
+        type: 'bar',
+        data: {
+            labels:['Fase 1','Fase 2','Fase 3','Fase 4','Fase 5'],
+            datasets:[
+                { label:'PPTO ESL',  data:[48000,42000,35000,28000,9283], backgroundColor:C.blue,   borderRadius:3, barPercentage:0.72 },
+                { label:'Ejecutado', data:[44500,38200,28600,15300,2770], backgroundColor:C.amber,  borderRadius:3, barPercentage:0.72 }
+            ]
+        },
+        options:{
+            responsive:true, maintainAspectRatio:false,
+            plugins:{ legend:{ position:'top', labels:{font:{size:9}, boxWidth:10, padding:8, color:'#64748b'} } },
+            scales:{
+                x:{ ticks:{font:{size:9}, color:'#94a3b8'}, grid:{display:false} },
+                y:{ ticks:{font:{size:9}, color:'#94a3b8', callback:v=>(v/1000).toFixed(0)+'M'}, grid:{color:'#e2e8f0'} }
+            }
+        }
+    });
+
+    const METRIC_NAMES = [
+        'RdiTotal',
+        'PresupuestoErequester',
+        'EjecutadoErequester',
+        'ComprometidoErequester',
+        'AsignadoErequester',
+        'DisponibleErequester'
+    ];
+    const MONTH_ORDER = { ene: 0, feb: 1, mar: 2, abr: 3, may: 4, jun: 5, jul: 6, ago: 7, sep: 8, oct: 9, nov: 10, dic: 11 };
+    const powerBIState = {
+        data: null,
+        filters: { areas: [], segmentos: [], etapas: [], fases: [], meses: [] },
+        options: { areas: [], segmentos: [], etapas: [], fases: [], meses: [] },
+        bound: false
+    };
+    const FILTER_CONFIG = [
+        { key: 'areas', optionKey: 'areas', cardId: 'area-filter-card', buttonId: 'filter-area-button', menuId: 'filter-area-menu', labelId: 'filter-area-label' },
+        { key: 'segmentos', optionKey: 'segmentos', cardId: 'segmento-filter-card', buttonId: 'filter-segmento-button', menuId: 'filter-segmento-menu', labelId: 'filter-segmento-label' },
+        { key: 'etapas', optionKey: 'etapas', cardId: 'etapa-filter-card', buttonId: 'filter-etapa-button', menuId: 'filter-etapa-menu', labelId: 'filter-etapa-label' },
+        { key: 'fases', optionKey: 'fases', cardId: 'fase-filter-card', buttonId: 'filter-fase-button', menuId: 'filter-fase-menu', labelId: 'filter-fase-label' },
+        { key: 'meses', optionKey: 'meses', cardId: 'mes-filter-card', buttonId: 'filter-mes-button', menuId: 'filter-mes-menu', labelId: 'filter-mes-label' }
+    ];
+
+    const asNumber = value => Number(value || 0);
+    const cleanDimension = value => String(value || '').trim() || 'Sin clasificar';
+    const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+    }[char]));
+    const uniqueSorted = values => [...new Set(values.map(cleanDimension).filter(Boolean))]
+        .sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base', numeric: true }));
+    const parseMonthKey = value => {
+        const match = String(value || '').trim().toLowerCase().match(/^([a-z]{3})\s+(\d{2})$/);
+        if (!match) return { year: 0, month: 0 };
+        return { year: Number(`20${match[2]}`), month: MONTH_ORDER[match[1]] ?? 0 };
+    };
+    const sortMonths = values => uniqueSorted(values).sort((a, b) => {
+        const ma = parseMonthKey(a);
+        const mb = parseMonthKey(b);
+        return (ma.year - mb.year) || (ma.month - mb.month) || a.localeCompare(b);
+    });
+    const makeEmptyMetrics = () => METRIC_NAMES.reduce((acc, name) => {
+        acc[name] = 0;
+        return acc;
+    }, { PorcentajeAsignado: 0, PorcentajeDisponible: 0 });
+    const finalizeMetrics = metrics => {
+        const ppto = asNumber(metrics.PresupuestoErequester);
+        metrics.PorcentajeAsignado = ppto ? asNumber(metrics.AsignadoErequester) / ppto : 0;
+        metrics.PorcentajeDisponible = ppto ? asNumber(metrics.DisponibleErequester) / ppto : 0;
+        return metrics;
+    };
+    const metricFromRow = row => finalizeMetrics(METRIC_NAMES.reduce((acc, name) => {
+        acc[name] = field(row, name);
+        return acc;
+    }, makeEmptyMetrics()));
+    const sumRows = rows => finalizeMetrics(rows.reduce((acc, row) => {
+        METRIC_NAMES.forEach(name => { acc[name] += field(row, name); });
+        return acc;
+    }, makeEmptyMetrics()));
+    const groupRowsBy = (rows, dimensionName) => {
+        const groups = new Map();
+        rows.forEach(row => {
+            const key = cleanDimension(dimension(row, dimensionName));
+            if (!groups.has(key)) groups.set(key, { label: key, metrics: makeEmptyMetrics() });
+            const current = groups.get(key).metrics;
+            METRIC_NAMES.forEach(name => { current[name] += field(row, name); });
+        });
+        return [...groups.values()]
+            .map(item => ({ label: item.label, ...finalizeMetrics(item.metrics) }))
+            .sort((a, b) => a.label.localeCompare(b.label, 'es', { sensitivity: 'base', numeric: true }));
+    };
+    const hasValue = row => METRIC_NAMES.some(name => Math.abs(field(row, name)) > 0);
+    const getDetailRows = data => Array.isArray(data?.datasets?.detalleFiltros) ? data.datasets.detalleFiltros : [];
+    const getMonthRows = data => Array.isArray(data?.datasets?.porMesResumen) ? data.datasets.porMesResumen : [];
+    const optionValues = (data, detailName, fallbackDataset, fallbackDimension) => {
+        const detailRows = getDetailRows(data);
+        if (detailRows.length) return uniqueSorted(detailRows.map(row => dimension(row, detailName)));
+        return uniqueSorted((data?.datasets?.[fallbackDataset] || []).map(row => dimension(row, fallbackDimension || detailName)));
+    };
+    const defaultMonth = data => {
+        const metadataMonth = data?.metadata?.filters?.mesA;
+        if (metadataMonth) return metadataMonth;
+        const activeMonths = getMonthRows(data)
+            .filter(hasValue)
+            .map(row => dimension(row, 'Calendario[MesA]'));
+        return sortMonths(activeMonths).pop() || powerBIState.options.meses[0] || '';
+    };
+
+    function defaultMonthSelection(data) {
+        const month = defaultMonth(data);
+        return month ? [month] : [];
+    }
+
+    function closeFilterMenus() {
+        FILTER_CONFIG.forEach(config => document.getElementById(config.cardId)?.classList.remove('open'));
+    }
+
+    function updateFilterLabel(config) {
+        const label = document.getElementById(config.labelId);
+        if (!label) return;
+        const selected = powerBIState.filters[config.key] || [];
+        const options = powerBIState.options[config.optionKey] || [];
+        if (!selected.length) label.textContent = 'Ninguna';
+        else if (selected.length === options.length) label.textContent = 'Todas';
+        else if (selected.length <= 2) label.textContent = selected.join(', ');
+        else label.textContent = `${selected.length} seleccionadas`;
+    }
+
+    function populateFilterMenu(config) {
+        const menu = document.getElementById(config.menuId);
+        if (!menu) return;
+        const selected = powerBIState.filters[config.key] || [];
+        const options = powerBIState.options[config.optionKey] || [];
+        menu.innerHTML = options.map(option => `
+            <label class="filter-option">
+                <input type="checkbox" value="${escapeHtml(option)}" ${selected.includes(option) ? 'checked' : ''}>
+                <span>${escapeHtml(option)}</span>
+            </label>
+        `).join('');
+        menu.querySelectorAll('input[type="checkbox"]').forEach(input => {
+            input.addEventListener('change', () => {
+                powerBIState.filters[config.key] = [...menu.querySelectorAll('input:checked')].map(item => item.value);
+                updateFilterLabel(config);
+                renderPowerBIView();
+            });
+        });
+        updateFilterLabel(config);
+    }
+
+    function bindPowerBIFilters() {
+        if (powerBIState.bound) return;
+        powerBIState.bound = true;
+
+        FILTER_CONFIG.forEach(config => {
+            const card = document.getElementById(config.cardId);
+            const button = document.getElementById(config.buttonId);
+            const menu = document.getElementById(config.menuId);
+            button?.addEventListener('click', event => {
+                event.stopPropagation();
+                const willOpen = !card?.classList.contains('open');
+                closeFilterMenus();
+                if (willOpen) card?.classList.add('open');
+            });
+            menu?.addEventListener('click', event => event.stopPropagation());
+        });
+        document.addEventListener('click', closeFilterMenus);
+
+        document.getElementById('filter-clear')?.addEventListener('click', () => {
+            powerBIState.filters.areas = [...powerBIState.options.areas];
+            powerBIState.filters.segmentos = [...powerBIState.options.segmentos];
+            powerBIState.filters.etapas = [...powerBIState.options.etapas];
+            powerBIState.filters.fases = [...powerBIState.options.fases];
+            powerBIState.filters.meses = defaultMonthSelection(powerBIState.data);
+            populateFilterControls();
+            renderPowerBIView();
+        });
+    }
+
+    function populateFilterControls() {
+        const data = powerBIState.data;
+        powerBIState.options.areas = optionValues(data, 'Rubros[Area]', 'porArea');
+        powerBIState.options.segmentos = optionValues(data, 'Rubros[Segmento]', 'porSegmento');
+        powerBIState.options.etapas = optionValues(data, 'Rubros[Etapa]', 'porEtapa');
+        powerBIState.options.fases = optionValues(data, 'Rubros[Fase]', 'porFase');
+        powerBIState.options.meses = sortMonths(getMonthRows(data).map(row => dimension(row, 'Calendario[MesA]')));
+
+        FILTER_CONFIG.forEach(config => {
+            const options = powerBIState.options[config.optionKey] || [];
+            const defaults = config.key === 'meses' ? defaultMonthSelection(data) : options;
+            const current = powerBIState.filters[config.key] || [];
+            const selected = current.filter(value => options.includes(value));
+            powerBIState.filters[config.key] = selected.length ? selected : defaults.filter(value => options.includes(value));
+            populateFilterMenu(config);
+        });
+    }
+
+    function filteredDetailRows() {
+        const filters = powerBIState.filters;
+        return getDetailRows(powerBIState.data).filter(row => {
+            const area = cleanDimension(dimension(row, 'Rubros[Area]'));
+            const segmento = cleanDimension(dimension(row, 'Rubros[Segmento]'));
+            const etapa = cleanDimension(dimension(row, 'Rubros[Etapa]'));
+            const fase = cleanDimension(dimension(row, 'Rubros[Fase]'));
+            const mes = cleanDimension(dimension(row, 'Calendario[MesA]'));
+
+            if (filters.areas.length && !filters.areas.includes(area)) return false;
+            if (filters.segmentos.length && !filters.segmentos.includes(segmento)) return false;
+            if (filters.etapas.length && !filters.etapas.includes(etapa)) return false;
+            if (filters.fases.length && !filters.fases.includes(fase)) return false;
+            if (filters.meses.length && !filters.meses.includes(mes)) return false;
+            return true;
+        });
+    }
+
+    function rowMetric(row, name) {
+        return Object.prototype.hasOwnProperty.call(row, name) ? row[name] : field(row, name);
+    }
+
+    function renderMetrics(totals) {
+        const rdi = rowMetric(totals, 'RdiTotal');
+        const pptoEr = rowMetric(totals, 'PresupuestoErequester');
+        const ejecutado = rowMetric(totals, 'EjecutadoErequester');
+        const comprometido = rowMetric(totals, 'ComprometidoErequester');
+        const asignado = rowMetric(totals, 'AsignadoErequester');
+        const disponible = rowMetric(totals, 'DisponibleErequester');
+        const pctAsignado = rowMetric(totals, 'PorcentajeAsignado');
+        const pctDisponible = rowMetric(totals, 'PorcentajeDisponible');
+
+        setHtml('hm-rdi', fmtMillions(rdi));
+        setHtml('hm-ejecutado', fmtMillions(ejecutado));
+        setHtml('hm-avance', `${(pctAsignado * 100).toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span>%</span>`);
+        setHtml('kpi-rdi', fmtMillions(rdi));
+        setHtml('kpi-ppto-er', fmtMillions(pptoEr));
+        setHtml('kpi-comprometido', fmtMillions(comprometido));
+        setHtml('kpi-asignado', fmtMillions(asignado));
+        setHtml('kpi-disponible', fmtMillions(disponible));
+        setText('gauge-asignado', toMillions(asignado).toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+        setText('gauge-ejecutado', fmtMillionsText(ejecutado));
+        setText('gauge-avance', fmtPct(pctAsignado));
+        setText('gauge-disponible', fmtMillionsText(disponible));
+
+        const assignedPct = Math.max(0, pctAsignado * 100);
+        const availablePct = assignedPct || pctDisponible ? Math.max(0, pctDisponible * 100) : 100;
+        gaugeChart.data.datasets[0].data = [assignedPct, availablePct];
+        gaugeChart.update();
+    }
+
+    function renderAreaTable(rows, totals) {
+        const areaBody = document.getElementById('resumen-area-body');
+        if (!areaBody) return;
+        const bodyRows = rows.map(row => `
+            <tr>
+                <td>${escapeHtml(row.label || dimension(row, 'Rubros[Area]'))}</td>
+                <td>${fmtMoney(rowMetric(row, 'RdiTotal'))}</td>
+                <td>${fmtMoney(rowMetric(row, 'PresupuestoErequester'))}</td>
+                <td>${fmtMoney(rowMetric(row, 'EjecutadoErequester'))}</td>
+                <td>${fmtMoney(rowMetric(row, 'ComprometidoErequester'))}</td>
+                <td>${fmtMoney(rowMetric(row, 'AsignadoErequester'))}</td>
+                <td>${fmtMoney(rowMetric(row, 'DisponibleErequester'))}</td>
+                <td class="pct-asig">${fmtPct(rowMetric(row, 'PorcentajeAsignado'))}</td>
+                <td class="${rowMetric(row, 'PorcentajeDisponible') < 0 ? 'pct-neg' : 'pct-disp'}">${fmtPct(rowMetric(row, 'PorcentajeDisponible'))}</td>
+            </tr>
+        `).join('');
+        const emptyRow = '<tr><td colspan="9">No hay datos para los filtros seleccionados.</td></tr>';
+        const totalRow = `
+            <tr class="total-row">
+                <td>Total</td>
+                <td>${fmtMoney(rowMetric(totals, 'RdiTotal'))}</td>
+                <td>${fmtMoney(rowMetric(totals, 'PresupuestoErequester'))}</td>
+                <td>${fmtMoney(rowMetric(totals, 'EjecutadoErequester'))}</td>
+                <td>${fmtMoney(rowMetric(totals, 'ComprometidoErequester'))}</td>
+                <td>${fmtMoney(rowMetric(totals, 'AsignadoErequester'))}</td>
+                <td>${fmtMoney(rowMetric(totals, 'DisponibleErequester'))}</td>
+                <td class="pct-asig">${fmtPct(rowMetric(totals, 'PorcentajeAsignado'))}</td>
+                <td class="${rowMetric(totals, 'PorcentajeDisponible') < 0 ? 'pct-neg' : 'pct-disp'}">${fmtPct(rowMetric(totals, 'PorcentajeDisponible'))}</td>
+            </tr>
+        `;
+        areaBody.innerHTML = (bodyRows || emptyRow) + totalRow;
+    }
+
+    function renderCharts(etapaRows, areaRows) {
+        const topEtapas = etapaRows
+            .filter(row => rowMetric(row, 'AsignadoErequester') > 0 || rowMetric(row, 'EjecutadoErequester') > 0)
+            .sort((a, b) => rowMetric(b, 'AsignadoErequester') - rowMetric(a, 'AsignadoErequester'))
+            .slice(0, 8);
+        etapaChart.data.labels = topEtapas.map(row => (row.label || dimension(row, 'Rubros[Etapa]')).replace(/\s+/g, ' ').slice(0, 18));
+        etapaChart.data.datasets[0].label = 'PPTO ER';
+        etapaChart.data.datasets[0].data = topEtapas.map(row => toMillions(rowMetric(row, 'PresupuestoErequester')));
+        etapaChart.data.datasets[1].data = topEtapas.map(row => toMillions(rowMetric(row, 'EjecutadoErequester')));
+        etapaChart.data.datasets[2].data = topEtapas.map(row => toMillions(rowMetric(row, 'ComprometidoErequester')));
+        etapaChart.options.scales.y.ticks.callback = value => `${value}M`;
+        etapaChart.update();
+
+        areaChart.data.labels = areaRows.map(row => row.label || dimension(row, 'Rubros[Area]'));
+        areaChart.data.datasets[0].label = 'PPTO ER';
+        areaChart.data.datasets[0].data = areaRows.map(row => toMillions(rowMetric(row, 'PresupuestoErequester')));
+        areaChart.data.datasets[1].data = areaRows.map(row => toMillions(rowMetric(row, 'AsignadoErequester')));
+        areaChart.options.scales.y.ticks.callback = value => `${value}M`;
+        areaChart.update();
+    }
+
+    function renderPowerBIView() {
+        const data = powerBIState.data;
+        const datasets = data?.datasets || {};
+        const detailRows = getDetailRows(data);
+        let totals = datasets.totales?.[0] ? metricFromRow(datasets.totales[0]) : makeEmptyMetrics();
+        let areaRows = datasets.porArea || [];
+        let etapaRows = datasets.porEtapa || [];
+
+        if (detailRows.length) {
+            const rows = filteredDetailRows();
+            totals = sumRows(rows);
+            areaRows = groupRowsBy(rows, 'Rubros[Area]');
+            etapaRows = groupRowsBy(rows, 'Rubros[Etapa]');
+        } else if (powerBIState.filters.meses.length) {
+            const monthRows = getMonthRows(data)
+                .filter(row => powerBIState.filters.meses.includes(cleanDimension(dimension(row, 'Calendario[MesA]'))));
+            if (monthRows.length) totals = sumRows(monthRows);
+        }
+
+        renderMetrics(totals);
+        renderAreaTable(areaRows, totals);
+        renderCharts(etapaRows, areaRows);
+
+        if (data?.metadata?.generatedAt) {
+            const updated = new Date(data.metadata.generatedAt);
+            const month = powerBIState.filters.meses.length
+                ? powerBIState.filters.meses.join(', ')
+                : data.metadata.filters?.mesA || '';
+            setText('powerbi-updated', `Power BI Service: ${month} - ${updated.toLocaleString('es-GT')}`);
+        }
+    }
+
+    function renderPowerBIResumen(data) {
+        powerBIState.data = data;
+        bindPowerBIFilters();
+        populateFilterControls();
+        renderPowerBIView();
+    }
+
+    async function loadPowerBIResumenFromSupabase() {
+        try {
+            const { data, error } = await client
+                .from('powerbi_resumen_cache')
+                .select('payload, mes_a, generated_at, updated_at')
+                .eq('project_key', POWERBI_PROJECT_KEY)
+                .single();
+
+            if (error || !data?.payload) return false;
+            renderPowerBIResumen(data.payload);
+            return true;
+        } catch (error) {
+            console.warn('No se pudieron cargar datos de Power BI desde Supabase.', error);
+            return false;
+        }
+    }
+
+    async function loadPowerBIResumenFromLocalJson() {
+        try {
+            const response = await fetch('data/powerbi/hlq/resumen-powerbi.json', { cache: 'no-store' });
+            if (!response.ok) return false;
+            renderPowerBIResumen(await response.json());
+            return true;
+        } catch (error) {
+            console.warn('No se pudieron cargar datos locales de Power BI.', error);
+            return false;
+        }
+    }
+
+    async function loadPowerBIResumen() {
+        const loadedFromSupabase = await loadPowerBIResumenFromSupabase();
+        if (!loadedFromSupabase) await loadPowerBIResumenFromLocalJson();
+    }
+
+    loadPowerBIResumen();
+</script>
+<script src="assets/js/tracker.js"></script>
+
+<!-- ── CHAT WIDGET ── -->
+<style>
+  #chat-fab {
+    position: fixed; bottom: 24px; right: 24px; z-index: 1000;
+    width: 52px; height: 52px; border-radius: 50%;
+    background: linear-gradient(135deg, #C9A84C, #a8832e);
+    border: none; cursor: pointer;
+    box-shadow: 0 4px 20px rgba(201,168,76,0.45);
+    display: flex; align-items: center; justify-content: center;
+    transition: transform .2s, box-shadow .2s; color: #fff;
+  }
+  #chat-fab:hover { transform: scale(1.08); box-shadow: 0 6px 28px rgba(201,168,76,0.6); }
+  #chat-fab svg { width: 24px; height: 24px; fill: currentColor; }
+
+  #chat-panel {
+    position: fixed; bottom: 86px; right: 24px; z-index: 1000;
+    width: 360px; height: 500px;
+    background: #0f172a; border: 1px solid rgba(201,168,76,0.28);
+    border-radius: 16px; display: flex; flex-direction: column;
+    box-shadow: 0 16px 56px rgba(0,0,0,0.55);
+    overflow: hidden;
+    transform: scale(0.92) translateY(14px); opacity: 0; pointer-events: none;
+    transition: transform .22s ease, opacity .22s ease;
+  }
+  #chat-panel.open { transform: scale(1) translateY(0); opacity: 1; pointer-events: all; }
+
+  .cp-header {
+    background: linear-gradient(90deg, #0f172a, #1e293b);
+    border-bottom: 1px solid rgba(201,168,76,0.2);
+    padding: 13px 14px; display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+  }
+  .cp-icon {
+    width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0;
+    background: rgba(201,168,76,0.13); border: 1px solid rgba(201,168,76,0.28);
+    display: flex; align-items: center; justify-content: center; font-size: 15px;
+  }
+  .cp-title { font-size: 0.82rem; font-weight: 700; color: #fff; }
+  .cp-sub { font-size: 0.6rem; color: rgba(201,168,76,0.65); margin-top: 1px; }
+  .cp-close {
+    margin-left: auto; background: none; border: none; cursor: pointer;
+    color: rgba(255,255,255,0.35); padding: 4px; border-radius: 6px;
+    display: flex; transition: color .15s, background .15s;
+  }
+  .cp-close:hover { color: #fff; background: rgba(255,255,255,0.07); }
+  .cp-close svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; }
+
+  .cp-messages {
+    flex: 1; overflow-y: auto; padding: 14px 14px 6px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .cp-messages::-webkit-scrollbar { width: 4px; }
+  .cp-messages::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+
+  .cp-msg { display: flex; flex-direction: column; max-width: 86%; }
+  .cp-msg.user { align-self: flex-end; align-items: flex-end; }
+  .cp-msg.assistant { align-self: flex-start; align-items: flex-start; }
+
+  .cp-bubble {
+    padding: 9px 13px; border-radius: 12px;
+    font-size: 0.77rem; line-height: 1.55; color: #fff;
+    white-space: pre-wrap; word-break: break-word;
+  }
+  .cp-msg.user .cp-bubble {
+    background: linear-gradient(135deg, #C9A84C, #a8832e);
+    border-bottom-right-radius: 4px;
+  }
+  .cp-msg.assistant .cp-bubble {
+    background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1);
+    border-bottom-left-radius: 4px;
+  }
+
+  .cp-typing { display: flex; gap: 4px; padding: 9px 13px; }
+  .cp-typing span {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: rgba(201,168,76,0.55); animation: cpBounce .9s infinite;
+  }
+  .cp-typing span:nth-child(2) { animation-delay: .18s; }
+  .cp-typing span:nth-child(3) { animation-delay: .36s; }
+  @keyframes cpBounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-6px)} }
+
+  .cp-footer {
+    border-top: 1px solid rgba(255,255,255,0.07);
+    padding: 10px 12px; display: flex; gap: 8px; flex-shrink: 0;
+    background: rgba(0,0,0,0.18);
+  }
+  #cp-input {
+    flex: 1; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.13);
+    border-radius: 10px; padding: 8px 12px; color: #fff; font-size: 0.77rem;
+    font-family: inherit; outline: none; resize: none; line-height: 1.45;
+    transition: border-color .15s;
+  }
+  #cp-input::placeholder { color: rgba(255,255,255,0.28); }
+  #cp-input:focus { border-color: rgba(201,168,76,0.45); }
+  #cp-send {
+    width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
+    background: linear-gradient(135deg, #C9A84C, #a8832e); border: none;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    align-self: flex-end; transition: opacity .15s;
+  }
+  #cp-send:hover { opacity: 0.85; }
+  #cp-send:disabled { opacity: 0.38; cursor: not-allowed; }
+  #cp-send svg { width: 15px; height: 15px; fill: #fff; }
+</style>
+
+<button id="chat-fab" title="Asistente IA">
+  <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 10H6v-2h12v2zm0-3H6V7h12v2z"/></svg>
+</button>
+
+<div id="chat-panel">
+  <div class="cp-header">
+    <div class="cp-icon">🤖</div>
+    <div>
+      <div class="cp-title">Asistente HLQ</div>
+      <div class="cp-sub">Datos en tiempo real desde Power BI</div>
+    </div>
+    <button class="cp-close" id="cp-close">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="cp-messages" id="cp-messages">
+    <div class="cp-msg assistant">
+      <div class="cp-bubble">Hola 👋 Soy tu asistente para Hacienda La Querencia. Puedo responderte preguntas sobre presupuesto, ejecución, áreas y etapas del proyecto. ¿En qué te ayudo?</div>
+    </div>
+  </div>
+  <div class="cp-footer">
+    <textarea id="cp-input" rows="2" placeholder="Ej: ¿Cuánto hemos ejecutado en Urbanización?"></textarea>
+    <button id="cp-send">
+      <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+(function () {
+  const EDGE_URL = 'https://iipgrojliqeyycvgnkrc.supabase.co/functions/v1/ai-agent';
+  const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlpcGdyb2psaXFleXljdmdua3JjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NzA1NzYsImV4cCI6MjA5MTM0NjU3Nn0.Y6FQ-1qWd7HPMvTnK4alpKxM-YLJ5CsKmkorAZKMJrg';
+
+  const fab      = document.getElementById('chat-fab');
+  const panel    = document.getElementById('chat-panel');
+  const closeBtn = document.getElementById('cp-close');
+  const messages = document.getElementById('cp-messages');
+  const input    = document.getElementById('cp-input');
+  const sendBtn  = document.getElementById('cp-send');
+
+  let history = [];
+
+  fab.addEventListener('click', () => panel.classList.add('open'));
+  closeBtn.addEventListener('click', () => panel.classList.remove('open'));
+
+  function addMsg(role, text) {
+    const wrap   = document.createElement('div');
+    wrap.className = `cp-msg ${role}`;
+    const bubble = document.createElement('div');
+    bubble.className = 'cp-bubble';
+    bubble.textContent = text;
+    wrap.appendChild(bubble);
+    messages.appendChild(wrap);
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  function addTyping() {
+    const wrap = document.createElement('div');
+    wrap.className = 'cp-msg assistant';
+    wrap.id = 'cp-typing';
+    wrap.innerHTML = '<div class="cp-bubble cp-typing"><span></span><span></span><span></span></div>';
+    messages.appendChild(wrap);
+    messages.scrollTop = messages.scrollHeight;
+    return wrap;
+  }
+
+  async function send() {
+    const text = input.value.trim();
+    if (!text || sendBtn.disabled) return;
+
+    input.value = '';
+    sendBtn.disabled = true;
+    addMsg('user', text);
+    const typing = addTyping();
+
+    try {
+      const session = JSON.parse(localStorage.getItem('sb-iipgrojliqeyycvgnkrc-auth-token') || 'null');
+      const token   = session?.access_token ?? '';
+
+      const res  = await fetch(EDGE_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          'apikey': ANON_KEY,
+        },
+        body: JSON.stringify({ message: text, project_key: POWERBI_PROJECT_KEY, history }),
+      });
+
+      const json  = await res.json();
+      typing.remove();
+      const reply = json.reply || json.error || 'Sin respuesta del servidor.';
+      addMsg('assistant', reply);
+
+      history.push({ role: 'user', content: text });
+      history.push({ role: 'assistant', content: reply });
+      if (history.length > 12) history = history.slice(-12);
+
+    } catch {
+      typing.remove();
+      addMsg('assistant', 'Error al conectar. Verifica tu conexión e intenta de nuevo.');
+    } finally {
+      sendBtn.disabled = false;
+      input.focus();
+    }
+  }
+
+  sendBtn.addEventListener('click', send);
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+  });
+})();
+</script>
+<!-- ── /CHAT WIDGET ── -->
+</body>
+</html>
