@@ -130,9 +130,10 @@ function Publish-SupabaseResumen {
         Prefer = "resolution=merge-duplicates,return=minimal"
     }
 
-    $uri = "$SupabaseUrl/rest/v1/powerbi_resumen_cache"
-    $body = $row | ConvertTo-Json -Depth 100
-    Invoke-RestMethod -Uri $uri -Method Post -Headers $headers -ContentType "application/json" -Body $body | Out-Null
+    $uri = "$SupabaseUrl/rest/v1/powerbi_resumen_cache?on_conflict=project_key"
+    $body = $row | ConvertTo-Json -Depth 100 -Compress
+    $bodyBytes = [System.Text.Encoding]::UTF8.GetBytes($body)
+    Invoke-RestMethod -Uri $uri -Method Post -Headers $headers -ContentType "application/json; charset=utf-8" -Body $bodyBytes | Out-Null
 }
 
 $repoRoot = Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..\..")
