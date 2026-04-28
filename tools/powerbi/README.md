@@ -20,12 +20,41 @@ powershell -ExecutionPolicy Bypass -File .\tools\powerbi\sync-powerbi-resumen.ps
 
 La primera ejecucion puede pedir inicio de sesion de Microsoft. Usa la cuenta que tiene acceso al reporte en Power BI.
 
+## Hacienda La Querencia
+
+Para sincronizar el reporte `06_DashboardPresupuesto_HLQ` de abril 2026:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\tools\powerbi\sync-powerbi-hlq.ps1
+```
+
+Para subirlo a Supabase con `project_key = hlq`:
+
+```powershell
+$env:SUPABASE_SERVICE_ROLE_KEY = "pegar_service_role_key_aqui"
+powershell -ExecutionPolicy Bypass -File .\tools\powerbi\sync-powerbi-hlq.ps1 -UploadSupabase
+```
+
+Si ya generaste el JSON local y solo necesitas subirlo a Supabase:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\tools\powerbi\upload-powerbi-hlq.ps1
+```
+
+Si necesitas otro mes, pasa el valor del modelo:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\tools\powerbi\sync-powerbi-hlq.ps1 -MesA "may 26" -UploadSupabase
+```
+
 ## Salidas locales
 
 - `data/powerbi/totales.json`
 - `data/powerbi/porArea.json`
 - `data/powerbi/porEtapa.json`
 - `data/powerbi/porSegmento.json`
+- `data/powerbi/porFase.json`
+- `data/powerbi/detalleFiltros.json`
 - `data/powerbi/porMes.json`
 - `data/powerbi/porMesResumen.json`
 - `data/powerbi/resumen-powerbi.json`

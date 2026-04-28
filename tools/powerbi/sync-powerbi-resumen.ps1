@@ -1,10 +1,14 @@
 param(
     [string]$WorkspaceId = "d111fc11-b7f3-4976-b74b-99f47f06bd22",
     [string]$ReportId = "f3fdef8d-947a-4e1a-9188-c774420fde9c",
+    [string]$ReportName = "",
+    [switch]$IncludeFilterDetail,
     [string]$DatasetId = "",
     [string]$ProjectKey = "bse",
     [string]$ProjectName = "Bosques de Santa Elena",
     [string]$MesA = "abr 26",
+    [string]$ModelProfile = "bse",
+    [string[]]$AreaFilterValues = @(),
     [string]$OutputDir = "data/powerbi",
     [switch]$UploadSupabase,
     [string]$SupabaseUrl = "https://iipgrojliqeyycvgnkrc.supabase.co",
@@ -29,7 +33,24 @@ function ConvertTo-Utf8JsonFile {
     if ($folder -and -not (Test-Path -LiteralPath $folder)) {
         New-Item -ItemType Directory -Force -Path $folder | Out-Null
     }
-    [System.IO.File]::WriteAllText((Resolve-Path -LiteralPath $folder).Path + "\" + (Split-Path -Leaf $Path), $json, [System.Text.Encoding]::UTF8)
+    $utf8NoBom = [System.Text.UTF8Encoding]::new($false)
+    [System.IO.File]::WriteAllText((Resolve-Path -LiteralPath $folder).Path + "\" + (Split-Path -Leaf $Path), $json, $utf8NoBom)
+}
+
+function ConvertTo-DaxIdentifier {
+    param(
+        [Parameter(Mandatory = $true)][string]$TableName,
+        [Parameter(Mandatory = $true)][string]$ObjectName
+    )
+
+    $safeTable = $TableName.Replace("'", "''")
+    $safeObject = $ObjectName.Replace("]", "]]")
+    return "'$safeTable'[$safeObject]"
+}
+
+function ConvertTo-DaxStringLiteral {
+    param([Parameter(Mandatory = $true)][string]$Value)
+    return '"' + $Value.Replace('"', '""') + '"'
 }
 
 function Invoke-PowerBIDaxQuery {
@@ -92,6 +113,29 @@ function Get-ErrorText {
     return ($parts | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }) -join "`n"
 }
 
+function Resolve-PowerBIReportByName {
+    param(
+        [Parameter(Mandatory = $true)][string]$WorkspaceId,
+        [Parameter(Mandatory = $true)][string]$ReportName
+    )
+
+    Write-Info "Buscando reporte por nombre: $ReportName"
+    $reportsResponse = Invoke-PowerBIRestMethod -Url "groups/$WorkspaceId/reports" -Method Get
+    $reports = @((($reportsResponse | ConvertFrom-Json).value))
+    $matches = @($reports | Where-Object { $_.name -eq $ReportName })
+
+    if ($matches.Count -eq 0) {
+        $available = ($reports | Select-Object -ExpandProperty name) -join ", "
+        throw "No se encontro el reporte '$ReportName' en el workspace. Reportes disponibles: $available"
+    }
+
+    if ($matches.Count -gt 1) {
+        throw "Se encontro mas de un reporte con el nombre '$ReportName'. Pasa -ReportId para evitar ambiguedad."
+    }
+
+    return $matches[0]
+}
+
 function Publish-SupabaseResumen {
     param(
         [Parameter(Mandatory = $true)]$Payload,
@@ -143,6 +187,18 @@ New-Item -ItemType Directory -Force -Path $outputPath | Out-Null
 Write-Info "Iniciando sesion. Usa tu cuenta de Microsoft con acceso al reporte."
 Connect-PowerBIServiceAccount | Out-Null
 
+if (-not [string]::IsNullOrWhiteSpace($ReportName)) {
+    $resolvedReport = Resolve-PowerBIReportByName -WorkspaceId $WorkspaceId -ReportName $ReportName
+    $ReportId = $resolvedReport.id
+    if ([string]::IsNullOrWhiteSpace($DatasetId)) {
+        $DatasetId = $resolvedReport.datasetId
+    }
+}
+
+if ([string]::IsNullOrWhiteSpace($ReportId)) {
+    throw "Falta ReportId. Pasa -ReportId o -ReportName."
+}
+
 if ([string]::IsNullOrWhiteSpace($DatasetId)) {
     Write-Info "Resolviendo dataset desde el reporte $ReportId"
     $reportResponse = Invoke-PowerBIRestMethod -Url "groups/$WorkspaceId/reports/$ReportId" -Method Get
@@ -165,6 +221,7 @@ $metadata = [ordered]@{
     datasetId = $DatasetId
     projectKey = $ProjectKey
     projectName = $ProjectName
+    modelProfile = $ModelProfile
     filters = [ordered]@{
         areas = @("Construccion", "Urbanizacion")
         mesA = $MesA
@@ -172,8 +229,57 @@ $metadata = [ordered]@{
     source = "Power BI Service"
 }
 
-$areaFilterDax = 'TREATAS({"Construcci" & UNICHAR(243) & "n", "Urbanizaci" & UNICHAR(243) & "n"}, ''Rubros''[Area])'
-$monthFilterDax = "TREATAS({`"$MesA`"}, 'Calendario'[MesA])"
+if ($ModelProfile -eq "hlq") {
+    $accentO = [char]0x00f3
+    $accentU = [char]0x00fa
+    $accentUpperO = [char]0x00d3
+    $segmentacionTable = "dimSegmentaci" + $accentO + "n"
+    $presupuestoRdiMeasure = "Presupuesto Seg" + $accentU + "n RDI"
+
+    $areaColumnDax = ConvertTo-DaxIdentifier -TableName $segmentacionTable -ObjectName "Area"
+    $segmentoColumnDax = ConvertTo-DaxIdentifier -TableName $segmentacionTable -ObjectName "Segmento"
+    $etapaColumnDax = ConvertTo-DaxIdentifier -TableName $segmentacionTable -ObjectName "Etapa"
+    $faseColumnDax = ConvertTo-DaxIdentifier -TableName "dimFase" -ObjectName "Fase"
+    $monthColumnDax = ConvertTo-DaxIdentifier -TableName "Calendario" -ObjectName "MesA"
+
+    $rdiMeasureDax = ConvertTo-DaxIdentifier -TableName "Medidas" -ObjectName $presupuestoRdiMeasure
+    $pptoErMeasureDax = ConvertTo-DaxIdentifier -TableName "Medidas" -ObjectName $presupuestoRdiMeasure
+    $ejecutadoMeasureDax = ConvertTo-DaxIdentifier -TableName "Medidas" -ObjectName "Ejecutado"
+    $comprometidoMeasureDax = ConvertTo-DaxIdentifier -TableName "Medidas" -ObjectName "Comprometido"
+    $asignadoMeasureDax = ConvertTo-DaxIdentifier -TableName "Medidas" -ObjectName "Asignado"
+    $disponibleMeasureDax = ConvertTo-DaxIdentifier -TableName "Medidas" -ObjectName "Disponible"
+    $pctAsignadoMeasureDax = ConvertTo-DaxIdentifier -TableName "Medidas" -ObjectName "% Asignado"
+    $pctDisponibleMeasureDax = ConvertTo-DaxIdentifier -TableName "Medidas" -ObjectName "% Disponible"
+
+    if ($AreaFilterValues.Count -eq 0) {
+        $AreaFilterValues = @(("CONSTRUCCI" + $accentUpperO + "N"), ("URBANIZACI" + $accentUpperO + "N"))
+    }
+} else {
+    $areaColumnDax = ConvertTo-DaxIdentifier -TableName "Rubros" -ObjectName "Area"
+    $segmentoColumnDax = ConvertTo-DaxIdentifier -TableName "Rubros" -ObjectName "Segmento"
+    $etapaColumnDax = ConvertTo-DaxIdentifier -TableName "Rubros" -ObjectName "Etapa"
+    $faseColumnDax = ConvertTo-DaxIdentifier -TableName "Rubros" -ObjectName "Fase"
+    $monthColumnDax = ConvertTo-DaxIdentifier -TableName "Calendario" -ObjectName "MesA"
+
+    $rdiMeasureDax = ConvertTo-DaxIdentifier -TableName "Medidas" -ObjectName "RDI Total"
+    $pptoErMeasureDax = ConvertTo-DaxIdentifier -TableName "Medidas" -ObjectName "Presupuesto Erequester"
+    $ejecutadoMeasureDax = ConvertTo-DaxIdentifier -TableName "Medidas" -ObjectName "Ejecutado Erequester"
+    $comprometidoMeasureDax = ConvertTo-DaxIdentifier -TableName "Medidas" -ObjectName "Comprometido Erequester"
+    $asignadoMeasureDax = ConvertTo-DaxIdentifier -TableName "Medidas" -ObjectName "Asignado Erequester"
+    $disponibleMeasureDax = ConvertTo-DaxIdentifier -TableName "Medidas" -ObjectName "Disponible Erequester"
+    $pctAsignadoMeasureDax = ConvertTo-DaxIdentifier -TableName "Medidas" -ObjectName "% Asignado"
+    $pctDisponibleMeasureDax = ConvertTo-DaxIdentifier -TableName "Medidas" -ObjectName "% Disponible"
+
+    if ($AreaFilterValues.Count -eq 0) {
+        $accentO = [char]0x00f3
+        $AreaFilterValues = @(("Construcci" + $accentO + "n"), ("Urbanizaci" + $accentO + "n"))
+    }
+}
+
+$areaFilterListDax = ($AreaFilterValues | ForEach-Object { ConvertTo-DaxStringLiteral $_ }) -join ", "
+$areaFilterDax = "TREATAS({$areaFilterListDax}, $areaColumnDax)"
+$monthFilterDax = "TREATAS({$(ConvertTo-DaxStringLiteral $MesA)}, $monthColumnDax)"
+$metadata.filters.areas = @($AreaFilterValues)
 
 $queries = [ordered]@{
     totales = @"
@@ -181,91 +287,132 @@ EVALUATE
 SUMMARIZECOLUMNS(
     $areaFilterDax,
     $monthFilterDax,
-    "RdiTotal", 'Medidas'[RDI Total],
-    "PresupuestoErequester", 'Medidas'[Presupuesto Erequester],
-    "EjecutadoErequester", 'Medidas'[Ejecutado Erequester],
-    "ComprometidoErequester", 'Medidas'[Comprometido Erequester],
-    "AsignadoErequester", 'Medidas'[Asignado Erequester],
-    "DisponibleErequester", 'Medidas'[Disponible Erequester],
-    "PorcentajeAsignado", 'Medidas'[% Asignado],
-    "PorcentajeDisponible", 'Medidas'[% Disponible]
+    "RdiTotal", $rdiMeasureDax,
+    "PresupuestoErequester", $pptoErMeasureDax,
+    "EjecutadoErequester", $ejecutadoMeasureDax,
+    "ComprometidoErequester", $comprometidoMeasureDax,
+    "AsignadoErequester", $asignadoMeasureDax,
+    "DisponibleErequester", $disponibleMeasureDax,
+    "PorcentajeAsignado", $pctAsignadoMeasureDax,
+    "PorcentajeDisponible", $pctDisponibleMeasureDax
 )
 "@
     porArea = @"
 EVALUATE
 SUMMARIZECOLUMNS(
-    'Rubros'[Area],
+    $areaColumnDax,
     $areaFilterDax,
     $monthFilterDax,
-    "RdiTotal", 'Medidas'[RDI Total],
-    "PresupuestoErequester", 'Medidas'[Presupuesto Erequester],
-    "EjecutadoErequester", 'Medidas'[Ejecutado Erequester],
-    "ComprometidoErequester", 'Medidas'[Comprometido Erequester],
-    "AsignadoErequester", 'Medidas'[Asignado Erequester],
-    "DisponibleErequester", 'Medidas'[Disponible Erequester],
-    "PorcentajeAsignado", 'Medidas'[% Asignado],
-    "PorcentajeDisponible", 'Medidas'[% Disponible]
+    "RdiTotal", $rdiMeasureDax,
+    "PresupuestoErequester", $pptoErMeasureDax,
+    "EjecutadoErequester", $ejecutadoMeasureDax,
+    "ComprometidoErequester", $comprometidoMeasureDax,
+    "AsignadoErequester", $asignadoMeasureDax,
+    "DisponibleErequester", $disponibleMeasureDax,
+    "PorcentajeAsignado", $pctAsignadoMeasureDax,
+    "PorcentajeDisponible", $pctDisponibleMeasureDax
 )
-ORDER BY 'Rubros'[Area]
+ORDER BY $areaColumnDax
 "@
     porEtapa = @"
 EVALUATE
 SUMMARIZECOLUMNS(
-    'Rubros'[Etapa],
+    $etapaColumnDax,
     $areaFilterDax,
     $monthFilterDax,
-    "RdiTotal", 'Medidas'[RDI Total],
-    "PresupuestoErequester", 'Medidas'[Presupuesto Erequester],
-    "EjecutadoErequester", 'Medidas'[Ejecutado Erequester],
-    "ComprometidoErequester", 'Medidas'[Comprometido Erequester],
-    "AsignadoErequester", 'Medidas'[Asignado Erequester],
-    "DisponibleErequester", 'Medidas'[Disponible Erequester],
-    "PorcentajeAsignado", 'Medidas'[% Asignado],
-    "PorcentajeDisponible", 'Medidas'[% Disponible]
+    "RdiTotal", $rdiMeasureDax,
+    "PresupuestoErequester", $pptoErMeasureDax,
+    "EjecutadoErequester", $ejecutadoMeasureDax,
+    "ComprometidoErequester", $comprometidoMeasureDax,
+    "AsignadoErequester", $asignadoMeasureDax,
+    "DisponibleErequester", $disponibleMeasureDax,
+    "PorcentajeAsignado", $pctAsignadoMeasureDax,
+    "PorcentajeDisponible", $pctDisponibleMeasureDax
 )
-ORDER BY 'Rubros'[Etapa]
+ORDER BY $etapaColumnDax
 "@
     porSegmento = @"
 EVALUATE
 SUMMARIZECOLUMNS(
-    'Rubros'[Segmento],
+    $segmentoColumnDax,
     $areaFilterDax,
     $monthFilterDax,
-    "RdiTotal", 'Medidas'[RDI Total],
-    "PresupuestoErequester", 'Medidas'[Presupuesto Erequester],
-    "EjecutadoErequester", 'Medidas'[Ejecutado Erequester],
-    "ComprometidoErequester", 'Medidas'[Comprometido Erequester],
-    "AsignadoErequester", 'Medidas'[Asignado Erequester],
-    "DisponibleErequester", 'Medidas'[Disponible Erequester],
-    "PorcentajeAsignado", 'Medidas'[% Asignado],
-    "PorcentajeDisponible", 'Medidas'[% Disponible]
+    "RdiTotal", $rdiMeasureDax,
+    "PresupuestoErequester", $pptoErMeasureDax,
+    "EjecutadoErequester", $ejecutadoMeasureDax,
+    "ComprometidoErequester", $comprometidoMeasureDax,
+    "AsignadoErequester", $asignadoMeasureDax,
+    "DisponibleErequester", $disponibleMeasureDax,
+    "PorcentajeAsignado", $pctAsignadoMeasureDax,
+    "PorcentajeDisponible", $pctDisponibleMeasureDax
 )
-ORDER BY 'Rubros'[Segmento]
+ORDER BY $segmentoColumnDax
 "@
     porMes = @"
 EVALUATE
 SUMMARIZECOLUMNS(
-    'Calendario'[MesA],
-    "AsignadoErequester", 'Medidas'[Asignado Erequester],
-    "EjecutadoErequester", 'Medidas'[Ejecutado Erequester]
+    $monthColumnDax,
+    "AsignadoErequester", $asignadoMeasureDax,
+    "EjecutadoErequester", $ejecutadoMeasureDax
 )
-ORDER BY 'Calendario'[MesA]
+ORDER BY $monthColumnDax
 "@
     porMesResumen = @"
 EVALUATE
 SUMMARIZECOLUMNS(
-    'Calendario'[MesA],
+    $monthColumnDax,
     $areaFilterDax,
-    "RdiTotal", 'Medidas'[RDI Total],
-    "PresupuestoErequester", 'Medidas'[Presupuesto Erequester],
-    "EjecutadoErequester", 'Medidas'[Ejecutado Erequester],
-    "ComprometidoErequester", 'Medidas'[Comprometido Erequester],
-    "AsignadoErequester", 'Medidas'[Asignado Erequester],
-    "DisponibleErequester", 'Medidas'[Disponible Erequester],
-    "PorcentajeAsignado", 'Medidas'[% Asignado],
-    "PorcentajeDisponible", 'Medidas'[% Disponible]
+    "RdiTotal", $rdiMeasureDax,
+    "PresupuestoErequester", $pptoErMeasureDax,
+    "EjecutadoErequester", $ejecutadoMeasureDax,
+    "ComprometidoErequester", $comprometidoMeasureDax,
+    "AsignadoErequester", $asignadoMeasureDax,
+    "DisponibleErequester", $disponibleMeasureDax,
+    "PorcentajeAsignado", $pctAsignadoMeasureDax,
+    "PorcentajeDisponible", $pctDisponibleMeasureDax
 )
-ORDER BY 'Calendario'[MesA]
+ORDER BY $monthColumnDax
+"@
+}
+
+if ($IncludeFilterDetail) {
+    $queries.porFase = @"
+EVALUATE
+SUMMARIZECOLUMNS(
+    $faseColumnDax,
+    $areaFilterDax,
+    $monthFilterDax,
+    "RdiTotal", $rdiMeasureDax,
+    "PresupuestoErequester", $pptoErMeasureDax,
+    "EjecutadoErequester", $ejecutadoMeasureDax,
+    "ComprometidoErequester", $comprometidoMeasureDax,
+    "AsignadoErequester", $asignadoMeasureDax,
+    "DisponibleErequester", $disponibleMeasureDax,
+    "PorcentajeAsignado", $pctAsignadoMeasureDax,
+    "PorcentajeDisponible", $pctDisponibleMeasureDax
+)
+ORDER BY $faseColumnDax
+"@
+
+    $queries.detalleFiltros = @"
+EVALUATE
+SUMMARIZECOLUMNS(
+    $monthColumnDax,
+    $areaColumnDax,
+    $segmentoColumnDax,
+    $etapaColumnDax,
+    $faseColumnDax,
+    $areaFilterDax,
+    "RdiTotal", $rdiMeasureDax,
+    "PresupuestoErequester", $pptoErMeasureDax,
+    "EjecutadoErequester", $ejecutadoMeasureDax,
+    "ComprometidoErequester", $comprometidoMeasureDax,
+    "AsignadoErequester", $asignadoMeasureDax,
+    "DisponibleErequester", $disponibleMeasureDax,
+    "PorcentajeAsignado", $pctAsignadoMeasureDax,
+    "PorcentajeDisponible", $pctDisponibleMeasureDax
+)
+ORDER BY $monthColumnDax, $areaColumnDax, $segmentoColumnDax, $etapaColumnDax, $faseColumnDax
 "@
 }
 

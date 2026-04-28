@@ -609,8 +609,21 @@
         bg:     '#f0f4f8'
     };
 
+    const DIMENSION_ALIASES = {
+        'Rubros[Area]': ['Rubros[Area]', 'dimSegmentación[Area]', 'Segmentación[Area]', 'Area'],
+        'Rubros[Segmento]': ['Rubros[Segmento]', 'dimSegmentación[Segmento]', 'Segmentación[Segmento]', 'Segmento'],
+        'Rubros[Etapa]': ['Rubros[Etapa]', 'dimSegmentación[Etapa]', 'Segmentación[Etapa]', 'Etapa'],
+        'Rubros[Fase]': ['Rubros[Fase]', 'dimFase[Fase]', 'Fase[Fase]', 'Fase'],
+        'Calendario[MesA]': ['Calendario[MesA]', 'MesA', 'Mes']
+    };
     const field = (row, name) => row?.[`[${name}]`] ?? row?.[name] ?? 0;
-    const dimension = (row, name) => row?.[name] ?? '';
+    const dimension = (row, name) => {
+        const aliases = DIMENSION_ALIASES[name] || [name];
+        for (const alias of aliases) {
+            if (row?.[alias] !== undefined && row?.[alias] !== null) return row[alias];
+        }
+        return '';
+    };
     const toMillions = value => Number(value || 0) / 1000000;
     const fmtMillions = value => `${toMillions(value).toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span>mill.</span>`;
     const fmtMillionsText = value => `${toMillions(value).toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}M`;

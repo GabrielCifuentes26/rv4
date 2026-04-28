@@ -1,9 +1,14 @@
 node_modules/
 .claude/
+supabase/.temp/
 *.log
 serviceAccountKey.json
 data/powerbi/*.log
 data/powerbi/*.json
+data/powerbi/**/*.log
+data/powerbi/**/*.json
+data/powerbi/**/*.pbix
+data/powerbi/**/pbix-extract/
 data/powerbi/metadata-*.json
 data/powerbi/prueba.json
 data/powerbi/service-report-export.pbix
