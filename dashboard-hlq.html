@@ -287,21 +287,34 @@
             margin: 0;
         }
         .filter-clear-one {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
             background: none;
-            border: none;
-            color: rgba(201,168,76,0.45);
-            font-size: 0.62rem;
+            border: 1px solid rgba(201,168,76,0.25);
+            color: rgba(201,168,76,0.6);
+            font-size: 0.55rem;
             font-weight: 700;
+            font-family: inherit;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
             cursor: pointer;
-            padding: 1px 4px;
-            border-radius: 3px;
+            padding: 2px 6px;
+            border-radius: 4px;
             line-height: 1;
-            transition: color .15s, background .15s;
+            transition: color .15s, background .15s, border-color .15s;
             flex-shrink: 0;
         }
         .filter-clear-one:hover {
             color: #C9A84C;
-            background: rgba(201,168,76,0.15);
+            background: rgba(201,168,76,0.12);
+            border-color: rgba(201,168,76,0.5);
+        }
+        .filter-clear-one svg {
+            width: 9px;
+            height: 9px;
+            fill: currentColor;
+            flex-shrink: 0;
         }
         .filter-select,
         .filter-trigger {
@@ -541,7 +554,7 @@
             <div class="filter-card" id="area-filter-card">
                 <div class="filter-header-row">
                     <label class="filter-label">Área</label>
-                    <button class="filter-clear-one" type="button" data-clear-filter="areas" title="Limpiar filtro Área">✕</button>
+                    <button class="filter-clear-one" type="button" data-clear-filter="areas" title="Limpiar filtro Área"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 5H7.83L2 11l5.83 6H20a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1zm-7 8H9l-2-2 2-2h4v4zm2-4h2v4h-2v-4z" opacity=".4"/><path d="M20 5H7.83L2 11l5.83 6H20a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1zM9 15l-2-2 2-2h4v4H9z"/></svg>Borrar</button>
                 </div>
                 <button class="filter-trigger" type="button" id="filter-area-button"><span id="filter-area-label">Seleccion multiple</span></button>
                 <div class="filter-menu" id="filter-area-menu"></div>
@@ -549,7 +562,7 @@
             <div class="filter-card" id="segmento-filter-card">
                 <div class="filter-header-row">
                     <label class="filter-label">Segmento</label>
-                    <button class="filter-clear-one" type="button" data-clear-filter="segmentos" title="Limpiar filtro Segmento">✕</button>
+                    <button class="filter-clear-one" type="button" data-clear-filter="segmentos" title="Limpiar filtro Segmento"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 5H7.83L2 11l5.83 6H20a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1zM9 15l-2-2 2-2h4v4H9z"/></svg>Borrar</button>
                 </div>
                 <button class="filter-trigger" type="button" id="filter-segmento-button"><span id="filter-segmento-label">Seleccion multiple</span></button>
                 <div class="filter-menu" id="filter-segmento-menu"></div>
@@ -557,7 +570,7 @@
             <div class="filter-card" id="fase-filter-card">
                 <div class="filter-header-row">
                     <label class="filter-label">Fase</label>
-                    <button class="filter-clear-one" type="button" data-clear-filter="fases" title="Limpiar filtro Fase">✕</button>
+                    <button class="filter-clear-one" type="button" data-clear-filter="fases" title="Limpiar filtro Fase"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 5H7.83L2 11l5.83 6H20a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1zM9 15l-2-2 2-2h4v4H9z"/></svg>Borrar</button>
                 </div>
                 <button class="filter-trigger" type="button" id="filter-fase-button"><span id="filter-fase-label">Seleccion multiple</span></button>
                 <div class="filter-menu" id="filter-fase-menu"></div>
@@ -565,7 +578,7 @@
             <div class="filter-card" id="mes-filter-card">
                 <div class="filter-header-row">
                     <label class="filter-label">Meses</label>
-                    <button class="filter-clear-one" type="button" data-clear-filter="meses" title="Limpiar filtro Meses">✕</button>
+                    <button class="filter-clear-one" type="button" data-clear-filter="meses" title="Limpiar filtro Meses"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 5H7.83L2 11l5.83 6H20a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1zM9 15l-2-2 2-2h4v4H9z"/></svg>Borrar</button>
                 </div>
                 <button class="filter-trigger" type="button" id="filter-mes-button"><span id="filter-mes-label">Seleccion multiple</span></button>
                 <div class="filter-menu" id="filter-mes-menu"></div>
