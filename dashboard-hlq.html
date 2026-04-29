@@ -250,7 +250,7 @@
         }
         .filters-grid {
             display: grid;
-            grid-template-columns: repeat(6, minmax(120px, 1fr));
+            grid-template-columns: repeat(5, minmax(140px, 1fr));
             gap: 10px;
             align-items: end;
             min-width: 0;
@@ -578,15 +578,7 @@
                 <button class="filter-trigger" type="button" id="filter-etapa-button"><span id="filter-etapa-label">Seleccion multiple</span></button>
                 <div class="filter-menu" id="filter-etapa-menu"></div>
             </div>
-            <div class="filter-card" id="inmueble-filter-card">
-                <div class="filter-header-row">
-                    <label class="filter-label">Inmueble</label>
-                    <button class="filter-clear-one" type="button" data-clear-filter="inmuebles" title="Limpiar filtro Inmueble"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 5H7.83L2 11l5.83 6H20a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1zM9 15l-2-2 2-2h4v4H9z"/></svg>Borrar</button>
-                </div>
-                <button class="filter-trigger" type="button" id="filter-inmueble-button"><span id="filter-inmueble-label">Seleccion multiple</span></button>
-                <div class="filter-menu" id="filter-inmueble-menu"></div>
-            </div>
-            <div class="filter-card" id="fase-filter-card">
+<div class="filter-card" id="fase-filter-card">
                 <div class="filter-header-row">
                     <label class="filter-label">Fase</label>
                     <button class="filter-clear-one" type="button" data-clear-filter="fases" title="Limpiar filtro Fase"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 5H7.83L2 11l5.83 6H20a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1zM9 15l-2-2 2-2h4v4H9z"/></svg>Borrar</button>
@@ -735,7 +727,6 @@
         'Rubros[Area]':     ['Rubros[Area]',     'dimSegmentación[Area]',     'Segmentación[Area]',     'Area'],
         'Rubros[Segmento]': ['Rubros[Segmento]', 'dimSegmentación[Segmento]', 'Segmentación[Segmento]', 'Segmento'],
         'Rubros[Etapa]':    ['Rubros[Etapa]',    'dimSegmentación[Etapa]',    'Segmentación[Etapa]',    'Etapa'],
-        'Rubros[Inmueble]': ['Rubros[Inmueble]', 'dimSegmentación[Inmueble]', 'Segmentación[Inmueble]', 'Inmueble'],
         'Rubros[Fase]':     ['Rubros[Fase]',     'dimFase[Fase]',             'Fase[Fase]',             'Fase'],
         'Calendario[MesA]': ['Calendario[MesA]', 'MesA', 'Mes']
     };
@@ -825,17 +816,16 @@
     const MONTH_ORDER = { ene: 0, feb: 1, mar: 2, abr: 3, may: 4, jun: 5, jul: 6, ago: 7, sep: 8, oct: 9, nov: 10, dic: 11 };
     const powerBIState = {
         data: null,
-        filters: { areas: [], segmentos: [], etapas: [], inmuebles: [], fases: [], meses: [] },
-        options: { areas: [], segmentos: [], etapas: [], inmuebles: [], fases: [], meses: [] },
+        filters: { areas: [], segmentos: [], etapas: [], fases: [], meses: [] },
+        options: { areas: [], segmentos: [], etapas: [], fases: [], meses: [] },
         bound: false
     };
     const FILTER_CONFIG = [
-        { key: 'areas',     optionKey: 'areas',     dimensionName: 'Rubros[Area]',        fallbackDataset: 'porArea',       cardId: 'area-filter-card',     buttonId: 'filter-area-button',     menuId: 'filter-area-menu',     labelId: 'filter-area-label' },
+        { key: 'areas',     optionKey: 'areas',     dimensionName: 'Rubros[Area]',        fallbackDataset: 'porArea',       cardId: 'area-filter-card',    buttonId: 'filter-area-button',    menuId: 'filter-area-menu',    labelId: 'filter-area-label' },
         { key: 'segmentos', optionKey: 'segmentos', dimensionName: 'Rubros[Segmento]',    fallbackDataset: 'porSegmento',   cardId: 'segmento-filter-card', buttonId: 'filter-segmento-button', menuId: 'filter-segmento-menu', labelId: 'filter-segmento-label' },
-        { key: 'etapas',    optionKey: 'etapas',    dimensionName: 'Rubros[Etapa]',       fallbackDataset: 'porArea',       cardId: 'etapa-filter-card',    buttonId: 'filter-etapa-button',    menuId: 'filter-etapa-menu',    labelId: 'filter-etapa-label' },
-        { key: 'inmuebles', optionKey: 'inmuebles', dimensionName: 'Rubros[Inmueble]',    fallbackDataset: 'porArea',       cardId: 'inmueble-filter-card', buttonId: 'filter-inmueble-button', menuId: 'filter-inmueble-menu', labelId: 'filter-inmueble-label' },
-        { key: 'fases',     optionKey: 'fases',     dimensionName: 'Rubros[Fase]',        fallbackDataset: 'porFase',       cardId: 'fase-filter-card',     buttonId: 'filter-fase-button',     menuId: 'filter-fase-menu',     labelId: 'filter-fase-label' },
-        { key: 'meses',     optionKey: 'meses',     dimensionName: 'Calendario[MesA]',    fallbackDataset: 'porMesResumen', cardId: 'mes-filter-card',      buttonId: 'filter-mes-button',      menuId: 'filter-mes-menu',      labelId: 'filter-mes-label' }
+        { key: 'etapas',    optionKey: 'etapas',    dimensionName: 'Rubros[Etapa]',       fallbackDataset: 'porArea',       cardId: 'etapa-filter-card',   buttonId: 'filter-etapa-button',   menuId: 'filter-etapa-menu',   labelId: 'filter-etapa-label' },
+        { key: 'fases',     optionKey: 'fases',     dimensionName: 'Rubros[Fase]',        fallbackDataset: 'porFase',       cardId: 'fase-filter-card',    buttonId: 'filter-fase-button',    menuId: 'filter-fase-menu',    labelId: 'filter-fase-label' },
+        { key: 'meses',     optionKey: 'meses',     dimensionName: 'Calendario[MesA]',    fallbackDataset: 'porMesResumen', cardId: 'mes-filter-card',     buttonId: 'filter-mes-button',     menuId: 'filter-mes-menu',     labelId: 'filter-mes-label' }
     ];
 
     const asNumber = value => Number(value || 0);
@@ -1018,8 +1008,8 @@
 
         // Botón "Limpiar filtros" global → resetea todos a "Todas"
         document.getElementById('filter-clear')?.addEventListener('click', () => {
-            powerBIState.filters = { areas: [], segmentos: [], etapas: [], inmuebles: [], fases: [], meses: [] };
-            powerBIState.options = { areas: [], segmentos: [], etapas: [], inmuebles: [], fases: [], meses: [] };
+            powerBIState.filters = { areas: [], segmentos: [], etapas: [], fases: [], meses: [] };
+            powerBIState.options = { areas: [], segmentos: [], etapas: [], fases: [], meses: [] };
             populateFilterControls();
             renderPowerBIView();
         });

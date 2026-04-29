@@ -239,7 +239,6 @@ if ($ModelProfile -eq "hlq") {
     $areaColumnDax = ConvertTo-DaxIdentifier -TableName $segmentacionTable -ObjectName "Area"
     $segmentoColumnDax = ConvertTo-DaxIdentifier -TableName $segmentacionTable -ObjectName "Segmento"
     $etapaColumnDax = ConvertTo-DaxIdentifier -TableName $segmentacionTable -ObjectName "Etapa"
-    $inmuebleColumnDax = ConvertTo-DaxIdentifier -TableName $segmentacionTable -ObjectName "Inmueble"
     $faseColumnDax = ConvertTo-DaxIdentifier -TableName "dimFase" -ObjectName "Fase"
     $monthColumnDax = ConvertTo-DaxIdentifier -TableName "Calendario" -ObjectName "MesA"
 
@@ -403,7 +402,6 @@ SUMMARIZECOLUMNS(
     $areaColumnDax,
     $segmentoColumnDax,
     $etapaColumnDax,
-    $inmuebleColumnDax,
     $faseColumnDax,
     $areaFilterDax,
     "RdiTotal", $rdiMeasureDax,
@@ -415,7 +413,7 @@ SUMMARIZECOLUMNS(
     "PorcentajeAsignado", $pctAsignadoMeasureDax,
     "PorcentajeDisponible", $pctDisponibleMeasureDax
 )
-ORDER BY $monthColumnDax, $areaColumnDax, $segmentoColumnDax, $etapaColumnDax, $inmuebleColumnDax, $faseColumnDax
+ORDER BY $monthColumnDax, $areaColumnDax, $segmentoColumnDax, $etapaColumnDax, $faseColumnDax
 "@
 }
 
