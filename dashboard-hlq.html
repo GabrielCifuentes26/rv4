@@ -269,6 +269,12 @@
             border-color: rgba(201,168,76,0.58);
             background: rgba(15,23,42,0.66);
         }
+        .filter-header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 0 0 6px;
+        }
         .filter-label {
             display: block;
             color: #C9A84C;
@@ -276,9 +282,26 @@
             font-weight: 800;
             letter-spacing: 0.55px;
             line-height: 1;
-            margin: 0 0 6px;
             padding-left: 2px;
             text-transform: uppercase;
+            margin: 0;
+        }
+        .filter-clear-one {
+            background: none;
+            border: none;
+            color: rgba(201,168,76,0.45);
+            font-size: 0.62rem;
+            font-weight: 700;
+            cursor: pointer;
+            padding: 1px 4px;
+            border-radius: 3px;
+            line-height: 1;
+            transition: color .15s, background .15s;
+            flex-shrink: 0;
+        }
+        .filter-clear-one:hover {
+            color: #C9A84C;
+            background: rgba(201,168,76,0.15);
         }
         .filter-select,
         .filter-trigger {
@@ -516,22 +539,34 @@
     <div class="filters-section">
         <div class="filters-grid">
             <div class="filter-card" id="area-filter-card">
-                <label class="filter-label">Área</label>
+                <div class="filter-header-row">
+                    <label class="filter-label">Área</label>
+                    <button class="filter-clear-one" type="button" data-clear-filter="areas" title="Limpiar filtro Área">✕</button>
+                </div>
                 <button class="filter-trigger" type="button" id="filter-area-button"><span id="filter-area-label">Seleccion multiple</span></button>
                 <div class="filter-menu" id="filter-area-menu"></div>
             </div>
             <div class="filter-card" id="segmento-filter-card">
-                <label class="filter-label">Segmento</label>
+                <div class="filter-header-row">
+                    <label class="filter-label">Segmento</label>
+                    <button class="filter-clear-one" type="button" data-clear-filter="segmentos" title="Limpiar filtro Segmento">✕</button>
+                </div>
                 <button class="filter-trigger" type="button" id="filter-segmento-button"><span id="filter-segmento-label">Seleccion multiple</span></button>
                 <div class="filter-menu" id="filter-segmento-menu"></div>
             </div>
             <div class="filter-card" id="fase-filter-card">
-                <label class="filter-label">Fase</label>
+                <div class="filter-header-row">
+                    <label class="filter-label">Fase</label>
+                    <button class="filter-clear-one" type="button" data-clear-filter="fases" title="Limpiar filtro Fase">✕</button>
+                </div>
                 <button class="filter-trigger" type="button" id="filter-fase-button"><span id="filter-fase-label">Seleccion multiple</span></button>
                 <div class="filter-menu" id="filter-fase-menu"></div>
             </div>
             <div class="filter-card" id="mes-filter-card">
-                <label class="filter-label">Meses</label>
+                <div class="filter-header-row">
+                    <label class="filter-label">Meses</label>
+                    <button class="filter-clear-one" type="button" data-clear-filter="meses" title="Limpiar filtro Meses">✕</button>
+                </div>
                 <button class="filter-trigger" type="button" id="filter-mes-button"><span id="filter-mes-label">Seleccion multiple</span></button>
                 <div class="filter-menu" id="filter-mes-menu"></div>
             </div>
@@ -861,10 +896,10 @@
         if (!label) return;
         const selected = powerBIState.filters[config.key] || [];
         const options = powerBIState.options[config.optionKey] || [];
-        // empty selection = no constraint = same as "all" (Power BI behavior)
-        if (!options.length) {
-            label.textContent = 'Sin datos';
-        } else if (!selected.length || selected.length === options.length) {
+        if (!selected.length) {
+            // empty = cleared / sin restricción (igual muestra todos los datos)
+            label.textContent = 'Ninguna';
+        } else if (selected.length === options.length) {
             label.textContent = config.key === 'meses' ? 'Todos' : 'Todas';
         } else if (selected.length <= 2) {
             label.textContent = selected.join(', ');
@@ -878,17 +913,17 @@
         if (!menu) return;
         const selected = powerBIState.filters[config.key] || [];
         const options = powerBIState.options[config.optionKey] || [];
-        // empty selection = all (Power BI behavior: no selection = no constraint)
-        const effectivelyAll = selected.length === 0 || selected.length === options.length;
-        const allIndeterminate = !effectivelyAll && selected.length > 0;
+        // all checked only when ALL options are explicitly selected (not when empty/cleared)
+        const allChecked = options.length > 0 && selected.length === options.length;
+        const allIndeterminate = selected.length > 0 && selected.length < options.length;
         menu.innerHTML = `
             <label class="filter-option select-all">
-                <input type="checkbox" data-select-all="true" ${effectivelyAll ? 'checked' : ''} ${options.length ? '' : 'disabled'}>
+                <input type="checkbox" data-select-all="true" ${allChecked ? 'checked' : ''} ${options.length ? '' : 'disabled'}>
                 <span>Seleccionar todo</span>
             </label>
         ` + options.map(option => `
             <label class="filter-option">
-                <input type="checkbox" data-filter-option="true" value="${escapeHtml(option)}" ${(effectivelyAll || selected.includes(option)) ? 'checked' : ''}>
+                <input type="checkbox" data-filter-option="true" value="${escapeHtml(option)}" ${selected.includes(option) ? 'checked' : ''}>
                 <span>${escapeHtml(option)}</span>
             </label>
         `).join('');
@@ -897,8 +932,8 @@
         if (selectAllInput) {
             selectAllInput.indeterminate = allIndeterminate;
             selectAllInput.addEventListener('change', () => {
-                // checked = all (empty = all); unchecked = also all (Power BI: can't have zero selected)
-                powerBIState.filters[config.key] = [];
+                // checked → selecciona todo; unchecked → limpia este filtro (toggle real)
+                powerBIState.filters[config.key] = selectAllInput.checked ? [...options] : [];
                 populateFilterControls(config.key);
                 renderPowerBIView();
             });
@@ -906,19 +941,10 @@
 
         menu.querySelectorAll('input[data-filter-option="true"]').forEach(input => {
             input.addEventListener('change', () => {
-                const prevSelected = powerBIState.filters[config.key] || [];
                 const opts = powerBIState.options[config.optionKey] || [];
-                let newSelected;
-                if (prevSelected.length === 0) {
-                    // Was in "all" (empty) state: transition to "all except unchecked"
-                    newSelected = input.checked
-                        ? [] // re-checked while in all mode → stay all
-                        : opts.filter(o => o !== input.value);
-                } else {
-                    newSelected = [...menu.querySelectorAll('input[data-filter-option="true"]:checked')].map(item => item.value);
-                }
-                // If all checked or none left → snap back to empty = all (Power BI behavior)
-                powerBIState.filters[config.key] = (newSelected.length === 0 || newSelected.length === opts.length) ? [] : newSelected;
+                const checked = [...menu.querySelectorAll('input[data-filter-option="true"]:checked')].map(item => item.value);
+                // si queda todo marcado → guardar como "todos" explícito; si queda vacío → cleared
+                powerBIState.filters[config.key] = checked.length === opts.length ? [...opts] : checked;
                 populateFilterControls(config.key);
                 renderPowerBIView();
             });
@@ -944,6 +970,18 @@
         });
         document.addEventListener('click', closeFilterMenus);
 
+        // Botón ✕ por filtro individual
+        document.querySelectorAll('.filter-clear-one[data-clear-filter]').forEach(btn => {
+            btn.addEventListener('click', event => {
+                event.stopPropagation();
+                const key = btn.dataset.clearFilter;
+                powerBIState.filters[key] = [];
+                populateFilterControls(key);
+                renderPowerBIView();
+            });
+        });
+
+        // Botón "Limpiar filtros" global → resetea todos a "Todas"
         document.getElementById('filter-clear')?.addEventListener('click', () => {
             powerBIState.filters = { areas: [], segmentos: [], fases: [], meses: [] };
             powerBIState.options = { areas: [], segmentos: [], fases: [], meses: [] };
@@ -1023,16 +1061,17 @@
             const selected = current.filter(value => options.includes(value));
 
             if (changedKey && config.key === changedKey) {
-                // User explicitly changed this filter — keep their selection (intersected with available options)
                 powerBIState.filters[config.key] = selected;
             } else if (!changedKey && !prior.hadOptions && prior.wasEmpty) {
-                // Initial load — default to all (empty = all in Power BI semantics)
-                powerBIState.filters[config.key] = [];
-            } else if (prior.wasAll || prior.wasEmpty) {
-                // Was showing all — keep showing all with the updated option set
+                // Carga inicial → seleccionar todo explícitamente (Todas)
+                powerBIState.filters[config.key] = [...options];
+            } else if (prior.wasAll) {
+                // Estaba en "Todas" → mantener "Todas" con el nuevo set de opciones
+                powerBIState.filters[config.key] = [...options];
+            } else if (prior.wasEmpty) {
+                // Estaba en "Ninguna" (cleared) → mantener limpio
                 powerBIState.filters[config.key] = [];
             } else {
-                // Had a specific selection — keep valid intersection
                 powerBIState.filters[config.key] = selected;
             }
         });
