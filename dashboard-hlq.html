@@ -575,7 +575,7 @@
         <div class="hero-metric">
             <div class="hm-icon blue">📋</div>
             <div>
-                <div class="hm-label">Presupuesto Inicial / RDI</div>
+                <div class="hm-label">Presupuesto SAP</div>
                 <div class="hm-value" id="hm-rdi">162.08 <span>mill.</span></div>
                 <div class="hm-sub">Presupuesto aprobado</div>
             </div>
@@ -600,11 +600,10 @@
 
     <!-- KPIs secundarios -->
     <div class="kpi-row">
-        <div class="kpi-card c1"><div class="kpi-label">PPTO RDI</div><div class="kpi-value" id="kpi-rdi">162.08 <span>mill.</span></div></div>
-        <div class="kpi-card c2"><div class="kpi-label">PPTO ER</div><div class="kpi-value" id="kpi-ppto-er">162.39 <span>mill.</span></div></div>
+        <div class="kpi-card c1"><div class="kpi-label">Presupuesto SAP</div><div class="kpi-value" id="kpi-rdi">162.08 <span>mill.</span></div></div>
         <div class="kpi-card c3"><div class="kpi-label">Comprometido</div><div class="kpi-value" id="kpi-comprometido">19.95 <span>mill.</span></div></div>
         <div class="kpi-card c5"><div class="kpi-label">Asignado</div><div class="kpi-value" id="kpi-asignado">149.33 <span>mill.</span></div></div>
-        <div class="kpi-card c6"><div class="kpi-label">Disponible Erequester</div><div class="kpi-value" id="kpi-disponible">13.06 <span>mill.</span></div></div>
+        <div class="kpi-card c6"><div class="kpi-label">Disponible</div><div class="kpi-value" id="kpi-disponible">13.06 <span>mill.</span></div></div>
     </div>
 
     <!-- Table -->
@@ -614,7 +613,7 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Área</th><th>PPTO RSI</th><th>PPTO ESL</th><th>Ejecutado</th>
+                        <th>Área</th><th>Presupuesto SAP</th><th>Ejecutado</th>
                         <th>Comprometido</th><th>Asignado</th><th>Disponible Imputable</th>
                         <th>% Asignado</th><th>% Disponible</th>
                     </tr>
@@ -739,7 +738,7 @@
         data: {
             labels: ['Gas\nCombustión','Acero\nEst.','Plomería\nAC','Pisos/\nRev.','Muros\nDiv.','Fachada\nExt.','Acabados\nFin.','Eléctrico\nGral.'],
             datasets: [
-                { label:'PPTO ESL',    data:[15200,22400,18600,12800,9400,16500,11200,8900], backgroundColor:C.blue,   borderRadius:3, barPercentage:0.72 },
+                { label:'Presupuesto SAP', data:[15200,22400,18600,12800,9400,16500,11200,8900], backgroundColor:C.blue,   borderRadius:3, barPercentage:0.72 },
                 { label:'Ejecutado',   data:[13800,20100,16200,11400,8600,14900,9800,7200],  backgroundColor:C.orange, borderRadius:3, barPercentage:0.72 },
                 { label:'Comprometido',data:[800,  1200, 1400, 900,  600, 1100, 800, 600],   backgroundColor:C.green,  borderRadius:3, barPercentage:0.72 }
             ]
@@ -760,7 +759,7 @@
         data: {
             labels:['Fase 1','Fase 2','Fase 3','Fase 4','Fase 5'],
             datasets:[
-                { label:'PPTO ESL',  data:[48000,42000,35000,28000,9283], backgroundColor:C.blue,   borderRadius:3, barPercentage:0.72 },
+                { label:'Presupuesto SAP', data:[48000,42000,35000,28000,9283], backgroundColor:C.blue,   borderRadius:3, barPercentage:0.72 },
                 { label:'Ejecutado', data:[44500,38200,28600,15300,2770], backgroundColor:C.amber,  borderRadius:3, barPercentage:0.72 }
             ]
         },
@@ -1133,7 +1132,6 @@
             <tr>
                 <td>${escapeHtml(displayName(row.label || dimension(row, 'Rubros[Area]')))}</td>
                 <td>${fmtMoney(rowMetric(row, 'RdiTotal'))}</td>
-                <td>${fmtMoney(rowMetric(row, 'PresupuestoErequester'))}</td>
                 <td>${fmtMoney(rowMetric(row, 'EjecutadoErequester'))}</td>
                 <td>${fmtMoney(rowMetric(row, 'ComprometidoErequester'))}</td>
                 <td>${fmtMoney(rowMetric(row, 'AsignadoErequester'))}</td>
@@ -1142,12 +1140,11 @@
                 <td class="${rowMetric(row, 'PorcentajeDisponible') < 0 ? 'pct-neg' : 'pct-disp'}">${fmtPct(rowMetric(row, 'PorcentajeDisponible'))}</td>
             </tr>
         `).join('');
-        const emptyRow = '<tr><td colspan="9">No hay datos para los filtros seleccionados.</td></tr>';
+        const emptyRow = '<tr><td colspan="8">No hay datos para los filtros seleccionados.</td></tr>';
         const totalRow = `
             <tr class="total-row">
                 <td>Total</td>
                 <td>${fmtMoney(rowMetric(totals, 'RdiTotal'))}</td>
-                <td>${fmtMoney(rowMetric(totals, 'PresupuestoErequester'))}</td>
                 <td>${fmtMoney(rowMetric(totals, 'EjecutadoErequester'))}</td>
                 <td>${fmtMoney(rowMetric(totals, 'ComprometidoErequester'))}</td>
                 <td>${fmtMoney(rowMetric(totals, 'AsignadoErequester'))}</td>
@@ -1165,7 +1162,7 @@
             .sort((a, b) => rowMetric(b, 'AsignadoErequester') - rowMetric(a, 'AsignadoErequester'))
             .slice(0, 8);
         etapaChart.data.labels = topEtapas.map(row => (row.label || dimension(row, 'Rubros[Etapa]')).replace(/\s+/g, ' ').slice(0, 18));
-        etapaChart.data.datasets[0].label = 'PPTO ER';
+        etapaChart.data.datasets[0].label = 'Presupuesto SAP';
         etapaChart.data.datasets[0].data = topEtapas.map(row => toMillions(rowMetric(row, 'PresupuestoErequester')));
         etapaChart.data.datasets[1].data = topEtapas.map(row => toMillions(rowMetric(row, 'EjecutadoErequester')));
         etapaChart.data.datasets[2].data = topEtapas.map(row => toMillions(rowMetric(row, 'ComprometidoErequester')));
@@ -1173,7 +1170,7 @@
         etapaChart.update();
 
         areaChart.data.labels = areaRows.map(row => displayName(row.label || dimension(row, 'Rubros[Area]')));
-        areaChart.data.datasets[0].label = 'PPTO ER';
+        areaChart.data.datasets[0].label = 'Presupuesto SAP';
         areaChart.data.datasets[0].data = areaRows.map(row => toMillions(rowMetric(row, 'PresupuestoErequester')));
         areaChart.data.datasets[1].data = areaRows.map(row => toMillions(rowMetric(row, 'AsignadoErequester')));
         areaChart.options.scales.y.ticks.callback = value => `${value}M`;
