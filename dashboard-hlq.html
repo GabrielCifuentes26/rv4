@@ -355,6 +355,13 @@
         }
         .filter-option:hover { background: rgba(255,255,255,0.07); }
         .filter-option input { accent-color: var(--blue); }
+        .filter-option.select-all {
+            border-bottom: 1px solid rgba(226,232,240,0.18);
+            margin-bottom: 4px;
+            padding-bottom: 9px;
+            color: #e2e8f0;
+            font-weight: 800;
+        }
         .filter-actions {
             display: flex;
             justify-content: flex-end;
@@ -865,15 +872,33 @@
         if (!menu) return;
         const selected = powerBIState.filters[config.key] || [];
         const options = powerBIState.options[config.optionKey] || [];
-        menu.innerHTML = options.map(option => `
+        const allChecked = options.length > 0 && selected.length === options.length;
+        const allIndeterminate = selected.length > 0 && selected.length < options.length;
+        menu.innerHTML = `
+            <label class="filter-option select-all">
+                <input type="checkbox" data-select-all="true" ${allChecked ? 'checked' : ''} ${options.length ? '' : 'disabled'}>
+                <span>Seleccionar todo</span>
+            </label>
+        ` + options.map(option => `
             <label class="filter-option">
-                <input type="checkbox" value="${escapeHtml(option)}" ${selected.includes(option) ? 'checked' : ''}>
+                <input type="checkbox" data-filter-option="true" value="${escapeHtml(option)}" ${selected.includes(option) ? 'checked' : ''}>
                 <span>${escapeHtml(option)}</span>
             </label>
         `).join('');
-        menu.querySelectorAll('input[type="checkbox"]').forEach(input => {
+
+        const selectAllInput = menu.querySelector('input[data-select-all="true"]');
+        if (selectAllInput) {
+            selectAllInput.indeterminate = allIndeterminate;
+            selectAllInput.addEventListener('change', () => {
+                powerBIState.filters[config.key] = selectAllInput.checked ? [...options] : [];
+                populateFilterControls(config.key);
+                renderPowerBIView();
+            });
+        }
+
+        menu.querySelectorAll('input[data-filter-option="true"]').forEach(input => {
             input.addEventListener('change', () => {
-                powerBIState.filters[config.key] = [...menu.querySelectorAll('input:checked')].map(item => item.value);
+                powerBIState.filters[config.key] = [...menu.querySelectorAll('input[data-filter-option="true"]:checked')].map(item => item.value);
                 populateFilterControls(config.key);
                 renderPowerBIView();
             });
