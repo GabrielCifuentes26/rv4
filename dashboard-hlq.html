@@ -72,29 +72,7 @@
             min-height: 100vh;
         }
 
-        /* ── SIDEBAR ── */
-        .sidebar {
-            width: 58px; background: var(--navy); flex-shrink: 0;
-            display: flex; flex-direction: column; align-items: center;
-            padding: 18px 0; gap: 6px;
-            border-right: 1px solid rgba(255,255,255,0.06);
-        }
-        .s-logo {
-            width: 38px; height: 38px; border-radius: 10px;
-            background: linear-gradient(135deg, var(--blue), var(--blue-dark));
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 900; font-size: 11px; color: #fff;
-            letter-spacing: 0.5px; margin-bottom: 16px;
-        }
-        .s-icon {
-            width: 38px; height: 38px; border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
-            color: rgba(255,255,255,0.35); font-size: 15px; cursor: pointer;
-            transition: background .15s, color .15s; text-decoration: none;
-        }
-        .s-icon:hover { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.8); }
-        .s-icon.active { background: rgba(14,165,233,0.2); color: var(--blue); }
-        .s-divider { width: 28px; height: 1px; background: rgba(255,255,255,0.08); margin: 4px 0; }
+        /* sidebar removed */
 
         /* ── MAIN ── */
         .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
@@ -510,17 +488,6 @@
 </head>
 <body>
 
-<!-- Sidebar -->
-<div class="sidebar">
-    <div class="s-logo">C&P</div>
-    <a href="index.html" class="s-icon" title="Inicio">⌂</a>
-    <div class="s-icon active">▦</div>
-    <div class="s-divider"></div>
-    <div class="s-icon">◈</div>
-    <div class="s-icon">◉</div>
-    <div class="s-icon" style="margin-top:auto" id="btn-logout" title="Cerrar sesión">⏻</div>
-</div>
-
 <!-- Main -->
 <div class="main">
 
@@ -722,6 +689,11 @@
         purple: '#8b5cf6',
         bg:     '#f0f4f8'
     };
+
+    const AREA_DISPLAY_NAMES = {
+        'FUERA DE PROYECTO': 'MITIGACIÓN CALLE A. Y PUENTE'
+    };
+    const displayName = value => AREA_DISPLAY_NAMES[String(value ?? '').toUpperCase().trim()] || value;
 
     const DIMENSION_ALIASES = {
         'Rubros[Area]':     ['Rubros[Area]',     'dimSegmentación[Area]',     'Segmentación[Area]',     'Area'],
@@ -927,7 +899,7 @@
         } else if (selected.length === options.length) {
             label.textContent = config.key === 'meses' ? 'Todos' : 'Todas';
         } else if (selected.length <= 2) {
-            label.textContent = selected.join(', ');
+            label.textContent = selected.map(displayName).join(', ');
         } else {
             label.textContent = `${selected.length} seleccionadas`;
         }
@@ -949,7 +921,7 @@
         ` + options.map(option => `
             <label class="filter-option">
                 <input type="checkbox" data-filter-option="true" value="${escapeHtml(option)}" ${selected.includes(option) ? 'checked' : ''}>
-                <span>${escapeHtml(option)}</span>
+                <span>${escapeHtml(displayName(option))}</span>
             </label>
         `).join('');
 
@@ -1159,7 +1131,7 @@
         if (!areaBody) return;
         const bodyRows = rows.map(row => `
             <tr>
-                <td>${escapeHtml(row.label || dimension(row, 'Rubros[Area]'))}</td>
+                <td>${escapeHtml(displayName(row.label || dimension(row, 'Rubros[Area]')))}</td>
                 <td>${fmtMoney(rowMetric(row, 'RdiTotal'))}</td>
                 <td>${fmtMoney(rowMetric(row, 'PresupuestoErequester'))}</td>
                 <td>${fmtMoney(rowMetric(row, 'EjecutadoErequester'))}</td>
@@ -1200,7 +1172,7 @@
         etapaChart.options.scales.y.ticks.callback = value => `${value}M`;
         etapaChart.update();
 
-        areaChart.data.labels = areaRows.map(row => row.label || dimension(row, 'Rubros[Area]'));
+        areaChart.data.labels = areaRows.map(row => displayName(row.label || dimension(row, 'Rubros[Area]')));
         areaChart.data.datasets[0].label = 'PPTO ER';
         areaChart.data.datasets[0].data = areaRows.map(row => toMillions(rowMetric(row, 'PresupuestoErequester')));
         areaChart.data.datasets[1].data = areaRows.map(row => toMillions(rowMetric(row, 'AsignadoErequester')));
