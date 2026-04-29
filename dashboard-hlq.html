@@ -932,17 +932,28 @@
         });
     }
 
-    function rowPassesSelectedFilters(row, excludeKey = null) {
+    function rowHasFilterValues(row) {
         if (!hasValue(row)) return false;
+        return FILTER_CONFIG.every(config => filterDimension(row, config));
+    }
+
+    function rowPassesOptionFilters(row, excludeKey = null) {
+        if (!rowHasFilterValues(row)) return false;
         return FILTER_CONFIG.every(config => {
             const value = filterDimension(row, config);
-            if (!value) return false;
             if (config.key === excludeKey) return true;
 
-            const options = powerBIState.options[config.optionKey] || [];
             const selected = powerBIState.filters[config.key] || [];
-            if (!options.length && !selected.length) return true;
+            if (!selected.length) return true;
             return selected.length > 0 && selected.includes(value);
+        });
+    }
+
+    function rowPassesSelectedFilters(row) {
+        if (!rowHasFilterValues(row)) return false;
+        return FILTER_CONFIG.every(config => {
+            const selected = powerBIState.filters[config.key] || [];
+            return selected.length > 0 && selected.includes(filterDimension(row, config));
         });
     }
 
@@ -954,20 +965,41 @@
         }
 
         const values = detailRows
-            .filter(row => rowPassesSelectedFilters(row, config.key))
+            .filter(row => rowPassesOptionFilters(row, config.key))
             .map(row => filterDimension(row, config));
         const options = uniqueNonBlankSorted(values);
         return config.key === 'meses' ? sortMonths(options) : options;
     }
 
-    function syncFilterSelections(changedKey = null) {
+    function snapshotFilterSelections() {
+        return FILTER_CONFIG.reduce((acc, config) => {
+            const options = powerBIState.options[config.optionKey] || [];
+            const selected = powerBIState.filters[config.key] || [];
+            acc[config.key] = {
+                selected: [...selected],
+                hadOptions: options.length > 0,
+                wasAll: options.length > 0 && selected.length === options.length,
+                wasEmpty: selected.length === 0
+            };
+            return acc;
+        }, {});
+    }
+
+    function syncFilterSelections(previous, changedKey = null) {
         FILTER_CONFIG.forEach(config => {
             const options = powerBIState.options[config.optionKey] || [];
-            const current = powerBIState.filters[config.key] || [];
+            const prior = previous?.[config.key] || { selected: [], wasAll: false, wasEmpty: true };
+            const current = powerBIState.filters[config.key] || prior.selected;
             const selected = current.filter(value => options.includes(value));
 
-            if (!changedKey || config.key !== changedKey) {
-                powerBIState.filters[config.key] = selected.length ? selected : [...options];
+            if (changedKey && config.key === changedKey) {
+                powerBIState.filters[config.key] = selected;
+            } else if (!changedKey && !prior.hadOptions && prior.wasEmpty) {
+                powerBIState.filters[config.key] = [...options];
+            } else if (prior.wasAll) {
+                powerBIState.filters[config.key] = [...options];
+            } else if (prior.wasEmpty) {
+                powerBIState.filters[config.key] = [];
             } else {
                 powerBIState.filters[config.key] = selected;
             }
@@ -976,10 +1008,11 @@
 
     function populateFilterControls(changedKey = null) {
         for (let pass = 0; pass < 2; pass += 1) {
+            const previous = snapshotFilterSelections();
             FILTER_CONFIG.forEach(config => {
                 powerBIState.options[config.optionKey] = buildFilterOptions(config);
             });
-            syncFilterSelections(changedKey);
+            syncFilterSelections(previous, changedKey);
         }
 
         FILTER_CONFIG.forEach(populateFilterMenu);
