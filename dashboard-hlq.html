@@ -755,10 +755,10 @@
         bound: false
     };
     const FILTER_CONFIG = [
-        { key: 'areas', optionKey: 'areas', cardId: 'area-filter-card', buttonId: 'filter-area-button', menuId: 'filter-area-menu', labelId: 'filter-area-label' },
-        { key: 'segmentos', optionKey: 'segmentos', cardId: 'segmento-filter-card', buttonId: 'filter-segmento-button', menuId: 'filter-segmento-menu', labelId: 'filter-segmento-label' },
-        { key: 'fases', optionKey: 'fases', cardId: 'fase-filter-card', buttonId: 'filter-fase-button', menuId: 'filter-fase-menu', labelId: 'filter-fase-label' },
-        { key: 'meses', optionKey: 'meses', cardId: 'mes-filter-card', buttonId: 'filter-mes-button', menuId: 'filter-mes-menu', labelId: 'filter-mes-label' }
+        { key: 'areas', optionKey: 'areas', dimensionName: 'Rubros[Area]', fallbackDataset: 'porArea', cardId: 'area-filter-card', buttonId: 'filter-area-button', menuId: 'filter-area-menu', labelId: 'filter-area-label' },
+        { key: 'segmentos', optionKey: 'segmentos', dimensionName: 'Rubros[Segmento]', fallbackDataset: 'porSegmento', cardId: 'segmento-filter-card', buttonId: 'filter-segmento-button', menuId: 'filter-segmento-menu', labelId: 'filter-segmento-label' },
+        { key: 'fases', optionKey: 'fases', dimensionName: 'Rubros[Fase]', fallbackDataset: 'porFase', cardId: 'fase-filter-card', buttonId: 'filter-fase-button', menuId: 'filter-fase-menu', labelId: 'filter-fase-label' },
+        { key: 'meses', optionKey: 'meses', dimensionName: 'Calendario[MesA]', fallbackDataset: 'porMesResumen', cardId: 'mes-filter-card', buttonId: 'filter-mes-button', menuId: 'filter-mes-menu', labelId: 'filter-mes-label' }
     ];
 
     const asNumber = value => Number(value || 0);
@@ -770,7 +770,11 @@
         '"': '&quot;',
         "'": '&#39;'
     }[char]));
+    const rawDimension = (row, name) => String(dimension(row, name) ?? '').trim();
+    const filterDimension = (row, config) => rawDimension(row, config.dimensionName);
     const uniqueSorted = values => [...new Set(values.map(cleanDimension).filter(Boolean))]
+        .sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base', numeric: true }));
+    const uniqueNonBlankSorted = values => [...new Set(values.map(value => String(value ?? '').trim()).filter(Boolean))]
         .sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base', numeric: true }));
     const parseMonthKey = value => {
         const match = String(value || '').trim().toLowerCase().match(/^([a-z]{3})\s+(\d{2})$/);
@@ -834,11 +838,9 @@
     const hasValue = row => METRIC_NAMES.some(name => Math.abs(field(row, name)) > 0);
     const getDetailRows = data => Array.isArray(data?.datasets?.detalleFiltros) ? data.datasets.detalleFiltros : [];
     const getMonthRows = data => Array.isArray(data?.datasets?.porMesResumen) ? data.datasets.porMesResumen : [];
-    const optionValues = (data, detailName, fallbackDataset, fallbackDimension) => {
-        const detailRows = getDetailRows(data);
-        if (detailRows.length) return uniqueSorted(detailRows.map(row => dimension(row, detailName)));
-        return uniqueSorted((data?.datasets?.[fallbackDataset] || []).map(row => dimension(row, fallbackDimension || detailName)));
-    };
+    const optionValues = (data, config) => uniqueNonBlankSorted((data?.datasets?.[config.fallbackDataset] || [])
+        .filter(hasValue)
+        .map(row => dimension(row, config.dimensionName)));
     function defaultMonthSelection() {
         return [...powerBIState.options.meses];
     }
@@ -872,7 +874,7 @@
         menu.querySelectorAll('input[type="checkbox"]').forEach(input => {
             input.addEventListener('change', () => {
                 powerBIState.filters[config.key] = [...menu.querySelectorAll('input:checked')].map(item => item.value);
-                updateFilterLabel(config);
+                populateFilterControls(config.key);
                 renderPowerBIView();
             });
         });
@@ -898,54 +900,68 @@
         document.addEventListener('click', closeFilterMenus);
 
         document.getElementById('filter-clear')?.addEventListener('click', () => {
-            powerBIState.filters.areas = [...powerBIState.options.areas];
-            powerBIState.filters.segmentos = [...powerBIState.options.segmentos];
-            powerBIState.filters.fases = [...powerBIState.options.fases];
-            powerBIState.filters.meses = defaultMonthSelection();
+            powerBIState.filters = { areas: [], segmentos: [], fases: [], meses: [] };
+            powerBIState.options = { areas: [], segmentos: [], fases: [], meses: [] };
             populateFilterControls();
             renderPowerBIView();
         });
     }
 
-    function populateFilterControls() {
-        const data = powerBIState.data;
-        powerBIState.options.areas = optionValues(data, 'Rubros[Area]', 'porArea');
-        powerBIState.options.segmentos = optionValues(data, 'Rubros[Segmento]', 'porSegmento');
-        powerBIState.options.fases = optionValues(data, 'Rubros[Fase]', 'porFase');
-        powerBIState.options.meses = sortMonths(getMonthRows(data)
-            .map(row => dimension(row, 'Calendario[MesA]'))
-            .filter(value => String(value || '').trim()));
+    function rowPassesSelectedFilters(row, excludeKey = null) {
+        if (!hasValue(row)) return false;
+        return FILTER_CONFIG.every(config => {
+            const value = filterDimension(row, config);
+            if (!value) return false;
+            if (config.key === excludeKey) return true;
 
-        FILTER_CONFIG.forEach(config => {
             const options = powerBIState.options[config.optionKey] || [];
-            const defaults = options;
-            const current = powerBIState.filters[config.key] || [];
-            const selected = current.filter(value => options.includes(value));
-            powerBIState.filters[config.key] = selected.length ? selected : defaults.filter(value => options.includes(value));
-            populateFilterMenu(config);
+            const selected = powerBIState.filters[config.key] || [];
+            if (!options.length && !selected.length) return true;
+            return selected.length > 0 && selected.includes(value);
         });
     }
 
-    function filteredDetailRows() {
-        const filters = powerBIState.filters;
-        const hasNoSelection = (key, value) => {
-            const options = powerBIState.options[key] || [];
-            const selected = filters[key] || [];
-            return options.length && (!selected.length || !selected.includes(value));
-        };
-        return getDetailRows(powerBIState.data).filter(row => {
-            const area = cleanDimension(dimension(row, 'Rubros[Area]'));
-            const segmento = cleanDimension(dimension(row, 'Rubros[Segmento]'));
-            const fase = cleanDimension(dimension(row, 'Rubros[Fase]'));
-            const mesRaw = String(dimension(row, 'Calendario[MesA]') || '').trim();
-            const mes = cleanDimension(mesRaw);
+    function buildFilterOptions(config) {
+        const detailRows = getDetailRows(powerBIState.data);
+        if (!detailRows.length) {
+            const values = optionValues(powerBIState.data, config);
+            return config.key === 'meses' ? sortMonths(values) : values;
+        }
 
-            if (hasNoSelection('areas', area)) return false;
-            if (hasNoSelection('segmentos', segmento)) return false;
-            if (hasNoSelection('fases', fase)) return false;
-            if ((powerBIState.options.meses || []).length && (!mesRaw || hasNoSelection('meses', mes))) return false;
-            return true;
+        const values = detailRows
+            .filter(row => rowPassesSelectedFilters(row, config.key))
+            .map(row => filterDimension(row, config));
+        const options = uniqueNonBlankSorted(values);
+        return config.key === 'meses' ? sortMonths(options) : options;
+    }
+
+    function syncFilterSelections(changedKey = null) {
+        FILTER_CONFIG.forEach(config => {
+            const options = powerBIState.options[config.optionKey] || [];
+            const current = powerBIState.filters[config.key] || [];
+            const selected = current.filter(value => options.includes(value));
+
+            if (!changedKey || config.key !== changedKey) {
+                powerBIState.filters[config.key] = selected.length ? selected : [...options];
+            } else {
+                powerBIState.filters[config.key] = selected;
+            }
         });
+    }
+
+    function populateFilterControls(changedKey = null) {
+        for (let pass = 0; pass < 2; pass += 1) {
+            FILTER_CONFIG.forEach(config => {
+                powerBIState.options[config.optionKey] = buildFilterOptions(config);
+            });
+            syncFilterSelections(changedKey);
+        }
+
+        FILTER_CONFIG.forEach(populateFilterMenu);
+    }
+
+    function filteredDetailRows() {
+        return getDetailRows(powerBIState.data).filter(row => rowPassesSelectedFilters(row));
     }
 
     function rowMetric(row, name) {
@@ -1071,6 +1087,8 @@
 
     function renderPowerBIResumen(data) {
         powerBIState.data = data;
+        powerBIState.filters = { areas: [], segmentos: [], fases: [], meses: [] };
+        powerBIState.options = { areas: [], segmentos: [], fases: [], meses: [] };
         bindPowerBIFilters();
         populateFilterControls();
         renderPowerBIView();
