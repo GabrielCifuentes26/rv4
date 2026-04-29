@@ -250,7 +250,7 @@
         }
         .filters-grid {
             display: grid;
-            grid-template-columns: repeat(4, minmax(160px, 1fr));
+            grid-template-columns: repeat(5, minmax(140px, 1fr));
             gap: 10px;
             align-items: end;
             min-width: 0;
@@ -493,6 +493,9 @@
             display: flex; justify-content: space-between; flex-shrink: 0;
             color: var(--gray2);
         }
+        @media (max-width: 1200px) {
+            .filters-grid { grid-template-columns: repeat(3, minmax(140px, 1fr)); }
+        }
         @media (max-width: 1100px) {
             .filters-section { grid-template-columns: 1fr auto; }
             .filters-grid { grid-template-columns: repeat(2, minmax(150px, 1fr)); }
@@ -566,6 +569,14 @@
                 </div>
                 <button class="filter-trigger" type="button" id="filter-segmento-button"><span id="filter-segmento-label">Seleccion multiple</span></button>
                 <div class="filter-menu" id="filter-segmento-menu"></div>
+            </div>
+            <div class="filter-card" id="etapa-filter-card">
+                <div class="filter-header-row">
+                    <label class="filter-label">Etapa</label>
+                    <button class="filter-clear-one" type="button" data-clear-filter="etapas" title="Limpiar filtro Etapa"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 5H7.83L2 11l5.83 6H20a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1zM9 15l-2-2 2-2h4v4H9z"/></svg>Borrar</button>
+                </div>
+                <button class="filter-trigger" type="button" id="filter-etapa-button"><span id="filter-etapa-label">Seleccion multiple</span></button>
+                <div class="filter-menu" id="filter-etapa-menu"></div>
             </div>
             <div class="filter-card" id="fase-filter-card">
                 <div class="filter-header-row">
@@ -805,15 +816,16 @@
     const MONTH_ORDER = { ene: 0, feb: 1, mar: 2, abr: 3, may: 4, jun: 5, jul: 6, ago: 7, sep: 8, oct: 9, nov: 10, dic: 11 };
     const powerBIState = {
         data: null,
-        filters: { areas: [], segmentos: [], fases: [], meses: [] },
-        options: { areas: [], segmentos: [], fases: [], meses: [] },
+        filters: { areas: [], segmentos: [], etapas: [], fases: [], meses: [] },
+        options: { areas: [], segmentos: [], etapas: [], fases: [], meses: [] },
         bound: false
     };
     const FILTER_CONFIG = [
-        { key: 'areas', optionKey: 'areas', dimensionName: 'Rubros[Area]', fallbackDataset: 'porArea', cardId: 'area-filter-card', buttonId: 'filter-area-button', menuId: 'filter-area-menu', labelId: 'filter-area-label' },
-        { key: 'segmentos', optionKey: 'segmentos', dimensionName: 'Rubros[Segmento]', fallbackDataset: 'porSegmento', cardId: 'segmento-filter-card', buttonId: 'filter-segmento-button', menuId: 'filter-segmento-menu', labelId: 'filter-segmento-label' },
-        { key: 'fases', optionKey: 'fases', dimensionName: 'Rubros[Fase]', fallbackDataset: 'porFase', cardId: 'fase-filter-card', buttonId: 'filter-fase-button', menuId: 'filter-fase-menu', labelId: 'filter-fase-label' },
-        { key: 'meses', optionKey: 'meses', dimensionName: 'Calendario[MesA]', fallbackDataset: 'porMesResumen', cardId: 'mes-filter-card', buttonId: 'filter-mes-button', menuId: 'filter-mes-menu', labelId: 'filter-mes-label' }
+        { key: 'areas',     optionKey: 'areas',     dimensionName: 'Rubros[Area]',        fallbackDataset: 'porArea',       cardId: 'area-filter-card',    buttonId: 'filter-area-button',    menuId: 'filter-area-menu',    labelId: 'filter-area-label' },
+        { key: 'segmentos', optionKey: 'segmentos', dimensionName: 'Rubros[Segmento]',    fallbackDataset: 'porSegmento',   cardId: 'segmento-filter-card', buttonId: 'filter-segmento-button', menuId: 'filter-segmento-menu', labelId: 'filter-segmento-label' },
+        { key: 'etapas',    optionKey: 'etapas',    dimensionName: 'Rubros[Etapa]',       fallbackDataset: 'porArea',       cardId: 'etapa-filter-card',   buttonId: 'filter-etapa-button',   menuId: 'filter-etapa-menu',   labelId: 'filter-etapa-label' },
+        { key: 'fases',     optionKey: 'fases',     dimensionName: 'Rubros[Fase]',        fallbackDataset: 'porFase',       cardId: 'fase-filter-card',    buttonId: 'filter-fase-button',    menuId: 'filter-fase-menu',    labelId: 'filter-fase-label' },
+        { key: 'meses',     optionKey: 'meses',     dimensionName: 'Calendario[MesA]',    fallbackDataset: 'porMesResumen', cardId: 'mes-filter-card',     buttonId: 'filter-mes-button',     menuId: 'filter-mes-menu',     labelId: 'filter-mes-label' }
     ];
 
     const asNumber = value => Number(value || 0);
@@ -996,8 +1008,8 @@
 
         // Botón "Limpiar filtros" global → resetea todos a "Todas"
         document.getElementById('filter-clear')?.addEventListener('click', () => {
-            powerBIState.filters = { areas: [], segmentos: [], fases: [], meses: [] };
-            powerBIState.options = { areas: [], segmentos: [], fases: [], meses: [] };
+            powerBIState.filters = { areas: [], segmentos: [], etapas: [], fases: [], meses: [] };
+            powerBIState.options = { areas: [], segmentos: [], etapas: [], fases: [], meses: [] };
             populateFilterControls();
             renderPowerBIView();
         });
@@ -1005,8 +1017,11 @@
 
     function rowHasFilterValues(row) {
         if (!hasValue(row)) return false;
-        // Only require structural dimensions; MesA can be null for budget-only rows
-        return FILTER_CONFIG.filter(c => c.key !== 'meses').every(config => filterDimension(row, config));
+        // Only require core structural dimensions; Etapa and MesA can be null for some rows
+        return ['areas', 'segmentos', 'fases'].every(key => {
+            const config = FILTER_CONFIG.find(c => c.key === key);
+            return config && filterDimension(row, config);
+        });
     }
 
     function rowPassesOptionFilters(row, excludeKey = null) {
