@@ -122,18 +122,18 @@ function Resolve-PowerBIReportByName {
     Write-Info "Buscando reporte por nombre: $ReportName"
     $reportsResponse = Invoke-PowerBIRestMethod -Url "groups/$WorkspaceId/reports" -Method Get
     $reports = @((($reportsResponse | ConvertFrom-Json).value))
-    $matches = @($reports | Where-Object { $_.name -eq $ReportName })
+    $reportMatches = @($reports | Where-Object { $_.name -eq $ReportName })
 
-    if ($matches.Count -eq 0) {
+    if ($reportMatches.Count -eq 0) {
         $available = ($reports | Select-Object -ExpandProperty name) -join ", "
         throw "No se encontro el reporte '$ReportName' en el workspace. Reportes disponibles: $available"
     }
 
-    if ($matches.Count -gt 1) {
+    if ($reportMatches.Count -gt 1) {
         throw "Se encontro mas de un reporte con el nombre '$ReportName'. Pasa -ReportId para evitar ambiguedad."
     }
 
-    return $matches[0]
+    return $reportMatches[0]
 }
 
 function Publish-SupabaseResumen {
