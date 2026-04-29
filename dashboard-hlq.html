@@ -74,6 +74,43 @@
 
         /* sidebar removed */
 
+        /* ── CONTROL EJECUCIÓN POR ÁREA ── */
+        .eac-card { display: flex; flex-direction: column; }
+        .eac-header {
+            display: grid; grid-template-columns: 1fr auto auto;
+            align-items: center; gap: 12px; margin-bottom: 14px;
+        }
+        .eac-legend { display: flex; gap: 12px; }
+        .eac-legend-item { display: flex; align-items: center; gap: 5px; font-size: 0.68rem; color: var(--gray); font-weight: 500; }
+        .eac-dot { width: 9px; height: 9px; border-radius: 3px; flex-shrink: 0; }
+        .eac-dot-asig { background: #1e293b; }
+        .eac-dot-disp { background: #dde4ed; border: 1px solid #cbd5e1; }
+        .eac-pct-header { font-size: 0.68rem; font-weight: 700; color: var(--gray); white-space: nowrap; }
+        .eac-rows { display: flex; flex-direction: column; gap: 12px; }
+        .eac-row { display: grid; grid-template-columns: 150px 1fr 76px; align-items: center; gap: 10px; }
+        .eac-area { display: flex; align-items: center; gap: 8px; }
+        .eac-icon-wrap {
+            width: 30px; height: 30px; border-radius: 8px; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .eac-icon-wrap svg { width: 15px; height: 15px; }
+        .eac-name { font-size: 0.68rem; font-weight: 700; color: var(--navy); line-height: 1.25; }
+        .eac-bar-track {
+            height: 30px; background: #dde4ed; border-radius: 10px;
+            overflow: hidden; position: relative;
+        }
+        .eac-bar-fill {
+            height: 100%; border-radius: 10px;
+            background: linear-gradient(90deg, #0f172a 0%, #1e3a5f 100%);
+            display: flex; align-items: center;
+            transition: width 0.7s cubic-bezier(.4,0,.2,1);
+            min-width: 0;
+        }
+        .eac-bar-label { font-size: 0.69rem; font-weight: 700; color: #fff; white-space: nowrap; padding: 0 10px; }
+        .eac-pct-col { text-align: right; }
+        .eac-pct-val { font-size: 0.95rem; font-weight: 800; color: var(--amber); display: block; line-height: 1.1; }
+        .eac-pct-of { font-size: 0.62rem; color: var(--gray2); display: block; margin-top: 1px; }
+
         /* ── MAIN ── */
         .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 
@@ -650,9 +687,16 @@
             </div>
         </div>
 
-        <div class="chart-card">
-            <div class="chart-title">Ejecutado por Etapa</div>
-            <canvas id="etapaChart"></canvas>
+        <div class="chart-card eac-card">
+            <div class="eac-header">
+                <span class="chart-title" style="margin:0">Control de Ejecución por Área</span>
+                <div class="eac-legend">
+                    <span class="eac-legend-item"><span class="eac-dot eac-dot-asig"></span>Asignado</span>
+                    <span class="eac-legend-item"><span class="eac-dot eac-dot-disp"></span>Disponible</span>
+                </div>
+                <span class="eac-pct-header">% Ejecución</span>
+            </div>
+            <div id="eac-rows" class="eac-rows"></div>
         </div>
 
         <div class="chart-card">
@@ -694,6 +738,62 @@
     };
     const displayName = value => AREA_DISPLAY_NAMES[String(value ?? '').toUpperCase().trim()] || value;
 
+    const AREA_CONFIG = {
+        'CONSTRUCCIÓN': {
+            iconBg: 'rgba(14,165,233,0.12)', iconColor: '#0ea5e9',
+            icon: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a8 8 0 0 1 8 8H4a8 8 0 0 1 8-8zm0 2a6 6 0 0 0-5.65 4h11.3A6 6 0 0 0 12 4zM2 11h20v2H2v-2zm2 4h16v1a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4v-1z"/></svg>`
+        },
+        'FUERA DE PROYECTO': {
+            iconBg: 'rgba(245,158,11,0.12)', iconColor: '#f59e0b',
+            icon: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 16v-1a10 10 0 0 1 20 0v1h-2v-1a8 8 0 0 0-16 0v1H2zm4 0H4v4h2v-4zm14 0h-2v4h2v-4zm-7 0h-2v4h2v-4z"/></svg>`
+        },
+        'URBANIZACIÓN': {
+            iconBg: 'rgba(16,185,129,0.12)', iconColor: '#10b981',
+            icon: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M15 11V5l-3-3-3 3v2H3v14h18V11h-6zm-8 8H5v-2h2v2zm0-4H5v-2h2v2zm0-4H5v-2h2v2zm6 8h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V7h2v2zm6 12h-2v-2h2v2zm0-4h-2v-2h2v2z"/></svg>`
+        }
+    };
+    const DEFAULT_AREA_CFG = {
+        iconBg: 'rgba(100,116,139,0.12)', iconColor: '#64748b',
+        icon: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3L2 12h3v8h6v-5h2v5h6v-8h3z"/></svg>`
+    };
+
+    function renderEjecucionArea(areaRows) {
+        const container = document.getElementById('eac-rows');
+        if (!container) return;
+        if (!areaRows || !areaRows.length) {
+            container.innerHTML = '<div style="color:var(--gray2);font-size:0.8rem;text-align:center;padding:20px">Sin datos</div>';
+            return;
+        }
+        container.innerHTML = areaRows.map(row => {
+            const rawName = String(row.label || dimension(row, 'Rubros[Area]') || '').toUpperCase().trim();
+            const label = displayName(rawName) || rawName;
+            const cfg = AREA_CONFIG[rawName] || DEFAULT_AREA_CFG;
+            const rdi = asNumber(rowMetric(row, 'RdiTotal'));
+            const asignado = asNumber(rowMetric(row, 'AsignadoErequester'));
+            const pctAsig = rdi > 0 ? asignado / rdi : 0;
+            const fillPct = Math.min(100, Math.max(0, pctAsig * 100));
+            const pctText = (pctAsig * 100).toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            const asigM = (asignado / 1e6).toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + 'M';
+            const rdiM = (rdi / 1e6).toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + 'M';
+            return `
+            <div class="eac-row">
+                <div class="eac-area">
+                    <div class="eac-icon-wrap" style="background:${cfg.iconBg};color:${cfg.iconColor}">${cfg.icon}</div>
+                    <span class="eac-name">${escapeHtml(label)}</span>
+                </div>
+                <div class="eac-bar-track">
+                    <div class="eac-bar-fill" style="width:${fillPct.toFixed(2)}%">
+                        ${fillPct >= 15 ? `<span class="eac-bar-label">${asigM}</span>` : ''}
+                    </div>
+                </div>
+                <div class="eac-pct-col">
+                    <span class="eac-pct-val">${pctText}%</span>
+                    <span class="eac-pct-of">de ${rdiM}</span>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
     const DIMENSION_ALIASES = {
         'Rubros[Area]':     ['Rubros[Area]',     'dimSegmentación[Area]',     'Segmentación[Area]',     'Area'],
         'Rubros[Segmento]': ['Rubros[Segmento]', 'dimSegmentación[Segmento]', 'Segmentación[Segmento]', 'Segmento'],
@@ -730,27 +830,6 @@
             datasets: [{ data:[91.98, 8.02], backgroundColor:[C.blue, '#e2e8f0'], borderWidth:0, circumference:240, rotation:240 }]
         },
         options: { responsive:true, cutout:'74%', plugins:{ legend:{display:false}, tooltip:{enabled:false} } }
-    });
-
-    // Etapa
-    const etapaChart = new Chart(document.getElementById('etapaChart'), {
-        type: 'bar',
-        data: {
-            labels: ['Gas\nCombustión','Acero\nEst.','Plomería\nAC','Pisos/\nRev.','Muros\nDiv.','Fachada\nExt.','Acabados\nFin.','Eléctrico\nGral.'],
-            datasets: [
-                { label:'Presupuesto SAP', data:[15200,22400,18600,12800,9400,16500,11200,8900], backgroundColor:C.blue,   borderRadius:3, barPercentage:0.72 },
-                { label:'Ejecutado',   data:[13800,20100,16200,11400,8600,14900,9800,7200],  backgroundColor:C.orange, borderRadius:3, barPercentage:0.72 },
-                { label:'Comprometido',data:[800,  1200, 1400, 900,  600, 1100, 800, 600],   backgroundColor:C.green,  borderRadius:3, barPercentage:0.72 }
-            ]
-        },
-        options: {
-            responsive:true, maintainAspectRatio:false,
-            plugins:{ legend:{ position:'top', labels:{font:{size:9}, boxWidth:10, padding:8, color:'#64748b'} } },
-            scales:{
-                x:{ ticks:{font:{size:8}, color:'#94a3b8'}, grid:{display:false} },
-                y:{ ticks:{font:{size:9}, color:'#94a3b8', callback:v=>v+'K'}, grid:{color:'#e2e8f0'} }
-            }
-        }
     });
 
     // Fase
@@ -1157,21 +1236,11 @@
     }
 
     function renderCharts(etapaRows, areaRows) {
-        const topEtapas = etapaRows
-            .filter(row => rowMetric(row, 'AsignadoErequester') > 0 || rowMetric(row, 'EjecutadoErequester') > 0)
-            .sort((a, b) => rowMetric(b, 'AsignadoErequester') - rowMetric(a, 'AsignadoErequester'))
-            .slice(0, 8);
-        etapaChart.data.labels = topEtapas.map(row => (row.label || dimension(row, 'Rubros[Etapa]')).replace(/\s+/g, ' ').slice(0, 18));
-        etapaChart.data.datasets[0].label = 'Presupuesto SAP';
-        etapaChart.data.datasets[0].data = topEtapas.map(row => toMillions(rowMetric(row, 'PresupuestoErequester')));
-        etapaChart.data.datasets[1].data = topEtapas.map(row => toMillions(rowMetric(row, 'EjecutadoErequester')));
-        etapaChart.data.datasets[2].data = topEtapas.map(row => toMillions(rowMetric(row, 'ComprometidoErequester')));
-        etapaChart.options.scales.y.ticks.callback = value => `${value}M`;
-        etapaChart.update();
+        renderEjecucionArea(areaRows);
 
         areaChart.data.labels = areaRows.map(row => displayName(row.label || dimension(row, 'Rubros[Area]')));
         areaChart.data.datasets[0].label = 'Presupuesto SAP';
-        areaChart.data.datasets[0].data = areaRows.map(row => toMillions(rowMetric(row, 'PresupuestoErequester')));
+        areaChart.data.datasets[0].data = areaRows.map(row => toMillions(rowMetric(row, 'RdiTotal')));
         areaChart.data.datasets[1].data = areaRows.map(row => toMillions(rowMetric(row, 'AsignadoErequester')));
         areaChart.options.scales.y.ticks.callback = value => `${value}M`;
         areaChart.update();
