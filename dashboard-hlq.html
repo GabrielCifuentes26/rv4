@@ -235,46 +235,89 @@
         /* ── TABLE ── */
         /* --- FILTERS --- */
         .filters-section {
-            background: linear-gradient(135deg, #13233a 0%, #102039 100%);
-            border-bottom: 1px solid rgba(255,255,255,0.08);
-            padding: 18px 22px;
+            position: relative;
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr) auto;
+            gap: 14px;
+            align-items: end;
+            background:
+                linear-gradient(90deg, rgba(14,165,233,0.12), transparent 28%),
+                linear-gradient(135deg, #101827 0%, #13233a 100%);
+            border-bottom: 1px solid rgba(148,163,184,0.20);
+            padding: 12px 18px 14px 22px;
             flex-shrink: 0;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+        }
+        .filters-section::before {
+            content: 'Filtros';
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            border-left: 3px solid #C9A84C;
+            padding: 0 13px 0 10px;
+            color: #e2e8f0;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.7px;
+            text-transform: uppercase;
+            background: rgba(15,23,42,0.48);
+            border-radius: 8px;
         }
         .filters-grid {
             display: grid;
-            grid-template-columns: repeat(4, minmax(150px, 1fr));
-            gap: 14px;
+            grid-template-columns: repeat(4, minmax(160px, 1fr));
+            gap: 10px;
             align-items: end;
+            min-width: 0;
         }
         .filter-card {
             position: relative;
-            background: rgba(8,18,35,0.62);
-            border: 1px solid rgba(148,163,184,0.14);
-            box-shadow: 0 10px 24px rgba(2,8,23,0.28);
-            padding: 10px 12px 12px;
+            background: rgba(15,23,42,0.42);
+            border: 1px solid rgba(148,163,184,0.20);
+            box-shadow: 0 8px 20px rgba(2,8,23,0.18);
+            padding: 7px;
+            border-radius: 8px;
             min-width: 0;
+        }
+        .filter-card:focus-within,
+        .filter-card.open {
+            border-color: rgba(201,168,76,0.58);
+            background: rgba(15,23,42,0.66);
         }
         .filter-label {
             display: block;
-            color: #f4a261;
-            font-size: 0.78rem;
+            color: #C9A84C;
+            font-size: 0.58rem;
             font-weight: 800;
-            margin-bottom: 7px;
+            letter-spacing: 0.55px;
+            line-height: 1;
+            margin: 0 0 6px;
+            padding-left: 2px;
+            text-transform: uppercase;
         }
         .filter-select,
         .filter-trigger {
             appearance: none;
+            position: relative;
             width: 100%;
-            height: 34px;
-            border: 1px solid rgba(226,232,240,0.82);
-            background: #243a59;
+            height: 32px;
+            border: 1px solid rgba(226,232,240,0.30);
+            background: #243550;
             color: #fff;
             font: 500 0.78rem 'Inter', 'Segoe UI', sans-serif;
-            padding: 0 34px 0 9px;
+            padding: 0 34px 0 10px;
             outline: none;
             cursor: pointer;
             text-align: left;
-            border-radius: 0;
+            border-radius: 7px;
+            transition: border-color .16s, background .16s, box-shadow .16s;
+        }
+        .filter-trigger:hover {
+            border-color: rgba(201,168,76,0.60);
+            background: #2a3d5c;
+        }
+        .filter-trigger:focus-visible {
+            box-shadow: 0 0 0 3px rgba(14,165,233,0.18);
         }
         .filter-select {
             background-image: linear-gradient(45deg, transparent 50%, #e5e7eb 50%), linear-gradient(135deg, #e5e7eb 50%, transparent 50%);
@@ -292,10 +335,10 @@
         .filter-trigger::after {
             content: '';
             position: absolute;
-            right: 20px;
-            bottom: 25px;
-            width: 11px;
-            height: 11px;
+            right: 12px;
+            top: 9px;
+            width: 9px;
+            height: 9px;
             border-right: 2px solid #e5e7eb;
             border-bottom: 2px solid #e5e7eb;
             transform: rotate(45deg);
@@ -305,9 +348,9 @@
             display: none;
             position: absolute;
             z-index: 30;
-            left: 12px;
-            right: 12px;
-            top: calc(100% - 6px);
+            left: 7px;
+            right: 7px;
+            top: calc(100% - 3px);
             max-height: 220px;
             overflow: auto;
             background: #101f36;
@@ -330,17 +373,35 @@
         .filter-actions {
             display: flex;
             justify-content: flex-end;
-            margin-top: 12px;
+            margin-top: 0;
         }
         .filter-clear {
-            background: rgba(14,165,233,0.13);
-            border: 1px solid rgba(14,165,233,0.38);
-            color: #bae6fd;
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            background: rgba(14,165,233,0.16);
+            border: 1px solid rgba(14,165,233,0.42);
+            color: #dff6ff;
             font: 700 0.72rem 'Inter', 'Segoe UI', sans-serif;
-            padding: 7px 14px;
+            padding: 0 13px;
             cursor: pointer;
+            border-radius: 8px;
+            white-space: nowrap;
+            transition: background .16s, border-color .16s, transform .16s;
         }
-        .filter-clear:hover { background: rgba(14,165,233,0.24); }
+        .filter-clear:hover {
+            background: rgba(14,165,233,0.28);
+            border-color: rgba(14,165,233,0.62);
+            transform: translateY(-1px);
+        }
+        .filter-clear svg {
+            width: 13px;
+            height: 13px;
+            fill: currentColor;
+            flex-shrink: 0;
+        }
 
         .table-section { padding: 12px 22px 8px; flex-shrink: 0; overflow-x: auto; }
         .section-label {
@@ -405,10 +466,15 @@
             color: var(--gray2);
         }
         @media (max-width: 1100px) {
-            .filters-grid { grid-template-columns: repeat(3, minmax(150px, 1fr)); }
+            .filters-section { grid-template-columns: 1fr auto; }
+            .filters-section::before { display: none; }
+            .filters-grid { grid-template-columns: repeat(2, minmax(150px, 1fr)); }
         }
         @media (max-width: 720px) {
+            .filters-section { grid-template-columns: 1fr; padding: 12px; }
             .filters-grid { grid-template-columns: 1fr; }
+            .filter-actions { justify-content: stretch; }
+            .filter-clear { width: 100%; }
         }
     </style>
 </head>
@@ -459,7 +525,7 @@
     <div class="filters-section">
         <div class="filters-grid">
             <div class="filter-card" id="area-filter-card">
-                <label class="filter-label">Area</label>
+                <label class="filter-label">Área</label>
                 <button class="filter-trigger" type="button" id="filter-area-button"><span id="filter-area-label">Seleccion multiple</span></button>
                 <div class="filter-menu" id="filter-area-menu"></div>
             </div>
@@ -474,13 +540,16 @@
                 <div class="filter-menu" id="filter-fase-menu"></div>
             </div>
             <div class="filter-card" id="mes-filter-card">
-                <label class="filter-label">Todos los meses</label>
+                <label class="filter-label">Meses</label>
                 <button class="filter-trigger" type="button" id="filter-mes-button"><span id="filter-mes-label">Seleccion multiple</span></button>
                 <div class="filter-menu" id="filter-mes-menu"></div>
             </div>
         </div>
         <div class="filter-actions">
-            <button class="filter-clear" type="button" id="filter-clear">Limpiar filtros</button>
+            <button class="filter-clear" type="button" id="filter-clear">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 5V2L7 7l5 5V9c2.76 0 5 2.24 5 5a5 5 0 0 1-8.66 3.39l-1.42 1.42A7 7 0 1 0 12 5z"/></svg>
+                Limpiar filtros
+            </button>
         </div>
     </div>
 
