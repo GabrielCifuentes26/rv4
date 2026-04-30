@@ -867,7 +867,7 @@
         </div>
 
         <div class="chart-card">
-            <div class="chart-title">Avance por Area</div>
+            <div class="chart-title">Avance por Segmento</div>
             <canvas id="faseChart"></canvas>
         </div>
     </div>
@@ -1021,22 +1021,26 @@
         options: { responsive:true, cutout:'74%', plugins:{ legend:{display:false}, tooltip:{enabled:false} } }
     });
 
-    // Fase
+    // Avance por Segmento — barras horizontales
     const areaChart = new Chart(document.getElementById('faseChart'), {
         type: 'bar',
         data: {
-            labels:['Fase 1','Fase 2','Fase 3','Fase 4','Fase 5'],
-            datasets:[
-                { label:'Presupuesto SAP', data:[48000,42000,35000,28000,9283], backgroundColor:C.blue,   borderRadius:3, barPercentage:0.72 },
-                { label:'Ejecutado', data:[44500,38200,28600,15300,2770], backgroundColor:C.amber,  borderRadius:3, barPercentage:0.72 }
+            labels: [],
+            datasets: [
+                { label: 'Presupuesto SAP', data: [], backgroundColor: '#0ea5e920', borderColor: '#0ea5e9', borderWidth: 1.5, borderRadius: 4, barPercentage: 0.55 },
+                { label: 'Asignado',        data: [], backgroundColor: '#10b98180', borderColor: '#10b981', borderWidth: 1.5, borderRadius: 4, barPercentage: 0.55 }
             ]
         },
-        options:{
-            responsive:true, maintainAspectRatio:false,
-            plugins:{ legend:{ position:'top', labels:{font:{size:9}, boxWidth:10, padding:8, color:'#64748b'} } },
-            scales:{
-                x:{ ticks:{font:{size:9}, color:'#94a3b8'}, grid:{display:false} },
-                y:{ ticks:{font:{size:9}, color:'#94a3b8', callback:v=>(v/1000).toFixed(0)+'M'}, grid:{color:'#e2e8f0'} }
+        options: {
+            indexAxis: 'y',
+            responsive: true, maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'top', labels: { font: { size: 9 }, boxWidth: 10, padding: 10, color: '#64748b' } },
+                tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.x.toFixed(2)}M` } }
+            },
+            scales: {
+                x: { grid: { color: '#f1f5f9' }, ticks: { font: { size: 9 }, color: '#94a3b8', callback: v => `${v}M` }, beginAtZero: true },
+                y: { grid: { display: false }, ticks: { font: { size: 9 }, color: '#475569' } }
             }
         }
     });
@@ -1938,14 +1942,13 @@
         }
     }
 
-    function renderCharts(etapaRows, areaRows) {
+    function renderCharts(etapaRows, areaRows, segmentoRows) {
         renderEjecucionArea(areaRows);
 
-        areaChart.data.labels = areaRows.map(row => displayName(row.label || dimension(row, 'Rubros[Area]')));
-        areaChart.data.datasets[0].label = 'Presupuesto SAP';
-        areaChart.data.datasets[0].data = areaRows.map(row => toMillions(rowMetric(row, 'RdiTotal')));
-        areaChart.data.datasets[1].data = areaRows.map(row => toMillions(rowMetric(row, 'AsignadoErequester')));
-        areaChart.options.scales.y.ticks.callback = value => `${value}M`;
+        const segs = segmentoRows || [];
+        areaChart.data.labels            = segs.map(r => r.label || dimension(r, 'Rubros[Segmento]'));
+        areaChart.data.datasets[0].data  = segs.map(r => +toMillions(rowMetric(r, 'RdiTotal')).toFixed(2));
+        areaChart.data.datasets[1].data  = segs.map(r => +toMillions(rowMetric(r, 'AsignadoErequester')).toFixed(2));
         areaChart.update();
     }
 
@@ -1957,12 +1960,13 @@
         let areaRows = datasets.porArea || [];
         let etapaRows = datasets.porEtapa || [];
 
-        let rawDetailRows = [];
+        let rawDetailRows = [], segmentoRows = [];
         if (detailRows.length) {
             rawDetailRows = filteredDetailRows();
             totals = aggregateDetailRows(rawDetailRows);
-            areaRows = groupRowsBy(rawDetailRows, 'Rubros[Area]');
-            etapaRows = groupRowsBy(rawDetailRows, 'Rubros[Etapa]');
+            areaRows     = groupRowsBy(rawDetailRows, 'Rubros[Area]');
+            etapaRows    = groupRowsBy(rawDetailRows, 'Rubros[Etapa]');
+            segmentoRows = groupRowsBy(rawDetailRows, 'Rubros[Segmento]');
         } else if (powerBIState.filters.meses.length) {
             const monthRows = getMonthRows(data)
                 .filter(row => powerBIState.filters.meses.includes(cleanDimension(dimension(row, 'Calendario[MesA]'))));
@@ -1971,7 +1975,7 @@
 
         renderMetrics(totals);
         renderAreaTable(areaRows, totals, rawDetailRows);
-        renderCharts(etapaRows, areaRows);
+        renderCharts(etapaRows, areaRows, segmentoRows);
         renderTendenciaFase(rawDetailRows);
 
         if (data?.metadata?.generatedAt) {
