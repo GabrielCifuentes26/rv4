@@ -2687,113 +2687,120 @@
     position: relative !important;
     z-index: 1200 !important;
     border-radius: 12px;
-    /* Huge shadow creates the 50% dark backdrop; inner glow highlights the element */
     box-shadow:
-      0 0 0 9999px rgba(0,0,0,0.50),
+      0 0 0 9999px rgba(0,0,0,0.52),
       0 0 0 3px #0ea5e9,
-      0 0 24px rgba(14,165,233,0.45) !important;
+      0 0 28px rgba(14,165,233,0.5) !important;
   }
 
   /* ── Robot container ── */
   #tour-robot {
     position: fixed;
-    right: -200px;
+    right: -220px;
     top: 50%;
-    /* translateY(-50%) keeps robot centered on its top value */
     transform: translateY(-50%);
     z-index: 1300;
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     gap: 0;
-    /* top animates the travel, right animates entry/exit */
-    transition: top 1.1s cubic-bezier(.34,1.3,.64,1), right 0.7s cubic-bezier(.4,0,.2,1);
+    transition: top 1.15s cubic-bezier(.34,1.28,.64,1), right 0.85s cubic-bezier(.34,1.56,.64,1);
     pointer-events: none;
   }
-  #tour-robot.visible { right: 10px; }
+  #tour-robot.visible { right: 12px; }
 
-  /* Robot image: float animation only on the img, NOT on the container */
+  /* Entry spin animation on the image wrapper only */
   #tour-robot-img-wrap {
-    width: 90px; height: 90px; flex-shrink: 0;
-    animation: tour-robot-float 2.8s ease-in-out infinite;
+    width: 100px; height: 100px; flex-shrink: 0;
+    animation: tour-float 2.8s ease-in-out infinite;
   }
   #tour-robot-img-wrap img {
     width: 100%; height: 100%;
     object-fit: contain;
-    filter: drop-shadow(0 4px 16px rgba(14,165,233,0.45));
+    filter: drop-shadow(0 6px 18px rgba(14,165,233,0.5));
     display: block;
   }
-  @keyframes tour-robot-float {
-    0%,100% { transform: translateY(0px) rotate(0deg); }
-    30%      { transform: translateY(-8px) rotate(-2deg); }
-    70%      { transform: translateY(-5px) rotate(2deg); }
+  /* Entry: robot spins + scales in */
+  #tour-robot.entering #tour-robot-img-wrap {
+    animation: tour-enter-spin 1s cubic-bezier(.34,1.56,.64,1) forwards;
   }
-  /* Bounce on arrival */
+  @keyframes tour-enter-spin {
+    0%   { transform: scale(0.2) rotate(-360deg) translateY(30px); opacity: 0; }
+    60%  { transform: scale(1.18) rotate(8deg) translateY(-6px); opacity: 1; }
+    80%  { transform: scale(0.94) rotate(-3deg) translateY(2px); }
+    100% { transform: scale(1) rotate(0deg) translateY(0); }
+  }
+  /* Idle float after entry */
+  #tour-robot.floating #tour-robot-img-wrap {
+    animation: tour-float 2.8s ease-in-out infinite;
+  }
+  @keyframes tour-float {
+    0%,100% { transform: translateY(0) rotate(0deg); }
+    35%     { transform: translateY(-9px) rotate(-2deg); }
+    70%     { transform: translateY(-5px) rotate(2deg); }
+  }
+  /* Bounce on step change */
   #tour-robot.arriving #tour-robot-img-wrap {
-    animation: tour-robot-arrive 0.5s cubic-bezier(.34,1.56,.64,1) forwards,
-               tour-robot-float 2.8s ease-in-out 0.5s infinite;
+    animation: tour-arrive 0.55s cubic-bezier(.34,1.56,.64,1) forwards,
+               tour-float 2.8s ease-in-out 0.55s infinite;
   }
-  @keyframes tour-robot-arrive {
-    0%   { transform: scale(0.8) translateY(10px); }
-    60%  { transform: scale(1.1) translateY(-4px); }
-    100% { transform: scale(1) translateY(0); }
+  @keyframes tour-arrive {
+    0%  { transform: scale(0.75) translateY(14px); }
+    65% { transform: scale(1.12) translateY(-5px); }
+    100%{ transform: scale(1) translateY(0); }
   }
 
   /* ── Speech bubble ── */
   #tour-bubble {
     position: absolute;
-    right: 98px;
-    bottom: 0;
-    width: 300px;
+    right: 108px;
+    top: 50%;
+    transform: translateY(-50%) scale(0.88) translateX(14px);
+    width: 318px;
     background: #fff;
     border: 1.5px solid #e2e8f0;
-    border-radius: 18px 18px 4px 18px;
-    box-shadow: 0 8px 32px rgba(15,23,42,0.14);
-    padding: 16px 18px 14px;
+    border-radius: 18px 4px 18px 18px;
+    box-shadow: 0 10px 36px rgba(15,23,42,0.16);
+    padding: 18px 20px 15px;
     pointer-events: all;
     opacity: 0;
-    transform: scale(0.88) translateX(12px);
-    transition: opacity 0.3s ease, transform 0.3s ease;
+    transition: opacity 0.32s ease, transform 0.32s ease;
   }
   #tour-bubble.show {
     opacity: 1;
-    transform: scale(1) translateX(0);
+    transform: translateY(-50%) scale(1) translateX(0);
   }
   #tour-bubble-step {
-    font-size: 0.6rem; font-weight: 700; letter-spacing: 0.8px;
-    text-transform: uppercase; color: #0ea5e9; margin-bottom: 4px;
+    font-size: 0.68rem; font-weight: 700; letter-spacing: 0.8px;
+    text-transform: uppercase; color: #0ea5e9; margin-bottom: 5px;
   }
   #tour-bubble-title {
-    font-size: 0.82rem; font-weight: 800; color: #0f172a;
-    margin-bottom: 7px; line-height: 1.25;
+    font-size: 1rem; font-weight: 800; color: #0f172a;
+    margin-bottom: 8px; line-height: 1.25;
   }
   #tour-bubble-text {
-    font-size: 0.74rem; color: #334155; line-height: 1.55;
-    margin-bottom: 12px;
+    font-size: 0.86rem; color: #334155; line-height: 1.6;
+    margin-bottom: 14px;
   }
-  /* Progress bar */
   #tour-progress-wrap {
     width: 100%; height: 3px; background: #e2e8f0;
-    border-radius: 2px; margin-bottom: 12px; overflow: hidden;
+    border-radius: 2px; margin-bottom: 14px; overflow: hidden;
   }
   #tour-progress-bar {
     height: 100%; width: 0%; background: #0ea5e9;
-    border-radius: 2px;
-    transition: width linear;
+    border-radius: 2px; transition: width linear;
   }
-  /* Actions */
   #tour-bubble-actions {
     display: flex; justify-content: space-between; align-items: center; gap: 8px;
   }
   #tour-skip {
-    background: none; border: none; font-size: 0.7rem; color: #94a3b8;
-    cursor: pointer; padding: 4px 0; font-weight: 600;
-    transition: color .15s;
+    background: none; border: none; font-size: 0.76rem; color: #94a3b8;
+    cursor: pointer; padding: 4px 0; font-weight: 600; transition: color .15s;
   }
   #tour-skip:hover { color: #ef4444; }
   #tour-next {
     background: #0ea5e9; color: #fff; border: none;
-    border-radius: 8px; font-size: 0.72rem; font-weight: 700;
-    padding: 7px 16px; cursor: pointer;
+    border-radius: 8px; font-size: 0.78rem; font-weight: 700;
+    padding: 8px 18px; cursor: pointer;
     transition: background .15s, transform .1s;
   }
   #tour-next:hover { background: #0284c7; transform: scale(1.04); }
@@ -2801,24 +2808,23 @@
   /* ── Floating restart button ── */
   #tour-fab {
     position: fixed; bottom: 84px; right: 24px; z-index: 1000;
-    width: 46px; height: 46px; border-radius: 50%;
+    width: 48px; height: 48px; border-radius: 50%;
     background: linear-gradient(135deg,#0ea5e9,#0284c7);
     border: none; cursor: pointer;
-    box-shadow: 0 4px 16px rgba(14,165,233,0.45);
+    box-shadow: 0 4px 18px rgba(14,165,233,0.5);
     display: flex; align-items: center; justify-content: center;
     transition: transform .2s, box-shadow .2s;
-    color: #fff;
   }
-  #tour-fab:hover { transform: scale(1.1); box-shadow: 0 6px 24px rgba(14,165,233,0.6); }
-  #tour-fab img { width: 28px; height: 28px; object-fit: contain; }
+  #tour-fab:hover { transform: scale(1.12); box-shadow: 0 6px 26px rgba(14,165,233,0.65); }
+  #tour-fab img { width: 30px; height: 30px; object-fit: contain; }
 </style>
 
 <!-- Robot -->
 <div id="tour-robot">
   <div id="tour-bubble">
-    <div id="tour-bubble-step">Paso 1 de 9</div>
+    <div id="tour-bubble-step">Paso 1 de 11</div>
     <div id="tour-bubble-title">Bienvenido</div>
-    <div id="tour-bubble-text">Hola, soy tu asistente. Te ayudaré a conocer todas las funciones de esta página.</div>
+    <div id="tour-bubble-text">Hola, soy tu asistente de Bosques de Jalapa. Te llevaré paso a paso por todas las funciones del dashboard.</div>
     <div id="tour-progress-wrap"><div id="tour-progress-bar"></div></div>
     <div id="tour-bubble-actions">
       <button id="tour-skip">Saltar recorrido</button>
@@ -2837,63 +2843,73 @@
 
 <script>
 (function() {
-  const AUTO_ADVANCE_MS = 9000;
+  const AUTO_MS = 10000;
 
   const STEPS = [
     {
       selector: null,
       title: '¡Hola! Soy tu asistente',
-      text: 'Te daré un recorrido por las funciones principales de este dashboard de Bosques de Jalapa. Puedes avanzar manualmente o dejar que avance solo.'
-    },
-    {
-      selector: '.segmento-card',
-      title: 'Avance por Segmento',
-      text: 'Esta gráfica muestra el avance de cada segmento del proyecto. La barra verde indica lo Asignado y la gris el Presupuesto SAP disponible. Puedes hacer scroll para ver todos los segmentos.'
-    },
-    {
-      selector: '.filters-section',
-      title: 'Filtros Principales',
-      text: 'Aquí filtras toda la información del dashboard: Área, Segmento, Etapa, Fase y Meses. Al seleccionar cualquier opción, todos los indicadores y gráficas se actualizan en tiempo real.'
-    },
-    {
-      selector: '.filter-search-wrap',
-      title: 'Buscador Rápido',
-      text: 'Escribe el nombre de un área, segmento o etapa para encontrar rápidamente información específica dentro del proyecto sin necesitar los filtros.'
-    },
-    {
-      selector: '#kpi-active-chip',
-      title: 'Filtros Activos',
-      text: 'Aquí aparecen los filtros que tienes activos actualmente. Puedes hacer clic en la X para quitarlos. Si seleccionas el mismo filtro dos veces, se desactiva automáticamente y la vista regresa al total.'
+      text: 'Te llevaré en un recorrido por todas las funciones del dashboard de Bosques de Jalapa. Puedes avanzar manualmente o esperar y lo haré solo.'
     },
     {
       selector: '.kpi-row',
-      title: 'Indicadores Clave',
-      text: 'Estas tarjetas muestran el resumen financiero del proyecto: Presupuesto SAP, Ejecutado, Comprometido, Asignado, Disponible y % Asignado. Se actualizan con cada filtro aplicado. Haz clic en una tarjeta para filtrar por esa métrica.'
+      title: 'Indicadores Clave del Proyecto',
+      text: 'Estas tarjetas resumen el estado financiero: Presupuesto SAP, Ejecutado, Comprometido, Asignado, Disponible y % Asignado. Haz clic en cualquiera para filtrar toda la vista por esa métrica.'
     },
     {
       selector: '.table-gauge-row',
       title: 'Tabla Resumen y Avance General',
-      text: 'La tabla muestra el detalle financiero por área. El velocímetro a la derecha indica el porcentaje de avance general del proyecto según lo Asignado. Haz clic en la flecha de cada fila para ver el desglose por segmento.'
+      text: 'La tabla muestra el detalle financiero por área. El velocímetro a la derecha indica el porcentaje de avance general del proyecto. Haz clic en la flecha de cada fila para ver el desglose por segmento.'
     },
     {
-      selector: '.charts-row',
-      title: 'Gráficos de Ejecución',
-      text: 'El gráfico izquierdo muestra el control de ejecución presupuestal por área (Ejecutado, Comprometido, Asignado y Disponible). El derecho desglosa el avance por cada segmento del proyecto.'
+      selector: '.filters-section',
+      title: 'Filtros Principales',
+      text: 'Desde aquí filtras todo el dashboard: Área, Segmento, Etapa, Fase y Meses. Al seleccionar cualquier opción, los indicadores, gráficas y tabla se actualizan en tiempo real automáticamente.'
+    },
+    {
+      selector: '.filter-search-wrap',
+      title: 'Buscador Rápido',
+      text: 'Escribe el nombre de un área, segmento o etapa para encontrar información específica al instante, sin necesidad de abrir los filtros uno por uno.'
+    },
+    {
+      selector: '#kpi-active-chip',
+      title: 'Filtros Activos',
+      text: 'Aquí verás los filtros que tienes activos en este momento. Haz clic en la X para quitar un filtro. Si seleccionas el mismo filtro dos veces, se desactiva solo y la vista regresa al total general.'
+    },
+    {
+      selector: '.chart-card.eac-card',
+      title: 'Control de Ejecución por Área',
+      text: 'Esta gráfica muestra el avance de cada área del proyecto: en azul lo Ejecutado, en naranja lo Comprometido, en negro el límite Asignado y en gris el Disponible restante del Presupuesto SAP.'
+    },
+    {
+      selector: '.segmento-card',
+      title: 'Avance por Segmento',
+      text: 'Aquí verás el avance de cada segmento del proyecto. La barra verde muestra lo Asignado y la gris el Presupuesto SAP disponible. Haz scroll dentro del gráfico si hay muchos segmentos.'
+    },
+    {
+      selector: '.tendencia-section',
+      title: 'Tendencia de Ejecución',
+      text: 'Esta gráfica de líneas muestra la evolución del presupuesto asignado a lo largo del tiempo, permitiendo ver la tendencia de ejecución mes a mes para cada área o fase del proyecto.'
+    },
+    {
+      selector: '#tendencia-toggle',
+      title: 'Switch Fase / Área',
+      text: '¡Este botón es clave! Puedes cambiar la vista de la gráfica de tendencia entre "Fase" y "Área" con un solo clic. Cada opción muestra una perspectiva diferente del mismo dato de ejecución.'
     },
     {
       selector: null,
-      title: '¡Listo para explorar!',
-      text: 'Ya conoces las funciones principales. Usa los filtros, el buscador y las gráficas para analizar la información de Bosques de Jalapa. ¡Puedes repetir este recorrido cuando quieras con el botón azul!'
+      title: '¡Ya eres un experto!',
+      text: 'Conoces todas las funciones del dashboard. Usa los filtros, el buscador, las gráficas y el switch Fase/Área para explorar a fondo la información de Bosques de Jalapa. ¡Hasta pronto!'
     }
   ];
 
-  let currentStep = 0;
-  let autoTimer   = null;
-  let progressInterval = null;
-  let highlighted = null;
-  let chipWasHidden = false;
+  let step      = 0;
+  let timer     = null;
+  let hilighted = null;
+  let chipWas   = false;
 
   const robot   = document.getElementById('tour-robot');
+  const imgWrap = document.getElementById('tour-robot-img-wrap');
   const bubble  = document.getElementById('tour-bubble');
   const stepLbl = document.getElementById('tour-bubble-step');
   const titleEl = document.getElementById('tour-bubble-title');
@@ -2903,121 +2919,108 @@
   const nextBtn = document.getElementById('tour-next');
   const fab     = document.getElementById('tour-fab');
 
-  function clearHighlight() {
-    if (highlighted) {
-      highlighted.classList.remove('tour-highlight');
-      highlighted = null;
-    }
-    // Hide chip if we forced it visible
+  function clearHL() {
+    if (hilighted) { hilighted.classList.remove('tour-highlight'); hilighted = null; }
     const chip = document.getElementById('kpi-active-chip');
-    if (chipWasHidden && chip) {
-      chip.style.display = '';
-      chipWasHidden = false;
-    }
+    if (chipWas && chip) { chip.style.display = ''; chipWas = false; }
   }
 
-  function positionRobotNear(el) {
-    // Trigger arrive bounce
+  function moveRobot(el) {
+    // Bounce animation on arrival
+    imgWrap.classList.remove('arriving'); // handled via robot class
     robot.classList.remove('arriving');
-    void robot.offsetWidth; // reflow
+    void robot.offsetWidth;
     robot.classList.add('arriving');
     setTimeout(() => robot.classList.remove('arriving'), 1200);
 
-    if (!el) {
-      robot.style.top = '50%';
-      return;
-    }
+    if (!el) { robot.style.top = '50%'; return; }
     const rect    = el.getBoundingClientRect();
     const mid     = rect.top + rect.height / 2;
     const vp      = window.innerHeight;
-    const clamped = Math.max(80, Math.min(vp - 80, mid));
-    robot.style.top = clamped + 'px';
+    robot.style.top = Math.max(90, Math.min(vp - 90, mid)) + 'px';
   }
 
-  function startProgressBar() {
+  function startBar() {
     bar.style.transition = 'none';
     bar.style.width = '0%';
-    clearInterval(progressInterval);
-    clearTimeout(autoTimer);
-
+    clearTimeout(timer);
     requestAnimationFrame(() => {
-      bar.style.transition = `width ${AUTO_ADVANCE_MS}ms linear`;
+      bar.style.transition = `width ${AUTO_MS}ms linear`;
       bar.style.width = '100%';
     });
-
-    autoTimer = setTimeout(() => {
-      if (currentStep < STEPS.length - 1) goToStep(currentStep + 1);
-      else endTour();
-    }, AUTO_ADVANCE_MS);
+    timer = setTimeout(() => {
+      step < STEPS.length - 1 ? goTo(step + 1) : endTour();
+    }, AUTO_MS);
   }
 
-  function goToStep(idx) {
-    clearHighlight();
+  function goTo(idx) {
+    clearHL();
     bubble.classList.remove('show');
-
-    currentStep = idx;
-    const step = STEPS[idx];
+    step = idx;
+    const s     = STEPS[idx];
     const total = STEPS.length;
 
     stepLbl.textContent = `Paso ${idx + 1} de ${total}`;
-    titleEl.textContent = step.title;
-    textEl.textContent  = step.text;
+    titleEl.textContent = s.title;
+    textEl.textContent  = s.text;
     nextBtn.textContent = idx === total - 1 ? 'Finalizar ✓' : 'Siguiente →';
 
-    // Highlight target
-    if (step.selector) {
-      const el = document.querySelector(step.selector);
+    if (s.selector) {
+      const el = document.querySelector(s.selector);
       if (el) {
-        // Special: force kpi-active-chip visible if hidden
-        if (step.selector === '#kpi-active-chip' && el.style.display === 'none') {
+        if (s.selector === '#kpi-active-chip' && el.style.display === 'none') {
           el.style.display = 'flex';
-          el.querySelector('#kpi-chip-lbl').textContent = 'Ejemplo: Comprometido';
-          chipWasHidden = true;
+          const lbl = el.querySelector('#kpi-chip-lbl');
+          if (lbl) lbl.textContent = 'Ejemplo: Comprometido';
+          chipWas = true;
         }
         el.scrollIntoView({ behavior: 'smooth', block: 'center' });
         setTimeout(() => {
           el.classList.add('tour-highlight');
-          highlighted = el;
-          positionRobotNear(el);
-        }, 350);
+          hilighted = el;
+          moveRobot(el);
+        }, 380);
       }
     } else {
-      positionRobotNear(null);
+      moveRobot(null);
     }
 
-    setTimeout(() => bubble.classList.add('show'), 200);
-    startProgressBar();
+    setTimeout(() => bubble.classList.add('show'), 220);
+    startBar();
   }
 
   function endTour() {
-    clearHighlight();
-    clearTimeout(autoTimer);
+    clearHL();
+    clearTimeout(timer);
     bubble.classList.remove('show');
     setTimeout(() => {
-      robot.classList.remove('visible');
-    }, 300);
+      robot.classList.remove('visible', 'floating', 'entering');
+      robot.style.right = '-220px';
+    }, 350);
   }
 
   function startTour() {
-    currentStep = 0;
-    robot.classList.add('visible');
-    goToStep(0);
+    step = 0;
+    // Entry animation: spin in
+    robot.classList.remove('visible', 'floating', 'entering', 'arriving');
+    robot.style.top = '50%';
+    void robot.offsetWidth;
+    robot.classList.add('visible', 'entering');
+    setTimeout(() => {
+      robot.classList.remove('entering');
+      robot.classList.add('floating');
+    }, 1100);
+    goTo(0);
   }
 
   nextBtn.addEventListener('click', () => {
-    clearTimeout(autoTimer);
-    clearInterval(progressInterval);
-    if (currentStep < STEPS.length - 1) goToStep(currentStep + 1);
-    else endTour();
+    clearTimeout(timer);
+    step < STEPS.length - 1 ? goTo(step + 1) : endTour();
   });
-
   skipBtn.addEventListener('click', endTour);
   fab.addEventListener('click', startTour);
 
-  // Auto-start on load
-  window.addEventListener('load', () => {
-    setTimeout(startTour, 1200);
-  });
+  window.addEventListener('load', () => setTimeout(startTour, 1000));
 })();
 </script>
 <!-- ── /TOUR ASSISTANT ── -->
