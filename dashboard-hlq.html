@@ -623,10 +623,20 @@
 
         /* ── CHARTS ── */
         .charts-row {
-            display: grid; grid-template-columns: 200px 1fr 1fr;
+            display: grid; grid-template-columns: 200px 1fr;
             gap: 10px; padding: 0 22px 16px;
             height: 250px; flex-shrink: 0;
         }
+        /* ── AVANCE POR SEGMENTO ── */
+        .segmento-section { padding: 0 22px 16px; flex-shrink: 0; }
+        .segmento-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 10px; gap: 12px; flex-wrap: wrap;
+        }
+        .seg-legend { display: flex; gap: 18px; flex-wrap: wrap; }
+        .seg-legend-item { display: flex; align-items: center; gap: 7px; font-size: 0.68rem; color: var(--gray); font-weight: 500; }
+        .seg-dot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+        .segmento-body { position: relative; }
         /* ── TENDENCIA POR FASE ── */
         .tendencia-section { padding: 0 22px 16px; flex-shrink: 0; }
         .tendencia-header {
@@ -884,9 +894,21 @@
             <div id="eac-rows" class="eac-rows"></div>
         </div>
 
+    </div>
+
+    <!-- Avance por Segmento -->
+    <div class="segmento-section">
         <div class="chart-card">
-            <div class="chart-title">Avance por Segmento</div>
-            <canvas id="faseChart"></canvas>
+            <div class="segmento-header">
+                <span class="chart-title" style="margin:0">Avance por Segmento</span>
+                <div class="seg-legend">
+                    <span class="seg-legend-item"><span class="seg-dot" style="background:#bfdbfe;border:1.5px solid #0ea5e9"></span>Presupuesto SAP</span>
+                    <span class="seg-legend-item"><span class="seg-dot" style="background:#10b981"></span>Asignado</span>
+                </div>
+            </div>
+            <div class="segmento-body" id="segmento-body" style="height:240px">
+                <canvas id="faseChart"></canvas>
+            </div>
         </div>
     </div>
 
@@ -1039,26 +1061,87 @@
         options: { responsive:true, cutout:'74%', plugins:{ legend:{display:false}, tooltip:{enabled:false} } }
     });
 
-    // Avance por Segmento — barras horizontales
+    // Avance por Segmento — barras overlay (Presupuesto SAP fondo, Asignado encima)
+    const segBarLabelPlugin = {
+        id: 'segBarLabel',
+        afterDatasetsDraw(chart) {
+            const ctx = chart.ctx;
+            const area = chart.chartArea;
+            const presupData = chart.data.datasets[0]?.data || [];
+            chart.data.datasets.forEach((ds, di) => {
+                const meta = chart.getDatasetMeta(di);
+                if (meta.hidden) return;
+                meta.data.forEach((bar, i) => {
+                    const val = ds.data[i];
+                    if (!val || val < 0.005) return;
+                    const lbl = val >= 1 ? `${val.toFixed(1)}M` : `${Math.round(val * 1000)}K`;
+                    const x = Math.min(bar.x + 5, area.right - 2);
+                    const yOff = di === 0 ? -8 : 7;
+                    ctx.save();
+                    if (di === 0) {
+                        ctx.fillStyle = '#93c5fd';
+                        ctx.font = '500 9px Inter, sans-serif';
+                    } else {
+                        const pct = presupData[i] > 0 ? Math.round(val / presupData[i] * 100) : 0;
+                        ctx.fillStyle = '#059669';
+                        ctx.font = '700 9.5px Inter, sans-serif';
+                        const fullLbl = `${lbl}  ${pct}%`;
+                        ctx.fillText(fullLbl, x, bar.y + yOff);
+                        ctx.restore();
+                        return;
+                    }
+                    ctx.textAlign = 'left';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(lbl, x, bar.y + yOff);
+                    ctx.restore();
+                });
+            });
+        }
+    };
+
     const areaChart = new Chart(document.getElementById('faseChart'), {
         type: 'bar',
+        plugins: [segBarLabelPlugin],
         data: {
             labels: [],
             datasets: [
-                { label: 'Presupuesto SAP', data: [], backgroundColor: '#0ea5e920', borderColor: '#0ea5e9', borderWidth: 1.5, borderRadius: 4, barPercentage: 0.55 },
-                { label: 'Asignado',        data: [], backgroundColor: '#10b98180', borderColor: '#10b981', borderWidth: 1.5, borderRadius: 4, barPercentage: 0.55 }
+                { label: 'Presupuesto SAP', data: [], backgroundColor: '#bfdbfe', borderColor: '#0ea5e9', borderWidth: 1.5, borderRadius: 4, barThickness: 20, order: 2 },
+                { label: 'Asignado',        data: [], backgroundColor: '#10b981', borderColor: '#059669', borderWidth: 0,   borderRadius: 4, barThickness: 20, order: 1 }
             ]
         },
         options: {
             indexAxis: 'y',
+            grouped: false,
             responsive: true, maintainAspectRatio: false,
+            layout: { padding: { right: 80 } },
             plugins: {
-                legend: { position: 'top', labels: { font: { size: 9 }, boxWidth: 10, padding: 10, color: '#64748b' } },
-                tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.x.toFixed(2)}M` } }
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => {
+                            const v = ctx.parsed.x;
+                            const lbl = v >= 1 ? `${v.toFixed(2)}M` : `${Math.round(v * 1000)}K`;
+                            return ` ${ctx.dataset.label}: ${lbl}`;
+                        }
+                    }
+                }
             },
             scales: {
-                x: { grid: { color: '#f1f5f9' }, ticks: { font: { size: 9 }, color: '#94a3b8', callback: v => `${v}M` }, beginAtZero: true },
-                y: { grid: { display: false }, ticks: { font: { size: 9 }, color: '#475569' } }
+                x: {
+                    grid: { color: '#f1f5f9' },
+                    ticks: { font: { size: 10 }, color: '#94a3b8', callback: v => v >= 1 ? `${v}M` : v > 0 ? `${Math.round(v*1000)}K` : '0' },
+                    beginAtZero: true
+                },
+                y: {
+                    grid: { display: false },
+                    ticks: {
+                        font: { size: 10, weight: '500' }, color: '#334155',
+                        callback: function(val) {
+                            const lbl = this.getLabelForValue(val);
+                            return lbl && lbl.length > 20 ? lbl.substring(0, 18) + '…' : lbl;
+                        }
+                    }
+                }
             }
         }
     });
@@ -2079,10 +2162,18 @@
     function renderCharts(etapaRows, areaRows, segmentoRows) {
         renderEjecucionArea(areaRows);
 
-        const segs = segmentoRows || [];
-        areaChart.data.labels            = segs.map(r => r.label || dimension(r, 'Rubros[Segmento]'));
-        areaChart.data.datasets[0].data  = segs.map(r => +toMillions(rowMetric(r, 'RdiTotal')).toFixed(2));
-        areaChart.data.datasets[1].data  = segs.map(r => +toMillions(rowMetric(r, 'AsignadoErequester')).toFixed(2));
+        // Sort segments by Presupuesto SAP descending
+        const segs = [...(segmentoRows || [])].sort((a, b) =>
+            asNumber(rowMetric(b, 'RdiTotal')) - asNumber(rowMetric(a, 'RdiTotal'))
+        );
+
+        // Dynamic height: 46px per segment, min 200px
+        const segBody = document.getElementById('segmento-body');
+        if (segBody) segBody.style.height = Math.max(200, segs.length * 46 + 70) + 'px';
+
+        areaChart.data.labels           = segs.map(r => String(r.label || dimension(r, 'Rubros[Segmento]') || '').toUpperCase());
+        areaChart.data.datasets[0].data = segs.map(r => +toMillions(rowMetric(r, 'RdiTotal')).toFixed(2));
+        areaChart.data.datasets[1].data = segs.map(r => +toMillions(rowMetric(r, 'AsignadoErequester')).toFixed(2));
         areaChart.update();
     }
 
