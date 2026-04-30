@@ -1559,45 +1559,69 @@
     }
 
     function renderSearchTable(areaBody, detailRows, totals) {
-        const q = searchQuery;
-        // Determine most specific matching level (Etapa > Segmento > Área)
-        const matchesAt = (dimName, applyDisplay) => [...new Set(
-            detailRows.map(r => String(dimension(r, dimName) || '').trim())
-                      .filter(v => v && (v.toLowerCase().includes(q) ||
-                                  (applyDisplay && displayName(v).toLowerCase().includes(q))))
-        )];
-        const etapaHits  = matchesAt('Rubros[Etapa]',    false);
-        const segHits    = matchesAt('Rubros[Segmento]', false);
-        const areaHits   = matchesAt('Rubros[Area]',     true);
+        const q = searchQuery.toLowerCase();
 
-        let matchLevel, matchDim, matchHits;
-        if (etapaHits.length)  { matchLevel = 'Etapa';    matchDim = 'Rubros[Etapa]';    matchHits = etapaHits; }
-        else if (segHits.length) { matchLevel = 'Segmento'; matchDim = 'Rubros[Segmento]'; matchHits = segHits; }
-        else                   { matchLevel = 'Área';     matchDim = 'Rubros[Area]';     matchHits = areaHits; }
+        // Identify which specific values match at each level (for badge labeling)
+        const etapaHits = new Set(detailRows.map(r => String(dimension(r,'Rubros[Etapa]')||'').trim()).filter(v => v && v.toLowerCase().includes(q)));
+        const segHits   = new Set(detailRows.map(r => String(dimension(r,'Rubros[Segmento]')||'').trim()).filter(v => v && v.toLowerCase().includes(q)));
 
-        const filtered = detailRows.filter(r =>
-            matchHits.includes(String(dimension(r, matchDim) || '').trim())
-        );
-        const matchRows = groupRowsBy(filtered, matchDim);
-
-        // Notice bar above table
+        // Notice bar
         const noticeEl = document.getElementById('search-mode-notice');
         if (noticeEl) {
             noticeEl.style.display = 'flex';
             noticeEl.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="var(--blue)" style="flex-shrink:0"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-            Mostrando <strong>${matchRows.length}</strong> resultado${matchRows.length!==1?'s':''} de <strong>${matchLevel}</strong> para "<strong>${escapeHtml(searchQuery)}</strong>"`;
+            Árbol filtrado para "<strong>${escapeHtml(searchQuery)}</strong>"`;
         }
 
-        let html = matchRows.map(row => {
-            const label = matchLevel === 'Área'
-                ? (displayName(String(row.label||'').toUpperCase().trim()) || row.label)
-                : String(row.label || '');
-            return `<tr class="tr-anim">
-                <td><span class="search-lvl-badge">${matchLevel}</span>${escapeHtml(label)}</td>
-                ${metricCells(row)}</tr>`;
-        }).join('');
+        // Build full 3-level tree: Área → Segmento → Etapa, all expanded
+        const areaRows = groupRowsBy(detailRows, 'Rubros[Area]');
+        let html = '';
 
-        if (!matchRows.length) {
+        areaRows.forEach((areaRow, ai) => {
+            const rawName = String(areaRow.label || '').toUpperCase().trim();
+            const dispName = displayName(rawName) || rawName;
+            const cfg = AREA_CONFIG[rawName] || DEFAULT_AREA_CFG;
+            const areaDetail = detailRows.filter(r =>
+                String(dimension(r, 'Rubros[Area]') || '').toUpperCase().trim() === rawName);
+            const segRows = groupRowsBy(areaDetail, 'Rubros[Segmento]');
+
+            // L1 — Área (always expanded)
+            html += `<tr class="tr-l1 tr-expandable expanded tr-anim" data-ai="${ai}">
+                <td class="td-l1">
+                    <span class="row-chev"></span>
+                    <span class="row-dot" style="background:${cfg.color}22;border:2px solid ${cfg.color}"></span>
+                    ${escapeHtml(dispName)}
+                </td>${metricCells(areaRow)}</tr>`;
+
+            segRows.forEach((segRow, si) => {
+                const segName = String(segRow.label || '').trim();
+                const isSegMatch = segHits.has(segName);
+                const segDetail = areaDetail.filter(r =>
+                    String(dimension(r, 'Rubros[Segmento]') || '').trim() === segName);
+                const etapaRowsFiltered = groupRowsBy(segDetail, 'Rubros[Etapa]').filter(e => e.label);
+                const segExp = etapaRowsFiltered.length > 0;
+
+                // L2 — Segmento (visible + expanded)
+                html += `<tr class="tr-l2 tr-child${segExp ? ' tr-expandable expanded' : ''} tr-anim" data-ai="${ai}" data-si="${si}">
+                    <td class="td-l2" style="border-left:3px solid ${cfg.color}">
+                        ${segExp ? '<span class="row-chev"></span>' : '<span class="row-chev-ph"></span>'}
+                        ${isSegMatch ? `<span class="search-lvl-badge">Segmento</span>` : ''}
+                        ${escapeHtml(segName)}
+                    </td>${metricCells(segRow)}</tr>`;
+
+                // L3 — Etapas (visible)
+                etapaRowsFiltered.forEach(etRow => {
+                    const isEtMatch = etapaHits.has(String(etRow.label || '').trim());
+                    html += `<tr class="tr-l3 tr-child tr-anim" data-ai="${ai}" data-si="${si}">
+                        <td class="td-l3" style="border-left:3px solid ${cfg.color}44">
+                            ${isEtMatch ? `<span class="search-lvl-badge">Etapa</span>` : ''}
+                            ${escapeHtml(etRow.label)}
+                        </td>${metricCells(etRow)}</tr>`;
+                });
+            });
+        });
+
+        if (!areaRows.length) {
             html = `<tr><td colspan="8" style="text-align:center;padding:20px;color:var(--gray2)">Sin resultados para "<strong>${escapeHtml(searchQuery)}</strong>".</td></tr>`;
         }
 
@@ -1611,6 +1635,7 @@
             <td class="pct-asig">${fmtPct(rowMetric(totals,'PorcentajeAsignado'))}</td>
             <td class="${dispT<0?'pct-neg':'pct-disp'}">${fmtPct(dispT)}</td></tr>`;
         areaBody.innerHTML = html;
+        bindTableDrill(areaBody);
     }
 
     function renderAreaTable(areaRows, totals, detailRows) {
