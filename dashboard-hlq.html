@@ -2252,14 +2252,17 @@
         const titleEl = document.getElementById('tendencia-title');
         if (titleEl) titleEl.textContent = `Tendencia de Ejecución por ${TENDENCIA_DIM_LABELS[dimKey] || dimKey}`;
 
-        // Leyenda personalizada
+        // Leyenda personalizada con total acumulado
+        const fmt2 = v => v >= 1 ? `${v.toFixed(2)}M` : `${Math.round(v * 1000)}K`;
         const leyenda = document.getElementById('tendencia-leyenda');
         if (leyenda) {
             leyenda.innerHTML = dims.map((f, i) => {
-                const color = FASE_PALETTE[i % FASE_PALETTE.length];
+                const color  = FASE_PALETTE[i % FASE_PALETTE.length];
+                const total  = meses.reduce((s, m) => s + toMillions(matrix[f][m]), 0);
                 return `<div class="tendencia-leyenda-item">
                     <div class="tendencia-dot" style="background:${color}"></div>
                     <span>${faseName(f)}</span>
+                    <span style="margin-left:5px;font-weight:700;color:${color}">${fmt2(total)}</span>
                 </div>`;
             }).join('');
         }
