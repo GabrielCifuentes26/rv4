@@ -99,6 +99,7 @@
         }
         .eac-icon-wrap svg { width: 24px; height: 24px; }
         .eac-name { font-size: 0.72rem; font-weight: 800; color: var(--navy); line-height: 1.25; text-transform: uppercase; letter-spacing: 0.3px; }
+        .eac-bar-outer { position: relative; }
         .eac-bar-track {
             height: 34px; border-radius: 10px;
             background: var(--c-disponible); overflow: hidden; display: flex;
@@ -114,9 +115,25 @@
         .eac-seg-lbl { font-size: 0.7rem; font-weight: 700; padding: 0 8px; }
         .eac-seg-ej .eac-seg-lbl, .eac-seg-comp .eac-seg-lbl { color: #fff; }
         .eac-seg-disp .eac-seg-lbl { color: var(--gray); }
+        /* Badge comprometido cuando el segmento es muy pequeño */
+        .eac-comp-badge {
+            position: absolute; bottom: calc(100% + 5px);
+            transform: translateX(-50%);
+            background: var(--c-comprometido); color: #fff;
+            font-size: 0.62rem; font-weight: 700;
+            padding: 3px 7px; border-radius: 6px;
+            white-space: nowrap; pointer-events: none; z-index: 5;
+            animation: slideUp .35s ease both;
+        }
+        .eac-comp-badge::after {
+            content: ''; position: absolute;
+            top: 100%; left: 50%; transform: translateX(-50%);
+            border: 4px solid transparent;
+            border-top-color: var(--c-comprometido);
+        }
         .eac-pct-col { text-align: right; }
-        .eac-pct-val { font-size: 1.15rem; font-weight: 800; color: var(--orange); display: block; line-height: 1.1; }
-        .eac-pct-of  { font-size: 0.65rem; color: var(--gray2); display: block; margin-top: 2px; }
+        .eac-pct-val { font-size: 1.15rem; font-weight: 800; color: var(--c-asignado); display: block; line-height: 1.1; }
+        .eac-pct-of  { font-size: 0.75rem; font-weight: 600; color: var(--c-ppto-sap); display: block; margin-top: 3px; }
 
         /* ── MAIN ── */
         .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
@@ -818,16 +835,21 @@
             const seg = (pct, cls, val) => pct > 0
                 ? `<div class="eac-seg ${cls}" style="width:${pct.toFixed(2)}%"><span class="eac-seg-lbl">${pct >= 9 ? fmt(val) : ''}</span></div>`
                 : '';
+            const badgeLeft = (ejPct + compPct / 2).toFixed(2);
+            const showBadge = compPct > 0 && compPct < 9;
             return `
             <div class="eac-row">
                 <div class="eac-area">
                     <div class="eac-icon-wrap" style="background:${cfg.bg};color:${cfg.color}">${cfg.icon}</div>
                     <span class="eac-name">${escapeHtml(label)}</span>
                 </div>
-                <div class="eac-bar-track">
-                    ${seg(ejPct,   'eac-seg-ej',   ejecutado)}
-                    ${seg(compPct, 'eac-seg-comp', comprom)}
-                    <div class="eac-seg eac-seg-disp"><span class="eac-seg-lbl">${fmt(disponible)}</span></div>
+                <div class="eac-bar-outer">
+                    ${showBadge ? `<div class="eac-comp-badge" style="left:${badgeLeft}%">${fmt(comprom)}</div>` : ''}
+                    <div class="eac-bar-track">
+                        ${seg(ejPct,   'eac-seg-ej',   ejecutado)}
+                        ${seg(compPct, 'eac-seg-comp', comprom)}
+                        <div class="eac-seg eac-seg-disp"><span class="eac-seg-lbl">${fmt(disponible)}</span></div>
+                    </div>
                 </div>
                 <div class="eac-pct-col">
                     <span class="eac-pct-val">${pctText}%</span>
