@@ -110,7 +110,13 @@
         }
         .eac-pct-header { font-size: 0.7rem; font-weight: 700; color: var(--gray); white-space: nowrap; }
         .eac-rows { display: flex; flex-direction: column; gap: 18px; flex: 1; justify-content: center; }
-        .eac-row { display: grid; grid-template-columns: 175px 1fr 90px; align-items: center; gap: 14px; }
+        .eac-row { display: grid; grid-template-columns: 175px 1fr 90px; align-items: center; gap: 14px; cursor: pointer; border-radius: 10px; transition: background 0.18s; }
+        .eac-row:hover { background: rgba(14,165,233,0.07); }
+        .eac-row.chart-selected { background: rgba(14,165,233,0.13); outline: 2px solid rgba(14,165,233,0.45); }
+        #resumen-area-body tr.tr-l1, #resumen-area-body tr.tr-l2 { cursor: pointer; }
+        #resumen-area-body tr.chart-row-selected td { background: rgba(14,165,233,0.09) !important; }
+        #faseChart { cursor: pointer; }
+        #tendenciaChart { cursor: pointer; }
         .eac-area { display: flex; align-items: center; gap: 12px; }
         .eac-icon-wrap {
             width: 46px; height: 46px; border-radius: 12px; flex-shrink: 0;
@@ -1077,7 +1083,7 @@
             // Clamp label center so it never overflows the bar area
             const asigLabelLeft = Math.max(6, Math.min(94, asigPct / 2)).toFixed(2);
             return `
-            <div class="eac-row">
+            <div class="eac-row" data-area="${rawName}">
                 <div class="eac-area">
                     <div class="eac-icon-wrap" style="background:${cfg.bg};color:${cfg.color}">${cfg.icon}</div>
                     <span class="eac-name">${escapeHtml(label)}</span>
@@ -2017,7 +2023,7 @@
             const expandable = segRows.length > 0;
 
             // Level 1
-            html += `<tr class="tr-l1${expandable ? ' tr-expandable' : ''}" data-ai="${ai}">
+            html += `<tr class="tr-l1${expandable ? ' tr-expandable' : ''}" data-ai="${ai}" data-rawname="${rawName}">
                 <td class="td-l1">
                     ${expandable ? '<span class="row-chev"></span>' : '<span class="row-chev-ph"></span>'}
                     <span class="row-dot" style="background:${cfg.color}22;border:2px solid ${cfg.color}"></span>
@@ -2032,7 +2038,7 @@
                 const etapaRows = groupRowsBy(segDetail, 'Rubros[Etapa]').filter(e => e.label);
                 const segExp = etapaRows.length > 0;
 
-                html += `<tr class="tr-l2 tr-child${segExp ? ' tr-expandable' : ''} tr-hidden" data-ai="${ai}" data-si="${si}">
+                html += `<tr class="tr-l2 tr-child${segExp ? ' tr-expandable' : ''} tr-hidden" data-ai="${ai}" data-si="${si}" data-rawseg="${segName}">
                     <td class="td-l2" style="border-left:3px solid ${cfg.color}">
                         ${segExp ? '<span class="row-chev"></span>' : '<span class="row-chev-ph"></span>'}
                         ${escapeHtml(segName)}
@@ -2419,6 +2425,7 @@
         bindPowerBIFilters();
         initSearch();
         bindKpiCards();
+        bindChartFilters();
         populateFilterControls();
         renderPowerBIView();
     }
@@ -2456,6 +2463,88 @@
         const loadedFromSupabase = await loadPowerBIResumenFromSupabase();
         if (!loadedFromSupabase) await loadPowerBIResumenFromLocalJson();
     }
+
+    // ── Chart-click filters ──────────────────────────────────────
+    function bindChartFilters() {
+        const chip      = document.getElementById('kpi-active-chip');
+        const chipLbl   = document.getElementById('kpi-chip-lbl');
+        const chipClear = document.getElementById('kpi-chip-clear');
+        let cfKey = null, cfVal = null;
+
+        function clearVisualSelection() {
+            document.querySelectorAll('.eac-row.chart-selected').forEach(el => el.classList.remove('chart-selected'));
+            document.querySelectorAll('#resumen-area-body .chart-row-selected').forEach(el => el.classList.remove('chart-row-selected'));
+        }
+
+        function clearChartFilter(andRender) {
+            if (!cfKey) return;
+            powerBIState.filters[cfKey] = [];
+            populateFilterControls(cfKey);
+            cfKey = null; cfVal = null;
+            clearVisualSelection();
+            chip.classList.remove('visible');
+            if (andRender !== false) renderPowerBIView();
+        }
+
+        function applyChartFilter(key, value, triggerEl) {
+            if (cfKey === key && cfVal === value) { clearChartFilter(); return; }
+            if (cfKey && cfKey !== key) {
+                powerBIState.filters[cfKey] = [];
+                populateFilterControls(cfKey);
+            }
+            clearVisualSelection();
+            powerBIState.filters[key] = [value];
+            cfKey = key; cfVal = value;
+            if (triggerEl) {
+                triggerEl.classList.add(triggerEl.classList.contains('eac-row') ? 'chart-selected' : 'chart-row-selected');
+            }
+            const meta = CAT_META[key] || { label: key, color: '#0ea5e9' };
+            chip.style.background = meta.color;
+            chip.style.boxShadow  = `0 3px 10px ${meta.color}55`;
+            chipLbl.textContent   = `${meta.label}: ${value}`;
+            chip.classList.add('visible');
+            populateFilterControls(key);
+            renderPowerBIView();
+        }
+
+        // Chip X también limpia filtros de gráfica
+        chipClear.addEventListener('click', () => clearChartFilter());
+
+        // ── EAC rows → Área ──────────────────────────────────────
+        document.getElementById('eac-rows').addEventListener('click', e => {
+            const row = e.target.closest('[data-area]');
+            if (row) applyChartFilter('areas', row.dataset.area, row);
+        });
+
+        // ── Segmento chart (faseChart) → Segmento ────────────────
+        document.getElementById('faseChart').addEventListener('click', e => {
+            const pts = areaChart.getElementsAtEventForMode(e, 'nearest', { intersect: true }, false);
+            if (!pts.length) return;
+            const label = areaChart.data.labels[pts[0].index];
+            if (label) applyChartFilter('segmentos', label, null);
+        });
+
+        // ── Tendencia chart → Mes ────────────────────────────────
+        document.getElementById('tendenciaChart').addEventListener('click', e => {
+            if (!tendenciaChart) return;
+            const pts = tendenciaChart.getElementsAtEventForMode(e, 'index', { intersect: false }, false);
+            if (!pts.length) return;
+            const label = tendenciaChart.data.labels[pts[0].index];
+            if (label) applyChartFilter('meses', label, null);
+        });
+
+        // ── Tabla → Área (tr-l1) o Segmento (tr-l2) ─────────────
+        document.getElementById('resumen-area-body').addEventListener('click', e => {
+            const row = e.target.closest('tr');
+            if (!row || row.classList.contains('total-row')) return;
+            if (row.classList.contains('tr-l1') && row.dataset.rawname) {
+                applyChartFilter('areas', row.dataset.rawname, row);
+            } else if (row.classList.contains('tr-l2') && row.dataset.rawseg) {
+                applyChartFilter('segmentos', row.dataset.rawseg, row);
+            }
+        });
+    }
+    // ── /Chart-click filters ─────────────────────────────────────
 
     loadPowerBIResumen();
 </script>
