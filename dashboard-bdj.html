@@ -2682,14 +2682,16 @@
 
 <!-- ── TOUR ASSISTANT ── -->
 <style>
-  /* ── Highlight on target element ── */
+  /* ── Dark overlay via box-shadow + highlight ── */
   .tour-highlight {
-    outline: 3px solid #0ea5e9 !important;
-    outline-offset: 4px !important;
-    box-shadow: 0 0 0 8px rgba(14,165,233,0.18), 0 0 32px rgba(14,165,233,0.22) !important;
-    border-radius: 12px;
-    position: relative;
+    position: relative !important;
     z-index: 1200 !important;
+    border-radius: 12px;
+    /* Huge shadow creates the 50% dark backdrop; inner glow highlights the element */
+    box-shadow:
+      0 0 0 9999px rgba(0,0,0,0.50),
+      0 0 0 3px #0ea5e9,
+      0 0 24px rgba(14,165,233,0.45) !important;
   }
 
   /* ── Robot container ── */
