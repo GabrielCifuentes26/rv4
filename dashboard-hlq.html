@@ -1859,24 +1859,23 @@
                     });
                 });
 
-                // ── 2. Nombre de Fase al final de la línea ──
-                chart.data.datasets.forEach((ds, di) => {
-                    const meta = chart.getDatasetMeta(di);
-                    if (meta.hidden || !meta.data.length) return;
-                    let lastPt = null;
-                    for (let j = meta.data.length - 1; j >= 0; j--) {
-                        if (ds.data[j] > 0) { lastPt = meta.data[j]; break; }
-                    }
-                    if (!lastPt) return;
+                // ── 2. Total por mes debajo del eje X ──
+                const xAxis = chart.scales.x;
+                const yBottom = chart.scales.y.bottom;
+                data.labels.forEach((_, mi) => {
+                    const total = chart.data.datasets.reduce((sum, ds, di) => {
+                        const meta = chart.getDatasetMeta(di);
+                        return sum + (meta.hidden ? 0 : (ds.data[mi] || 0));
+                    }, 0);
+                    if (total <= 0) return;
+                    const x = xAxis.getPixelForTick(mi);
+                    const text = `${total.toFixed(2)}M`;
                     ctx.save();
-                    ctx.font = '700 10px Inter, sans-serif';
-                    ctx.fillStyle = ds.borderColor;
-                    ctx.textAlign = 'left';
-                    ctx.textBaseline = 'middle';
-                    ctx.beginPath();
-                    ctx.arc(lastPt.x, lastPt.y, 3, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.fillText(ds.label, lastPt.x + 8, lastPt.y);
+                    ctx.font = '700 9px Inter, sans-serif';
+                    ctx.fillStyle = '#64748b';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'top';
+                    ctx.fillText(text, x, yBottom + 22);
                     ctx.restore();
                 });
             }
@@ -1890,12 +1889,13 @@
                 options: {
                     responsive: true, maintainAspectRatio: false,
                     interaction: { mode: 'index', intersect: false },
-                    layout: { padding: { top: 28, right: 110, bottom: 8 } },
+                    layout: { padding: { top: 28, right: 20, bottom: 26 } },
                     plugins: {
                         legend: { display: false },
                         tooltip: {
                             callbacks: {
-                                label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(2)}M`
+                                label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(2)}M`,
+                                footer: items => `Total: ${items.reduce((s, i) => s + i.parsed.y, 0).toFixed(2)}M`
                             }
                         }
                     },
