@@ -701,13 +701,13 @@
             font-size: 0.63rem; text-transform: uppercase; letter-spacing: 0.8px;
             color: var(--gray2); margin-bottom: 8px; font-weight: 700;
         }
-        .gauge-wrap { position: relative; flex: 1; display: flex; align-items: center; justify-content: center; }
-        .gauge-overlay { position: absolute; text-align: center; bottom: 18%; }
-        .gauge-val { font-size: 1.1rem; font-weight: 900; color: var(--navy); }
-        .gauge-sub { font-size: 0.58rem; color: var(--gray2); margin-top: 1px; }
-        .gauge-stats { display: flex; justify-content: space-around; margin-top: 6px; }
+        .gauge-wrap { position: relative; flex: 1; display: flex; align-items: flex-end; justify-content: center; overflow: hidden; }
+        .gauge-overlay { position: absolute; text-align: center; bottom: 2px; left: 50%; transform: translateX(-50%); width: 100%; }
+        .gauge-val { font-size: 1.35rem; font-weight: 900; color: var(--navy); line-height: 1; }
+        .gauge-sub { font-size: 0.58rem; color: var(--gray2); margin-top: 2px; }
+        .gauge-stats { display: flex; justify-content: space-around; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
         .gstat { text-align: center; }
-        .gstat-val { font-size: 0.75rem; font-weight: 700; }
+        .gstat-val { font-size: 0.73rem; font-weight: 700; }
         .gstat-lbl { font-size: 0.55rem; color: var(--gray2); }
 
         /* ── FOOTER ── */
@@ -920,14 +920,14 @@
             <div class="gauge-wrap">
                 <canvas id="gaugeChart"></canvas>
                 <div class="gauge-overlay">
-                    <div class="gauge-val" id="gauge-asignado">149.33</div>
-                    <div class="gauge-sub">mill. asignado</div>
+                    <div class="gauge-val" id="gauge-pct" style="color:var(--c-pct)">--%</div>
+                    <div class="gauge-sub">Asignado</div>
                 </div>
             </div>
             <div class="gauge-stats">
-                <div class="gstat"><div class="gstat-val" id="gauge-ejecutado" style="color:var(--c-ejecutado)">129.38M</div><div class="gstat-lbl">Ejecutado</div></div>
-                <div class="gstat"><div class="gstat-val" id="gauge-avance" style="color:var(--c-pct)">91.98%</div><div class="gstat-lbl">% Asignado</div></div>
-                <div class="gstat"><div class="gstat-val" id="gauge-disponible" style="color:#64748b">13.06M</div><div class="gstat-lbl">Disponible</div></div>
+                <div class="gstat"><div class="gstat-val" id="gauge-ppto" style="color:var(--c-ppto-sap)">--M</div><div class="gstat-lbl">Presupuesto SAP</div></div>
+                <div class="gstat"><div class="gstat-val" id="gauge-asignado" style="color:var(--c-asignado)">--M</div><div class="gstat-lbl">Asignado</div></div>
+                <div class="gstat"><div class="gstat-val" id="gauge-disponible" style="color:#64748b">--M</div><div class="gstat-lbl">Disponible</div></div>
             </div>
         </div>
 
@@ -1121,9 +1121,9 @@
     const gaugeChart = new Chart(document.getElementById('gaugeChart'), {
         type: 'doughnut',
         data: {
-            datasets: [{ data:[91.98, 8.02], backgroundColor:[C.blue, '#e2e8f0'], borderWidth:0, circumference:240, rotation:240 }]
+            datasets: [{ data:[36.78, 63.22], backgroundColor:['#10b981','#cbd5e1'], borderWidth:0 }]
         },
-        options: { responsive:true, cutout:'74%', plugins:{ legend:{display:false}, tooltip:{enabled:false} } }
+        options: { responsive:true, maintainAspectRatio:true, aspectRatio:2, cutout:'72%', rotation:-180, circumference:180, plugins:{ legend:{display:false}, tooltip:{enabled:false} } }
     });
 
     // Avance por Segmento — barras apiladas (Asignado + Disponible = Presupuesto SAP)
@@ -1826,14 +1826,14 @@
         setHtml('kpi-asignado', fmtMillions(asignado));
         setHtml('kpi-disponible', fmtMillions(disponible));
         setHtml('kpi-pct-asignado', `${(pctAsignado * 100).toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span>%</span>`);
-        setText('gauge-asignado', toMillions(asignado).toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
-        setText('gauge-ejecutado', fmtMillionsText(ejecutado));
-        setText('gauge-avance', fmtPct(pctAsignado));
+        setText('gauge-pct', `${(pctAsignado * 100).toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%`);
+        setText('gauge-ppto', fmtMillionsText(rdi));
+        setText('gauge-asignado', fmtMillionsText(asignado));
         setText('gauge-disponible', fmtMillionsText(disponible));
 
         const assignedPct = Math.max(0, pctAsignado * 100);
         const availablePct = assignedPct || pctDisponible ? Math.max(0, pctDisponible * 100) : 100;
-        gaugeChart.data.datasets[0].data = [assignedPct, availablePct];
+        gaugeChart.data.datasets[0].data = [assignedPct, Math.max(0, 100 - assignedPct)];
         gaugeChart.update();
     }
 
