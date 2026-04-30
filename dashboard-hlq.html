@@ -1768,8 +1768,7 @@
         });
 
         const fases = [...faseSet].sort();
-        const meses = [...mesSet].sort((a, b) =>
-            (MONTH_ORDER[a.toLowerCase()] ?? 99) - (MONTH_ORDER[b.toLowerCase()] ?? 99));
+        const meses = sortMonths([...mesSet]);
 
         // Build fase × mes matrix
         const matrix = {};
