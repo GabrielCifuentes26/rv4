@@ -560,6 +560,21 @@
         .tr-l3 { background: #f1f5f9 !important; }
         .td-l3 { padding-left: 52px !important; font-size: 0.69rem !important; color: var(--gray2) !important; font-weight: 400 !important; }
         .tr-l3 td:not(:first-child) { color: var(--gray2); font-size: 0.69rem; }
+        /* Search mode */
+        .search-lvl-badge {
+            display: inline-block;
+            background: rgba(14,165,233,0.12); color: var(--blue);
+            font-size: 0.54rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.5px; padding: 1px 6px; border-radius: 4px;
+            margin-right: 6px; vertical-align: middle;
+        }
+        .search-mode-notice {
+            display: flex; align-items: center; gap: 8px;
+            padding: 7px 14px; background: rgba(14,165,233,0.05);
+            border-bottom: 1px solid var(--border);
+            font-size: 0.68rem; color: var(--gray);
+        }
+        .search-mode-notice strong { color: var(--blue); }
 
         /* ── CHARTS ── */
         .charts-row {
@@ -749,6 +764,7 @@
     <!-- Table -->
     <div class="table-section">
         <div class="section-label">Resumen por Área</div>
+        <div class="search-mode-notice" id="search-mode-notice" style="display:none"></div>
         <div class="table-wrap">
             <table>
                 <thead>
@@ -1403,9 +1419,75 @@
                 <td class="${disp < 0 ? 'pct-neg' : 'pct-disp'}">${fmtPct(disp)}</td>`;
     }
 
+    function renderSearchTable(areaBody, detailRows, totals) {
+        const q = searchQuery;
+        // Determine most specific matching level (Etapa > Segmento > Área)
+        const matchesAt = (dimName, applyDisplay) => [...new Set(
+            detailRows.map(r => String(dimension(r, dimName) || '').trim())
+                      .filter(v => v && (v.toLowerCase().includes(q) ||
+                                  (applyDisplay && displayName(v).toLowerCase().includes(q))))
+        )];
+        const etapaHits  = matchesAt('Rubros[Etapa]',    false);
+        const segHits    = matchesAt('Rubros[Segmento]', false);
+        const areaHits   = matchesAt('Rubros[Area]',     true);
+
+        let matchLevel, matchDim, matchHits;
+        if (etapaHits.length)  { matchLevel = 'Etapa';    matchDim = 'Rubros[Etapa]';    matchHits = etapaHits; }
+        else if (segHits.length) { matchLevel = 'Segmento'; matchDim = 'Rubros[Segmento]'; matchHits = segHits; }
+        else                   { matchLevel = 'Área';     matchDim = 'Rubros[Area]';     matchHits = areaHits; }
+
+        const filtered = detailRows.filter(r =>
+            matchHits.includes(String(dimension(r, matchDim) || '').trim())
+        );
+        const matchRows = groupRowsBy(filtered, matchDim);
+
+        // Notice bar above table
+        const noticeEl = document.getElementById('search-mode-notice');
+        if (noticeEl) {
+            noticeEl.style.display = 'flex';
+            noticeEl.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="var(--blue)" style="flex-shrink:0"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            Mostrando <strong>${matchRows.length}</strong> resultado${matchRows.length!==1?'s':''} de <strong>${matchLevel}</strong> para "<strong>${escapeHtml(searchQuery)}</strong>"`;
+        }
+
+        let html = matchRows.map(row => {
+            const label = matchLevel === 'Área'
+                ? (displayName(String(row.label||'').toUpperCase().trim()) || row.label)
+                : String(row.label || '');
+            return `<tr class="tr-anim">
+                <td><span class="search-lvl-badge">${matchLevel}</span>${escapeHtml(label)}</td>
+                ${metricCells(row)}</tr>`;
+        }).join('');
+
+        if (!matchRows.length) {
+            html = `<tr><td colspan="8" style="text-align:center;padding:20px;color:var(--gray2)">Sin resultados para "<strong>${escapeHtml(searchQuery)}</strong>".</td></tr>`;
+        }
+
+        const dispT = rowMetric(totals, 'PorcentajeDisponible');
+        html += `<tr class="total-row"><td>Total</td>
+            <td>${fmtMoney(rowMetric(totals,'RdiTotal'))}</td>
+            <td>${fmtMoney(rowMetric(totals,'EjecutadoErequester'))}</td>
+            <td>${fmtMoney(rowMetric(totals,'ComprometidoErequester'))}</td>
+            <td>${fmtMoney(rowMetric(totals,'AsignadoErequester'))}</td>
+            <td>${fmtMoney(rowMetric(totals,'DisponibleErequester'))}</td>
+            <td class="pct-asig">${fmtPct(rowMetric(totals,'PorcentajeAsignado'))}</td>
+            <td class="${dispT<0?'pct-neg':'pct-disp'}">${fmtPct(dispT)}</td></tr>`;
+        areaBody.innerHTML = html;
+    }
+
     function renderAreaTable(areaRows, totals, detailRows) {
         const areaBody = document.getElementById('resumen-area-body');
         if (!areaBody) return;
+
+        // Hide/show notice bar
+        const noticeEl = document.getElementById('search-mode-notice');
+        if (noticeEl) noticeEl.style.display = 'none';
+
+        // Search mode: flat result rows
+        if (searchQuery && detailRows && detailRows.length) {
+            renderSearchTable(areaBody, detailRows, totals);
+            return;
+        }
+
         const hasDetail = detailRows && detailRows.length > 0;
         let html = '';
 
