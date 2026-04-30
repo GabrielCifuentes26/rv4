@@ -234,14 +234,16 @@
             content: ''; position: absolute;
             top: 0; left: 0; bottom: 0; width: 4px; border-radius: 14px 0 0 14px;
         }
-        .kpi-card:nth-child(1) { animation-delay: .05s; }
+        .kpi-card:nth-child(1) { animation-delay: .04s; }
         .kpi-card:nth-child(1)::after { background: var(--c-ppto-sap); }
-        .kpi-card:nth-child(2) { animation-delay: .12s; }
-        .kpi-card:nth-child(2)::after { background: var(--c-comprometido); }
-        .kpi-card:nth-child(3) { animation-delay: .19s; }
-        .kpi-card:nth-child(3)::after { background: var(--c-asignado); }
-        .kpi-card:nth-child(4) { animation-delay: .26s; }
-        .kpi-card:nth-child(4)::after { background: var(--purple); }
+        .kpi-card:nth-child(2) { animation-delay: .09s; }
+        .kpi-card:nth-child(2)::after { background: var(--c-ejecutado); }
+        .kpi-card:nth-child(3) { animation-delay: .14s; }
+        .kpi-card:nth-child(3)::after { background: var(--c-comprometido); }
+        .kpi-card:nth-child(4) { animation-delay: .19s; }
+        .kpi-card:nth-child(4)::after { background: var(--c-asignado); }
+        .kpi-card:nth-child(5) { animation-delay: .24s; }
+        .kpi-card:nth-child(5)::after { background: var(--purple); }
         .kpi-card:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(15,23,42,0.11); }
         .kpi-card:hover .kpi-icon { transform: scale(1.1) rotate(-5deg); }
         .kpi-icon {
@@ -667,6 +669,15 @@
             <div class="kpi-texts">
                 <div class="kpi-label">Presupuesto SAP</div>
                 <div class="kpi-value" id="kpi-rdi">162.08 <span>mill.</span></div>
+            </div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-icon" style="background:rgba(59,91,219,0.15)">
+                <svg viewBox="0 0 24 24" fill="#3b5bdb"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg>
+            </div>
+            <div class="kpi-texts">
+                <div class="kpi-label">Ejecutado</div>
+                <div class="kpi-value" id="kpi-ejecutado">-- <span>mill.</span></div>
             </div>
         </div>
         <div class="kpi-card">
@@ -1328,6 +1339,7 @@
         setHtml('hm-ejecutado', fmtMillions(ejecutado));
         setHtml('hm-avance', `${(pctAsignado * 100).toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span>%</span>`);
         setHtml('kpi-rdi', fmtMillions(rdi));
+        setHtml('kpi-ejecutado', fmtMillions(ejecutado));
         setHtml('kpi-ppto-er', fmtMillions(pptoEr));
         setHtml('kpi-comprometido', fmtMillions(comprometido));
         setHtml('kpi-asignado', fmtMillions(asignado));
