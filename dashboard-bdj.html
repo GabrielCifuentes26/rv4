@@ -704,7 +704,7 @@
         .gauge-wrap { position: relative; width: 100%; }
         .gauge-overlay {
             position: absolute; text-align: center;
-            top: 52%; left: 50%; transform: translate(-50%, -50%);
+            top: 78%; left: 50%; transform: translate(-50%, -50%);
             white-space: nowrap; z-index: 1; pointer-events: none;
         }
         .gauge-val { font-size: 1.45rem; font-weight: 900; color: var(--navy); line-height: 1; }
@@ -1127,33 +1127,15 @@
             const { ctx } = chart;
             const cx = arc.x, cy = arc.y;
             const outerR = arc.outerRadius;
-            const total  = (chart.data.datasets[0].data[0] || 0) + (chart.data.datasets[0].data[1] || 0);
-            const ratio  = total > 0 ? (chart.data.datasets[0].data[0] || 0) / total : 0;
-            const angle  = Math.PI * (1 + ratio);
-            const len    = outerR * 0.76;
-            ctx.save();
-            ctx.translate(cx, cy);
-            // Needle
-            ctx.beginPath();
-            ctx.moveTo(0, 0);
-            ctx.lineTo(Math.cos(angle) * len, Math.sin(angle) * len);
-            ctx.strokeStyle = '#334155'; ctx.lineWidth = 2.5; ctx.lineCap = 'round';
-            ctx.stroke();
-            // Pivot circle
-            ctx.beginPath(); ctx.arc(0, 0, 5, 0, Math.PI * 2);
-            ctx.fillStyle = '#334155'; ctx.fill();
-            ctx.beginPath(); ctx.arc(0, 0, 3, 0, Math.PI * 2);
-            ctx.fillStyle = '#fff'; ctx.fill();
-            ctx.restore();
-            // Endpoint labels
+            // Endpoint labels only
             const fs = Math.max(7, Math.round(outerR * 0.13));
             ctx.save();
             ctx.font = `600 ${fs}px system-ui,sans-serif`;
             ctx.fillStyle = '#94a3b8';
             ctx.textAlign = 'right'; ctx.textBaseline = 'top';
-            ctx.fillText('0', cx - outerR + 2, cy + 4);
+            ctx.fillText('0%', cx - outerR + 2, cy + 4);
             ctx.textAlign = 'left'; ctx.textBaseline = 'top';
-            ctx.fillText(gaugeRdiLabel, cx + outerR - 2, cy + 4);
+            ctx.fillText('100%', cx + outerR - 2, cy + 4);
             ctx.restore();
         }
     };
