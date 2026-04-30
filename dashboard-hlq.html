@@ -624,7 +624,7 @@
             font-size: 0.68rem; color: var(--gray); font-weight: 500;
         }
         .tendencia-dot { width: 26px; height: 3px; border-radius: 2px; flex-shrink: 0; }
-        .tendencia-body { position: relative; height: 230px; }
+        .tendencia-body { position: relative; height: 300px; }
         .chart-card {
             background: var(--surface); border-radius: 12px; padding: 14px;
             border: 1px solid var(--border); box-shadow: var(--shadow);
@@ -1797,60 +1797,66 @@
             };
         });
 
-        // Plugin: etiqueta escalonada en cada punto + etiqueta de fase al final
+        // Totales por mes (suma de todas las fases)
+        const monthTotals = meses.map(m =>
+            fases.reduce((s, f) => s + (matrix[f][m] || 0), 0)
+        );
+
         const labelPlugin = {
             id: 'faseLabels',
             afterDatasetsDraw(chart) {
                 const { ctx, data } = chart;
+                const yAxis   = chart.scales.y;
+                const xAxis   = chart.scales.x;
+                const yTop    = yAxis.top;
+                const yBottom = yAxis.bottom;
+                const PILL_H  = 14, PILL_PAD = 7, MIN_GAP = 2;
+                const MIN_VAL = 0.05; // ocultar pills < 0.05M para no saturar
 
-                // ── 1. Etiquetas de valor por mes (escalonadas) ──
+                // ── 1. Píldoras de valor por mes (escalonadas, sin salir del área) ──
                 data.labels.forEach((_, mi) => {
-                    // Recoger todos los puntos visibles para este mes
                     const pts = [];
                     chart.data.datasets.forEach((ds, di) => {
                         const meta = chart.getDatasetMeta(di);
                         if (meta.hidden) return;
                         const pt = meta.data[mi];
-                        if (!pt || ds.data[mi] <= 0) return;
-                        pts.push({ pt, ds, val: ds.data[mi] });
+                        const val = ds.data[mi] || 0;
+                        if (!pt || val < MIN_VAL) return;
+                        pts.push({ pt, ds, val });
                     });
                     if (!pts.length) return;
 
-                    // Ordenar por Y (más arriba primero = valor más alto)
+                    // Más alto primero (menor Y en canvas)
                     pts.sort((a, b) => a.pt.y - b.pt.y);
 
-                    // Escalonar: arriba / abajo alternando, con separación mínima
-                    const PILL_H = 15, MIN_SEP = 3;
-                    const assigned = [];
+                    // Calcular posiciones Y sin solaparse y sin salir del área
+                    const positions = [];
                     pts.forEach((p, idx) => {
-                        const isAbove = idx % 2 === 0;
-                        let y = p.pt.y + (isAbove ? -(PILL_H + 4) : (PILL_H + 4));
-                        // Evitar colisión con el asignado anterior
-                        assigned.forEach(prev => {
-                            if (Math.abs(prev.x - p.pt.x) < 2) {
-                                const overlap = (PILL_H + MIN_SEP) - Math.abs(y - prev.y);
-                                if (overlap > 0) y += isAbove ? -overlap : overlap;
-                            }
-                        });
-                        assigned.push({ x: p.pt.x, y });
+                        const above = idx % 2 === 0;
+                        let y = p.pt.y + (above ? -(PILL_H + 5) : (PILL_H + 5));
+                        // Clamp dentro del área del chart
+                        y = Math.max(yTop + PILL_H / 2 + 2, Math.min(yBottom - PILL_H / 2 - 2, y));
+                        // Separar de posiciones ya asignadas
+                        let tries = 0;
+                        while (tries < 8 && positions.some(py => Math.abs(py - y) < PILL_H + MIN_GAP)) {
+                            y += above ? -(PILL_H + MIN_GAP) : (PILL_H + MIN_GAP);
+                            y = Math.max(yTop + PILL_H / 2 + 2, Math.min(yBottom - PILL_H / 2 - 2, y));
+                            tries++;
+                        }
+                        positions.push(y);
 
                         const text = `${p.val.toFixed(2)}M`;
                         ctx.save();
                         ctx.font = '600 9px Inter, sans-serif';
                         const tw = ctx.measureText(text).width;
-                        const pw = tw + 8, ph = PILL_H;
-                        const px = p.pt.x - pw / 2, py = y - ph / 2;
-
-                        // Fondo blanco con borde de color
-                        ctx.fillStyle = 'rgba(255,255,255,0.92)';
+                        const pw = tw + PILL_PAD * 2;
+                        ctx.fillStyle = 'rgba(255,255,255,0.93)';
                         ctx.beginPath();
-                        ctx.roundRect(px, py, pw, ph, 4);
+                        ctx.roundRect(p.pt.x - pw / 2, y - PILL_H / 2, pw, PILL_H, 4);
                         ctx.fill();
                         ctx.strokeStyle = p.ds.borderColor;
-                        ctx.lineWidth = 1;
+                        ctx.lineWidth = 1.2;
                         ctx.stroke();
-
-                        // Texto del color de la fase
                         ctx.fillStyle = p.ds.borderColor;
                         ctx.textAlign = 'center';
                         ctx.textBaseline = 'middle';
@@ -1859,23 +1865,25 @@
                     });
                 });
 
-                // ── 2. Total por mes debajo del eje X ──
-                const xAxis = chart.scales.x;
-                const yBottom = chart.scales.y.bottom;
-                data.labels.forEach((_, mi) => {
-                    const total = chart.data.datasets.reduce((sum, ds, di) => {
-                        const meta = chart.getDatasetMeta(di);
-                        return sum + (meta.hidden ? 0 : (ds.data[mi] || 0));
-                    }, 0);
+                // ── 2. Total por mes: línea separadora + monto bold debajo del eje ──
+                monthTotals.forEach((total, mi) => {
                     if (total <= 0) return;
                     const x = xAxis.getPixelForTick(mi);
-                    const text = `${total.toFixed(2)}M`;
+                    const text = `${toMillions(total).toFixed(2)}M`;
+                    // Línea separadora sutil
                     ctx.save();
-                    ctx.font = '700 9px Inter, sans-serif';
-                    ctx.fillStyle = '#64748b';
+                    ctx.strokeStyle = '#e2e8f0';
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(x - 16, yBottom + 20);
+                    ctx.lineTo(x + 16, yBottom + 20);
+                    ctx.stroke();
+                    // Texto total
+                    ctx.font = '700 9.5px Inter, sans-serif';
+                    ctx.fillStyle = '#475569';
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'top';
-                    ctx.fillText(text, x, yBottom + 22);
+                    ctx.fillText(text, x, yBottom + 24);
                     ctx.restore();
                 });
             }
@@ -1889,7 +1897,7 @@
                 options: {
                     responsive: true, maintainAspectRatio: false,
                     interaction: { mode: 'index', intersect: false },
-                    layout: { padding: { top: 28, right: 20, bottom: 26 } },
+                    layout: { padding: { top: 24, right: 16, bottom: 44 } },
                     plugins: {
                         legend: { display: false },
                         tooltip: {
@@ -1900,9 +1908,14 @@
                         }
                     },
                     scales: {
-                        x: { grid: { color: '#f1f5f9' }, ticks: { font: { size: 11 } } },
-                        y: { grid: { color: '#f1f5f9' }, beginAtZero: true,
-                             ticks: { callback: v => `${v}M`, font: { size: 11 } } }
+                        x: {
+                            grid: { color: '#f1f5f9' },
+                            ticks: { font: { size: 10.5 }, maxRotation: 0, color: '#64748b' }
+                        },
+                        y: {
+                            grid: { color: '#f1f5f9' }, beginAtZero: true,
+                            ticks: { callback: v => `${v}M`, font: { size: 10.5 }, color: '#64748b' }
+                        }
                     }
                 }
             });
