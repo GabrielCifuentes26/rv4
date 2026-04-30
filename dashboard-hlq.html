@@ -641,20 +641,21 @@
 
         /* ── CHARTS ── */
         .charts-row {
-            display: grid; grid-template-columns: 200px 1fr;
+            display: grid; grid-template-columns: 200px 2fr 3fr;
             gap: 10px; padding: 0 22px 16px;
-            min-height: 260px; flex-shrink: 0;
+            flex-shrink: 0; align-items: stretch;
         }
-        /* ── AVANCE POR SEGMENTO ── */
-        .segmento-section { padding: 0 22px 16px; flex-shrink: 0; }
+        .gauge-card { align-self: start; }
+        /* ── AVANCE POR SEGMENTO (inline en charts-row) ── */
+        .segmento-card { display: flex; flex-direction: column; }
         .segmento-header {
             display: flex; align-items: center; justify-content: space-between;
-            margin-bottom: 10px; gap: 12px; flex-wrap: wrap;
+            margin-bottom: 8px; gap: 10px; flex-wrap: wrap; flex-shrink: 0;
         }
-        .seg-legend { display: flex; gap: 18px; flex-wrap: wrap; }
-        .seg-legend-item { display: flex; align-items: center; gap: 7px; font-size: 0.68rem; color: var(--gray); font-weight: 500; }
-        .seg-dot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
-        .segmento-body { position: relative; }
+        .seg-legend { display: flex; gap: 14px; flex-wrap: wrap; }
+        .seg-legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.65rem; color: var(--gray); font-weight: 500; }
+        .seg-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+        .segmento-body { position: relative; flex: 1; min-height: 0; }
         /* ── TENDENCIA POR FASE ── */
         .tendencia-section { padding: 0 22px 16px; flex-shrink: 0; }
         .tendencia-header {
@@ -883,7 +884,7 @@
 
     <!-- Charts -->
     <div class="charts-row">
-        <div class="chart-card">
+        <div class="chart-card gauge-card">
             <div class="chart-title">Avance General</div>
             <div class="gauge-wrap">
                 <canvas id="gaugeChart"></canvas>
@@ -913,11 +914,7 @@
             <div id="eac-rows" class="eac-rows"></div>
         </div>
 
-    </div>
-
-    <!-- Avance por Segmento -->
-    <div class="segmento-section">
-        <div class="chart-card">
+        <div class="chart-card segmento-card">
             <div class="segmento-header">
                 <span class="chart-title" style="margin:0">Avance por Segmento</span>
                 <div class="seg-legend">
@@ -925,10 +922,11 @@
                     <span class="seg-legend-item"><span class="seg-dot" style="background:#10b981"></span>Asignado</span>
                 </div>
             </div>
-            <div class="segmento-body" id="segmento-body" style="height:240px">
+            <div class="segmento-body" id="segmento-body">
                 <canvas id="faseChart"></canvas>
             </div>
         </div>
+
     </div>
 
     <!-- Tendencia por Fase -->
@@ -1101,26 +1099,29 @@
                 meta.data.forEach((bar, i) => {
                     const val = ds.data[i];
                     if (!val || val < 0.005) return;
-                    const lbl = val >= 1 ? `${val.toFixed(1)}M` : `${Math.round(val * 1000)}K`;
-                    const x = Math.min(bar.x + 5, area.right - 2);
-                    const yOff = di === 0 ? -8 : 7;
-                    ctx.save();
+                    const barW = bar.x - area.left;
+                    if (barW < 12) return; // skip bars too thin to label
+                    const fmt = v => v >= 1 ? `${v.toFixed(1)}M` : `${Math.round(v * 1000)}K`;
                     if (di === 0) {
-                        ctx.fillStyle = '#93c5fd';
-                        ctx.font = '500 9px Inter, sans-serif';
-                    } else {
-                        const pct = presupData[i] > 0 ? Math.round(val / presupData[i] * 100) : 0;
-                        ctx.fillStyle = '#059669';
-                        ctx.font = '700 9.5px Inter, sans-serif';
-                        const fullLbl = `${lbl}  ${pct}%`;
-                        ctx.fillText(fullLbl, x, bar.y + yOff);
+                        // Presupuesto: pequeño, azul claro, encima del bar
+                        const lbl = fmt(val);
+                        const x = Math.min(bar.x + 4, area.right - lbl.length * 5 - 2);
+                        ctx.save();
+                        ctx.fillStyle = '#7dd3fc'; ctx.font = '500 8px Inter,sans-serif';
+                        ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+                        ctx.fillText(lbl, x, bar.y - 8);
                         ctx.restore();
-                        return;
+                    } else {
+                        // Asignado: verde bold, con %, debajo del bar
+                        const pct = presupData[i] > 0 ? Math.round(val / presupData[i] * 100) : 0;
+                        const lbl = `${fmt(val)}  ${pct}%`;
+                        const x = Math.min(bar.x + 4, area.right - lbl.length * 5.2 - 2);
+                        ctx.save();
+                        ctx.fillStyle = '#059669'; ctx.font = '700 8.5px Inter,sans-serif';
+                        ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+                        ctx.fillText(lbl, x, bar.y + 9);
+                        ctx.restore();
                     }
-                    ctx.textAlign = 'left';
-                    ctx.textBaseline = 'middle';
-                    ctx.fillText(lbl, x, bar.y + yOff);
-                    ctx.restore();
                 });
             });
         }
@@ -1132,23 +1133,22 @@
         data: {
             labels: [],
             datasets: [
-                { label: 'Presupuesto SAP', data: [], backgroundColor: '#bfdbfe', borderColor: '#0ea5e9', borderWidth: 1.5, borderRadius: 4, barThickness: 20, order: 2 },
-                { label: 'Asignado',        data: [], backgroundColor: '#10b981', borderColor: '#059669', borderWidth: 0,   borderRadius: 4, barThickness: 20, order: 1 }
+                { label: 'Presupuesto SAP', data: [], backgroundColor: '#bfdbfe', borderColor: '#0ea5e9', borderWidth: 1.5, borderRadius: 3, barThickness: 13, order: 2 },
+                { label: 'Asignado',        data: [], backgroundColor: '#10b981', borderColor: '#059669', borderWidth: 0,   borderRadius: 3, barThickness: 13, order: 1 }
             ]
         },
         options: {
             indexAxis: 'y',
             grouped: false,
             responsive: true, maintainAspectRatio: false,
-            layout: { padding: { right: 80 } },
+            layout: { padding: { right: 70, top: 4, bottom: 4 } },
             plugins: {
                 legend: { display: false },
                 tooltip: {
                     callbacks: {
                         label: ctx => {
                             const v = ctx.parsed.x;
-                            const lbl = v >= 1 ? `${v.toFixed(2)}M` : `${Math.round(v * 1000)}K`;
-                            return ` ${ctx.dataset.label}: ${lbl}`;
+                            return ` ${ctx.dataset.label}: ${v >= 1 ? v.toFixed(2)+'M' : Math.round(v*1000)+'K'}`;
                         }
                     }
                 }
@@ -1156,16 +1156,16 @@
             scales: {
                 x: {
                     grid: { color: '#f1f5f9' },
-                    ticks: { font: { size: 10 }, color: '#94a3b8', callback: v => v >= 1 ? `${v}M` : v > 0 ? `${Math.round(v*1000)}K` : '0' },
+                    ticks: { font: { size: 9 }, color: '#94a3b8', callback: v => v >= 1 ? `${v}M` : v > 0 ? `${Math.round(v*1000)}K` : '0' },
                     beginAtZero: true
                 },
                 y: {
                     grid: { display: false },
                     ticks: {
-                        font: { size: 10, weight: '500' }, color: '#334155',
+                        font: { size: 9, weight: '500' }, color: '#334155',
                         callback: function(val) {
                             const lbl = this.getLabelForValue(val);
-                            return lbl && lbl.length > 20 ? lbl.substring(0, 18) + '…' : lbl;
+                            return lbl && lbl.length > 16 ? lbl.substring(0, 14) + '…' : lbl;
                         }
                     }
                 }
@@ -2194,9 +2194,6 @@
             asNumber(rowMetric(b, 'RdiTotal')) - asNumber(rowMetric(a, 'RdiTotal'))
         );
 
-        // Dynamic height: 46px per segment, min 200px
-        const segBody = document.getElementById('segmento-body');
-        if (segBody) segBody.style.height = Math.max(200, segs.length * 46 + 70) + 'px';
 
         areaChart.data.labels           = segs.map(r => String(r.label || dimension(r, 'Rubros[Segmento]') || '').toUpperCase());
         areaChart.data.datasets[0].data = segs.map(r => +toMillions(rowMetric(r, 'RdiTotal')).toFixed(2));
