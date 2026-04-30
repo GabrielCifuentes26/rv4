@@ -514,8 +514,6 @@
         }
         th:first-child { text-align: left; color: var(--gray); }
         tbody tr { border-bottom: 1px solid var(--border); transition: background .15s; }
-        tbody tr:nth-child(even) { background: var(--bg); }
-        tbody tr:hover { background: rgba(14,165,233,0.04); }
         td { padding: 8px 14px; text-align: right; color: var(--gray); white-space: nowrap; }
         td:first-child { text-align: left; color: var(--navy); font-weight: 500; }
         .pct-asig { color: var(--amber); font-weight: 700; }
@@ -523,6 +521,45 @@
         .pct-neg  { color: var(--red); font-weight: 700; }
         tr.total-row { background: rgba(14,165,233,0.04) !important; border-top: 2px solid var(--blue); }
         tr.total-row td { color: var(--navy); font-weight: 700; }
+
+        /* ── TREE TABLE ── */
+        @keyframes trFade { from { opacity:0; transform:translateY(-3px); } to { opacity:1; transform:translateY(0); } }
+        .tr-hidden { display: none; }
+        .tr-anim   { animation: trFade .22s ease both; }
+        /* Chevron */
+        .row-chev {
+            display: inline-block; font-style: normal;
+            width: 18px; height: 18px; line-height: 18px; text-align: center;
+            border-radius: 4px; background: var(--border); color: var(--gray);
+            margin-right: 7px; vertical-align: middle;
+            transition: transform .22s cubic-bezier(.4,0,.2,1), background .15s, color .15s;
+            user-select: none; font-size: 0.75rem; font-weight: 700; flex-shrink: 0;
+        }
+        .row-chev::before { content: '›'; }
+        .row-chev-ph { display: inline-block; width: 18px; margin-right: 7px; vertical-align: middle; }
+        .row-dot {
+            display: inline-block; width: 10px; height: 10px; border-radius: 50%;
+            margin-right: 7px; vertical-align: middle; flex-shrink: 0;
+        }
+        /* Level 1 — Área */
+        .tr-l1 { background: var(--surface) !important; }
+        .tr-l1.tr-expandable { cursor: pointer; }
+        .tr-l1.tr-expandable:hover td { background: rgba(14,165,233,0.03); }
+        .tr-l1.tr-expandable:hover .row-chev { background: rgba(14,165,233,0.14); color: var(--blue); }
+        .tr-l1.expanded .row-chev { transform: rotate(90deg); background: rgba(14,165,233,0.14); color: var(--blue); }
+        .td-l1 { font-weight: 600 !important; color: var(--navy) !important; }
+        /* Level 2 — Segmento */
+        .tr-l2 { background: #f8fafc !important; }
+        .tr-l2.tr-expandable { cursor: pointer; }
+        .tr-l2.tr-expandable:hover td { background: #f0f4f8 !important; }
+        .tr-l2.tr-expandable:hover .row-chev { background: rgba(14,165,233,0.14); color: var(--blue); }
+        .tr-l2.expanded .row-chev { transform: rotate(90deg); background: rgba(14,165,233,0.14); color: var(--blue); }
+        .td-l2 { padding-left: 30px !important; font-size: 0.71rem !important; color: var(--gray) !important; }
+        .tr-l2 td:not(:first-child) { color: var(--gray); font-size: 0.71rem; }
+        /* Level 3 — Etapa */
+        .tr-l3 { background: #f1f5f9 !important; }
+        .td-l3 { padding-left: 52px !important; font-size: 0.69rem !important; color: var(--gray2) !important; font-weight: 400 !important; }
+        .tr-l3 td:not(:first-child) { color: var(--gray2); font-size: 0.69rem; }
 
         /* ── CHARTS ── */
         .charts-row {
@@ -1355,35 +1392,145 @@
         gaugeChart.update();
     }
 
-    function renderAreaTable(rows, totals) {
+    function metricCells(row) {
+        const disp = rowMetric(row, 'PorcentajeDisponible');
+        return `<td>${fmtMoney(rowMetric(row,'RdiTotal'))}</td>
+                <td>${fmtMoney(rowMetric(row,'EjecutadoErequester'))}</td>
+                <td>${fmtMoney(rowMetric(row,'ComprometidoErequester'))}</td>
+                <td>${fmtMoney(rowMetric(row,'AsignadoErequester'))}</td>
+                <td>${fmtMoney(rowMetric(row,'DisponibleErequester'))}</td>
+                <td class="pct-asig">${fmtPct(rowMetric(row,'PorcentajeAsignado'))}</td>
+                <td class="${disp < 0 ? 'pct-neg' : 'pct-disp'}">${fmtPct(disp)}</td>`;
+    }
+
+    function renderAreaTable(areaRows, totals, detailRows) {
         const areaBody = document.getElementById('resumen-area-body');
         if (!areaBody) return;
-        const bodyRows = rows.map(row => `
-            <tr>
-                <td>${escapeHtml(displayName(row.label || dimension(row, 'Rubros[Area]')))}</td>
-                <td>${fmtMoney(rowMetric(row, 'RdiTotal'))}</td>
-                <td>${fmtMoney(rowMetric(row, 'EjecutadoErequester'))}</td>
-                <td>${fmtMoney(rowMetric(row, 'ComprometidoErequester'))}</td>
-                <td>${fmtMoney(rowMetric(row, 'AsignadoErequester'))}</td>
-                <td>${fmtMoney(rowMetric(row, 'DisponibleErequester'))}</td>
-                <td class="pct-asig">${fmtPct(rowMetric(row, 'PorcentajeAsignado'))}</td>
-                <td class="${rowMetric(row, 'PorcentajeDisponible') < 0 ? 'pct-neg' : 'pct-disp'}">${fmtPct(rowMetric(row, 'PorcentajeDisponible'))}</td>
-            </tr>
-        `).join('');
-        const emptyRow = '<tr><td colspan="8">No hay datos para los filtros seleccionados.</td></tr>';
-        const totalRow = `
-            <tr class="total-row">
-                <td>Total</td>
-                <td>${fmtMoney(rowMetric(totals, 'RdiTotal'))}</td>
-                <td>${fmtMoney(rowMetric(totals, 'EjecutadoErequester'))}</td>
-                <td>${fmtMoney(rowMetric(totals, 'ComprometidoErequester'))}</td>
-                <td>${fmtMoney(rowMetric(totals, 'AsignadoErequester'))}</td>
-                <td>${fmtMoney(rowMetric(totals, 'DisponibleErequester'))}</td>
-                <td class="pct-asig">${fmtPct(rowMetric(totals, 'PorcentajeAsignado'))}</td>
-                <td class="${rowMetric(totals, 'PorcentajeDisponible') < 0 ? 'pct-neg' : 'pct-disp'}">${fmtPct(rowMetric(totals, 'PorcentajeDisponible'))}</td>
-            </tr>
-        `;
-        areaBody.innerHTML = (bodyRows || emptyRow) + totalRow;
+        const hasDetail = detailRows && detailRows.length > 0;
+        let html = '';
+
+        areaRows.forEach((areaRow, ai) => {
+            const rawName = String(areaRow.label || '').toUpperCase().trim();
+            const dispName = displayName(rawName) || rawName;
+            const cfg = AREA_CONFIG[rawName] || DEFAULT_AREA_CFG;
+
+            // Pre-compute segment rows so we know if expandable
+            let segRows = [];
+            let areaDetail = [];
+            if (hasDetail) {
+                areaDetail = detailRows.filter(r =>
+                    String(dimension(r, 'Rubros[Area]') || '').toUpperCase().trim() === rawName);
+                segRows = groupRowsBy(areaDetail, 'Rubros[Segmento]');
+            }
+            const expandable = segRows.length > 0;
+
+            // Level 1
+            html += `<tr class="tr-l1${expandable ? ' tr-expandable' : ''}" data-ai="${ai}">
+                <td class="td-l1">
+                    ${expandable ? '<span class="row-chev"></span>' : '<span class="row-chev-ph"></span>'}
+                    <span class="row-dot" style="background:${cfg.color}22;border:2px solid ${cfg.color}"></span>
+                    ${escapeHtml(dispName)}
+                </td>${metricCells(areaRow)}</tr>`;
+
+            // Level 2 — Segmentos
+            segRows.forEach((segRow, si) => {
+                const segName = String(segRow.label || '').trim();
+                const segDetail = areaDetail.filter(r =>
+                    String(dimension(r, 'Rubros[Segmento]') || '').trim() === segName);
+                const etapaRows = groupRowsBy(segDetail, 'Rubros[Etapa]').filter(e => e.label);
+                const segExp = etapaRows.length > 0;
+
+                html += `<tr class="tr-l2 tr-child${segExp ? ' tr-expandable' : ''} tr-hidden" data-ai="${ai}" data-si="${si}">
+                    <td class="td-l2" style="border-left:3px solid ${cfg.color}">
+                        ${segExp ? '<span class="row-chev"></span>' : '<span class="row-chev-ph"></span>'}
+                        ${escapeHtml(segName)}
+                    </td>${metricCells(segRow)}</tr>`;
+
+                // Level 3 — Etapas
+                etapaRows.forEach(etRow => {
+                    html += `<tr class="tr-l3 tr-child tr-hidden" data-ai="${ai}" data-si="${si}">
+                        <td class="td-l3" style="border-left:3px solid ${cfg.color}44">
+                            ${escapeHtml(etRow.label)}
+                        </td>${metricCells(etRow)}</tr>`;
+                });
+            });
+        });
+
+        if (!areaRows.length) html = '<tr><td colspan="8" style="text-align:center;padding:16px;color:var(--gray2)">Sin datos para los filtros seleccionados.</td></tr>';
+
+        const dispT = rowMetric(totals, 'PorcentajeDisponible');
+        html += `<tr class="total-row"><td>Total</td>
+            <td>${fmtMoney(rowMetric(totals,'RdiTotal'))}</td>
+            <td>${fmtMoney(rowMetric(totals,'EjecutadoErequester'))}</td>
+            <td>${fmtMoney(rowMetric(totals,'ComprometidoErequester'))}</td>
+            <td>${fmtMoney(rowMetric(totals,'AsignadoErequester'))}</td>
+            <td>${fmtMoney(rowMetric(totals,'DisponibleErequester'))}</td>
+            <td class="pct-asig">${fmtPct(rowMetric(totals,'PorcentajeAsignado'))}</td>
+            <td class="${dispT < 0 ? 'pct-neg' : 'pct-disp'}">${fmtPct(dispT)}</td></tr>`;
+
+        areaBody.innerHTML = html;
+        bindTableDrill(areaBody);
+    }
+
+    function bindTableDrill(tbody) {
+        tbody.addEventListener('click', e => {
+            const tr = e.target.closest('tr.tr-expandable');
+            if (!tr) return;
+            const ai = tr.dataset.ai;
+            const si = tr.dataset.si;
+            const isL1 = tr.classList.contains('tr-l1');
+            const isOpen = tr.classList.contains('expanded');
+
+            if (isL1) {
+                // Accordion: close other open areas
+                tbody.querySelectorAll('.tr-l1.expanded').forEach(other => {
+                    if (other === tr) return;
+                    const oai = other.dataset.ai;
+                    other.classList.remove('expanded');
+                    tbody.querySelectorAll(`.tr-child[data-ai="${oai}"]`).forEach(c => {
+                        c.classList.add('tr-hidden');
+                        c.classList.remove('expanded', 'tr-anim');
+                    });
+                });
+                if (isOpen) {
+                    tr.classList.remove('expanded');
+                    tbody.querySelectorAll(`.tr-child[data-ai="${ai}"]`).forEach(c => {
+                        c.classList.add('tr-hidden');
+                        c.classList.remove('expanded', 'tr-anim');
+                    });
+                } else {
+                    tr.classList.add('expanded');
+                    tbody.querySelectorAll(`.tr-l2[data-ai="${ai}"]`).forEach(c => {
+                        c.classList.remove('tr-hidden');
+                        void c.offsetWidth; // force reflow for animation restart
+                        c.classList.add('tr-anim');
+                    });
+                }
+            } else {
+                // Segmento accordion within same area
+                tbody.querySelectorAll(`.tr-l2.expanded[data-ai="${ai}"]`).forEach(other => {
+                    if (other === tr) return;
+                    const osi = other.dataset.si;
+                    other.classList.remove('expanded');
+                    tbody.querySelectorAll(`.tr-l3[data-ai="${ai}"][data-si="${osi}"]`).forEach(c => {
+                        c.classList.add('tr-hidden');
+                        c.classList.remove('tr-anim');
+                    });
+                });
+                if (isOpen) {
+                    tr.classList.remove('expanded');
+                    tbody.querySelectorAll(`.tr-l3[data-ai="${ai}"][data-si="${si}"]`).forEach(c =>
+                        c.classList.add('tr-hidden'));
+                } else {
+                    tr.classList.add('expanded');
+                    tbody.querySelectorAll(`.tr-l3[data-ai="${ai}"][data-si="${si}"]`).forEach(c => {
+                        c.classList.remove('tr-hidden');
+                        void c.offsetWidth;
+                        c.classList.add('tr-anim');
+                    });
+                }
+            }
+        });
     }
 
     function renderCharts(etapaRows, areaRows) {
@@ -1405,11 +1552,12 @@
         let areaRows = datasets.porArea || [];
         let etapaRows = datasets.porEtapa || [];
 
+        let rawDetailRows = [];
         if (detailRows.length) {
-            const rows = filteredDetailRows();
-            totals = aggregateDetailRows(rows);
-            areaRows = groupRowsBy(rows, 'Rubros[Area]');
-            etapaRows = groupRowsBy(rows, 'Rubros[Etapa]');
+            rawDetailRows = filteredDetailRows();
+            totals = aggregateDetailRows(rawDetailRows);
+            areaRows = groupRowsBy(rawDetailRows, 'Rubros[Area]');
+            etapaRows = groupRowsBy(rawDetailRows, 'Rubros[Etapa]');
         } else if (powerBIState.filters.meses.length) {
             const monthRows = getMonthRows(data)
                 .filter(row => powerBIState.filters.meses.includes(cleanDimension(dimension(row, 'Calendario[MesA]'))));
@@ -1417,7 +1565,7 @@
         }
 
         renderMetrics(totals);
-        renderAreaTable(areaRows, totals);
+        renderAreaTable(areaRows, totals, rawDetailRows);
         renderCharts(etapaRows, areaRows);
 
         if (data?.metadata?.generatedAt) {
