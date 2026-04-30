@@ -2843,7 +2843,11 @@
 
 <script>
 (function() {
-  const AUTO_MS = 10000;
+  // Reading speed: ~170 wpm = 1 word / 353ms. Min 6s, max 13s.
+  function readMs(text) {
+    const words = text.trim().split(/\s+/).length;
+    return Math.max(6000, Math.min(13000, words * 353));
+  }
 
   const STEPS = [
     {
@@ -2868,11 +2872,13 @@
     },
     {
       selector: '.filter-search-wrap',
+      robotBelow: true,   // robot se posiciona más abajo para no tapar
       title: 'Buscador Rápido',
       text: 'Escribe el nombre de un área, segmento o etapa para encontrar información específica al instante, sin necesidad de abrir los filtros uno por uno.'
     },
     {
       selector: '#kpi-active-chip',
+      robotBelow: true,   // igual, es elemento pequeño en zona alta
       title: 'Filtros Activos',
       text: 'Aquí verás los filtros que tienes activos en este momento. Haz clic en la X para quitar un filtro. Si seleccionas el mismo filtro dos veces, se desactiva solo y la vista regresa al total general.'
     },
@@ -2925,32 +2931,48 @@
     if (chipWas && chip) { chip.style.display = ''; chipWas = false; }
   }
 
-  function moveRobot(el) {
-    // Bounce animation on arrival
-    imgWrap.classList.remove('arriving'); // handled via robot class
+  function moveRobot(el, forceBelow) {
     robot.classList.remove('arriving');
     void robot.offsetWidth;
     robot.classList.add('arriving');
     setTimeout(() => robot.classList.remove('arriving'), 1200);
 
     if (!el) { robot.style.top = '50%'; return; }
-    const rect    = el.getBoundingClientRect();
-    const mid     = rect.top + rect.height / 2;
-    const vp      = window.innerHeight;
-    robot.style.top = Math.max(90, Math.min(vp - 90, mid)) + 'px';
+
+    const rect = el.getBoundingClientRect();
+    const vp   = window.innerHeight;
+    const elMid = rect.top + rect.height / 2;
+
+    let targetY;
+    if (forceBelow) {
+      // Position robot well below the element so bubble doesn't cover it
+      targetY = Math.min(vp - 90, rect.bottom + 180);
+    } else if (elMid < vp * 0.38) {
+      // Element near top → robot below it
+      targetY = Math.min(vp - 90, rect.bottom + 150);
+    } else if (elMid > vp * 0.72) {
+      // Element near bottom → robot above it
+      targetY = Math.max(90, rect.top - 150);
+    } else {
+      targetY = elMid;
+    }
+    robot.style.top = Math.max(90, Math.min(vp - 90, targetY)) + 'px';
   }
 
-  function startBar() {
+  let currentDuration = 8000;
+
+  function startBar(ms) {
+    currentDuration = ms;
     bar.style.transition = 'none';
     bar.style.width = '0%';
     clearTimeout(timer);
     requestAnimationFrame(() => {
-      bar.style.transition = `width ${AUTO_MS}ms linear`;
+      bar.style.transition = `width ${ms}ms linear`;
       bar.style.width = '100%';
     });
     timer = setTimeout(() => {
       step < STEPS.length - 1 ? goTo(step + 1) : endTour();
-    }, AUTO_MS);
+    }, ms);
   }
 
   function goTo(idx) {
@@ -2959,6 +2981,7 @@
     step = idx;
     const s     = STEPS[idx];
     const total = STEPS.length;
+    const ms    = readMs(s.text);
 
     stepLbl.textContent = `Paso ${idx + 1} de ${total}`;
     titleEl.textContent = s.title;
@@ -2978,15 +3001,15 @@
         setTimeout(() => {
           el.classList.add('tour-highlight');
           hilighted = el;
-          moveRobot(el);
+          moveRobot(el, !!s.robotBelow);
         }, 380);
       }
     } else {
-      moveRobot(null);
+      moveRobot(null, false);
     }
 
     setTimeout(() => bubble.classList.add('show'), 220);
-    startBar();
+    startBar(ms);
   }
 
   function endTour() {
