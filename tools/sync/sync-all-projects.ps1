@@ -43,6 +43,20 @@ try {
     Write-Warning "[RV4] Error BSE: $_"
 }
 
+# ── BDJ ──────────────────────────────────────────────────────────────────────
+try {
+    Write-Host "[RV4] Sincronizando BDJ ($mesA)..." -ForegroundColor Cyan
+    & (Join-Path $powerbIDir "sync-powerbi-bdj.ps1") `
+        -MesA              $mesA `
+        -UploadSupabase `
+        -SupabaseServiceKey $SupabaseServiceKey
+    $completed.Add("BDJ — Bosques de Jalapa")
+    Write-Host "[RV4] BDJ completado." -ForegroundColor Green
+} catch {
+    $errors.Add("BDJ: $($_.Exception.Message)")
+    Write-Warning "[RV4] Error BDJ: $_"
+}
+
 # ── HLQ ──────────────────────────────────────────────────────────────────────
 try {
     Write-Host "[RV4] Sincronizando HLQ ($mesA)..." -ForegroundColor Cyan
