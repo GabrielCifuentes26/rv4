@@ -688,7 +688,7 @@
                 <div class="eac-legend">
                     <span class="eac-legend-item"><span class="eac-dot eac-dot-ej"></span>Ejecutado</span>
                     <span class="eac-legend-item"><span class="eac-dot eac-dot-comp"></span>Comprometido</span>
-                    <span class="eac-legend-item"><span class="eac-dot eac-dot-disp"></span>Por ejecutar</span>
+                    <span class="eac-legend-item"><span class="eac-dot eac-dot-disp"></span>Disponible</span>
                 </div>
                 <span class="eac-pct-header">% Ejecución</span>
             </div>
@@ -764,10 +764,10 @@
             const rawName = String(row.label || dimension(row, 'Rubros[Area]') || '').toUpperCase().trim();
             const label = displayName(rawName) || rawName;
             const cfg = AREA_CONFIG[rawName] || DEFAULT_AREA_CFG;
-            const rdi       = asNumber(rowMetric(row, 'RdiTotal'));
-            const ejecutado = asNumber(rowMetric(row, 'EjecutadoErequester'));
-            const comprom   = asNumber(rowMetric(row, 'ComprometidoErequester'));
-            const porEj     = Math.max(0, rdi - ejecutado - comprom);
+            const rdi        = asNumber(rowMetric(row, 'RdiTotal'));
+            const ejecutado  = asNumber(rowMetric(row, 'EjecutadoErequester'));
+            const comprom    = asNumber(rowMetric(row, 'ComprometidoErequester'));
+            const disponible = asNumber(rowMetric(row, 'DisponibleErequester'));
             const pctAsig   = asNumber(rowMetric(row, 'PorcentajeAsignado'));
             const pctText   = (pctAsig * 100).toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             const ejPct     = rdi > 0 ? Math.min(100, (ejecutado / rdi) * 100) : 0;
@@ -784,7 +784,7 @@
                 <div class="eac-bar-track">
                     ${seg(ejPct,   'eac-seg-ej',   ejecutado)}
                     ${seg(compPct, 'eac-seg-comp', comprom)}
-                    <div class="eac-seg eac-seg-disp"><span class="eac-seg-lbl">${fmt(porEj)}</span></div>
+                    <div class="eac-seg eac-seg-disp"><span class="eac-seg-lbl">${fmt(disponible)}</span></div>
                 </div>
                 <div class="eac-pct-col">
                     <span class="eac-pct-val">${pctText}%</span>
