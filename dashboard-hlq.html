@@ -704,8 +704,8 @@
         .gauge-wrap { position: relative; width: 100%; }
         .gauge-overlay {
             position: absolute; text-align: center;
-            bottom: 6px; left: 50%; transform: translateX(-50%);
-            white-space: nowrap; z-index: 1;
+            top: 52%; left: 50%; transform: translate(-50%, -50%);
+            white-space: nowrap; z-index: 1; pointer-events: none;
         }
         .gauge-val { font-size: 1.45rem; font-weight: 900; color: var(--navy); line-height: 1; }
         .gauge-sub { font-size: 0.58rem; color: var(--gray2); margin-top: 3px; letter-spacing: 0.5px; }
@@ -1122,6 +1122,8 @@
     };
 
     // Gauge
+    let gaugeRdiLabel = '--';
+
     const gaugeNeedlePlugin = {
         id: 'gaugeNeedle',
         afterDatasetsDraw(chart) {
@@ -1133,8 +1135,8 @@
             const outerR = arc.outerRadius;
             const total  = (chart.data.datasets[0].data[0] || 0) + (chart.data.datasets[0].data[1] || 0);
             const ratio  = total > 0 ? (chart.data.datasets[0].data[0] || 0) / total : 0;
-            const angle  = Math.PI * (1 + ratio); // 0%=left, 50%=top, 100%=right
-            const len    = outerR * 0.78;
+            const angle  = Math.PI * (1 + ratio);
+            const len    = outerR * 0.76;
             ctx.save();
             ctx.translate(cx, cy);
             // Needle
@@ -1148,6 +1150,16 @@
             ctx.fillStyle = '#334155'; ctx.fill();
             ctx.beginPath(); ctx.arc(0, 0, 3, 0, Math.PI * 2);
             ctx.fillStyle = '#fff'; ctx.fill();
+            ctx.restore();
+            // Endpoint labels
+            const fs = Math.max(7, Math.round(outerR * 0.13));
+            ctx.save();
+            ctx.font = `600 ${fs}px system-ui,sans-serif`;
+            ctx.fillStyle = '#94a3b8';
+            ctx.textAlign = 'right'; ctx.textBaseline = 'top';
+            ctx.fillText('0', cx - outerR + 2, cy + 4);
+            ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+            ctx.fillText(gaugeRdiLabel, cx + outerR - 2, cy + 4);
             ctx.restore();
         }
     };
@@ -1884,6 +1896,7 @@
 
         const assignedPct = Math.max(0, pctAsignado * 100);
         const availablePct = assignedPct || pctDisponible ? Math.max(0, pctDisponible * 100) : 100;
+        gaugeRdiLabel = fmtMillionsText(rdi);
         gaugeChart.data.datasets[0].data = [assignedPct, Math.max(0, 100 - assignedPct)];
         gaugeChart.update();
     }
