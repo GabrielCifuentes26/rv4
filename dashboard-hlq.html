@@ -671,14 +671,17 @@
         }
         .tendencia-dot { width: 26px; height: 3px; border-radius: 2px; flex-shrink: 0; }
         .tendencia-body { position: relative; height: 300px; }
-        .tendencia-toggle { display: flex; gap: 5px; flex-shrink: 0; }
-        .tendencia-btn {
-            padding: 3px 11px; border-radius: 20px; border: 1.5px solid #e2e8f0;
-            background: #fff; color: #64748b; font-size: 0.68rem; font-weight: 600;
-            cursor: pointer; transition: background .15s, color .15s, border-color .15s;
+        .tendencia-toggle {
+            display: flex; gap: 0; flex-shrink: 0;
+            background: #f1f5f9; border-radius: 8px; padding: 2px;
         }
-        .tendencia-btn.active { background: #6366f1; border-color: #6366f1; color: #fff; }
-        .tendencia-btn:hover:not(.active) { border-color: #6366f1; color: #6366f1; }
+        .tendencia-btn {
+            padding: 3px 13px; border-radius: 6px; border: none;
+            background: transparent; color: #94a3b8; font-size: 0.67rem; font-weight: 600;
+            cursor: pointer; transition: background .15s, color .15s;
+        }
+        .tendencia-btn.active { background: #fff; color: #334155; box-shadow: 0 1px 3px rgba(15,23,42,0.1); }
+        .tendencia-btn:hover:not(.active) { color: #475569; }
         .chart-card {
             background: var(--surface); border-radius: 12px; padding: 14px;
             border: 1px solid var(--border); box-shadow: var(--shadow);
@@ -957,7 +960,6 @@
                     <div class="tendencia-toggle" id="tendencia-toggle">
                         <button class="tendencia-btn active" data-dim="Rubros[Fase]">Fase</button>
                         <button class="tendencia-btn" data-dim="Rubros[Area]">Área</button>
-                        <button class="tendencia-btn" data-dim="Rubros[Segmento]">Segmento</button>
                     </div>
                     <div class="tendencia-leyenda" id="tendencia-leyenda"></div>
                 </div>
