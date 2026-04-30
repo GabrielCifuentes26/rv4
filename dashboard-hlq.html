@@ -226,10 +226,40 @@
             display: flex; align-items: center; gap: 14px;
             border: 1px solid var(--border);
             box-shadow: 0 1px 5px rgba(15,23,42,0.06);
-            transition: transform .28s cubic-bezier(.4,0,.2,1), box-shadow .28s cubic-bezier(.4,0,.2,1);
+            transition: transform .28s cubic-bezier(.4,0,.2,1), box-shadow .28s cubic-bezier(.4,0,.2,1),
+                        background .22s, border-color .22s, opacity .22s, filter .22s;
             animation: slideUp .5s ease both;
             position: relative; overflow: hidden; cursor: default;
         }
+        /* KPI interactivity */
+        .kpi-card[data-kpi]:not([data-kpi="ppto-sap"]) { cursor: pointer; }
+        .kpi-card[data-kpi="ppto-sap"] { cursor: default; }
+        .kpi-row.has-filter .kpi-card:not(.kpi-active) {
+            opacity: 0.42; filter: grayscale(25%);
+            transform: none !important;
+            box-shadow: 0 1px 3px rgba(15,23,42,0.04) !important;
+        }
+        .kpi-row.has-filter .kpi-card:not(.kpi-active):hover {
+            opacity: 0.65; transform: translateY(-2px) !important;
+        }
+        /* Active chip / filtro activo */
+        .kpi-active-chip {
+            display: none; align-items: center; gap: 8px;
+            padding: 5px 8px 5px 13px; border-radius: 20px;
+            font-size: 0.7rem; font-weight: 600; color: #fff;
+            width: fit-content; margin: 0 0 6px 2px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.14);
+            animation: slideUp .2s ease both;
+        }
+        .kpi-active-chip.visible { display: flex; }
+        .kpi-chip-x {
+            background: rgba(255,255,255,0.28); border: none; color: #fff;
+            width: 18px; height: 18px; border-radius: 50%; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.85rem; line-height: 1; padding: 0;
+            transition: background .15s; flex-shrink: 0;
+        }
+        .kpi-chip-x:hover { background: rgba(255,255,255,0.45); }
         .kpi-card::after {
             content: ''; position: absolute;
             top: 0; left: 0; bottom: 0; width: 4px; border-radius: 14px 0 0 14px;
@@ -713,8 +743,12 @@
     </div>
 
     <!-- KPIs -->
+    <div class="kpi-active-chip" id="kpi-active-chip">
+        <span id="kpi-chip-lbl"></span>
+        <button class="kpi-chip-x" id="kpi-chip-clear" title="Quitar filtro">×</button>
+    </div>
     <div class="kpi-row">
-        <div class="kpi-card">
+        <div class="kpi-card" data-kpi="ppto-sap">
             <div class="kpi-icon" style="background:rgba(14,165,233,0.2)">
                 <svg viewBox="0 0 24 24" fill="#0ea5e9"><path d="M21 18v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v1h-9a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h9zm-9-2h10V8H12v8zm4-2.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/></svg>
             </div>
@@ -723,7 +757,7 @@
                 <div class="kpi-value" id="kpi-rdi">162.08 <span>mill.</span></div>
             </div>
         </div>
-        <div class="kpi-card">
+        <div class="kpi-card" data-kpi="ejecutado">
             <div class="kpi-icon" style="background:rgba(59,91,219,0.15)">
                 <svg viewBox="0 0 24 24" fill="#3b5bdb"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg>
             </div>
@@ -732,7 +766,7 @@
                 <div class="kpi-value" id="kpi-ejecutado">-- <span>mill.</span></div>
             </div>
         </div>
-        <div class="kpi-card">
+        <div class="kpi-card" data-kpi="comprometido">
             <div class="kpi-icon" style="background:rgba(245,158,11,0.2)">
                 <svg viewBox="0 0 24 24" fill="#f59e0b"><path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 0 0 1.946-.806 3.42 3.42 0 0 1 4.438 0 3.42 3.42 0 0 0 1.946.806 3.42 3.42 0 0 1 3.138 3.138 3.42 3.42 0 0 0 .806 1.946 3.42 3.42 0 0 1 0 4.438 3.42 3.42 0 0 0-.806 1.946 3.42 3.42 0 0 1-3.138 3.138 3.42 3.42 0 0 0-1.946.806 3.42 3.42 0 0 1-4.438 0 3.42 3.42 0 0 0-1.946-.806 3.42 3.42 0 0 1-3.138-3.138 3.42 3.42 0 0 0-.806-1.946 3.42 3.42 0 0 1 0-4.438 3.42 3.42 0 0 0 .806-1.946 3.42 3.42 0 0 1 3.138-3.138z" stroke="#f59e0b" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M9 12l2 2 4-4" stroke="#f59e0b" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </div>
@@ -741,7 +775,7 @@
                 <div class="kpi-value" id="kpi-comprometido">19.95 <span>mill.</span></div>
             </div>
         </div>
-        <div class="kpi-card">
+        <div class="kpi-card" data-kpi="asignado">
             <div class="kpi-icon" style="background:rgba(16,185,129,0.2)">
                 <svg viewBox="0 0 24 24" fill="#10b981"><path d="M11 2a9 9 0 1 0 9 9h-9V2zm2 0v9h9a9 9 0 0 0-9-9z"/></svg>
             </div>
@@ -750,7 +784,7 @@
                 <div class="kpi-value" id="kpi-asignado">149.33 <span>mill.</span></div>
             </div>
         </div>
-        <div class="kpi-card">
+        <div class="kpi-card" data-kpi="disponible">
             <div class="kpi-icon" style="background:rgba(139,92,246,0.2)">
                 <svg viewBox="0 0 24 24" fill="#8b5cf6"><path d="M2 7a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7zm2 0v10h16V7H4zm2 3h4v2H6v-2zm0 4h4v2H6v-2zm6-4h6v2h-6v-2z"/></svg>
             </div>
@@ -1301,9 +1335,28 @@
     }
 
     let searchQuery = '';
+    let kpiFilter = null; // 'ejecutado'|'comprometido'|'asignado'|'disponible'|null
+
+    const KPI_FILTER_FIELD = {
+        ejecutado:    'EjecutadoErequester',
+        comprometido: 'ComprometidoErequester',
+        asignado:     'AsignadoErequester',
+        disponible:   'DisponibleErequester',
+    };
+
+    const KPI_FILTER_META = {
+        ejecutado:    { label: 'Ejecutado',    color: '#3b5bdb' },
+        comprometido: { label: 'Comprometido', color: '#f59e0b' },
+        asignado:     { label: 'Asignado',     color: '#10b981' },
+        disponible:   { label: 'Disponible',   color: '#8b5cf6' },
+    };
 
     function filteredDetailRows() {
-        const rows = getDetailRows(powerBIState.data).filter(row => rowPassesSelectedFilters(row));
+        let rows = getDetailRows(powerBIState.data).filter(row => rowPassesSelectedFilters(row));
+        if (kpiFilter && KPI_FILTER_FIELD[kpiFilter]) {
+            const field = KPI_FILTER_FIELD[kpiFilter];
+            rows = rows.filter(r => asNumber(r[field]) > 0);
+        }
         if (!searchQuery) return rows;
         return rows.filter(row =>
             FILTER_CONFIG.some(config => {
@@ -1312,6 +1365,62 @@
                                displayName(val).toLowerCase().includes(searchQuery));
             })
         );
+    }
+
+    function bindKpiCards() {
+        const cards = document.querySelectorAll('.kpi-card[data-kpi]');
+        const kpiRow = document.querySelector('.kpi-row');
+        const chip   = document.getElementById('kpi-active-chip');
+        const chipLbl   = document.getElementById('kpi-chip-lbl');
+        const chipClear = document.getElementById('kpi-chip-clear');
+
+        function clearKpiFilter() {
+            kpiFilter = null;
+            kpiRow.classList.remove('has-filter');
+            cards.forEach(c => {
+                c.classList.remove('kpi-active');
+                c.style.background = '';
+                c.style.borderColor = '';
+                c.style.boxShadow = '';
+            });
+            chip.classList.remove('visible');
+            renderPowerBIView();
+        }
+
+        function applyKpiFilter(key) {
+            kpiFilter = key;
+            const meta = KPI_FILTER_META[key];
+            kpiRow.classList.add('has-filter');
+            cards.forEach(c => {
+                c.classList.remove('kpi-active');
+                c.style.background = '';
+                c.style.borderColor = '';
+                c.style.boxShadow = '';
+            });
+            const activeCard = document.querySelector(`.kpi-card[data-kpi="${key}"]`);
+            if (activeCard) {
+                activeCard.classList.add('kpi-active');
+                activeCard.style.background  = meta.color + '10'; // ~6% tint
+                activeCard.style.borderColor = meta.color + '55'; // ~33% border
+                activeCard.style.boxShadow   = `0 0 0 2.5px ${meta.color}30, 0 8px 20px ${meta.color}20`;
+            }
+            chip.style.background = meta.color;
+            chip.style.boxShadow  = `0 3px 10px ${meta.color}55`;
+            chipLbl.textContent   = `Filtro activo: ${meta.label}`;
+            chip.classList.add('visible');
+            renderPowerBIView();
+        }
+
+        cards.forEach(card => {
+            card.addEventListener('click', () => {
+                const key = card.dataset.kpi;
+                if (key === 'ppto-sap') { clearKpiFilter(); return; }
+                if (kpiFilter === key) { clearKpiFilter(); return; } // toggle off
+                applyKpiFilter(key);
+            });
+        });
+
+        chipClear.addEventListener('click', clearKpiFilter);
     }
 
     function updateSearchSuggestions(text) {
@@ -1667,6 +1776,7 @@
         powerBIState.options = { areas: [], segmentos: [], fases: [], meses: [] };
         bindPowerBIFilters();
         initSearch();
+        bindKpiCards();
         populateFilterControls();
         renderPowerBIView();
     }
