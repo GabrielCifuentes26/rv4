@@ -642,9 +642,17 @@
         }
         .search-mode-notice strong { color: var(--blue); }
 
+        /* ── TABLE + GAUGE SIDE BY SIDE ── */
+        .table-gauge-row {
+            display: flex; gap: 10px; padding: 0 22px 8px;
+            align-items: start; flex-shrink: 0;
+        }
+        .table-gauge-row .table-section { flex: 1; min-width: 0; padding: 12px 0 8px; }
+        .table-gauge-row .gauge-card { width: 210px; flex-shrink: 0; align-self: stretch; }
+
         /* ── CHARTS ── */
         .charts-row {
-            display: grid; grid-template-columns: 200px 2fr 3fr;
+            display: grid; grid-template-columns: 2fr 3fr;
             gap: 10px; padding: 0 22px 16px;
             flex-shrink: 0; align-items: stretch;
         }
@@ -897,35 +905,33 @@
         </div>
     </div>
 
-    <!-- Table -->
-    <div class="table-section">
-        <div class="section-label">Resumen por Área</div>
-        <div class="search-mode-notice" id="search-mode-notice" style="display:none"></div>
-        <div class="table-wrap">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Área</th><th>Presupuesto SAP</th><th>Ejecutado</th>
-                        <th>Comprometido</th><th>Asignado</th><th>Disponible</th>
-                        <th>% Asignado</th><th>% Disponible</th>
-                    </tr>
-                </thead>
-                <tbody id="resumen-area-body">
-                    <tr><td>Construcción</td><td>120,477,476.11</td><td>123,454,431.78</td><td>98,168,770.89</td><td>16,540,708.91</td><td>114,709,479.80</td><td>8,744,951.98</td><td class="pct-asig">92.92%</td><td class="pct-disp">7.08%</td></tr>
-                    <tr><td>Urbanización</td><td>29,837,668.62</td><td>29,939,366.88</td><td>25,195,463.25</td><td>1,984,100.25</td><td>27,179,563.50</td><td>2,759,803.38</td><td class="pct-asig">90.79%</td><td class="pct-disp">9.21%</td></tr>
-                    <tr><td>I.7a Construcción</td><td>4,122,589.34</td><td>2,840,245.67</td><td>1,950,423.18</td><td>441,209.56</td><td>2,391,632.74</td><td>448,612.93</td><td class="pct-asig">84.20%</td><td class="pct-disp">15.80%</td></tr>
-                    <tr><td>I.7a Urbanización</td><td>2,358,147.25</td><td>1,640,198.45</td><td>1,278,456.83</td><td>218,643.21</td><td>1,497,100.04</td><td>143,098.41</td><td class="pct-asig">91.28%</td><td class="pct-disp">8.72%</td></tr>
-                    <tr><td>I.7a Infraestructura</td><td>1,036,089.81</td><td>299,982.34</td><td>584,814.64</td><td>165,579.51</td><td>750,394.15</td><td>-450,411.81</td><td class="pct-asig">250.15%</td><td class="pct-neg">-150.15%</td></tr>
-                    <tr><td>Megaproyecto Urbanización</td><td>1,000,000.00</td><td>980,000.00</td><td>789,234.56</td><td>140,000.00</td><td>929,234.56</td><td>50,765.44</td><td class="pct-asig">94.82%</td><td class="pct-disp">5.18%</td></tr>
-                    <tr><td>Megaproyecto Infraestructura</td><td>3,245,344.76</td><td>3,129,066.57</td><td>1,402,996.62</td><td>464,803.01</td><td>1,867,799.63</td><td>1,261,266.94</td><td class="pct-asig">59.69%</td><td class="pct-disp">40.31%</td></tr>
-                    <tr class="total-row"><td>Total</td><td>162,077,315.89</td><td>162,283,291.69</td><td>129,370,159.97</td><td>19,955,044.45</td><td>149,325,204.42</td><td>13,064,142.32</td><td class="pct-asig">91.98%</td><td class="pct-disp">8.04%</td></tr>
-                </tbody>
-            </table>
+    <!-- Table + Gauge -->
+    <div class="table-gauge-row">
+        <div class="table-section">
+            <div class="section-label">Resumen por Área</div>
+            <div class="search-mode-notice" id="search-mode-notice" style="display:none"></div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Área</th><th>Presupuesto SAP</th><th>Ejecutado</th>
+                            <th>Comprometido</th><th>Asignado</th><th>Disponible</th>
+                            <th>% Asignado</th><th>% Disponible</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resumen-area-body">
+                        <tr><td>Construcción</td><td>120,477,476.11</td><td>123,454,431.78</td><td>98,168,770.89</td><td>16,540,708.91</td><td>114,709,479.80</td><td>8,744,951.98</td><td class="pct-asig">92.92%</td><td class="pct-disp">7.08%</td></tr>
+                        <tr><td>Urbanización</td><td>29,837,668.62</td><td>29,939,366.88</td><td>25,195,463.25</td><td>1,984,100.25</td><td>27,179,563.50</td><td>2,759,803.38</td><td class="pct-asig">90.79%</td><td class="pct-disp">9.21%</td></tr>
+                        <tr><td>I.7a Construcción</td><td>4,122,589.34</td><td>2,840,245.67</td><td>1,950,423.18</td><td>441,209.56</td><td>2,391,632.74</td><td>448,612.93</td><td class="pct-asig">84.20%</td><td class="pct-disp">15.80%</td></tr>
+                        <tr><td>I.7a Urbanización</td><td>2,358,147.25</td><td>1,640,198.45</td><td>1,278,456.83</td><td>218,643.21</td><td>1,497,100.04</td><td>143,098.41</td><td class="pct-asig">91.28%</td><td class="pct-disp">8.72%</td></tr>
+                        <tr><td>I.7a Infraestructura</td><td>1,036,089.81</td><td>299,982.34</td><td>584,814.64</td><td>165,579.51</td><td>750,394.15</td><td>-450,411.81</td><td class="pct-asig">250.15%</td><td class="pct-neg">-150.15%</td></tr>
+                        <tr><td>Megaproyecto Urbanización</td><td>1,000,000.00</td><td>980,000.00</td><td>789,234.56</td><td>140,000.00</td><td>929,234.56</td><td>50,765.44</td><td class="pct-asig">94.82%</td><td class="pct-disp">5.18%</td></tr>
+                        <tr><td>Megaproyecto Infraestructura</td><td>3,245,344.76</td><td>3,129,066.57</td><td>1,402,996.62</td><td>464,803.01</td><td>1,867,799.63</td><td>1,261,266.94</td><td class="pct-asig">59.69%</td><td class="pct-disp">40.31%</td></tr>
+                        <tr class="total-row"><td>Total</td><td>162,077,315.89</td><td>162,283,291.69</td><td>129,370,159.97</td><td>19,955,044.45</td><td>149,325,204.42</td><td>13,064,142.32</td><td class="pct-asig">91.98%</td><td class="pct-disp">8.04%</td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
-
-    <!-- Charts -->
-    <div class="charts-row">
         <div class="chart-card gauge-card">
             <div class="chart-title">Avance General</div>
             <div class="gauge-wrap">
@@ -941,7 +947,10 @@
                 <div class="gstat"><div class="gstat-val" id="gauge-disponible" style="color:#64748b">--M</div><div class="gstat-lbl">Disponible</div></div>
             </div>
         </div>
+    </div>
 
+    <!-- Charts -->
+    <div class="charts-row">
         <div class="chart-card eac-card">
             <div class="eac-header">
                 <span class="chart-title" style="margin:0">Control de Ejecución por Área</span>
