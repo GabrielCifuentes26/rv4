@@ -2113,7 +2113,7 @@
             const color = FASE_PALETTE[i % FASE_PALETTE.length];
             return {
                 label: faseName(fase),
-                data: meses.map(m => +toMillions(matrix[fase][m]).toFixed(3)),
+                data: meses.map(m => toMillions(matrix[fase][m])),
                 borderColor: color, backgroundColor: color + '15',
                 fill: true, tension: 0.4, borderWidth: 2.5,
                 pointRadius: 4, pointHoverRadius: 7, pointBackgroundColor: color,
