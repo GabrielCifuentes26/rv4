@@ -229,28 +229,28 @@
 
         /* ── SECONDARY KPI ROW ── */
         .kpi-row {
-            display: flex; gap: 8px; padding: 12px 22px;
+            display: flex; gap: 10px; padding: 12px 22px;
             background: var(--surface);
             border-bottom: 1px solid var(--border);
             flex-shrink: 0;
         }
         .kpi-card {
-            flex: 1; background: var(--bg);
-            border-radius: 10px; padding: 12px 14px;
-            border-left: 3px solid transparent;
-            border: 1px solid var(--border); border-left-width: 3px;
-            transition: transform .2s;
+            flex: 1; background: var(--navy2);
+            border-radius: 12px; padding: 14px 16px;
+            display: flex; align-items: center; gap: 13px;
+            transition: transform .2s, box-shadow .2s;
+            box-shadow: 0 2px 10px rgba(15,23,42,0.18);
         }
-        .kpi-card:hover { transform: translateY(-2px); }
-        .kpi-card.c1 { border-left-color: var(--blue); }
-        .kpi-card.c2 { border-left-color: var(--orange); }
-        .kpi-card.c3 { border-left-color: var(--amber); }
-        .kpi-card.c4 { border-left-color: var(--red); }
-        .kpi-card.c5 { border-left-color: var(--green); }
-        .kpi-card.c6 { border-left-color: var(--purple); }
-        .kpi-label { font-size: 0.6rem; color: var(--gray2); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px; font-weight: 600; }
-        .kpi-value { font-size: 1.1rem; font-weight: 800; color: var(--navy); white-space: nowrap; }
-        .kpi-value span { font-size: 0.68rem; font-weight: 400; color: var(--gray2); }
+        .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 6px 22px rgba(15,23,42,0.28); }
+        .kpi-icon {
+            width: 44px; height: 44px; border-radius: 11px;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .kpi-icon svg { width: 22px; height: 22px; }
+        .kpi-texts { min-width: 0; }
+        .kpi-label { font-size: 0.58rem; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 3px; font-weight: 600; }
+        .kpi-value { font-size: 1.08rem; font-weight: 800; color: #fff; white-space: nowrap; }
+        .kpi-value span { font-size: 0.65rem; font-weight: 400; color: rgba(255,255,255,0.55); }
 
         /* ── TABLE ── */
         /* --- FILTERS --- */
@@ -642,10 +642,42 @@
 
     <!-- KPIs secundarios -->
     <div class="kpi-row">
-        <div class="kpi-card c1"><div class="kpi-label">Presupuesto SAP</div><div class="kpi-value" id="kpi-rdi">162.08 <span>mill.</span></div></div>
-        <div class="kpi-card c3"><div class="kpi-label">Comprometido</div><div class="kpi-value" id="kpi-comprometido">19.95 <span>mill.</span></div></div>
-        <div class="kpi-card c5"><div class="kpi-label">Asignado</div><div class="kpi-value" id="kpi-asignado">149.33 <span>mill.</span></div></div>
-        <div class="kpi-card c6"><div class="kpi-label">Disponible</div><div class="kpi-value" id="kpi-disponible">13.06 <span>mill.</span></div></div>
+        <div class="kpi-card">
+            <div class="kpi-icon" style="background:rgba(14,165,233,0.2)">
+                <svg viewBox="0 0 24 24" fill="#0ea5e9"><path d="M21 18v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v1h-9a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h9zm-9-2h10V8H12v8zm4-2.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/></svg>
+            </div>
+            <div class="kpi-texts">
+                <div class="kpi-label">Presupuesto SAP</div>
+                <div class="kpi-value" id="kpi-rdi">162.08 <span>mill.</span></div>
+            </div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-icon" style="background:rgba(245,158,11,0.2)">
+                <svg viewBox="0 0 24 24" fill="#f59e0b"><path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 0 0 1.946-.806 3.42 3.42 0 0 1 4.438 0 3.42 3.42 0 0 0 1.946.806 3.42 3.42 0 0 1 3.138 3.138 3.42 3.42 0 0 0 .806 1.946 3.42 3.42 0 0 1 0 4.438 3.42 3.42 0 0 0-.806 1.946 3.42 3.42 0 0 1-3.138 3.138 3.42 3.42 0 0 0-1.946.806 3.42 3.42 0 0 1-4.438 0 3.42 3.42 0 0 0-1.946-.806 3.42 3.42 0 0 1-3.138-3.138 3.42 3.42 0 0 0-.806-1.946 3.42 3.42 0 0 1 0-4.438 3.42 3.42 0 0 0 .806-1.946 3.42 3.42 0 0 1 3.138-3.138z" stroke="#f59e0b" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M9 12l2 2 4-4" stroke="#f59e0b" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="kpi-texts">
+                <div class="kpi-label">Comprometido</div>
+                <div class="kpi-value" id="kpi-comprometido">19.95 <span>mill.</span></div>
+            </div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-icon" style="background:rgba(16,185,129,0.2)">
+                <svg viewBox="0 0 24 24" fill="#10b981"><path d="M11 2a9 9 0 1 0 9 9h-9V2zm2 0v9h9a9 9 0 0 0-9-9z"/></svg>
+            </div>
+            <div class="kpi-texts">
+                <div class="kpi-label">Asignado</div>
+                <div class="kpi-value" id="kpi-asignado">149.33 <span>mill.</span></div>
+            </div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-icon" style="background:rgba(139,92,246,0.2)">
+                <svg viewBox="0 0 24 24" fill="#8b5cf6"><path d="M2 7a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7zm2 0v10h16V7H4zm2 3h4v2H6v-2zm0 4h4v2H6v-2zm6-4h6v2h-6v-2z"/></svg>
+            </div>
+            <div class="kpi-texts">
+                <div class="kpi-label">Disponible</div>
+                <div class="kpi-value" id="kpi-disponible">13.06 <span>mill.</span></div>
+            </div>
+        </div>
     </div>
 
     <!-- Table -->
