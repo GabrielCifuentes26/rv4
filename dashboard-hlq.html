@@ -1797,11 +1797,6 @@
             };
         });
 
-        // Totales por mes (suma de todas las fases)
-        const monthTotals = meses.map(m =>
-            fases.reduce((s, f) => s + (matrix[f][m] || 0), 0)
-        );
-
         const labelPlugin = {
             id: 'faseLabels',
             afterDatasetsDraw(chart) {
@@ -1866,10 +1861,15 @@
                 });
 
                 // ── 2. Total por mes: línea separadora + monto bold debajo del eje ──
-                monthTotals.forEach((total, mi) => {
+                data.labels.forEach((_, mi) => {
+                    // Sumar directamente desde los datasets (ya están en millones)
+                    const total = chart.data.datasets.reduce((sum, ds, di) => {
+                        const meta = chart.getDatasetMeta(di);
+                        return sum + (meta.hidden ? 0 : (ds.data[mi] || 0));
+                    }, 0);
                     if (total <= 0) return;
                     const x = xAxis.getPixelForTick(mi);
-                    const text = `${toMillions(total).toFixed(2)}M`;
+                    const text = `${total.toFixed(2)}M`;
                     // Línea separadora sutil
                     ctx.save();
                     ctx.strokeStyle = '#e2e8f0';
