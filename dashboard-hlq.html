@@ -612,6 +612,19 @@
             gap: 10px; padding: 0 22px 16px;
             height: 250px; flex-shrink: 0;
         }
+        /* ── TENDENCIA POR FASE ── */
+        .tendencia-section { padding: 0 22px 16px; flex-shrink: 0; }
+        .tendencia-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 14px; gap: 12px; flex-wrap: wrap;
+        }
+        .tendencia-leyenda { display: flex; gap: 18px; flex-wrap: wrap; }
+        .tendencia-leyenda-item {
+            display: flex; align-items: center; gap: 7px;
+            font-size: 0.68rem; color: var(--gray); font-weight: 500;
+        }
+        .tendencia-dot { width: 26px; height: 3px; border-radius: 2px; flex-shrink: 0; }
+        .tendencia-body { position: relative; height: 230px; }
         .chart-card {
             background: var(--surface); border-radius: 12px; padding: 14px;
             border: 1px solid var(--border); box-shadow: var(--shadow);
@@ -856,6 +869,19 @@
         <div class="chart-card">
             <div class="chart-title">Avance por Area</div>
             <canvas id="faseChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Tendencia por Fase -->
+    <div class="tendencia-section">
+        <div class="chart-card">
+            <div class="tendencia-header">
+                <span class="chart-title" style="margin:0">Tendencia de Ejecución por Fase</span>
+                <div class="tendencia-leyenda" id="tendencia-leyenda"></div>
+            </div>
+            <div class="tendencia-body">
+                <canvas id="tendenciaChart"></canvas>
+            </div>
         </div>
     </div>
 
@@ -1724,6 +1750,104 @@
         });
     }
 
+    const FASE_PALETTE = ['#3b5bdb','#10b981','#f59e0b','#8b5cf6','#ef4444','#0ea5e9','#f97316'];
+    let tendenciaChart = null;
+
+    function renderTendenciaFase(detailRows) {
+        const canvas = document.getElementById('tendenciaChart');
+        if (!canvas) return;
+
+        // Collect unique fases and months from rows that have both dimensions
+        const faseSet = new Set();
+        const mesSet  = new Set();
+        detailRows.forEach(r => {
+            const fase = String(dimension(r, 'Rubros[Fase]') || '').trim();
+            const mes  = String(dimension(r, 'Calendario[MesA]') || '').trim();
+            if (fase) faseSet.add(fase);
+            if (mes)  mesSet.add(mes);
+        });
+
+        const fases = [...faseSet].sort();
+        const meses = [...mesSet].sort((a, b) =>
+            (MONTH_ORDER[a.toLowerCase()] ?? 99) - (MONTH_ORDER[b.toLowerCase()] ?? 99));
+
+        // Build fase × mes matrix
+        const matrix = {};
+        fases.forEach(f => {
+            matrix[f] = {};
+            meses.forEach(m => { matrix[f][m] = { ej: 0, comp: 0 }; });
+        });
+        detailRows.forEach(r => {
+            const fase = String(dimension(r, 'Rubros[Fase]') || '').trim();
+            const mes  = String(dimension(r, 'Calendario[MesA]') || '').trim();
+            if (!fase || !mes || !matrix[fase]) return;
+            matrix[fase][mes].ej   += asNumber(rowMetric(r, 'EjecutadoErequester'));
+            matrix[fase][mes].comp += asNumber(rowMetric(r, 'ComprometidoErequester'));
+        });
+
+        const datasets = [];
+        fases.forEach((fase, i) => {
+            const color = FASE_PALETTE[i % FASE_PALETTE.length];
+            datasets.push({
+                label: fase,
+                data: meses.map(m => +toMillions(matrix[fase][m].ej).toFixed(3)),
+                borderColor: color, backgroundColor: color + '15',
+                fill: true, tension: 0.4, borderWidth: 2.5,
+                pointRadius: 4, pointHoverRadius: 7, pointBackgroundColor: color,
+            });
+            if (fases.length <= 4) { // dashed comprometido solo si no hay demasiadas fases
+                datasets.push({
+                    label: fase + ' · Comprometido',
+                    data: meses.map(m => +toMillions(matrix[fase][m].comp).toFixed(3)),
+                    borderColor: color, backgroundColor: 'transparent',
+                    fill: false, tension: 0.4, borderWidth: 1.5,
+                    borderDash: [5, 4], pointRadius: 3, pointHoverRadius: 5,
+                    pointBackgroundColor: color, pointStyle: 'rectRot',
+                });
+            }
+        });
+
+        if (!tendenciaChart) {
+            tendenciaChart = new Chart(canvas, {
+                type: 'line',
+                data: { labels: meses, datasets },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(2)}M`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { grid: { color: '#f1f5f9' }, ticks: { font: { size: 11 } } },
+                        y: { grid: { color: '#f1f5f9' }, beginAtZero: true,
+                             ticks: { callback: v => `${v}M`, font: { size: 11 } } }
+                    }
+                }
+            });
+        } else {
+            tendenciaChart.data.labels   = meses;
+            tendenciaChart.data.datasets = datasets;
+            tendenciaChart.update();
+        }
+
+        // Leyenda personalizada
+        const leyenda = document.getElementById('tendencia-leyenda');
+        if (leyenda) {
+            leyenda.innerHTML = fases.map((f, i) => {
+                const color = FASE_PALETTE[i % FASE_PALETTE.length];
+                return `<div class="tendencia-leyenda-item">
+                    <div class="tendencia-dot" style="background:${color}"></div>
+                    <span>${f}</span>
+                </div>`;
+            }).join('');
+        }
+    }
+
     function renderCharts(etapaRows, areaRows) {
         renderEjecucionArea(areaRows);
 
@@ -1758,6 +1882,7 @@
         renderMetrics(totals);
         renderAreaTable(areaRows, totals, rawDetailRows);
         renderCharts(etapaRows, areaRows);
+        renderTendenciaFase(rawDetailRows);
 
         if (data?.metadata?.generatedAt) {
             const updated = new Date(data.metadata.generatedAt);
