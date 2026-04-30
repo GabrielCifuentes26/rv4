@@ -78,38 +78,43 @@
         .eac-card { display: flex; flex-direction: column; }
         .eac-header {
             display: grid; grid-template-columns: 1fr auto auto;
-            align-items: center; gap: 12px; margin-bottom: 14px;
+            align-items: center; gap: 12px; margin-bottom: 16px;
         }
-        .eac-legend { display: flex; gap: 12px; }
-        .eac-legend-item { display: flex; align-items: center; gap: 5px; font-size: 0.68rem; color: var(--gray); font-weight: 500; }
-        .eac-dot { width: 9px; height: 9px; border-radius: 3px; flex-shrink: 0; }
-        .eac-dot-asig { background: #1e293b; }
-        .eac-dot-disp { background: #dde4ed; border: 1px solid #cbd5e1; }
+        .eac-legend { display: flex; gap: 14px; }
+        .eac-legend-item { display: flex; align-items: center; gap: 5px; font-size: 0.67rem; color: var(--gray); font-weight: 500; }
+        .eac-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+        .eac-dot-ej   { background: #3b5bdb; }
+        .eac-dot-comp { background: #7048e8; }
+        .eac-dot-disp { background: #d8dfe8; border: 1px solid #c4cdd8; }
         .eac-pct-header { font-size: 0.68rem; font-weight: 700; color: var(--gray); white-space: nowrap; }
-        .eac-rows { display: flex; flex-direction: column; gap: 12px; }
-        .eac-row { display: grid; grid-template-columns: 150px 1fr 76px; align-items: center; gap: 10px; }
-        .eac-area { display: flex; align-items: center; gap: 8px; }
+        .eac-rows { display: flex; flex-direction: column; gap: 14px; }
+        .eac-row { display: grid; grid-template-columns: 144px 1fr 78px; align-items: center; gap: 10px; }
+        .eac-area { display: flex; align-items: center; gap: 9px; }
         .eac-icon-wrap {
-            width: 30px; height: 30px; border-radius: 8px; flex-shrink: 0;
+            width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
             display: flex; align-items: center; justify-content: center;
+            background: rgba(14,165,233,0.1);
         }
-        .eac-icon-wrap svg { width: 15px; height: 15px; }
-        .eac-name { font-size: 0.68rem; font-weight: 700; color: var(--navy); line-height: 1.25; }
+        .eac-icon-wrap svg { width: 18px; height: 18px; }
+        .eac-name { font-size: 0.69rem; font-weight: 700; color: var(--navy); line-height: 1.25; text-transform: uppercase; letter-spacing: 0.2px; }
         .eac-bar-track {
-            height: 30px; background: #dde4ed; border-radius: 10px;
-            overflow: hidden; position: relative;
+            height: 32px; border-radius: 10px;
+            overflow: hidden; display: flex;
         }
-        .eac-bar-fill {
-            height: 100%; border-radius: 10px;
-            background: linear-gradient(90deg, #0f172a 0%, #1e3a5f 100%);
-            display: flex; align-items: center;
-            transition: width 0.7s cubic-bezier(.4,0,.2,1);
-            min-width: 0;
+        .eac-seg {
+            height: 100%; display: flex; align-items: center; justify-content: center;
+            overflow: hidden; white-space: nowrap;
+            transition: width 0.65s cubic-bezier(.4,0,.2,1);
         }
-        .eac-bar-label { font-size: 0.69rem; font-weight: 700; color: #fff; white-space: nowrap; padding: 0 10px; }
+        .eac-seg-ej   { background: #3b5bdb; }
+        .eac-seg-comp { background: #7048e8; }
+        .eac-seg-disp { background: #d8dfe8; flex: 1; }
+        .eac-seg-lbl { font-size: 0.68rem; font-weight: 700; padding: 0 7px; }
+        .eac-seg-ej .eac-seg-lbl, .eac-seg-comp .eac-seg-lbl { color: #fff; }
+        .eac-seg-disp .eac-seg-lbl { color: #64748b; }
         .eac-pct-col { text-align: right; }
-        .eac-pct-val { font-size: 0.95rem; font-weight: 800; color: var(--amber); display: block; line-height: 1.1; }
-        .eac-pct-of { font-size: 0.62rem; color: var(--gray2); display: block; margin-top: 1px; }
+        .eac-pct-val { font-size: 1rem; font-weight: 800; color: var(--orange); display: block; line-height: 1.1; }
+        .eac-pct-of  { font-size: 0.62rem; color: var(--gray2); display: block; margin-top: 1px; }
 
         /* ── MAIN ── */
         .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
@@ -691,8 +696,9 @@
             <div class="eac-header">
                 <span class="chart-title" style="margin:0">Control de Ejecución por Área</span>
                 <div class="eac-legend">
-                    <span class="eac-legend-item"><span class="eac-dot eac-dot-asig"></span>Asignado</span>
-                    <span class="eac-legend-item"><span class="eac-dot eac-dot-disp"></span>Disponible</span>
+                    <span class="eac-legend-item"><span class="eac-dot eac-dot-ej"></span>Ejecutado</span>
+                    <span class="eac-legend-item"><span class="eac-dot eac-dot-comp"></span>Comprometido</span>
+                    <span class="eac-legend-item"><span class="eac-dot eac-dot-disp"></span>Por ejecutar</span>
                 </div>
                 <span class="eac-pct-header">% Ejecución</span>
             </div>
@@ -740,20 +746,19 @@
 
     const AREA_CONFIG = {
         'CONSTRUCCIÓN': {
-            iconBg: 'rgba(14,165,233,0.12)', iconColor: '#0ea5e9',
-            icon: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a8 8 0 0 1 8 8H4a8 8 0 0 1 8-8zm0 2a6 6 0 0 0-5.65 4h11.3A6 6 0 0 0 12 4zM2 11h20v2H2v-2zm2 4h16v1a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4v-1z"/></svg>`
+            color: '#0ea5e9',
+            icon: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 15h-2v-4h-4V9h4V5h-4V3H7v2H3v4h4v2H3v4H1v2h22v-2h-2zM9 5h6v2H9V5zM5 7h2v2H5V7zm4 4h6v4H9v-4zm8 4v-2h2v2h-2z"/></svg>`
         },
         'FUERA DE PROYECTO': {
-            iconBg: 'rgba(245,158,11,0.12)', iconColor: '#f59e0b',
-            icon: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 16v-1a10 10 0 0 1 20 0v1h-2v-1a8 8 0 0 0-16 0v1H2zm4 0H4v4h2v-4zm14 0h-2v4h2v-4zm-7 0h-2v4h2v-4z"/></svg>`
+            color: '#10b981',
+            icon: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>`
         },
         'URBANIZACIÓN': {
-            iconBg: 'rgba(16,185,129,0.12)', iconColor: '#10b981',
-            icon: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M15 11V5l-3-3-3 3v2H3v14h18V11h-6zm-8 8H5v-2h2v2zm0-4H5v-2h2v2zm0-4H5v-2h2v2zm6 8h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V7h2v2zm6 12h-2v-2h2v2zm0-4h-2v-2h2v2z"/></svg>`
+            color: '#8b5cf6',
+            icon: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>`
         }
     };
-    const DEFAULT_AREA_CFG = {
-        iconBg: 'rgba(100,116,139,0.12)', iconColor: '#64748b',
+    const DEFAULT_AREA_CFG = { color: '#64748b',
         icon: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3L2 12h3v8h6v-5h2v5h6v-8h3z"/></svg>`
     };
 
@@ -764,31 +769,36 @@
             container.innerHTML = '<div style="color:var(--gray2);font-size:0.8rem;text-align:center;padding:20px">Sin datos</div>';
             return;
         }
+        const fmt = v => (v / 1e6).toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + 'M';
         container.innerHTML = areaRows.map(row => {
             const rawName = String(row.label || dimension(row, 'Rubros[Area]') || '').toUpperCase().trim();
             const label = displayName(rawName) || rawName;
             const cfg = AREA_CONFIG[rawName] || DEFAULT_AREA_CFG;
-            const rdi = asNumber(rowMetric(row, 'RdiTotal'));
-            const asignado = asNumber(rowMetric(row, 'AsignadoErequester'));
-            const pctAsig = rdi > 0 ? asignado / rdi : 0;
-            const fillPct = Math.min(100, Math.max(0, pctAsig * 100));
-            const pctText = (pctAsig * 100).toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            const asigM = (asignado / 1e6).toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + 'M';
-            const rdiM = (rdi / 1e6).toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + 'M';
+            const rdi       = asNumber(rowMetric(row, 'RdiTotal'));
+            const ejecutado = asNumber(rowMetric(row, 'EjecutadoErequester'));
+            const comprom   = asNumber(rowMetric(row, 'ComprometidoErequester'));
+            const porEj     = Math.max(0, rdi - ejecutado - comprom);
+            const pctAsig   = asNumber(rowMetric(row, 'PorcentajeAsignado'));
+            const pctText   = (pctAsig * 100).toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            const ejPct     = rdi > 0 ? Math.min(100, (ejecutado / rdi) * 100) : 0;
+            const compPct   = rdi > 0 ? Math.min(100 - ejPct, (comprom  / rdi) * 100) : 0;
+            const seg = (pct, cls, val) => pct > 0
+                ? `<div class="eac-seg ${cls}" style="width:${pct.toFixed(2)}%"><span class="eac-seg-lbl">${pct >= 9 ? fmt(val) : ''}</span></div>`
+                : '';
             return `
             <div class="eac-row">
                 <div class="eac-area">
-                    <div class="eac-icon-wrap" style="background:${cfg.iconBg};color:${cfg.iconColor}">${cfg.icon}</div>
+                    <div class="eac-icon-wrap" style="background:${cfg.color}1a;color:${cfg.color}">${cfg.icon}</div>
                     <span class="eac-name">${escapeHtml(label)}</span>
                 </div>
                 <div class="eac-bar-track">
-                    <div class="eac-bar-fill" style="width:${fillPct.toFixed(2)}%">
-                        ${fillPct >= 15 ? `<span class="eac-bar-label">${asigM}</span>` : ''}
-                    </div>
+                    ${seg(ejPct,   'eac-seg-ej',   ejecutado)}
+                    ${seg(compPct, 'eac-seg-comp', comprom)}
+                    <div class="eac-seg eac-seg-disp"><span class="eac-seg-lbl">${fmt(porEj)}</span></div>
                 </div>
                 <div class="eac-pct-col">
                     <span class="eac-pct-val">${pctText}%</span>
-                    <span class="eac-pct-of">de ${rdiM}</span>
+                    <span class="eac-pct-of">de ${fmt(rdi)}</span>
                 </div>
             </div>`;
         }).join('');
