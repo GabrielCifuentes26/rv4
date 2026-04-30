@@ -66,7 +66,8 @@
             --c-ejecutado:   #3b5bdb;
             --c-comprometido:#f59e0b;
             --c-asignado:    #10b981;
-            --c-disponible:  #e2e8f0;
+            --c-disponible:  #cbd5e1;
+            --c-pct:         #06b6d4;
         }
 
         body {
@@ -291,9 +292,9 @@
         .kpi-card:nth-child(4) { animation-delay: .19s; }
         .kpi-card:nth-child(4)::after { background: var(--c-asignado); }
         .kpi-card:nth-child(5) { animation-delay: .24s; }
-        .kpi-card:nth-child(5)::after { background: var(--purple); }
+        .kpi-card:nth-child(5)::after { background: var(--c-disponible); }
         .kpi-card:nth-child(6) { animation-delay: .29s; }
-        .kpi-card:nth-child(6)::after { background: #0ea5e9; }
+        .kpi-card:nth-child(6)::after { background: var(--c-pct); }
         .kpi-card:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(15,23,42,0.11); }
         .kpi-card:hover .kpi-icon { transform: scale(1.1) rotate(-5deg); }
         .kpi-icon {
@@ -581,7 +582,7 @@
         tbody tr { border-bottom: 1px solid var(--border); transition: background .15s; }
         td { padding: 8px 14px; text-align: right; color: var(--gray); white-space: nowrap; }
         td:first-child { text-align: left; color: var(--navy); font-weight: 500; }
-        .pct-asig { color: var(--amber); font-weight: 700; }
+        .pct-asig { color: var(--c-pct); font-weight: 700; }
         .pct-disp { color: var(--green); font-weight: 700; }
         .pct-neg  { color: var(--red); font-weight: 700; }
         tr.total-row { background: rgba(14,165,233,0.04) !important; border-top: 2px solid var(--blue); }
@@ -858,8 +859,8 @@
             </div>
         </div>
         <div class="kpi-card" data-kpi="disponible">
-            <div class="kpi-icon" style="background:rgba(139,92,246,0.2)">
-                <svg viewBox="0 0 24 24" fill="#8b5cf6"><path d="M2 7a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7zm2 0v10h16V7H4zm2 3h4v2H6v-2zm0 4h4v2H6v-2zm6-4h6v2h-6v-2z"/></svg>
+            <div class="kpi-icon" style="background:rgba(100,116,139,0.15)">
+                <svg viewBox="0 0 24 24" fill="#64748b"><path d="M2 7a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7zm2 0v10h16V7H4zm2 3h4v2H6v-2zm0 4h4v2H6v-2zm6-4h6v2h-6v-2z"/></svg>
             </div>
             <div class="kpi-texts">
                 <div class="kpi-label">Disponible</div>
@@ -867,8 +868,8 @@
             </div>
         </div>
         <div class="kpi-card" data-kpi="pct-asignado" style="cursor:default">
-            <div class="kpi-icon" style="background:rgba(14,165,233,0.2)">
-                <svg viewBox="0 0 24 24" fill="#0ea5e9"><path d="M11 2a9 9 0 1 0 9 9h-9V2zm2 0v9h9a9 9 0 0 0-9-9z"/></svg>
+            <div class="kpi-icon" style="background:rgba(6,182,212,0.15)">
+                <svg viewBox="0 0 24 24" fill="#06b6d4"><path d="M11 2a9 9 0 1 0 9 9h-9V2zm2 0v9h9a9 9 0 0 0-9-9z"/></svg>
             </div>
             <div class="kpi-texts">
                 <div class="kpi-label">% Asignado</div>
@@ -916,9 +917,9 @@
                 </div>
             </div>
             <div class="gauge-stats">
-                <div class="gstat"><div class="gstat-val" id="gauge-ejecutado" style="color:var(--orange)">129.38M</div><div class="gstat-lbl">Ejecutado</div></div>
-                <div class="gstat"><div class="gstat-val" id="gauge-avance" style="color:var(--blue)">91.98%</div><div class="gstat-lbl">% Asignado</div></div>
-                <div class="gstat"><div class="gstat-val" id="gauge-disponible" style="color:var(--green)">13.06M</div><div class="gstat-lbl">Disponible</div></div>
+                <div class="gstat"><div class="gstat-val" id="gauge-ejecutado" style="color:var(--c-ejecutado)">129.38M</div><div class="gstat-lbl">Ejecutado</div></div>
+                <div class="gstat"><div class="gstat-val" id="gauge-avance" style="color:var(--c-pct)">91.98%</div><div class="gstat-lbl">% Asignado</div></div>
+                <div class="gstat"><div class="gstat-val" id="gauge-disponible" style="color:#64748b">13.06M</div><div class="gstat-lbl">Disponible</div></div>
             </div>
         </div>
 
@@ -941,7 +942,7 @@
                 <span class="chart-title" style="margin:0">Avance por Segmento</span>
                 <div class="seg-legend">
                     <span class="seg-legend-item"><span class="seg-dot" style="background:#10b981"></span>Asignado</span>
-                    <span class="seg-legend-item"><span class="seg-dot" style="background:#bfdbfe;border:1.5px solid #93c5fd"></span>Disponible (Presupuesto SAP)</span>
+                    <span class="seg-legend-item"><span class="seg-dot" style="background:#cbd5e1;border:1.5px solid #94a3b8"></span>Disponible (Presupuesto SAP)</span>
                 </div>
             </div>
             <div class="segmento-body" id="segmento-body">
@@ -1184,7 +1185,7 @@
             labels: [],
             datasets: [
                 { label: 'Asignado',    data: [], backgroundColor: '#10b981', borderColor: '#059669', borderWidth: 0, borderRadius: 0, borderSkipped: false, stack: 'budget' },
-                { label: 'Disponible',  data: [], backgroundColor: '#bfdbfe', borderColor: '#93c5fd', borderWidth: 0, borderRadius: 3, borderSkipped: false, stack: 'budget' }
+                { label: 'Disponible',  data: [], backgroundColor: '#cbd5e1', borderColor: '#94a3b8', borderWidth: 0, borderRadius: 3, borderSkipped: false, stack: 'budget' }
             ]
         },
         options: {
@@ -1564,7 +1565,7 @@
         ejecutado:    { label: 'Ejecutado',    color: '#3b5bdb' },
         comprometido: { label: 'Comprometido', color: '#f59e0b' },
         asignado:     { label: 'Asignado',     color: '#10b981' },
-        disponible:   { label: 'Disponible',   color: '#8b5cf6' },
+        disponible:   { label: 'Disponible',   color: '#64748b' },
     };
 
     function filteredDetailRows() {
