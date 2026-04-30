@@ -292,6 +292,8 @@
         .kpi-card:nth-child(4)::after { background: var(--c-asignado); }
         .kpi-card:nth-child(5) { animation-delay: .24s; }
         .kpi-card:nth-child(5)::after { background: var(--purple); }
+        .kpi-card:nth-child(6) { animation-delay: .29s; }
+        .kpi-card:nth-child(6)::after { background: #0ea5e9; }
         .kpi-card:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(15,23,42,0.11); }
         .kpi-card:hover .kpi-icon { transform: scale(1.1) rotate(-5deg); }
         .kpi-icon {
@@ -859,6 +861,15 @@
             <div class="kpi-texts">
                 <div class="kpi-label">Disponible</div>
                 <div class="kpi-value" id="kpi-disponible">13.06 <span>mill.</span></div>
+            </div>
+        </div>
+        <div class="kpi-card" data-kpi="pct-asignado" style="cursor:default">
+            <div class="kpi-icon" style="background:rgba(14,165,233,0.2)">
+                <svg viewBox="0 0 24 24" fill="#0ea5e9"><path d="M11 2a9 9 0 1 0 9 9h-9V2zm2 0v9h9a9 9 0 0 0-9-9z"/></svg>
+            </div>
+            <div class="kpi-texts">
+                <div class="kpi-label">% Asignado</div>
+                <div class="kpi-value" id="kpi-pct-asignado">-- <span>%</span></div>
             </div>
         </div>
     </div>
@@ -1800,6 +1811,7 @@
         setHtml('kpi-comprometido', fmtMillions(comprometido));
         setHtml('kpi-asignado', fmtMillions(asignado));
         setHtml('kpi-disponible', fmtMillions(disponible));
+        setHtml('kpi-pct-asignado', `${(pctAsignado * 100).toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span>%</span>`);
         setText('gauge-asignado', toMillions(asignado).toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
         setText('gauge-ejecutado', fmtMillionsText(ejecutado));
         setText('gauge-avance', fmtPct(pctAsignado));
