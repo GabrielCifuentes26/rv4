@@ -1770,98 +1770,51 @@
         const fases = [...faseSet].sort();
         const meses = sortMonths([...mesSet]);
 
-        // Build fase × mes matrix
+        // Build fase × mes matrix (Asignado)
         const matrix = {};
         fases.forEach(f => {
             matrix[f] = {};
-            meses.forEach(m => { matrix[f][m] = { ej: 0, comp: 0 }; });
+            meses.forEach(m => { matrix[f][m] = 0; });
         });
         detailRows.forEach(r => {
             const fase = String(dimension(r, 'Rubros[Fase]') || '').trim();
             const mes  = String(dimension(r, 'Calendario[MesA]') || '').trim();
             if (!fase || !mes || !matrix[fase]) return;
-            matrix[fase][mes].ej   += asNumber(rowMetric(r, 'EjecutadoErequester'));
-            matrix[fase][mes].comp += asNumber(rowMetric(r, 'ComprometidoErequester'));
+            matrix[fase][mes] += asNumber(rowMetric(r, 'AsignadoErequester'));
         });
 
-        const datasets = [];
-        fases.forEach((fase, i) => {
+        const datasets = fases.map((fase, i) => {
             const color = FASE_PALETTE[i % FASE_PALETTE.length];
-            datasets.push({
+            return {
                 label: fase,
-                data: meses.map(m => +toMillions(matrix[fase][m].ej).toFixed(3)),
-                borderColor: color, backgroundColor: color + '15',
-                fill: true, tension: 0.4, borderWidth: 2.5,
-                pointRadius: 4, pointHoverRadius: 7, pointBackgroundColor: color,
-            });
-            if (fases.length <= 4) { // dashed comprometido solo si no hay demasiadas fases
-                datasets.push({
-                    label: fase + ' · Comprometido',
-                    data: meses.map(m => +toMillions(matrix[fase][m].comp).toFixed(3)),
-                    borderColor: color, backgroundColor: 'transparent',
-                    fill: false, tension: 0.4, borderWidth: 1.5,
-                    borderDash: [5, 4], pointRadius: 3, pointHoverRadius: 5,
-                    pointBackgroundColor: color, pointStyle: 'rectRot',
-                });
-            }
+                data: meses.map(m => +toMillions(matrix[fase][m]).toFixed(3)),
+                backgroundColor: color + 'cc',
+                borderColor: color,
+                borderWidth: 1.5,
+                borderRadius: 4,
+                hoverBackgroundColor: color,
+            };
         });
-
-        // Plugin: etiqueta al final de cada línea principal
-        const endLabelPlugin = {
-            id: 'endLabels',
-            afterDatasetsDraw(chart) {
-                const { ctx } = chart;
-                chart.data.datasets.forEach((ds, i) => {
-                    if (ds.borderDash) return; // skip comprometido dashed
-                    const meta = chart.getDatasetMeta(i);
-                    if (meta.hidden || !meta.data.length) return;
-                    // Find last point with actual data
-                    let lastPt = null;
-                    for (let j = meta.data.length - 1; j >= 0; j--) {
-                        if (ds.data[j] > 0) { lastPt = meta.data[j]; break; }
-                    }
-                    if (!lastPt) return;
-                    const x = lastPt.x;
-                    const y = lastPt.y;
-                    ctx.save();
-                    ctx.font = '600 10.5px Inter, sans-serif';
-                    ctx.fillStyle = ds.borderColor;
-                    ctx.textAlign = 'left';
-                    ctx.textBaseline = 'middle';
-                    // Small dot connector
-                    ctx.beginPath();
-                    ctx.arc(x, y, 3, 0, Math.PI * 2);
-                    ctx.fillStyle = ds.borderColor;
-                    ctx.fill();
-                    // Label text
-                    ctx.fillStyle = ds.borderColor;
-                    ctx.fillText(ds.label, x + 8, y);
-                    ctx.restore();
-                });
-            }
-        };
 
         if (!tendenciaChart) {
             tendenciaChart = new Chart(canvas, {
-                type: 'line',
+                type: 'bar',
                 data: { labels: meses, datasets },
-                plugins: [endLabelPlugin],
                 options: {
                     responsive: true, maintainAspectRatio: false,
                     interaction: { mode: 'index', intersect: false },
-                    layout: { padding: { right: 110 } },
                     plugins: {
                         legend: { display: false },
                         tooltip: {
-                            filter: item => !item.dataset.borderDash,
                             callbacks: {
                                 label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(2)}M`
                             }
                         }
                     },
                     scales: {
-                        x: { grid: { color: '#f1f5f9' }, ticks: { font: { size: 11 } } },
-                        y: { grid: { color: '#f1f5f9' }, beginAtZero: true,
+                        x: { stacked: true, grid: { display: false }, ticks: { font: { size: 11 } } },
+                        y: { stacked: true, grid: { color: '#f1f5f9' }, beginAtZero: true,
+                             title: { display: true, text: 'Asignado (M)', font: { size: 10 }, color: '#94a3b8' },
                              ticks: { callback: v => `${v}M`, font: { size: 11 } } }
                     }
                 }
