@@ -1783,10 +1783,13 @@
             matrix[fase][mes] += asNumber(rowMetric(r, 'AsignadoErequester'));
         });
 
+        // "01" → "Fase 1", "SP" → "SP"
+        const faseName = f => /^\d+$/.test(f.trim()) ? `Fase ${parseInt(f, 10)}` : f;
+
         const datasets = fases.map((fase, i) => {
             const color = FASE_PALETTE[i % FASE_PALETTE.length];
             return {
-                label: fase,
+                label: faseName(fase),
                 data: meses.map(m => +toMillions(matrix[fase][m]).toFixed(3)),
                 borderColor: color, backgroundColor: color + '15',
                 fill: true, tension: 0.4, borderWidth: 2.5,
@@ -1794,12 +1797,71 @@
             };
         });
 
-        const endLabelPlugin = {
-            id: 'endLabels',
+        // Plugin: etiqueta escalonada en cada punto + etiqueta de fase al final
+        const labelPlugin = {
+            id: 'faseLabels',
             afterDatasetsDraw(chart) {
-                const { ctx } = chart;
-                chart.data.datasets.forEach((ds, i) => {
-                    const meta = chart.getDatasetMeta(i);
+                const { ctx, data } = chart;
+
+                // ── 1. Etiquetas de valor por mes (escalonadas) ──
+                data.labels.forEach((_, mi) => {
+                    // Recoger todos los puntos visibles para este mes
+                    const pts = [];
+                    chart.data.datasets.forEach((ds, di) => {
+                        const meta = chart.getDatasetMeta(di);
+                        if (meta.hidden) return;
+                        const pt = meta.data[mi];
+                        if (!pt || ds.data[mi] <= 0) return;
+                        pts.push({ pt, ds, val: ds.data[mi] });
+                    });
+                    if (!pts.length) return;
+
+                    // Ordenar por Y (más arriba primero = valor más alto)
+                    pts.sort((a, b) => a.pt.y - b.pt.y);
+
+                    // Escalonar: arriba / abajo alternando, con separación mínima
+                    const PILL_H = 15, MIN_SEP = 3;
+                    const assigned = [];
+                    pts.forEach((p, idx) => {
+                        const isAbove = idx % 2 === 0;
+                        let y = p.pt.y + (isAbove ? -(PILL_H + 4) : (PILL_H + 4));
+                        // Evitar colisión con el asignado anterior
+                        assigned.forEach(prev => {
+                            if (Math.abs(prev.x - p.pt.x) < 2) {
+                                const overlap = (PILL_H + MIN_SEP) - Math.abs(y - prev.y);
+                                if (overlap > 0) y += isAbove ? -overlap : overlap;
+                            }
+                        });
+                        assigned.push({ x: p.pt.x, y });
+
+                        const text = `${p.val.toFixed(2)}M`;
+                        ctx.save();
+                        ctx.font = '600 9px Inter, sans-serif';
+                        const tw = ctx.measureText(text).width;
+                        const pw = tw + 8, ph = PILL_H;
+                        const px = p.pt.x - pw / 2, py = y - ph / 2;
+
+                        // Fondo blanco con borde de color
+                        ctx.fillStyle = 'rgba(255,255,255,0.92)';
+                        ctx.beginPath();
+                        ctx.roundRect(px, py, pw, ph, 4);
+                        ctx.fill();
+                        ctx.strokeStyle = p.ds.borderColor;
+                        ctx.lineWidth = 1;
+                        ctx.stroke();
+
+                        // Texto del color de la fase
+                        ctx.fillStyle = p.ds.borderColor;
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(text, p.pt.x, y);
+                        ctx.restore();
+                    });
+                });
+
+                // ── 2. Nombre de Fase al final de la línea ──
+                chart.data.datasets.forEach((ds, di) => {
+                    const meta = chart.getDatasetMeta(di);
                     if (meta.hidden || !meta.data.length) return;
                     let lastPt = null;
                     for (let j = meta.data.length - 1; j >= 0; j--) {
@@ -1807,7 +1869,7 @@
                     }
                     if (!lastPt) return;
                     ctx.save();
-                    ctx.font = '600 10.5px Inter, sans-serif';
+                    ctx.font = '700 10px Inter, sans-serif';
                     ctx.fillStyle = ds.borderColor;
                     ctx.textAlign = 'left';
                     ctx.textBaseline = 'middle';
@@ -1824,11 +1886,11 @@
             tendenciaChart = new Chart(canvas, {
                 type: 'line',
                 data: { labels: meses, datasets },
-                plugins: [endLabelPlugin],
+                plugins: [labelPlugin],
                 options: {
                     responsive: true, maintainAspectRatio: false,
                     interaction: { mode: 'index', intersect: false },
-                    layout: { padding: { right: 110 } },
+                    layout: { padding: { top: 28, right: 110, bottom: 8 } },
                     plugins: {
                         legend: { display: false },
                         tooltip: {
@@ -1850,14 +1912,14 @@
             tendenciaChart.update();
         }
 
-        // Leyenda personalizada
+        // Leyenda personalizada con "Fase 1", "Fase 2"…
         const leyenda = document.getElementById('tendencia-leyenda');
         if (leyenda) {
             leyenda.innerHTML = fases.map((f, i) => {
                 const color = FASE_PALETTE[i % FASE_PALETTE.length];
                 return `<div class="tendencia-leyenda-item">
                     <div class="tendencia-dot" style="background:${color}"></div>
-                    <span>${f}</span>
+                    <span>${faseName(f)}</span>
                 </div>`;
             }).join('');
         }
