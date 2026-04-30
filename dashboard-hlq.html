@@ -1807,16 +1807,54 @@
             }
         });
 
+        // Plugin: etiqueta al final de cada línea principal
+        const endLabelPlugin = {
+            id: 'endLabels',
+            afterDatasetsDraw(chart) {
+                const { ctx } = chart;
+                chart.data.datasets.forEach((ds, i) => {
+                    if (ds.borderDash) return; // skip comprometido dashed
+                    const meta = chart.getDatasetMeta(i);
+                    if (meta.hidden || !meta.data.length) return;
+                    // Find last point with actual data
+                    let lastPt = null;
+                    for (let j = meta.data.length - 1; j >= 0; j--) {
+                        if (ds.data[j] > 0) { lastPt = meta.data[j]; break; }
+                    }
+                    if (!lastPt) return;
+                    const x = lastPt.x;
+                    const y = lastPt.y;
+                    ctx.save();
+                    ctx.font = '600 10.5px Inter, sans-serif';
+                    ctx.fillStyle = ds.borderColor;
+                    ctx.textAlign = 'left';
+                    ctx.textBaseline = 'middle';
+                    // Small dot connector
+                    ctx.beginPath();
+                    ctx.arc(x, y, 3, 0, Math.PI * 2);
+                    ctx.fillStyle = ds.borderColor;
+                    ctx.fill();
+                    // Label text
+                    ctx.fillStyle = ds.borderColor;
+                    ctx.fillText(ds.label, x + 8, y);
+                    ctx.restore();
+                });
+            }
+        };
+
         if (!tendenciaChart) {
             tendenciaChart = new Chart(canvas, {
                 type: 'line',
                 data: { labels: meses, datasets },
+                plugins: [endLabelPlugin],
                 options: {
                     responsive: true, maintainAspectRatio: false,
                     interaction: { mode: 'index', intersect: false },
+                    layout: { padding: { right: 110 } },
                     plugins: {
                         legend: { display: false },
                         tooltip: {
+                            filter: item => !item.dataset.borderDash,
                             callbacks: {
                                 label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(2)}M`
                             }
