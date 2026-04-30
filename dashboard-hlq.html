@@ -1354,8 +1354,8 @@
     function filteredDetailRows() {
         let rows = getDetailRows(powerBIState.data).filter(row => rowPassesSelectedFilters(row));
         if (kpiFilter && KPI_FILTER_FIELD[kpiFilter]) {
-            const field = KPI_FILTER_FIELD[kpiFilter];
-            rows = rows.filter(r => asNumber(r[field]) > 0);
+            const metricName = KPI_FILTER_FIELD[kpiFilter];
+            rows = rows.filter(r => asNumber(rowMetric(r, metricName)) > 0);
         }
         if (!searchQuery) return rows;
         return rows.filter(row =>
