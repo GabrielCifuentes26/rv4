@@ -88,7 +88,20 @@
         .eac-dot { width: 12px; height: 12px; border-radius: 4px; flex-shrink: 0; }
         .eac-dot-ej   { background: var(--c-ejecutado); }
         .eac-dot-comp { background: var(--c-comprometido); }
+        .eac-dot-asig { background: #0f172a; border-radius: 2px; }
         .eac-dot-disp { background: #c8d0db; }
+        /* Línea de Asignado debajo de la barra */
+        .eac-asig-wrap { position: relative; height: 22px; margin-top: 3px; }
+        .eac-asig-line {
+            position: absolute; left: 0; top: 8px;
+            height: 2.5px; background: #0f172a; border-radius: 2px; min-width: 4px;
+        }
+        .eac-asig-val {
+            position: absolute; top: 13px;
+            transform: translateX(-50%);
+            font-size: 0.65rem; font-weight: 700; color: #0f172a;
+            white-space: nowrap;
+        }
         .eac-pct-header { font-size: 0.7rem; font-weight: 700; color: var(--gray); white-space: nowrap; }
         .eac-rows { display: flex; flex-direction: column; gap: 18px; }
         .eac-row { display: grid; grid-template-columns: 175px 1fr 90px; align-items: center; gap: 14px; }
@@ -887,6 +900,7 @@
                 <div class="eac-legend">
                     <span class="eac-legend-item"><span class="eac-dot eac-dot-ej"></span>Ejecutado</span>
                     <span class="eac-legend-item"><span class="eac-dot eac-dot-comp"></span>Comprometido</span>
+                    <span class="eac-legend-item"><span class="eac-dot eac-dot-asig"></span>Asignado</span>
                     <span class="eac-legend-item"><span class="eac-dot eac-dot-disp"></span>Disponible</span>
                 </div>
                 <span class="eac-pct-header">% Ejecución</span>
@@ -991,16 +1005,19 @@
             const rdi        = asNumber(rowMetric(row, 'RdiTotal'));
             const ejecutado  = asNumber(rowMetric(row, 'EjecutadoErequester'));
             const comprom    = asNumber(rowMetric(row, 'ComprometidoErequester'));
+            const asignado   = asNumber(rowMetric(row, 'AsignadoErequester'));
             const disponible = asNumber(rowMetric(row, 'DisponibleErequester'));
             const pctAsig   = asNumber(rowMetric(row, 'PorcentajeAsignado'));
             const pctText   = (pctAsig * 100).toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             const ejPct     = rdi > 0 ? Math.min(100, (ejecutado / rdi) * 100) : 0;
             const compPct   = rdi > 0 ? Math.min(100 - ejPct, (comprom  / rdi) * 100) : 0;
+            const asigPct   = rdi > 0 ? Math.min(100, (asignado / rdi) * 100) : 0;
             const seg = (pct, cls, val) => pct > 0
                 ? `<div class="eac-seg ${cls}" style="width:${pct.toFixed(2)}%"><span class="eac-seg-lbl">${pct >= 9 ? fmt(val) : ''}</span></div>`
                 : '';
             const badgeLeft = (ejPct + compPct / 2).toFixed(2);
             const showBadge = compPct > 0 && compPct < 9;
+            const asigLabelLeft = (asigPct / 2).toFixed(2);
             return `
             <div class="eac-row">
                 <div class="eac-area">
@@ -1013,6 +1030,10 @@
                         ${seg(ejPct,   'eac-seg-ej',   ejecutado)}
                         ${seg(compPct, 'eac-seg-comp', comprom)}
                         <div class="eac-seg eac-seg-disp"><span class="eac-seg-lbl">${fmt(disponible)}</span></div>
+                    </div>
+                    <div class="eac-asig-wrap">
+                        <div class="eac-asig-line" style="width:${asigPct.toFixed(2)}%"></div>
+                        <div class="eac-asig-val" style="left:${asigLabelLeft}%">${fmt(asignado)}</div>
                     </div>
                 </div>
                 <div class="eac-pct-col">
