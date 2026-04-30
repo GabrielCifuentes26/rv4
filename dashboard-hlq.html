@@ -1130,59 +1130,63 @@
     const segBarLabelPlugin = {
         id: 'segBarLabel',
         afterDatasetsDraw(chart) {
-            const ctx = chart.ctx;
+            const ctx  = chart.ctx;
             const area = chart.chartArea;
-            const asigData  = chart.data.datasets[0]?.data || [];
-            const dispData  = chart.data.datasets[1]?.data || [];
+            const asigData = chart.data.datasets[0]?.data || [];
+            const dispData = chart.data.datasets[1]?.data || [];
             const fmt = v => v >= 1 ? `${v.toFixed(1)}M` : `${Math.round(v * 1000)}K`;
 
-            // Dataset 0: Asignado (verde) — label con valor y %
+            // Dataset 0: Asignado (verde)
             const meta0 = chart.getDatasetMeta(0);
             if (!meta0.hidden) {
                 meta0.data.forEach((bar, i) => {
-                    const asig  = asigData[i]  || 0;
+                    const asig  = asigData[i] || 0;
                     const total = asig + (dispData[i] || 0);
-                    if (asig < 0.005) return;
-                    const pct     = total > 0 ? Math.round(asig / total * 100) : 0;
-                    const lbl     = `${fmt(asig)} · ${pct}%`;
-                    const segW    = bar.x - (bar.base ?? area.left);
-                    const segMid  = (bar.x + (bar.base ?? area.left)) / 2;
+                    if (asig < 0.001) return;
+                    const pct    = total > 0 ? Math.round(asig / total * 100) : 0;
+                    const segW   = bar.x - (bar.base ?? area.left);
+                    const segMid = (bar.x + (bar.base ?? area.left)) / 2;
+
                     ctx.save();
-                    ctx.font = '600 9.5px Inter,sans-serif';
-                    const tw = ctx.measureText(lbl).width;
-                    if (segW >= tw + 12) {
-                        // cabe dentro: blanco centrado
-                        ctx.fillStyle = '#ffffff';
-                        ctx.textAlign = 'center';
-                        ctx.textBaseline = 'middle';
-                        ctx.fillText(lbl, segMid, bar.y);
-                    } else if (segW >= 18) {
-                        // solo el %
-                        const shortLbl = `${pct}%`;
-                        ctx.fillStyle = '#ffffff';
-                        ctx.textAlign = 'center';
-                        ctx.textBaseline = 'middle';
+                    ctx.font = '700 10px Inter,sans-serif';
+                    const fullLbl  = `${fmt(asig)} · ${pct}%`;
+                    const shortLbl = `${pct}%`;
+
+                    if (segW >= ctx.measureText(fullLbl).width + 14) {
+                        ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                        ctx.fillText(fullLbl, segMid, bar.y);
+                    } else if (segW >= ctx.measureText(shortLbl).width + 10) {
+                        ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
                         ctx.fillText(shortLbl, segMid, bar.y);
+                    } else {
+                        // Barra muy pequeña: label fuera con punto de anclaje
+                        const xOut = bar.x + 6;
+                        if (xOut + ctx.measureText(shortLbl).width + 4 <= area.right + 60) {
+                            ctx.fillStyle = '#059669'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+                            ctx.beginPath();
+                            ctx.arc(bar.x + 3, bar.y, 2.5, 0, Math.PI * 2);
+                            ctx.fillStyle = '#059669'; ctx.fill();
+                            ctx.fillStyle = '#059669'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+                            ctx.fillText(shortLbl, xOut + 4, bar.y);
+                        }
                     }
                     ctx.restore();
                 });
             }
 
-            // Dataset 1: Disponible (azul) — label del total al final del bar
+            // Dataset 1: Disponible — total al final del bar
             const meta1 = chart.getDatasetMeta(1);
             if (!meta1.hidden) {
                 meta1.data.forEach((bar, i) => {
-                    const asig  = asigData[i]  || 0;
+                    const asig  = asigData[i] || 0;
                     const total = asig + (dispData[i] || 0);
-                    if (total < 0.005) return;
+                    if (total < 0.001) return;
                     const lbl = fmt(total);
-                    const x   = Math.min(bar.x + 5, area.right - ctx.measureText(lbl).width - 2);
                     ctx.save();
-                    ctx.fillStyle = '#475569';
-                    ctx.font = '500 8.5px Inter,sans-serif';
-                    ctx.textAlign = 'left';
-                    ctx.textBaseline = 'middle';
-                    ctx.fillText(lbl, x, bar.y);
+                    ctx.font = '500 9px Inter,sans-serif';
+                    ctx.fillStyle = '#64748b';
+                    ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+                    ctx.fillText(lbl, bar.x + 5, bar.y);
                     ctx.restore();
                 });
             }
@@ -1195,48 +1199,55 @@
         data: {
             labels: [],
             datasets: [
-                { label: 'Asignado',    data: [], backgroundColor: '#10b981', borderColor: '#059669', borderWidth: 0, borderRadius: 0, borderSkipped: false, stack: 'budget' },
-                { label: 'Disponible',  data: [], backgroundColor: '#cbd5e1', borderColor: '#94a3b8', borderWidth: 0, borderRadius: 3, borderSkipped: false, stack: 'budget' }
+                { label: 'Asignado',   data: [], backgroundColor: '#10b981', borderWidth: 0, borderRadius: { topRight: 0, bottomRight: 0 }, borderSkipped: false, stack: 'budget', barThickness: 20 },
+                { label: 'Disponible', data: [], backgroundColor: '#e2e8f0', borderWidth: 0, borderRadius: { topRight: 4, bottomRight: 4 }, borderSkipped: false, stack: 'budget', barThickness: 20 }
             ]
         },
         options: {
             indexAxis: 'y',
             responsive: true, maintainAspectRatio: false,
-            layout: { padding: { right: 52, top: 4, bottom: 4 } },
+            layout: { padding: { right: 60, top: 6, bottom: 6, left: 0 } },
             plugins: {
                 legend: { display: false },
                 tooltip: {
                     callbacks: {
                         label: ctx => {
-                            const v   = ctx.parsed.x;
-                            const fmt = n => n >= 1 ? n.toFixed(2)+'M' : Math.round(n*1000)+'K';
+                            const v    = ctx.parsed.x;
+                            const fmtT = n => n >= 1 ? n.toFixed(2)+'M' : Math.round(n*1000)+'K';
                             const asig  = ctx.chart.data.datasets[0]?.data[ctx.dataIndex] || 0;
                             const total = asig + (ctx.chart.data.datasets[1]?.data[ctx.dataIndex] || 0);
                             if (ctx.datasetIndex === 0) {
                                 const pct = total > 0 ? (asig/total*100).toFixed(1) : 0;
-                                return ` Asignado: ${fmt(v)} (${pct}%)`;
+                                return ` Asignado: ${fmtT(v)} (${pct}%)`;
                             }
-                            return ` Presupuesto SAP: ${fmt(total)}  |  Disponible: ${fmt(v)}`;
+                            return ` Presupuesto SAP: ${fmtT(total)}  |  Disponible: ${fmtT(v)}`;
                         }
                     }
                 }
             },
             scales: {
                 x: {
-                    stacked: true,
+                    stacked: true, type: 'logarithmic',
+                    min: 0.01,
                     grid: { color: '#f1f5f9' },
-                    ticks: { font: { size: 9 }, color: '#94a3b8', callback: v => v >= 1 ? `${v}M` : v > 0 ? `${Math.round(v*1000)}K` : '0' },
-                    beginAtZero: true
+                    ticks: {
+                        font: { size: 9 }, color: '#94a3b8',
+                        callback: v => {
+                            const targets = [0.1, 0.5, 1, 2, 5, 10, 20, 50, 100];
+                            if (targets.some(t => Math.abs(v - t) < 0.001)) {
+                                return v >= 1 ? `${v}M` : `${Math.round(v*1000)}K`;
+                            }
+                            return '';
+                        }
+                    }
                 },
                 y: {
                     stacked: true,
                     grid: { display: false },
+                    afterFit(axis) { axis.width = 170; },
                     ticks: {
-                        font: { size: 9, weight: '500' }, color: '#334155',
-                        callback: function(val) {
-                            const lbl = this.getLabelForValue(val);
-                            return lbl && lbl.length > 16 ? lbl.substring(0, 14) + '…' : lbl;
-                        }
+                        font: { size: 9.5, weight: '600' }, color: '#334155',
+                        callback: function(val) { return this.getLabelForValue(val); }
                     }
                 }
             }
@@ -2302,12 +2313,13 @@
         );
 
 
+        const safeLog = v => Math.max(0.01, v); // log scale requires > 0
         areaChart.data.labels           = segs.map(r => String(r.label || dimension(r, 'Rubros[Segmento]') || '').toUpperCase());
-        areaChart.data.datasets[0].data = segs.map(r => +toMillions(rowMetric(r, 'AsignadoErequester')).toFixed(2));
+        areaChart.data.datasets[0].data = segs.map(r => safeLog(toMillions(rowMetric(r, 'AsignadoErequester'))));
         areaChart.data.datasets[1].data = segs.map(r => {
             const total = toMillions(rowMetric(r, 'RdiTotal'));
             const asig  = toMillions(rowMetric(r, 'AsignadoErequester'));
-            return +Math.max(0, total - asig).toFixed(2);
+            return safeLog(Math.max(0, total - asig));
         });
         areaChart.update();
     }
