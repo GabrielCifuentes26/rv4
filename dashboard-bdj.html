@@ -658,7 +658,14 @@
         .seg-legend { display: flex; gap: 14px; flex-wrap: wrap; }
         .seg-legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.65rem; color: var(--gray); font-weight: 500; }
         .seg-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
-        .segmento-body { position: relative; flex: 1; min-height: 0; }
+        .segmento-body {
+            position: relative; flex: 1; min-height: 0;
+            overflow-y: auto; max-height: 340px;
+        }
+        .segmento-body::-webkit-scrollbar { width: 6px; }
+        .segmento-body::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 3px; }
+        .segmento-body::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        .segmento-body::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         /* ── TENDENCIA POR FASE ── */
         .tendencia-section { padding: 0 22px 16px; flex-shrink: 0; }
         .tendencia-header {
@@ -1227,8 +1234,8 @@
         data: {
             labels: [],
             datasets: [
-                { label: 'Asignado',   data: [], backgroundColor: '#10b981', borderWidth: 0, borderRadius: { topRight: 0, bottomRight: 0 }, borderSkipped: false, stack: 'budget', barThickness: 20 },
-                { label: 'Disponible', data: [], backgroundColor: '#e2e8f0', borderWidth: 0, borderRadius: { topRight: 4, bottomRight: 4 }, borderSkipped: false, stack: 'budget', barThickness: 20 }
+                { label: 'Asignado',   data: [], backgroundColor: '#10b981', borderWidth: 0, borderRadius: { topRight: 0, bottomRight: 0 }, borderSkipped: false, stack: 'budget', barThickness: 24 },
+                { label: 'Disponible', data: [], backgroundColor: '#e2e8f0', borderWidth: 0, borderRadius: { topRight: 4, bottomRight: 4 }, borderSkipped: false, stack: 'budget', barThickness: 24 }
             ]
         },
         options: {
@@ -2350,6 +2357,12 @@
             const asig  = toMillions(rowMetric(r, 'AsignadoErequester'));
             return safeLog(Math.max(0, total - asig));
         });
+        // Dynamic canvas height so bars have breathing room and container scrolls
+        const ROW_HEIGHT = 46;
+        const canvasEl = document.getElementById('faseChart');
+        const nRows = areaChart.data.labels.length;
+        const newH = Math.max(120, nRows * ROW_HEIGHT + 24);
+        canvasEl.style.height = newH + 'px';
         areaChart.update();
     }
 
