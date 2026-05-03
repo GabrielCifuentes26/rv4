@@ -1,4 +1,4 @@
-param(
+﻿param(
     [string]$MesA = "abr 26",
     [switch]$UploadSupabase,
     [string]$SupabaseServiceKey = $env:SUPABASE_SERVICE_ROLE_KEY
@@ -10,12 +10,11 @@ $accentUpperO = [char]0x00d3
 
 $syncScript = Join-Path $PSScriptRoot "sync-powerbi-resumen.ps1"
 $syncArgs = @{
-    ReportName           = "05_DashboardPresupuesto_BDP"
     DatasetId            = "245c5962-1238-43bb-88ba-5dce10fbbfab"
     ProjectKey           = "bdp"
     ProjectName          = "Bosques de Pinula"
     MesA                 = $MesA
-    ModelProfile         = "hlq"
+    ModelProfile         = "bse"
     OutputDir            = "data/powerbi/bdp"
     IncludeFilterDetail  = $true
     AreaFilterValues     = @(("CONSTRUCCI" + $accentUpperO + "N"), ("URBANIZACI" + $accentUpperO + "N"))
@@ -27,3 +26,4 @@ if ($UploadSupabase) {
 } else {
     & $syncScript @syncArgs
 }
+
