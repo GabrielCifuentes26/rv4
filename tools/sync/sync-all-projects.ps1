@@ -57,6 +57,20 @@ try {
     Write-Warning "[RV4] Error BDJ: $_"
 }
 
+# ── BDP ──────────────────────────────────────────────────────────────────────
+try {
+    Write-Host "[RV4] Sincronizando BDP ($mesA)..." -ForegroundColor Cyan
+    & (Join-Path $powerbIDir "sync-powerbi-bdp.ps1") `
+        -MesA              $mesA `
+        -UploadSupabase `
+        -SupabaseServiceKey $SupabaseServiceKey
+    $completed.Add("BDP — Bosques de Pinula")
+    Write-Host "[RV4] BDP completado." -ForegroundColor Green
+} catch {
+    $errors.Add("BDP: $($_.Exception.Message)")
+    Write-Warning "[RV4] Error BDP: $_"
+}
+
 # ── HLQ ──────────────────────────────────────────────────────────────────────
 try {
     Write-Host "[RV4] Sincronizando HLQ ($mesA)..." -ForegroundColor Cyan
