@@ -2005,7 +2005,7 @@
         let html = '';
 
         areaRows.forEach((areaRow, ai) => {
-            const rawName = String(areaRow.label || '').toUpperCase().trim();
+            const rawName = String(areaRow.label || dimension(areaRow, 'Rubros[Area]') || '').toUpperCase().trim();
             const dispName = displayName(rawName) || rawName;
             const cfg = AREA_CONFIG[rawName] || DEFAULT_AREA_CFG;
 

@@ -169,15 +169,19 @@ function Publish-SupabaseResumen {
     )
 
     $headers = @{
-        apikey = $SupabaseServiceKey
+        apikey        = $SupabaseServiceKey
         Authorization = "Bearer $SupabaseServiceKey"
-        Prefer = "resolution=merge-duplicates,return=minimal"
     }
 
-    $uri = "$SupabaseUrl/rest/v1/powerbi_resumen_cache?on_conflict=project_key"
+    # DELETE existing row first to guarantee clean replacement
+    $deleteUri = "$SupabaseUrl/rest/v1/powerbi_resumen_cache?project_key=eq.$ProjectKey"
+    Invoke-RestMethod -Uri $deleteUri -Method Delete -Headers $headers | Out-Null
+
+    # INSERT fresh row
+    $insertHeaders = $headers + @{ Prefer = "return=minimal" }
     $body = $row | ConvertTo-Json -Depth 100 -Compress
     $bodyBytes = [System.Text.Encoding]::UTF8.GetBytes($body)
-    Invoke-RestMethod -Uri $uri -Method Post -Headers $headers -ContentType "application/json; charset=utf-8" -Body $bodyBytes | Out-Null
+    Invoke-RestMethod -Uri "$SupabaseUrl/rest/v1/powerbi_resumen_cache" -Method Post -Headers $insertHeaders -ContentType "application/json; charset=utf-8" -Body $bodyBytes | Out-Null
 }
 
 $repoRoot = Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..\..")
