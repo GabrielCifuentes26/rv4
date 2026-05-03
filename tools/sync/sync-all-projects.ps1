@@ -71,6 +71,20 @@ try {
     Write-Warning "[RV4] Error BDP: $_"
 }
 
+# ── RDB ──────────────────────────────────────────────────────────────────────
+try {
+    Write-Host "[RV4] Sincronizando RDB ($mesA)..." -ForegroundColor Cyan
+    & (Join-Path $powerbIDir "sync-powerbi-rdb.ps1") `
+        -MesA              $mesA `
+        -UploadSupabase `
+        -SupabaseServiceKey $SupabaseServiceKey
+    $completed.Add("RDB — Residencias Del Bosque")
+    Write-Host "[RV4] RDB completado." -ForegroundColor Green
+} catch {
+    $errors.Add("RDB: $($_.Exception.Message)")
+    Write-Warning "[RV4] Error RDB: $_"
+}
+
 # ── HLQ ──────────────────────────────────────────────────────────────────────
 try {
     Write-Host "[RV4] Sincronizando HLQ ($mesA)..." -ForegroundColor Cyan

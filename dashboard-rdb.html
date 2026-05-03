@@ -1,0 +1,3140 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — Control Presupuestario</title>
+    <style>html{visibility:hidden}</style>
+    <script>
+    (function(){
+        try {
+            var s=JSON.parse(localStorage.getItem('sb-iipgrojliqeyycvgnkrc-auth-token')||'null');
+            if(s&&s.access_token&&(!s.expires_at||Date.now()/1000<s.expires_at)){
+                document.documentElement.style.visibility='visible';
+            } else { window.location.replace('login.html'); }
+        } catch(e){ window.location.replace('login.html'); }
+    })();
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const { createClient } = supabase;
+        const client = createClient(
+            'https://iipgrojliqeyycvgnkrc.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlpcGdyb2psaXFleXljdmdua3JjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NzA1NzYsImV4cCI6MjA5MTM0NjU3Nn0.Y6FQ-1qWd7HPMvTnK4alpKxM-YLJ5CsKmkorAZKMJrg'
+        );
+
+        const PROJECT_NAME = 'Residencias Del Bosque';
+        const POWERBI_PROJECT_KEY = 'rdb';
+
+        client.auth.getSession().then(({ data: { session } }) => {
+            if (!session) { window.location.href = 'login.html'; }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('project-title').textContent = PROJECT_NAME;
+            document.title = `${PROJECT_NAME} — Dashboard`;
+            document.getElementById('btn-logout').addEventListener('click', () => {
+                client.auth.signOut().then(() => window.location.href = 'login.html');
+            });
+        });
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg:        #f0f4f8;
+            --surface:   #ffffff;
+            --navy:      #0f172a;
+            --navy2:     #1e293b;
+            --gray:      #64748b;
+            --gray2:     #94a3b8;
+            --border:    #e2e8f0;
+            --blue:      #0ea5e9;
+            --blue-dark: #0284c7;
+            --orange:    #f97316;
+            --green:     #10b981;
+            --amber:     #f59e0b;
+            --red:       #ef4444;
+            --purple:    #8b5cf6;
+            --shadow:    0 2px 12px rgba(15,23,42,0.08);
+            --shadow-lg: 0 8px 32px rgba(15,23,42,0.12);
+            /* ── Paleta estándar de métricas (misma en todos los dashboards) ── */
+            --c-ppto-sap:    #0ea5e9;
+            --c-ejecutado:   #3b5bdb;
+            --c-comprometido:#f59e0b;
+            --c-asignado:    #10b981;
+            --c-disponible:  #cbd5e1;
+            --c-pct:         #06b6d4;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--navy);
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            font-size: 13px;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* sidebar removed */
+
+        /* ── CONTROL EJECUCIÓN POR ÁREA ── */
+        .eac-card { display: flex; flex-direction: column; }
+        .eac-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; gap: 12px; }
+        .eac-legend { display: flex; gap: 16px; }
+        .eac-legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.68rem; color: var(--gray); font-weight: 500; }
+        .eac-dot { width: 12px; height: 12px; border-radius: 4px; flex-shrink: 0; }
+        .eac-dot-ej   { background: var(--c-ejecutado); }
+        .eac-dot-comp { background: var(--c-comprometido); }
+        .eac-dot-asig { background: #0f172a; border-radius: 2px; }
+        .eac-dot-disp { background: #c8d0db; }
+        /* Regla Asignado "|————|" debajo de la barra */
+        .eac-asig-wrap { position: relative; height: 26px; margin-top: 4px; overflow: visible; }
+        .eac-asig-bracket {
+            position: absolute; left: 0; top: 4px;
+            height: 10px;
+            border-top: 2px solid #64748b;
+            border-left: 2.5px solid #64748b;
+            border-right: 2.5px solid #64748b;
+            box-sizing: border-box;
+            min-width: 8px;
+        }
+        .eac-asig-val {
+            position: absolute; top: 15px;
+            transform: translateX(-50%);
+            font-size: 0.65rem; font-weight: 700; color: #334155;
+            white-space: nowrap;
+        }
+        .eac-pct-header { font-size: 0.7rem; font-weight: 700; color: var(--gray); white-space: nowrap; }
+        .eac-rows { display: flex; flex-direction: column; gap: 18px; flex: 1; justify-content: center; }
+        .eac-row { display: grid; grid-template-columns: 175px 1fr 90px; align-items: center; gap: 14px; cursor: pointer; border-radius: 10px; transition: background 0.18s; }
+        .eac-row:hover { background: rgba(14,165,233,0.07); }
+        .eac-row.chart-selected { background: rgba(14,165,233,0.13); outline: 2px solid rgba(14,165,233,0.45); }
+        #resumen-area-body tr.tr-l1, #resumen-area-body tr.tr-l2 { cursor: pointer; }
+        #resumen-area-body tr.chart-row-selected td { background: rgba(14,165,233,0.09) !important; }
+        #faseChart { cursor: pointer; }
+        #tendenciaChart { cursor: pointer; }
+        .eac-area { display: flex; align-items: center; gap: 12px; }
+        .eac-icon-wrap {
+            width: 46px; height: 46px; border-radius: 12px; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .eac-icon-wrap svg { width: 24px; height: 24px; }
+        .eac-name { font-size: 0.72rem; font-weight: 800; color: var(--navy); line-height: 1.25; text-transform: uppercase; letter-spacing: 0.3px; }
+        .eac-bar-outer { position: relative; }
+        .eac-bar-track {
+            height: 34px; border-radius: 10px;
+            background: var(--c-disponible); overflow: hidden; display: flex;
+        }
+        .eac-seg {
+            height: 100%; display: flex; align-items: center; justify-content: center;
+            overflow: hidden; white-space: nowrap; flex-shrink: 0;
+            transition: width 0.65s cubic-bezier(.4,0,.2,1);
+        }
+        .eac-seg-ej   { background: var(--c-ejecutado);    border-right: 3px solid rgba(255,255,255,0.8); border-radius: 0 6px 6px 0; }
+        .eac-seg-comp { background: var(--c-comprometido); border-right: 3px solid rgba(255,255,255,0.8); border-radius: 0 6px 6px 0; }
+        .eac-seg-disp { background: transparent; flex: 1; }
+        .eac-seg-lbl { font-size: 0.7rem; font-weight: 700; padding: 0 8px; }
+        .eac-seg-ej .eac-seg-lbl, .eac-seg-comp .eac-seg-lbl { color: #fff; }
+        .eac-seg-disp .eac-seg-lbl { color: var(--gray); }
+        /* Badge comprometido cuando el segmento es muy pequeño */
+        .eac-comp-badge {
+            position: absolute; bottom: calc(100% + 5px);
+            transform: translateX(-50%);
+            background: var(--c-comprometido); color: #fff;
+            font-size: 0.62rem; font-weight: 700;
+            padding: 3px 7px; border-radius: 6px;
+            white-space: nowrap; pointer-events: none; z-index: 5;
+            animation: slideUp .35s ease both;
+        }
+        .eac-comp-badge::after {
+            content: ''; position: absolute;
+            top: 100%; left: 50%; transform: translateX(-50%);
+            border: 4px solid transparent;
+            border-top-color: var(--c-comprometido);
+        }
+        .eac-pct-col { text-align: right; }
+        .eac-pct-val { font-size: 1.15rem; font-weight: 800; color: var(--c-asignado); display: block; line-height: 1.1; }
+        .eac-pct-of  { font-size: 0.75rem; font-weight: 600; color: var(--c-ppto-sap); display: block; margin-top: 3px; }
+
+        /* ── MAIN ── */
+        .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+        /* ── TOPBAR ── */
+        .topbar {
+            position: relative;
+            background: #0f172a;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            padding: 0 22px;
+            height: 56px;
+            display: flex; align-items: center; justify-content: space-between;
+            flex-shrink: 0;
+            box-shadow: 0 2px 16px rgba(15,23,42,0.25);
+        }
+        .topbar::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 2px;
+            background: linear-gradient(90deg, transparent 0%, #C9A84C 35%, #C9A84C 65%, transparent 100%);
+        }
+
+        /* ── izquierda ── */
+        .topbar-left { display: flex; align-items: center; gap: 0; }
+        .home-link {
+            display: flex; align-items: center; justify-content: center;
+            width: 36px; height: 36px; border-radius: 8px;
+            background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
+            color: rgba(255,255,255,0.6); text-decoration: none;
+            transition: background .18s, color .18s;
+            flex-shrink: 0; margin-right: 14px;
+        }
+        .home-link:hover { background: #C9A84C; color: #fff; border-color: #C9A84C; }
+        .home-link svg { width: 15px; height: 15px; fill: currentColor; }
+
+        .topbar-divider {
+            width: 1px; height: 28px;
+            background: rgba(255,255,255,0.12);
+            margin: 0 16px; flex-shrink: 0;
+        }
+        .topbar-brand { font-size: 0.95rem; font-weight: 900; color: #fff; letter-spacing: 0.5px; white-space: nowrap; }
+        .topbar-brand span { color: #C9A84C; }
+        .topbar-sub { font-size: 0.62rem; color: rgba(255,255,255,0.38); margin-top: 1px; letter-spacing: 0.2px; }
+
+        .project-badge {
+            display: inline-flex; align-items: center; gap: 7px;
+            background: rgba(201,168,76,0.13); border: 1px solid rgba(201,168,76,0.35);
+            color: #C9A84C; padding: 5px 14px; border-radius: 20px;
+            font-size: 0.73rem; font-weight: 700; letter-spacing: 0.2px;
+            white-space: nowrap;
+        }
+        .project-badge svg { width: 13px; height: 13px; fill: currentColor; flex-shrink: 0; }
+
+        /* ── derecha ── */
+        .topbar-right { display: flex; align-items: center; gap: 10px; }
+
+        .period-select {
+            appearance: none; -webkit-appearance: none;
+            background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.15);
+            color: rgba(255,255,255,0.75); padding: 5px 28px 5px 11px;
+            border-radius: 7px; font-size: 0.72rem; font-family: inherit;
+            font-weight: 600; outline: none; cursor: pointer;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='rgba(255,255,255,0.45)' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 9px center;
+            transition: border-color .18s, background-color .18s;
+        }
+        .period-select:hover { border-color: rgba(201,168,76,0.5); background-color: rgba(255,255,255,0.10); }
+        .period-select option { background: #0f172a; color: #fff; }
+
+        .btn-logout {
+            display: flex; align-items: center; gap: 6px;
+            background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3);
+            color: #f87171; padding: 5px 14px; border-radius: 7px;
+            font-size: 0.72rem; font-weight: 700; cursor: pointer;
+            font-family: inherit; transition: background .18s, border-color .18s, color .18s;
+        }
+        .btn-logout:hover { background: rgba(239,68,68,0.22); border-color: rgba(239,68,68,0.55); color: #fca5a5; }
+        .btn-logout svg { width: 13px; height: 13px; fill: currentColor; }
+
+        /* ── KPI CARDS ── */
+        @keyframes slideUp { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:translateY(0); } }
+        .kpi-row {
+            display: flex; gap: 12px; padding: 16px 22px;
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+        .kpi-card {
+            flex: 1; background: var(--surface);
+            border-radius: 14px; padding: 16px 18px 16px 22px;
+            display: flex; align-items: center; gap: 14px;
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 5px rgba(15,23,42,0.06);
+            transition: transform .28s cubic-bezier(.4,0,.2,1), box-shadow .28s cubic-bezier(.4,0,.2,1),
+                        background .22s, border-color .22s, opacity .22s, filter .22s;
+            animation: slideUp .5s ease both;
+            position: relative; overflow: hidden; cursor: default;
+        }
+        /* KPI interactivity */
+        .kpi-card[data-kpi]:not([data-kpi="ppto-sap"]) { cursor: pointer; }
+        .kpi-card[data-kpi="ppto-sap"] { cursor: default; }
+        .kpi-row.has-filter .kpi-card:not(.kpi-active) {
+            opacity: 0.42; filter: grayscale(25%);
+            transform: none !important;
+            box-shadow: 0 1px 3px rgba(15,23,42,0.04) !important;
+        }
+        .kpi-row.has-filter .kpi-card:not(.kpi-active):hover {
+            opacity: 0.65; transform: translateY(-2px) !important;
+        }
+        /* Active chip / filtro activo */
+        .kpi-active-chip {
+            display: none; align-items: center; gap: 8px;
+            padding: 5px 8px 5px 13px; border-radius: 20px;
+            font-size: 0.7rem; font-weight: 600; color: #fff;
+            width: fit-content; margin: 0 0 6px 2px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.14);
+            animation: slideUp .2s ease both;
+        }
+        .kpi-active-chip.visible { display: flex; }
+        .kpi-chip-x {
+            background: rgba(255,255,255,0.28); border: none; color: #fff;
+            width: 18px; height: 18px; border-radius: 50%; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.85rem; line-height: 1; padding: 0;
+            transition: background .15s; flex-shrink: 0;
+        }
+        .kpi-chip-x:hover { background: rgba(255,255,255,0.45); }
+        .kpi-card::after {
+            content: ''; position: absolute;
+            top: 0; left: 0; bottom: 0; width: 4px; border-radius: 14px 0 0 14px;
+        }
+        .kpi-card:nth-child(1) { animation-delay: .04s; }
+        .kpi-card:nth-child(1)::after { background: var(--c-ppto-sap); }
+        .kpi-card:nth-child(2) { animation-delay: .09s; }
+        .kpi-card:nth-child(2)::after { background: var(--c-ejecutado); }
+        .kpi-card:nth-child(3) { animation-delay: .14s; }
+        .kpi-card:nth-child(3)::after { background: var(--c-comprometido); }
+        .kpi-card:nth-child(4) { animation-delay: .19s; }
+        .kpi-card:nth-child(4)::after { background: var(--c-asignado); }
+        .kpi-card:nth-child(5) { animation-delay: .24s; }
+        .kpi-card:nth-child(5)::after { background: var(--c-disponible); }
+        .kpi-card:nth-child(6) { animation-delay: .29s; }
+        .kpi-card:nth-child(6)::after { background: var(--c-pct); }
+        .kpi-card:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(15,23,42,0.11); }
+        .kpi-card:hover .kpi-icon { transform: scale(1.1) rotate(-5deg); }
+        .kpi-icon {
+            width: 48px; height: 48px; border-radius: 13px;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+            transition: transform .28s cubic-bezier(.4,0,.2,1);
+        }
+        .kpi-icon svg { width: 23px; height: 23px; }
+        .kpi-texts { min-width: 0; }
+        .kpi-label { font-size: 0.6rem; color: var(--gray2); text-transform: uppercase; letter-spacing: 0.9px; margin-bottom: 4px; font-weight: 700; }
+        .kpi-value { font-size: 1.18rem; font-weight: 800; color: var(--navy); white-space: nowrap; }
+        .kpi-value span { font-size: 0.68rem; font-weight: 400; color: var(--gray2); }
+
+        /* ── TABLE ── */
+        /* --- FILTERS --- */
+        .filters-section {
+            position: relative;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 12px;
+            align-items: center;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 10px 18px 10px 22px;
+            flex-shrink: 0;
+        }
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(130px, 1fr));
+            gap: 8px;
+            align-items: center;
+            min-width: 0;
+        }
+        .filter-card {
+            position: relative;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            padding: 7px 10px;
+            border-radius: 10px;
+            min-width: 0;
+            transition: border-color .15s, box-shadow .15s;
+        }
+        .filter-card:focus-within,
+        .filter-card.open {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(14,165,233,0.1);
+            background: var(--surface);
+        }
+        .filter-header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 0 0 5px;
+        }
+        .filter-label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--gray);
+            font-size: 0.6rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            line-height: 1;
+            text-transform: uppercase;
+            margin: 0;
+        }
+        .filter-label svg { width: 12px; height: 12px; fill: currentColor; opacity: .65; flex-shrink: 0; }
+        .filter-clear-one {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            background: none;
+            border: none;
+            color: var(--gray2);
+            font-size: 0.55rem;
+            font-weight: 700;
+            font-family: inherit;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+            cursor: pointer;
+            padding: 2px 4px;
+            border-radius: 4px;
+            line-height: 1;
+            transition: color .15s, background .15s;
+            flex-shrink: 0;
+        }
+        .filter-clear-one:hover { color: var(--navy); background: var(--border); }
+        .filter-clear-one svg { width: 9px; height: 9px; fill: currentColor; flex-shrink: 0; }
+        .filter-select,
+        .filter-trigger {
+            appearance: none;
+            position: relative;
+            width: 100%;
+            height: 30px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--navy);
+            font: 600 0.78rem 'Inter', 'Segoe UI', sans-serif;
+            padding: 0 28px 0 8px;
+            outline: none;
+            cursor: pointer;
+            text-align: left;
+            border-radius: 7px;
+            transition: border-color .15s, box-shadow .15s;
+        }
+        .filter-trigger:hover { border-color: var(--blue); }
+        .filter-trigger:focus-visible { box-shadow: 0 0 0 3px rgba(14,165,233,0.12); }
+        .filter-select {
+            background-image: linear-gradient(45deg, transparent 50%, var(--gray) 50%), linear-gradient(135deg, var(--gray) 50%, transparent 50%);
+            background-position: calc(100% - 14px) 11px, calc(100% - 8px) 11px;
+            background-size: 6px 6px, 6px 6px;
+            background-repeat: no-repeat;
+        }
+        .filter-select option { background: #fff; color: var(--navy); }
+        .filter-trigger span:first-child {
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: var(--navy);
+        }
+        .filter-trigger::after {
+            content: '';
+            position: absolute;
+            right: 10px;
+            top: 8px;
+            width: 8px; height: 8px;
+            border-right: 2px solid var(--gray);
+            border-bottom: 2px solid var(--gray);
+            transform: rotate(45deg);
+            pointer-events: none;
+        }
+        .filter-menu {
+            display: none;
+            position: absolute;
+            z-index: 30;
+            left: 0; right: 0;
+            top: calc(100% + 4px);
+            max-height: 220px;
+            overflow: auto;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            box-shadow: 0 8px 24px rgba(15,23,42,0.12);
+            padding: 6px;
+        }
+        .filter-card.open .filter-menu { display: block; }
+        .filter-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 8px;
+            color: var(--navy);
+            font-size: 0.74rem;
+            cursor: pointer;
+            border-radius: 6px;
+        }
+        .filter-option:hover { background: var(--bg); }
+        .filter-option input { accent-color: var(--blue); }
+        .filter-option.select-all {
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 4px;
+            padding-bottom: 9px;
+            color: var(--navy2);
+            font-weight: 800;
+        }
+        .filter-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        /* ── Buscador ── */
+        .filter-search-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .fsw-icon {
+            position: absolute; left: 11px;
+            width: 15px; height: 15px;
+            fill: var(--gray2); pointer-events: none; flex-shrink: 0;
+            transition: fill .2s;
+        }
+        .filter-search-wrap:focus-within .fsw-icon { fill: var(--blue); }
+        .filter-search {
+            height: 36px; width: 240px;
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: 20px;
+            color: var(--navy);
+            font: 500 0.78rem 'Inter', 'Segoe UI', sans-serif;
+            padding: 0 34px 0 33px;
+            outline: none;
+            transition: border-color .2s, box-shadow .2s, width .3s cubic-bezier(.4,0,.2,1);
+        }
+        .filter-search:focus, .filter-search.has-value {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(14,165,233,0.12);
+            width: 290px;
+        }
+        .filter-search::placeholder { color: var(--gray2); }
+        .filter-search-clear-btn {
+            position: absolute; right: 9px;
+            width: 20px; height: 20px;
+            border: none; background: var(--bg); cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; padding: 0; flex-shrink: 0;
+            transition: background .15s;
+        }
+        .filter-search-clear-btn:hover { background: var(--border); }
+        .filter-search-clear-btn svg { width: 11px; height: 11px; fill: var(--gray); pointer-events: none; }
+        .filter-search-suggestions {
+            display: none;
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            box-shadow: 0 12px 36px rgba(15,23,42,0.15);
+            padding: 6px;
+            z-index: 40;
+            max-height: 300px;
+            overflow: auto;
+            min-width: 290px;
+        }
+        .filter-search-suggestions.visible { display: block; }
+        .fss-category {
+            font-size: 0.57rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.7px; color: var(--gray2);
+            padding: 8px 10px 3px; display: flex; align-items: center; gap: 6px;
+        }
+        .fss-cat-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+        .fss-item {
+            padding: 7px 10px; cursor: pointer; border-radius: 8px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .fss-item:hover, .fss-item.fss-selected { background: rgba(14,165,233,0.07); }
+        .fss-item-body { display: flex; flex-direction: column; gap: 1px; min-width: 0; flex: 1; }
+        .fss-item-main { font-size: 0.76rem; color: var(--navy); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .fss-item-main strong { color: var(--blue); font-weight: 700; }
+        .fss-item-path { font-size: 0.61rem; color: var(--gray2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .fss-item-badge { flex-shrink: 0; font-size: 0.55rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; padding: 2px 6px; border-radius: 4px; color: #fff; }
+        .fss-empty { padding: 14px; font-size: 0.72rem; color: var(--gray2); text-align: center; }
+        /* ── Botón limpiar ── */
+        .filter-clear {
+            height: 34px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--gray);
+            font: 700 0.72rem 'Inter', 'Segoe UI', sans-serif;
+            padding: 0 12px;
+            cursor: pointer;
+            border-radius: 8px;
+            white-space: nowrap;
+            transition: background .15s, border-color .15s, color .15s;
+        }
+        .filter-clear:hover { background: var(--navy); border-color: var(--navy); color: #fff; }
+        .filter-clear svg { width: 13px; height: 13px; fill: currentColor; flex-shrink: 0; }
+
+        .table-section { padding: 12px 22px 8px; flex-shrink: 0; overflow-x: auto; }
+        .section-label {
+            font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px;
+            color: var(--gray2); margin-bottom: 8px; font-weight: 700;
+        }
+        .table-wrap {
+            overflow-x: auto; border-radius: 12px;
+            border: 1px solid var(--border); background: var(--surface);
+            box-shadow: var(--shadow);
+        }
+        table { width: 100%; border-collapse: collapse; font-size: 0.73rem; }
+        thead tr { background: var(--bg); }
+        th {
+            padding: 10px 14px; text-align: right; font-weight: 700;
+            color: var(--navy2); white-space: nowrap;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        th:first-child { text-align: left; color: var(--gray); }
+        tbody tr { border-bottom: 1px solid var(--border); transition: background .15s; }
+        td { padding: 8px 14px; text-align: right; color: var(--gray); white-space: nowrap; }
+        td:first-child { text-align: left; color: var(--navy); font-weight: 500; }
+        .pct-asig { color: var(--c-pct); font-weight: 700; }
+        .pct-disp { color: var(--green); font-weight: 700; }
+        .pct-neg  { color: var(--red); font-weight: 700; }
+        tr.total-row { background: rgba(14,165,233,0.04) !important; border-top: 2px solid var(--blue); }
+        tr.total-row td { color: var(--navy); font-weight: 700; }
+
+        /* ── TREE TABLE ── */
+        @keyframes trFade { from { opacity:0; transform:translateY(-3px); } to { opacity:1; transform:translateY(0); } }
+        .tr-hidden { display: none; }
+        .tr-anim   { animation: trFade .22s ease both; }
+        /* Chevron */
+        .row-chev {
+            display: inline-block; font-style: normal;
+            width: 18px; height: 18px; line-height: 18px; text-align: center;
+            border-radius: 4px; background: var(--border); color: var(--gray);
+            margin-right: 7px; vertical-align: middle;
+            transition: transform .22s cubic-bezier(.4,0,.2,1), background .15s, color .15s;
+            user-select: none; font-size: 0.75rem; font-weight: 700; flex-shrink: 0;
+        }
+        .row-chev::before { content: '›'; }
+        .row-chev-ph { display: inline-block; width: 18px; margin-right: 7px; vertical-align: middle; }
+        .row-dot {
+            display: inline-block; width: 10px; height: 10px; border-radius: 50%;
+            margin-right: 7px; vertical-align: middle; flex-shrink: 0;
+        }
+        /* Level 1 — Área */
+        .tr-l1 { background: var(--surface) !important; }
+        .tr-l1.tr-expandable { cursor: pointer; }
+        .tr-l1.tr-expandable:hover td { background: rgba(14,165,233,0.03); }
+        .tr-l1.tr-expandable:hover .row-chev { background: rgba(14,165,233,0.14); color: var(--blue); }
+        .tr-l1.expanded .row-chev { transform: rotate(90deg); background: rgba(14,165,233,0.14); color: var(--blue); }
+        .td-l1 { font-weight: 600 !important; color: var(--navy) !important; }
+        /* Level 2 — Segmento */
+        .tr-l2 { background: #f8fafc !important; }
+        .tr-l2.tr-expandable { cursor: pointer; }
+        .tr-l2.tr-expandable:hover td { background: #f0f4f8 !important; }
+        .tr-l2.tr-expandable:hover .row-chev { background: rgba(14,165,233,0.14); color: var(--blue); }
+        .tr-l2.expanded .row-chev { transform: rotate(90deg); background: rgba(14,165,233,0.14); color: var(--blue); }
+        .td-l2 { padding-left: 30px !important; font-size: 0.71rem !important; color: var(--gray) !important; }
+        .tr-l2 td:not(:first-child) { color: var(--gray); font-size: 0.71rem; }
+        /* Level 3 — Etapa */
+        .tr-l3 { background: #f1f5f9 !important; }
+        .td-l3 { padding-left: 52px !important; font-size: 0.69rem !important; color: var(--gray2) !important; font-weight: 400 !important; }
+        .tr-l3 td:not(:first-child) { color: var(--gray2); font-size: 0.69rem; }
+        /* Search mode */
+        .search-lvl-badge {
+            display: inline-block;
+            background: rgba(14,165,233,0.12); color: var(--blue);
+            font-size: 0.54rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.5px; padding: 1px 6px; border-radius: 4px;
+            margin-right: 6px; vertical-align: middle;
+        }
+        .search-mode-notice {
+            display: flex; align-items: center; gap: 8px;
+            padding: 7px 14px; background: rgba(14,165,233,0.05);
+            border-bottom: 1px solid var(--border);
+            font-size: 0.68rem; color: var(--gray);
+        }
+        .search-mode-notice strong { color: var(--blue); }
+
+        /* ── TABLE + GAUGE SIDE BY SIDE ── */
+        .table-gauge-row {
+            display: flex; gap: 10px; padding: 0 22px 8px;
+            align-items: start; flex-shrink: 0;
+        }
+        .table-gauge-row .table-section { flex: 1; min-width: 0; padding: 12px 0 8px; }
+        .table-gauge-row .gauge-card { width: 210px; flex-shrink: 0; align-self: stretch; }
+
+        /* ── CHARTS ── */
+        .charts-row {
+            display: grid; grid-template-columns: 2fr 3fr;
+            gap: 10px; padding: 0 22px 16px;
+            flex-shrink: 0; align-items: stretch;
+        }
+        .gauge-card { align-self: start; }
+        /* ── AVANCE POR SEGMENTO (inline en charts-row) ── */
+        .segmento-card { display: flex; flex-direction: column; }
+        .segmento-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 8px; gap: 10px; flex-wrap: wrap; flex-shrink: 0;
+        }
+        .seg-legend { display: flex; gap: 14px; flex-wrap: wrap; }
+        .seg-legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.65rem; color: var(--gray); font-weight: 500; }
+        .seg-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+        .segmento-body {
+            position: relative; flex: 1; min-height: 0;
+            overflow-y: auto; max-height: 340px;
+        }
+        .segmento-body::-webkit-scrollbar { width: 6px; }
+        .segmento-body::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 3px; }
+        .segmento-body::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        .segmento-body::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        /* ── TENDENCIA POR FASE ── */
+        .tendencia-section { padding: 0 22px 16px; flex-shrink: 0; }
+        .tendencia-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 14px; gap: 12px; flex-wrap: wrap;
+        }
+        .tendencia-leyenda { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+        .tendencia-leyenda-item {
+            display: flex; align-items: center; gap: 6px;
+            background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 20px;
+            padding: 3px 10px 3px 8px;
+            font-size: 0.67rem; color: var(--gray); font-weight: 500;
+        }
+        .tendencia-leyenda-total { font-size: 0.72rem; font-weight: 800; }
+        .tendencia-dot { width: 22px; height: 3px; border-radius: 2px; flex-shrink: 0; }
+        .tendencia-metric-badge {
+            font-size: 0.62rem; font-weight: 700; color: var(--c-asignado);
+            background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.25);
+            border-radius: 4px; padding: 1px 6px; white-space: nowrap;
+        }
+        .tendencia-body { position: relative; height: 300px; }
+        .tendencia-toggle {
+            display: flex; gap: 0; flex-shrink: 0;
+            background: #f1f5f9; border-radius: 8px; padding: 2px;
+        }
+        .tendencia-btn {
+            padding: 3px 13px; border-radius: 6px; border: none;
+            background: transparent; color: #94a3b8; font-size: 0.67rem; font-weight: 600;
+            cursor: pointer; transition: background .15s, color .15s;
+        }
+        .tendencia-btn.active { background: #fff; color: #334155; box-shadow: 0 1px 3px rgba(15,23,42,0.1); }
+        .tendencia-btn:hover:not(.active) { color: #475569; }
+        .chart-card {
+            background: var(--surface); border-radius: 12px; padding: 14px;
+            border: 1px solid var(--border); box-shadow: var(--shadow);
+            display: flex; flex-direction: column; overflow: hidden;
+        }
+        .chart-card canvas { flex: 1; min-height: 0; }
+        .chart-title {
+            font-size: 0.63rem; text-transform: uppercase; letter-spacing: 0.8px;
+            color: var(--gray2); margin-bottom: 8px; font-weight: 700;
+        }
+        .gauge-wrap { position: relative; width: 100%; }
+        .gauge-overlay {
+            position: absolute; text-align: center;
+            top: 78%; left: 50%; transform: translate(-50%, -50%);
+            white-space: nowrap; z-index: 1; pointer-events: none;
+        }
+        .gauge-val { font-size: 1.45rem; font-weight: 900; color: var(--navy); line-height: 1; }
+        .gauge-sub { font-size: 0.58rem; color: var(--gray2); margin-top: 3px; letter-spacing: 0.5px; }
+        .gauge-stats { display: flex; justify-content: space-around; margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--border); }
+        .gstat { text-align: center; }
+        .gstat-val { font-size: 0.73rem; font-weight: 700; }
+        .gstat-lbl { font-size: 0.55rem; color: var(--gray2); }
+
+        /* ── FOOTER ── */
+        .footer-bar {
+            background: var(--surface); border-top: 1px solid var(--border);
+            padding: 7px 22px; font-size: 0.62rem;
+            display: flex; justify-content: space-between; flex-shrink: 0;
+            color: var(--gray2);
+        }
+        @media (max-width: 1350px) {
+            .filters-grid { grid-template-columns: repeat(3, minmax(130px, 1fr)); }
+        }
+        @media (max-width: 1100px) {
+            .filters-section { grid-template-columns: 1fr auto; }
+            .filters-grid { grid-template-columns: repeat(2, minmax(150px, 1fr)); }
+        }
+        @media (max-width: 720px) {
+            .filters-section { grid-template-columns: 1fr; padding: 12px; }
+            .filters-grid { grid-template-columns: 1fr; }
+            .filter-actions { justify-content: stretch; }
+            .filter-clear { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Main -->
+<div class="main">
+
+    <!-- Topbar -->
+    <div class="topbar">
+        <div class="topbar-left">
+            <a href="index.html" class="home-link" title="Ir a Inicio">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+            </a>
+            <div>
+                <div class="topbar-brand">Costos&<span>Presupuestos</span></div>
+                <div class="topbar-sub">Control Presupuestario de Obra</div>
+            </div>
+            <div class="topbar-divider"></div>
+            <div class="project-badge">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 6h-2.18c.07-.44.18-.86.18-1a3 3 0 0 0-6 0c0 .14.11.56.18 1H10c0-.6-.04-1-.1-1.38A3 3 0 0 0 4 5v1H2v14h20V6zm-10-.93a1 1 0 0 1 2 0c0 .34-.33 1.22-.54 1.88L11 7.67c-.21-.67-.54-1.55-.54-1.88-.02-.21.27-.72.54-.72zm8 12.93H6V8h2v1h8V8h2v10z"/></svg>
+                <span id="project-title">Proyecto</span>
+            </div>
+        </div>
+        <div class="topbar-right">
+            <select class="period-select">
+                <option>Periodo: 2026</option>
+            </select>
+            <button class="btn-logout" id="btn-logout">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5-5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
+                Salir
+            </button>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-section">
+        <div class="filters-grid">
+            <div class="filter-card" id="area-filter-card">
+                <div class="filter-header-row">
+                    <label class="filter-label"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>Área</label>
+                    <button class="filter-clear-one" type="button" data-clear-filter="areas" title="Limpiar"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>Borrar</button>
+                </div>
+                <button class="filter-trigger" type="button" id="filter-area-button"><span id="filter-area-label">Todas</span></button>
+                <div class="filter-menu" id="filter-area-menu"></div>
+            </div>
+            <div class="filter-card" id="segmento-filter-card">
+                <div class="filter-header-row">
+                    <label class="filter-label"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 4l5 2.18V11c0 3.5-2.33 6.79-5 7.93-2.67-1.14-5-4.43-5-7.93V7.18L12 5z"/></svg>Segmento</label>
+                    <button class="filter-clear-one" type="button" data-clear-filter="segmentos" title="Limpiar"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>Borrar</button>
+                </div>
+                <button class="filter-trigger" type="button" id="filter-segmento-button"><span id="filter-segmento-label">Todos</span></button>
+                <div class="filter-menu" id="filter-segmento-menu"></div>
+            </div>
+            <div class="filter-card" id="etapa-filter-card">
+                <div class="filter-header-row">
+                    <label class="filter-label"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>Etapa</label>
+                    <button class="filter-clear-one" type="button" data-clear-filter="etapas" title="Limpiar"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>Borrar</button>
+                </div>
+                <button class="filter-trigger" type="button" id="filter-etapa-button"><span id="filter-etapa-label">Todas</span></button>
+                <div class="filter-menu" id="filter-etapa-menu"></div>
+            </div>
+            <div class="filter-card" id="fase-filter-card">
+                <div class="filter-header-row">
+                    <label class="filter-label"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>Fase</label>
+                    <button class="filter-clear-one" type="button" data-clear-filter="fases" title="Limpiar"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>Borrar</button>
+                </div>
+                <button class="filter-trigger" type="button" id="filter-fase-button"><span id="filter-fase-label">Todas</span></button>
+                <div class="filter-menu" id="filter-fase-menu"></div>
+            </div>
+            <div class="filter-card" id="mes-filter-card">
+                <div class="filter-header-row">
+                    <label class="filter-label"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13z"/></svg>Meses</label>
+                    <button class="filter-clear-one" type="button" data-clear-filter="meses" title="Limpiar"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>Borrar</button>
+                </div>
+                <button class="filter-trigger" type="button" id="filter-mes-button"><span id="filter-mes-label">Todos</span></button>
+                <div class="filter-menu" id="filter-mes-menu"></div>
+            </div>
+        </div>
+        <div class="filter-actions">
+            <div class="filter-search-wrap">
+                <svg class="fsw-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                <input class="filter-search" type="text" id="filter-search" placeholder="Buscar área, segmento, etapa..." autocomplete="off">
+                <button class="filter-search-clear-btn" id="filter-search-clear-btn" type="button" title="Limpiar búsqueda" style="display:none">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                </button>
+                <div class="filter-search-suggestions" id="filter-search-suggestions"></div>
+            </div>
+            <button class="filter-clear" type="button" id="filter-clear">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 5V2L7 7l5 5V9c2.76 0 5 2.24 5 5a5 5 0 0 1-8.66 3.39l-1.42 1.42A7 7 0 1 0 12 5z"/></svg>
+                Limpiar
+            </button>
+        </div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="kpi-active-chip" id="kpi-active-chip">
+        <span id="kpi-chip-lbl"></span>
+        <button class="kpi-chip-x" id="kpi-chip-clear" title="Quitar filtro">×</button>
+    </div>
+    <div class="kpi-row">
+        <div class="kpi-card" data-kpi="ppto-sap">
+            <div class="kpi-icon" style="background:rgba(14,165,233,0.2)">
+                <svg viewBox="0 0 24 24" fill="#0ea5e9"><path d="M21 18v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v1h-9a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h9zm-9-2h10V8H12v8zm4-2.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/></svg>
+            </div>
+            <div class="kpi-texts">
+                <div class="kpi-label">Presupuesto SAP</div>
+                <div class="kpi-value" id="kpi-rdi">162.08 <span>mill.</span></div>
+            </div>
+        </div>
+        <div class="kpi-card" data-kpi="ejecutado">
+            <div class="kpi-icon" style="background:rgba(59,91,219,0.15)">
+                <svg viewBox="0 0 24 24" fill="#3b5bdb"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg>
+            </div>
+            <div class="kpi-texts">
+                <div class="kpi-label">Ejecutado</div>
+                <div class="kpi-value" id="kpi-ejecutado">-- <span>mill.</span></div>
+            </div>
+        </div>
+        <div class="kpi-card" data-kpi="comprometido">
+            <div class="kpi-icon" style="background:rgba(245,158,11,0.2)">
+                <svg viewBox="0 0 24 24" fill="#f59e0b"><path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 0 0 1.946-.806 3.42 3.42 0 0 1 4.438 0 3.42 3.42 0 0 0 1.946.806 3.42 3.42 0 0 1 3.138 3.138 3.42 3.42 0 0 0 .806 1.946 3.42 3.42 0 0 1 0 4.438 3.42 3.42 0 0 0-.806 1.946 3.42 3.42 0 0 1-3.138 3.138 3.42 3.42 0 0 0-1.946.806 3.42 3.42 0 0 1-4.438 0 3.42 3.42 0 0 0-1.946-.806 3.42 3.42 0 0 1-3.138-3.138 3.42 3.42 0 0 0-.806-1.946 3.42 3.42 0 0 1 0-4.438 3.42 3.42 0 0 0 .806-1.946 3.42 3.42 0 0 1 3.138-3.138z" stroke="#f59e0b" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M9 12l2 2 4-4" stroke="#f59e0b" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="kpi-texts">
+                <div class="kpi-label">Comprometido</div>
+                <div class="kpi-value" id="kpi-comprometido">19.95 <span>mill.</span></div>
+            </div>
+        </div>
+        <div class="kpi-card" data-kpi="asignado">
+            <div class="kpi-icon" style="background:rgba(16,185,129,0.2)">
+                <svg viewBox="0 0 24 24" fill="#10b981"><path d="M11 2a9 9 0 1 0 9 9h-9V2zm2 0v9h9a9 9 0 0 0-9-9z"/></svg>
+            </div>
+            <div class="kpi-texts">
+                <div class="kpi-label">Asignado</div>
+                <div class="kpi-value" id="kpi-asignado">149.33 <span>mill.</span></div>
+            </div>
+        </div>
+        <div class="kpi-card" data-kpi="disponible">
+            <div class="kpi-icon" style="background:rgba(100,116,139,0.15)">
+                <svg viewBox="0 0 24 24" fill="#64748b"><path d="M2 7a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7zm2 0v10h16V7H4zm2 3h4v2H6v-2zm0 4h4v2H6v-2zm6-4h6v2h-6v-2z"/></svg>
+            </div>
+            <div class="kpi-texts">
+                <div class="kpi-label">Disponible</div>
+                <div class="kpi-value" id="kpi-disponible">13.06 <span>mill.</span></div>
+            </div>
+        </div>
+        <div class="kpi-card" data-kpi="pct-asignado" style="cursor:default">
+            <div class="kpi-icon" style="background:rgba(6,182,212,0.15)">
+                <svg viewBox="0 0 24 24" fill="#06b6d4"><path d="M11 2a9 9 0 1 0 9 9h-9V2zm2 0v9h9a9 9 0 0 0-9-9z"/></svg>
+            </div>
+            <div class="kpi-texts">
+                <div class="kpi-label">% Asignado</div>
+                <div class="kpi-value" id="kpi-pct-asignado">-- <span>%</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table + Gauge -->
+    <div class="table-gauge-row">
+        <div class="table-section">
+            <div class="section-label">Resumen por Área</div>
+            <div class="search-mode-notice" id="search-mode-notice" style="display:none"></div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Área</th><th>Presupuesto SAP</th><th>Ejecutado</th>
+                            <th>Comprometido</th><th>Asignado</th><th>Disponible</th>
+                            <th>% Asignado</th><th>% Disponible</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resumen-area-body">
+                        <tr><td>Construcción</td><td>120,477,476.11</td><td>123,454,431.78</td><td>98,168,770.89</td><td>16,540,708.91</td><td>114,709,479.80</td><td>8,744,951.98</td><td class="pct-asig">92.92%</td><td class="pct-disp">7.08%</td></tr>
+                        <tr><td>Urbanización</td><td>29,837,668.62</td><td>29,939,366.88</td><td>25,195,463.25</td><td>1,984,100.25</td><td>27,179,563.50</td><td>2,759,803.38</td><td class="pct-asig">90.79%</td><td class="pct-disp">9.21%</td></tr>
+                        <tr><td>I.7a Construcción</td><td>4,122,589.34</td><td>2,840,245.67</td><td>1,950,423.18</td><td>441,209.56</td><td>2,391,632.74</td><td>448,612.93</td><td class="pct-asig">84.20%</td><td class="pct-disp">15.80%</td></tr>
+                        <tr><td>I.7a Urbanización</td><td>2,358,147.25</td><td>1,640,198.45</td><td>1,278,456.83</td><td>218,643.21</td><td>1,497,100.04</td><td>143,098.41</td><td class="pct-asig">91.28%</td><td class="pct-disp">8.72%</td></tr>
+                        <tr><td>I.7a Infraestructura</td><td>1,036,089.81</td><td>299,982.34</td><td>584,814.64</td><td>165,579.51</td><td>750,394.15</td><td>-450,411.81</td><td class="pct-asig">250.15%</td><td class="pct-neg">-150.15%</td></tr>
+                        <tr><td>Megaproyecto Urbanización</td><td>1,000,000.00</td><td>980,000.00</td><td>789,234.56</td><td>140,000.00</td><td>929,234.56</td><td>50,765.44</td><td class="pct-asig">94.82%</td><td class="pct-disp">5.18%</td></tr>
+                        <tr><td>Megaproyecto Infraestructura</td><td>3,245,344.76</td><td>3,129,066.57</td><td>1,402,996.62</td><td>464,803.01</td><td>1,867,799.63</td><td>1,261,266.94</td><td class="pct-asig">59.69%</td><td class="pct-disp">40.31%</td></tr>
+                        <tr class="total-row"><td>Total</td><td>162,077,315.89</td><td>162,283,291.69</td><td>129,370,159.97</td><td>19,955,044.45</td><td>149,325,204.42</td><td>13,064,142.32</td><td class="pct-asig">91.98%</td><td class="pct-disp">8.04%</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="chart-card gauge-card">
+            <div class="chart-title">Avance General</div>
+            <div class="gauge-wrap">
+                <canvas id="gaugeChart"></canvas>
+                <div class="gauge-overlay">
+                    <div class="gauge-val" id="gauge-pct" style="color:var(--c-pct)">--%</div>
+                    <div class="gauge-sub">Asignado</div>
+                </div>
+            </div>
+            <div class="gauge-stats">
+                <div class="gstat"><div class="gstat-val" id="gauge-ppto" style="color:var(--c-ppto-sap)">--M</div><div class="gstat-lbl">Presupuesto SAP</div></div>
+                <div class="gstat"><div class="gstat-val" id="gauge-asignado" style="color:var(--c-asignado)">--M</div><div class="gstat-lbl">Asignado</div></div>
+                <div class="gstat"><div class="gstat-val" id="gauge-disponible" style="color:#64748b">--M</div><div class="gstat-lbl">Disponible</div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="charts-row">
+        <div class="chart-card eac-card">
+            <div class="eac-header">
+                <span class="chart-title" style="margin:0">Control de Ejecución por Área</span>
+                <div class="eac-legend">
+                    <span class="eac-legend-item"><span class="eac-dot eac-dot-ej"></span>Ejecutado</span>
+                    <span class="eac-legend-item"><span class="eac-dot eac-dot-comp"></span>Comprometido</span>
+                    <span class="eac-legend-item"><span class="eac-dot eac-dot-asig"></span>Asignado</span>
+                    <span class="eac-legend-item"><span class="eac-dot eac-dot-disp"></span>Disponible</span>
+                </div>
+                <span class="eac-pct-header">% Ejecución</span>
+            </div>
+            <div id="eac-rows" class="eac-rows"></div>
+        </div>
+
+        <div class="chart-card segmento-card">
+            <div class="segmento-header">
+                <span class="chart-title" style="margin:0">Avance por Segmento</span>
+                <div class="seg-legend">
+                    <span class="seg-legend-item"><span class="seg-dot" style="background:#10b981"></span>Asignado</span>
+                    <span class="seg-legend-item"><span class="seg-dot" style="background:#cbd5e1;border:1.5px solid #94a3b8"></span>Disponible (Presupuesto SAP)</span>
+                </div>
+            </div>
+            <div class="segmento-body" id="segmento-body">
+                <canvas id="faseChart"></canvas>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Tendencia por Fase -->
+    <div class="tendencia-section">
+        <div class="chart-card">
+            <div class="tendencia-header">
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="chart-title" style="margin:0" id="tendencia-title">Tendencia de Ejecución por Fase</span>
+                    <span class="tendencia-metric-badge">Asignado</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+                    <div class="tendencia-toggle" id="tendencia-toggle">
+                        <button class="tendencia-btn active" data-dim="Rubros[Fase]">Fase</button>
+                        <button class="tendencia-btn" data-dim="Rubros[Area]">Área</button>
+                    </div>
+                    <div class="tendencia-leyenda" id="tendencia-leyenda"></div>
+                </div>
+            </div>
+            <div class="tendencia-body">
+                <canvas id="tendenciaChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer-bar">
+        <span id="footer-project">Control Presupuestario de Obra</span>
+        <span id="powerbi-updated">Actualizado: 2026</span>
+    </div>
+
+</div><!-- /main -->
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('footer-project').textContent =
+            `${PROJECT_NAME} — Control Presupuestario de Obra`;
+    });
+
+    // Chart defaults: ajustados para tema claro
+    Chart.defaults.color = '#64748b';
+    Chart.defaults.borderColor = '#e2e8f0';
+
+    const C = {
+        blue:   '#0ea5e9',
+        orange: '#f97316',
+        amber:  '#f59e0b',
+        green:  '#10b981',
+        red:    '#ef4444',
+        purple: '#8b5cf6',
+        bg:     '#f0f4f8'
+    };
+
+    const AREA_DISPLAY_NAMES = {};
+    const displayName = value => AREA_DISPLAY_NAMES[String(value ?? '').toUpperCase().trim()] || value;
+
+    const AREA_CONFIG = {
+        'CONSTRUCCIÓN': {
+            color: '#0ea5e9', bg: 'rgba(14,165,233,0.13)',
+            icon: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 15h-2v-4h-4V9h4V5h-4V3H7v2H3v4h4v2H3v4H1v2h22v-2h-2zM9 5h6v2H9V5zM5 7h2v2H5V7zm4 4h6v4H9v-4zm8 4v-2h2v2h-2z"/></svg>`
+        },
+        'URBANIZACIÓN': {
+            color: '#10b981', bg: 'rgba(16,185,129,0.13)',
+            icon: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>`
+        }
+    };
+    const DEFAULT_AREA_CFG = { color: '#64748b', bg: 'rgba(100,116,139,0.13)',
+        icon: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3L2 12h3v8h6v-5h2v5h6v-8h3z"/></svg>`
+    };
+
+    function renderEjecucionArea(areaRows) {
+        const container = document.getElementById('eac-rows');
+        if (!container) return;
+        if (!areaRows || !areaRows.length) {
+            container.innerHTML = '<div style="color:var(--gray2);font-size:0.8rem;text-align:center;padding:20px">Sin datos</div>';
+            return;
+        }
+        const fmt = v => (v / 1e6).toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + 'M';
+        container.innerHTML = areaRows.map(row => {
+            const rawName = String(row.label || dimension(row, 'Rubros[Area]') || '').toUpperCase().trim();
+            const label = displayName(rawName) || rawName;
+            const cfg = AREA_CONFIG[rawName] || DEFAULT_AREA_CFG;
+            const rdi        = asNumber(rowMetric(row, 'RdiTotal'));
+            const ejecutado  = asNumber(rowMetric(row, 'EjecutadoErequester'));
+            const comprom    = asNumber(rowMetric(row, 'ComprometidoErequester'));
+            const asignado   = asNumber(rowMetric(row, 'AsignadoErequester'));
+            const disponible = asNumber(rowMetric(row, 'DisponibleErequester'));
+            const pctAsig   = asNumber(rowMetric(row, 'PorcentajeAsignado'));
+            const pctText   = (pctAsig * 100).toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            const ejPct     = rdi > 0 ? Math.min(100, (ejecutado / rdi) * 100) : 0;
+            const compPct   = rdi > 0 ? Math.min(100 - ejPct, (comprom  / rdi) * 100) : 0;
+            const asigPct   = rdi > 0 ? Math.min(100, (asignado / rdi) * 100) : 0;
+            const seg = (pct, cls, val) => pct > 0
+                ? `<div class="eac-seg ${cls}" style="width:${pct.toFixed(2)}%"><span class="eac-seg-lbl">${pct >= 9 ? fmt(val) : ''}</span></div>`
+                : '';
+            const badgeLeft = (ejPct + compPct / 2).toFixed(2);
+            const showBadge = compPct > 0 && compPct < 9;
+            // Clamp label center so it never overflows the bar area
+            const asigLabelLeft = Math.max(6, Math.min(94, asigPct / 2)).toFixed(2);
+            return `
+            <div class="eac-row" data-area="${rawName}">
+                <div class="eac-area">
+                    <div class="eac-icon-wrap" style="background:${cfg.bg};color:${cfg.color}">${cfg.icon}</div>
+                    <span class="eac-name">${escapeHtml(label)}</span>
+                </div>
+                <div class="eac-bar-outer">
+                    ${showBadge ? `<div class="eac-comp-badge" style="left:${badgeLeft}%">${fmt(comprom)}</div>` : ''}
+                    <div class="eac-bar-track">
+                        ${seg(ejPct,   'eac-seg-ej',   ejecutado)}
+                        ${seg(compPct, 'eac-seg-comp', comprom)}
+                        <div class="eac-seg eac-seg-disp"><span class="eac-seg-lbl">${fmt(disponible)}</span></div>
+                    </div>
+                    <div class="eac-asig-wrap">
+                        <div class="eac-asig-bracket" style="width:${asigPct.toFixed(2)}%"></div>
+                        <div class="eac-asig-val" style="left:${asigLabelLeft}%">${fmt(asignado)}</div>
+                    </div>
+                </div>
+                <div class="eac-pct-col">
+                    <span class="eac-pct-val">${pctText}%</span>
+                    <span class="eac-pct-of">de ${fmt(rdi)}</span>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    const DIMENSION_ALIASES = {
+        'Rubros[Area]':     ['Rubros[Area]',     'dimSegmentación[Area]',     'Segmentación[Area]',     'Area'],
+        'Rubros[Segmento]': ['Rubros[Segmento]', 'dimSegmentación[Segmento]', 'Segmentación[Segmento]', 'Segmento'],
+        'Rubros[Etapa]':    ['Rubros[Etapa]',    'dimSegmentación[Etapa]',    'Segmentación[Etapa]',    'Etapa'],
+        'Rubros[Fase]':     ['Rubros[Fase]',     'dimFase[Fase]',             'Fase[Fase]',             'Fase'],
+        'Calendario[MesA]': ['Calendario[MesA]', 'MesA', 'Mes']
+    };
+    const field = (row, name) => row?.[`[${name}]`] ?? row?.[name] ?? 0;
+    const dimension = (row, name) => {
+        const aliases = DIMENSION_ALIASES[name] || [name];
+        for (const alias of aliases) {
+            if (row?.[alias] !== undefined && row?.[alias] !== null) return row[alias];
+        }
+        return '';
+    };
+    const toMillions = value => Number(value || 0) / 1000000;
+    const fmtMillions = value => `${toMillions(value).toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span>mill.</span>`;
+    const fmtMillionsText = value => `${toMillions(value).toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}M`;
+    const fmtMoney = value => Number(value || 0).toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const fmtPct = value => `${(Number(value || 0) * 100).toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%`;
+    const setHtml = (id, html) => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = html;
+    };
+    const setText = (id, text) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = text;
+    };
+
+    // Gauge
+    let gaugeRdiLabel = '--';
+
+    const gaugeNeedlePlugin = {
+        id: 'gaugeNeedle',
+        afterDatasetsDraw(chart) {
+            const meta = chart.getDatasetMeta(0);
+            if (!meta?.data?.length) return;
+            const arc  = meta.data[0];
+            const { ctx } = chart;
+            const cx = arc.x, cy = arc.y;
+            const outerR = arc.outerRadius;
+            // Endpoint labels only
+            const fs = Math.max(7, Math.round(outerR * 0.13));
+            ctx.save();
+            ctx.font = `600 ${fs}px system-ui,sans-serif`;
+            ctx.fillStyle = '#94a3b8';
+            ctx.textAlign = 'right'; ctx.textBaseline = 'top';
+            ctx.fillText('0%', cx - outerR + 2, cy + 4);
+            ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+            ctx.fillText('100%', cx + outerR - 2, cy + 4);
+            ctx.restore();
+        }
+    };
+
+    const gaugeChart = new Chart(document.getElementById('gaugeChart'), {
+        type: 'doughnut',
+        plugins: [gaugeNeedlePlugin],
+        data: {
+            datasets: [{ data:[36.78, 63.22], backgroundColor:['#10b981','#cbd5e1'], borderWidth:0 }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: true, aspectRatio: 2,
+            cutout: '65%', rotation: -90, circumference: 180,
+            animation: { duration: 800, easing: 'easeInOutQuart' },
+            plugins: { legend: { display: false }, tooltip: { enabled: false } }
+        }
+    });
+
+    // Avance por Segmento — barras apiladas (Asignado + Disponible = Presupuesto SAP)
+    const segBarLabelPlugin = {
+        id: 'segBarLabel',
+        afterDatasetsDraw(chart) {
+            const ctx  = chart.ctx;
+            const area = chart.chartArea;
+            const asigData = chart.data.datasets[0]?.data || [];
+            const dispData = chart.data.datasets[1]?.data || [];
+            const fmt = v => v >= 1 ? `${v.toFixed(1)}M` : `${Math.round(v * 1000)}K`;
+
+            // Dataset 0: Asignado (verde)
+            const meta0 = chart.getDatasetMeta(0);
+            if (!meta0.hidden) {
+                meta0.data.forEach((bar, i) => {
+                    const asig  = asigData[i] || 0;
+                    const total = asig + (dispData[i] || 0);
+                    if (asig < 0.001) return;
+                    const pct    = total > 0 ? Math.round(asig / total * 100) : 0;
+                    const segW   = bar.x - (bar.base ?? area.left);
+                    const segMid = (bar.x + (bar.base ?? area.left)) / 2;
+
+                    ctx.save();
+                    ctx.font = '700 10px Inter,sans-serif';
+                    const fullLbl  = `${fmt(asig)} · ${pct}%`;
+                    const shortLbl = `${pct}%`;
+
+                    if (segW >= ctx.measureText(fullLbl).width + 14) {
+                        ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                        ctx.fillText(fullLbl, segMid, bar.y);
+                    } else if (segW >= ctx.measureText(shortLbl).width + 10) {
+                        ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                        ctx.fillText(shortLbl, segMid, bar.y);
+                    } else {
+                        // Barra muy pequeña: label fuera con punto de anclaje
+                        const xOut = bar.x + 6;
+                        if (xOut + ctx.measureText(shortLbl).width + 4 <= area.right + 60) {
+                            ctx.fillStyle = '#059669'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+                            ctx.beginPath();
+                            ctx.arc(bar.x + 3, bar.y, 2.5, 0, Math.PI * 2);
+                            ctx.fillStyle = '#059669'; ctx.fill();
+                            ctx.fillStyle = '#059669'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+                            ctx.fillText(shortLbl, xOut + 4, bar.y);
+                        }
+                    }
+                    ctx.restore();
+                });
+            }
+
+            // Dataset 1: Disponible — total al final del bar
+            const meta1 = chart.getDatasetMeta(1);
+            if (!meta1.hidden) {
+                meta1.data.forEach((bar, i) => {
+                    const asig  = asigData[i] || 0;
+                    const total = asig + (dispData[i] || 0);
+                    if (total < 0.001) return;
+                    const lbl = fmt(total);
+                    ctx.save();
+                    ctx.font = '500 9px Inter,sans-serif';
+                    ctx.fillStyle = '#64748b';
+                    ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+                    ctx.fillText(lbl, bar.x + 5, bar.y);
+                    ctx.restore();
+                });
+            }
+        }
+    };
+
+    const areaChart = new Chart(document.getElementById('faseChart'), {
+        type: 'bar',
+        plugins: [segBarLabelPlugin],
+        data: {
+            labels: [],
+            datasets: [
+                { label: 'Asignado',   data: [], backgroundColor: '#10b981', borderWidth: 0, borderRadius: { topRight: 0, bottomRight: 0 }, borderSkipped: false, stack: 'budget', barThickness: 24 },
+                { label: 'Disponible', data: [], backgroundColor: '#e2e8f0', borderWidth: 0, borderRadius: { topRight: 4, bottomRight: 4 }, borderSkipped: false, stack: 'budget', barThickness: 24 }
+            ]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true, maintainAspectRatio: false,
+            layout: { padding: { right: 60, top: 6, bottom: 6, left: 0 } },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => {
+                            const v    = ctx.parsed.x;
+                            const fmtT = n => n >= 1 ? n.toFixed(2)+'M' : Math.round(n*1000)+'K';
+                            const asig  = ctx.chart.data.datasets[0]?.data[ctx.dataIndex] || 0;
+                            const total = asig + (ctx.chart.data.datasets[1]?.data[ctx.dataIndex] || 0);
+                            if (ctx.datasetIndex === 0) {
+                                const pct = total > 0 ? (asig/total*100).toFixed(1) : 0;
+                                return ` Asignado: ${fmtT(v)} (${pct}%)`;
+                            }
+                            return ` Presupuesto SAP: ${fmtT(total)}  |  Disponible: ${fmtT(v)}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    stacked: true, type: 'logarithmic',
+                    min: 0.01,
+                    grid: { color: '#f1f5f9' },
+                    ticks: {
+                        font: { size: 9 }, color: '#94a3b8',
+                        callback: v => {
+                            const targets = [0.1, 0.5, 1, 2, 5, 10, 20, 50, 100];
+                            if (targets.some(t => Math.abs(v - t) < 0.001)) {
+                                return v >= 1 ? `${v}M` : `${Math.round(v*1000)}K`;
+                            }
+                            return '';
+                        }
+                    }
+                },
+                y: {
+                    stacked: true,
+                    grid: { display: false },
+                    afterFit(axis) { axis.width = 170; },
+                    ticks: {
+                        font: { size: 9.5, weight: '600' }, color: '#334155',
+                        callback: function(val) { return this.getLabelForValue(val); }
+                    }
+                }
+            }
+        }
+    });
+
+    const METRIC_NAMES = [
+        'RdiTotal',
+        'PresupuestoErequester',
+        'EjecutadoErequester',
+        'ComprometidoErequester',
+        'AsignadoErequester',
+        'DisponibleErequester'
+    ];
+    const BUDGET_METRIC_NAMES = ['RdiTotal', 'PresupuestoErequester'];
+    const FLOW_METRIC_NAMES = ['EjecutadoErequester', 'ComprometidoErequester', 'AsignadoErequester'];
+    const BUDGET_KEY_DIMENSIONS = ['Rubros[Area]', 'Rubros[Segmento]', 'Rubros[Etapa]', 'Rubros[Fase]'];
+    const MONTH_ORDER = { ene: 0, feb: 1, mar: 2, abr: 3, may: 4, jun: 5, jul: 6, ago: 7, sep: 8, oct: 9, nov: 10, dic: 11 };
+    const powerBIState = {
+        data: null,
+        filters: { areas: [], segmentos: [], etapas: [], fases: [], meses: [] },
+        options: { areas: [], segmentos: [], etapas: [], fases: [], meses: [] },
+        bound: false
+    };
+    const FILTER_CONFIG = [
+        { key: 'areas',     optionKey: 'areas',     dimensionName: 'Rubros[Area]',        fallbackDataset: 'porArea',       cardId: 'area-filter-card',    buttonId: 'filter-area-button',    menuId: 'filter-area-menu',    labelId: 'filter-area-label' },
+        { key: 'segmentos', optionKey: 'segmentos', dimensionName: 'Rubros[Segmento]',    fallbackDataset: 'porSegmento',   cardId: 'segmento-filter-card', buttonId: 'filter-segmento-button', menuId: 'filter-segmento-menu', labelId: 'filter-segmento-label' },
+        { key: 'etapas',    optionKey: 'etapas',    dimensionName: 'Rubros[Etapa]',       fallbackDataset: 'porArea',       cardId: 'etapa-filter-card',   buttonId: 'filter-etapa-button',   menuId: 'filter-etapa-menu',   labelId: 'filter-etapa-label' },
+        { key: 'fases',     optionKey: 'fases',     dimensionName: 'Rubros[Fase]',        fallbackDataset: 'porFase',       cardId: 'fase-filter-card',    buttonId: 'filter-fase-button',    menuId: 'filter-fase-menu',    labelId: 'filter-fase-label' },
+        { key: 'meses',     optionKey: 'meses',     dimensionName: 'Calendario[MesA]',    fallbackDataset: 'porMesResumen', cardId: 'mes-filter-card',     buttonId: 'filter-mes-button',     menuId: 'filter-mes-menu',     labelId: 'filter-mes-label' }
+    ];
+
+    const asNumber = value => Number(value || 0);
+    const cleanDimension = value => String(value || '').trim() || 'Sin clasificar';
+    const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+    }[char]));
+    const rawDimension = (row, name) => String(dimension(row, name) ?? '').trim();
+    const filterDimension = (row, config) => rawDimension(row, config.dimensionName);
+    const uniqueSorted = values => [...new Set(values.map(cleanDimension).filter(Boolean))]
+        .sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base', numeric: true }));
+    const uniqueNonBlankSorted = values => [...new Set(values.map(value => String(value ?? '').trim()).filter(Boolean))]
+        .sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base', numeric: true }));
+    const parseMonthKey = value => {
+        const match = String(value || '').trim().toLowerCase().match(/^([a-z]{3})\s+(\d{2})$/);
+        if (!match) return { year: 0, month: 0 };
+        return { year: Number(`20${match[2]}`), month: MONTH_ORDER[match[1]] ?? 0 };
+    };
+    const sortMonths = values => uniqueSorted(values).sort((a, b) => {
+        const ma = parseMonthKey(a);
+        const mb = parseMonthKey(b);
+        return (ma.year - mb.year) || (ma.month - mb.month) || a.localeCompare(b);
+    });
+    const makeEmptyMetrics = () => METRIC_NAMES.reduce((acc, name) => {
+        acc[name] = 0;
+        return acc;
+    }, { PorcentajeAsignado: 0, PorcentajeDisponible: 0 });
+    const finalizeMetrics = metrics => {
+        const ppto = asNumber(metrics.PresupuestoErequester);
+        metrics.PorcentajeAsignado = ppto ? asNumber(metrics.AsignadoErequester) / ppto : 0;
+        metrics.PorcentajeDisponible = ppto ? asNumber(metrics.DisponibleErequester) / ppto : 0;
+        return metrics;
+    };
+    const metricFromRow = row => finalizeMetrics(METRIC_NAMES.reduce((acc, name) => {
+        acc[name] = field(row, name);
+        return acc;
+    }, makeEmptyMetrics()));
+    const sumRows = rows => finalizeMetrics(rows.reduce((acc, row) => {
+        METRIC_NAMES.forEach(name => { acc[name] += field(row, name); });
+        return acc;
+    }, makeEmptyMetrics()));
+    const budgetKey = row => BUDGET_KEY_DIMENSIONS.map(name => cleanDimension(dimension(row, name))).join('|');
+    const finalizeDetailMetrics = metrics => {
+        metrics.DisponibleErequester = asNumber(metrics.PresupuestoErequester) - asNumber(metrics.AsignadoErequester);
+        return finalizeMetrics(metrics);
+    };
+    const addDetailMetrics = (metrics, row, seenBudgetKeys) => {
+        const key = budgetKey(row);
+        if (!seenBudgetKeys.has(key)) {
+            BUDGET_METRIC_NAMES.forEach(name => { metrics[name] += field(row, name); });
+            seenBudgetKeys.add(key);
+        }
+        FLOW_METRIC_NAMES.forEach(name => { metrics[name] += field(row, name); });
+    };
+    const aggregateDetailRows = rows => {
+        const metrics = makeEmptyMetrics();
+        const seenBudgetKeys = new Set();
+        rows.forEach(row => addDetailMetrics(metrics, row, seenBudgetKeys));
+        return finalizeDetailMetrics(metrics);
+    };
+    const groupRowsBy = (rows, dimensionName) => {
+        const groups = new Map();
+        rows.forEach(row => {
+            const key = cleanDimension(dimension(row, dimensionName));
+            if (!groups.has(key)) groups.set(key, { label: key, metrics: makeEmptyMetrics(), seenBudgetKeys: new Set() });
+            const current = groups.get(key);
+            addDetailMetrics(current.metrics, row, current.seenBudgetKeys);
+        });
+        return [...groups.values()]
+            .map(item => ({ label: item.label, ...finalizeDetailMetrics(item.metrics) }))
+            .sort((a, b) => a.label.localeCompare(b.label, 'es', { sensitivity: 'base', numeric: true }));
+    };
+    const hasValue = row => METRIC_NAMES.some(name => Math.abs(field(row, name)) > 0);
+    const getDetailRows = data => Array.isArray(data?.datasets?.detalleFiltros) ? data.datasets.detalleFiltros : [];
+    const getMonthRows = data => Array.isArray(data?.datasets?.porMesResumen) ? data.datasets.porMesResumen : [];
+    const optionValues = (data, config) => uniqueNonBlankSorted((data?.datasets?.[config.fallbackDataset] || [])
+        .filter(hasValue)
+        .map(row => dimension(row, config.dimensionName)));
+    function defaultMonthSelection() {
+        return [...powerBIState.options.meses];
+    }
+
+    function closeFilterMenus() {
+        FILTER_CONFIG.forEach(config => document.getElementById(config.cardId)?.classList.remove('open'));
+    }
+
+    function updateFilterLabel(config) {
+        const label = document.getElementById(config.labelId);
+        if (!label) return;
+        const selected = powerBIState.filters[config.key] || [];
+        const options = powerBIState.options[config.optionKey] || [];
+        if (!selected.length) {
+            // empty = cleared / sin restricción (igual muestra todos los datos)
+            label.textContent = 'Ninguna';
+        } else if (selected.length === options.length) {
+            label.textContent = config.key === 'meses' ? 'Todos' : 'Todas';
+        } else if (selected.length <= 2) {
+            label.textContent = selected.map(displayName).join(', ');
+        } else {
+            label.textContent = `${selected.length} seleccionadas`;
+        }
+    }
+
+    function populateFilterMenu(config) {
+        const menu = document.getElementById(config.menuId);
+        if (!menu) return;
+        const selected = powerBIState.filters[config.key] || [];
+        const options = powerBIState.options[config.optionKey] || [];
+        // all checked only when ALL options are explicitly selected (not when empty/cleared)
+        const allChecked = options.length > 0 && selected.length === options.length;
+        const allIndeterminate = selected.length > 0 && selected.length < options.length;
+        menu.innerHTML = `
+            <label class="filter-option select-all">
+                <input type="checkbox" data-select-all="true" ${allChecked ? 'checked' : ''} ${options.length ? '' : 'disabled'}>
+                <span>Seleccionar todo</span>
+            </label>
+        ` + options.map(option => `
+            <label class="filter-option">
+                <input type="checkbox" data-filter-option="true" value="${escapeHtml(option)}" ${selected.includes(option) ? 'checked' : ''}>
+                <span>${escapeHtml(displayName(option))}</span>
+            </label>
+        `).join('');
+
+        const selectAllInput = menu.querySelector('input[data-select-all="true"]');
+        if (selectAllInput) {
+            selectAllInput.indeterminate = allIndeterminate;
+            selectAllInput.addEventListener('change', () => {
+                // checked → selecciona todo; unchecked → limpia este filtro (toggle real)
+                powerBIState.filters[config.key] = selectAllInput.checked ? [...options] : [];
+                populateFilterControls(config.key);
+                renderPowerBIView();
+            });
+        }
+
+        menu.querySelectorAll('input[data-filter-option="true"]').forEach(input => {
+            input.addEventListener('change', () => {
+                const opts = powerBIState.options[config.optionKey] || [];
+                const checked = [...menu.querySelectorAll('input[data-filter-option="true"]:checked')].map(item => item.value);
+                // si queda todo marcado → guardar como "todos" explícito; si queda vacío → cleared
+                powerBIState.filters[config.key] = checked.length === opts.length ? [...opts] : checked;
+                populateFilterControls(config.key);
+                renderPowerBIView();
+            });
+        });
+        updateFilterLabel(config);
+    }
+
+    function bindPowerBIFilters() {
+        if (powerBIState.bound) return;
+        powerBIState.bound = true;
+
+        FILTER_CONFIG.forEach(config => {
+            const card = document.getElementById(config.cardId);
+            const button = document.getElementById(config.buttonId);
+            const menu = document.getElementById(config.menuId);
+            button?.addEventListener('click', event => {
+                event.stopPropagation();
+                const willOpen = !card?.classList.contains('open');
+                closeFilterMenus();
+                if (willOpen) card?.classList.add('open');
+            });
+            menu?.addEventListener('click', event => event.stopPropagation());
+        });
+        document.addEventListener('click', closeFilterMenus);
+
+        // Botón ✕ por filtro individual
+        document.querySelectorAll('.filter-clear-one[data-clear-filter]').forEach(btn => {
+            btn.addEventListener('click', event => {
+                event.stopPropagation();
+                const key = btn.dataset.clearFilter;
+                powerBIState.filters[key] = [];
+                populateFilterControls(key);
+                renderPowerBIView();
+            });
+        });
+
+        // Botón "Limpiar filtros" global → resetea todos a "Todas"
+        document.getElementById('filter-clear')?.addEventListener('click', () => {
+            powerBIState.filters = { areas: [], segmentos: [], etapas: [], fases: [], meses: [] };
+            powerBIState.options = { areas: [], segmentos: [], etapas: [], fases: [], meses: [] };
+            const inp = document.getElementById('filter-search');
+            if (inp) inp.value = '';
+            searchQuery = '';
+            document.getElementById('filter-search-suggestions')?.classList.remove('visible');
+            populateFilterControls();
+            renderPowerBIView();
+        });
+    }
+
+    function rowHasFilterValues(row) {
+        if (!hasValue(row)) return false;
+        // Only require core structural dimensions; Etapa and MesA can be null for some rows
+        return ['areas', 'segmentos', 'fases'].every(key => {
+            const config = FILTER_CONFIG.find(c => c.key === key);
+            return config && filterDimension(row, config);
+        });
+    }
+
+    function rowPassesOptionFilters(row, excludeKey = null) {
+        if (!rowHasFilterValues(row)) return false;
+        return FILTER_CONFIG.every(config => {
+            if (config.key === excludeKey) return true;
+            const selected = powerBIState.filters[config.key] || [];
+            if (!selected.length) return true; // empty = no constraint
+            const value = filterDimension(row, config);
+            // Budget rows (null MesA) always pass the month filter
+            if (config.key === 'meses' && !value) return true;
+            return selected.includes(value);
+        });
+    }
+
+    function rowPassesSelectedFilters(row) {
+        if (!rowHasFilterValues(row)) return false;
+        return FILTER_CONFIG.every(config => {
+            const selected = powerBIState.filters[config.key] || [];
+            if (!selected.length) return true; // empty = no constraint = show all (Power BI behavior)
+            const value = filterDimension(row, config);
+            // Budget rows (null MesA) always pass the month filter
+            if (config.key === 'meses' && !value) return true;
+            return selected.includes(value);
+        });
+    }
+
+    function buildFilterOptions(config) {
+        const detailRows = getDetailRows(powerBIState.data);
+        if (!detailRows.length) {
+            const values = optionValues(powerBIState.data, config);
+            return config.key === 'meses' ? sortMonths(values) : values;
+        }
+
+        const values = detailRows
+            .filter(row => {
+                // Meses options: only rows that actually have a month value
+                if (config.key === 'meses' && !filterDimension(row, config)) return false;
+                return rowPassesOptionFilters(row, config.key);
+            })
+            .map(row => filterDimension(row, config));
+        const options = uniqueNonBlankSorted(values);
+        return config.key === 'meses' ? sortMonths(options) : options;
+    }
+
+    function snapshotFilterSelections() {
+        return FILTER_CONFIG.reduce((acc, config) => {
+            const options = powerBIState.options[config.optionKey] || [];
+            const selected = powerBIState.filters[config.key] || [];
+            acc[config.key] = {
+                selected: [...selected],
+                hadOptions: options.length > 0,
+                wasAll: options.length > 0 && selected.length === options.length,
+                wasEmpty: selected.length === 0
+            };
+            return acc;
+        }, {});
+    }
+
+    function syncFilterSelections(previous, changedKey = null) {
+        FILTER_CONFIG.forEach(config => {
+            const options = powerBIState.options[config.optionKey] || [];
+            const prior = previous?.[config.key] || { selected: [], wasAll: false, wasEmpty: true };
+            const current = powerBIState.filters[config.key] || prior.selected;
+            const selected = current.filter(value => options.includes(value));
+
+            if (changedKey && config.key === changedKey) {
+                powerBIState.filters[config.key] = selected;
+            } else if (!changedKey && !prior.hadOptions && prior.wasEmpty) {
+                // Carga inicial → seleccionar todo explícitamente (Todas)
+                powerBIState.filters[config.key] = [...options];
+            } else if (prior.wasAll) {
+                // Estaba en "Todas" → mantener "Todas" con el nuevo set de opciones
+                powerBIState.filters[config.key] = [...options];
+            } else if (prior.wasEmpty) {
+                // Estaba en "Ninguna" (cleared) → mantener limpio
+                powerBIState.filters[config.key] = [];
+            } else {
+                powerBIState.filters[config.key] = selected;
+            }
+        });
+    }
+
+    function populateFilterControls(changedKey = null) {
+        for (let pass = 0; pass < 2; pass += 1) {
+            const previous = snapshotFilterSelections();
+            FILTER_CONFIG.forEach(config => {
+                powerBIState.options[config.optionKey] = buildFilterOptions(config);
+            });
+            syncFilterSelections(previous, changedKey);
+        }
+
+        FILTER_CONFIG.forEach(populateFilterMenu);
+    }
+
+    let searchQuery = '';
+    let kpiFilter = null; // 'ejecutado'|'comprometido'|'asignado'|'disponible'|null
+
+    const KPI_FILTER_FIELD = {
+        ejecutado:    'EjecutadoErequester',
+        comprometido: 'ComprometidoErequester',
+        asignado:     'AsignadoErequester',
+        disponible:   'DisponibleErequester',
+    };
+
+    const KPI_FILTER_META = {
+        ejecutado:    { label: 'Ejecutado',    color: '#3b5bdb' },
+        comprometido: { label: 'Comprometido', color: '#f59e0b' },
+        asignado:     { label: 'Asignado',     color: '#10b981' },
+        disponible:   { label: 'Disponible',   color: '#64748b' },
+    };
+
+    function filteredDetailRows() {
+        let rows = getDetailRows(powerBIState.data).filter(row => rowPassesSelectedFilters(row));
+        if (kpiFilter && KPI_FILTER_FIELD[kpiFilter]) {
+            const metricName = KPI_FILTER_FIELD[kpiFilter];
+            rows = rows.filter(r => asNumber(rowMetric(r, metricName)) > 0);
+        }
+        if (!searchQuery) return rows;
+        return rows.filter(row =>
+            FILTER_CONFIG.some(config => {
+                const val = filterDimension(row, config);
+                return val && (val.toLowerCase().includes(searchQuery) ||
+                               displayName(val).toLowerCase().includes(searchQuery));
+            })
+        );
+    }
+
+    function bindKpiCards() {
+        const cards = document.querySelectorAll('.kpi-card[data-kpi]');
+        const kpiRow = document.querySelector('.kpi-row');
+        const chip   = document.getElementById('kpi-active-chip');
+        const chipLbl   = document.getElementById('kpi-chip-lbl');
+        const chipClear = document.getElementById('kpi-chip-clear');
+
+        function clearKpiFilter() {
+            kpiFilter = null;
+            kpiRow.classList.remove('has-filter');
+            cards.forEach(c => {
+                c.classList.remove('kpi-active');
+                c.style.background = '';
+                c.style.borderColor = '';
+                c.style.boxShadow = '';
+            });
+            chip.classList.remove('visible');
+            renderPowerBIView();
+        }
+
+        function applyKpiFilter(key) {
+            kpiFilter = key;
+            const meta = KPI_FILTER_META[key];
+            kpiRow.classList.add('has-filter');
+            cards.forEach(c => {
+                c.classList.remove('kpi-active');
+                c.style.background = '';
+                c.style.borderColor = '';
+                c.style.boxShadow = '';
+            });
+            const activeCard = document.querySelector(`.kpi-card[data-kpi="${key}"]`);
+            if (activeCard) {
+                activeCard.classList.add('kpi-active');
+                activeCard.style.background  = meta.color + '10'; // ~6% tint
+                activeCard.style.borderColor = meta.color + '55'; // ~33% border
+                activeCard.style.boxShadow   = `0 0 0 2.5px ${meta.color}30, 0 8px 20px ${meta.color}20`;
+            }
+            chip.style.background = meta.color;
+            chip.style.boxShadow  = `0 3px 10px ${meta.color}55`;
+            chipLbl.textContent   = `Filtro activo: ${meta.label}`;
+            chip.classList.add('visible');
+            renderPowerBIView();
+        }
+
+        cards.forEach(card => {
+            card.addEventListener('click', () => {
+                const key = card.dataset.kpi;
+                if (key === 'ppto-sap') { clearKpiFilter(); return; }
+                if (kpiFilter === key) { clearKpiFilter(); return; } // toggle off
+                applyKpiFilter(key);
+            });
+        });
+
+        chipClear.addEventListener('click', clearKpiFilter);
+    }
+
+    const CAT_META = {
+        areas:     { label: 'Área',     color: '#0ea5e9' },
+        segmentos: { label: 'Segmento', color: '#10b981' },
+        etapas:    { label: 'Etapa',    color: '#f59e0b' },
+        fases:     { label: 'Fase',     color: '#8b5cf6' },
+        meses:     { label: 'Mes',      color: '#ef4444' },
+    };
+
+    function buildBreadcrumbIndex() {
+        const allRows = getDetailRows(powerBIState.data);
+        const etapaCtx = {}, segCtx = {};
+        allRows.forEach(r => {
+            const area = displayName(String(dimension(r,'Rubros[Area]')||'').toUpperCase().trim()) || '';
+            const seg  = String(dimension(r,'Rubros[Segmento]')||'').trim();
+            const et   = String(dimension(r,'Rubros[Etapa]')||'').trim();
+            if (seg && !segCtx[seg])  segCtx[seg] = area;
+            if (et  && !etapaCtx[et]) etapaCtx[et] = [area, seg].filter(Boolean).join(' › ');
+        });
+        return { etapaCtx, segCtx };
+    }
+
+    function syncSearchClearBtn(inp) {
+        const btn = document.getElementById('filter-search-clear-btn');
+        if (btn) btn.style.display = inp && inp.value.trim() ? 'flex' : 'none';
+    }
+
+    function updateSearchSuggestions(text, inp) {
+        const sug = document.getElementById('filter-search-suggestions');
+        if (!sug) return;
+        if (!text) { sug.classList.remove('visible'); sug.innerHTML = ''; return; }
+        const lower = text.toLowerCase();
+        const esc   = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const hi    = (str) => escapeHtml(str).replace(new RegExp(`(${esc(text)})`, 'gi'), '<strong>$1</strong>');
+        const { etapaCtx, segCtx } = buildBreadcrumbIndex();
+
+        let html = '', total = 0;
+        FILTER_CONFIG.forEach(config => {
+            const meta = CAT_META[config.key] || { label: config.key, color: '#64748b' };
+            const opts = (powerBIState.options[config.optionKey] || [])
+                .filter(o => {
+                    const d = displayName(o);
+                    return o.toLowerCase().includes(lower) || d.toLowerCase().includes(lower);
+                }).slice(0, 6);
+            if (!opts.length) return;
+            html += `<div class="fss-category">
+                <span class="fss-cat-dot" style="background:${meta.color}"></span>${meta.label}
+            </div>`;
+            opts.forEach(opt => {
+                total++;
+                const rawDisp = config.key === 'areas' ? displayName(String(opt).toUpperCase().trim()) || opt : displayName(opt) || opt;
+                let path = '';
+                if (config.key === 'etapas') path = etapaCtx[opt] || '';
+                else if (config.key === 'segmentos') path = segCtx[opt] || '';
+                html += `<div class="fss-item" data-fk="${config.key}" data-val="${escapeHtml(opt)}" data-disp="${escapeHtml(rawDisp)}">
+                    <div class="fss-item-body">
+                        <div class="fss-item-main">${hi(rawDisp)}</div>
+                        ${path ? `<div class="fss-item-path">${escapeHtml(path)}</div>` : ''}
+                    </div>
+                    <span class="fss-item-badge" style="background:${meta.color}">${meta.label}</span>
+                </div>`;
+            });
+        });
+
+        sug.innerHTML = total ? html : '<div class="fss-empty">Sin resultados para ese término</div>';
+        sug.classList.add('visible');
+
+        sug.querySelectorAll('.fss-item').forEach(item => {
+            item.addEventListener('mousedown', e => {
+                e.preventDefault();
+                const key  = item.dataset.fk;
+                const val  = item.dataset.val;
+                const disp = item.dataset.disp || val;
+                const cfg  = FILTER_CONFIG.find(c => c.key === key);
+                if (cfg) {
+                    // Clear other panel filters; apply this one
+                    powerBIState.filters = { areas: [], segmentos: [], etapas: [], fases: [], meses: [] };
+                    powerBIState.filters[cfg.key] = [val];
+                    if (inp) { inp.value = disp; inp.classList.add('has-value'); }
+                    syncSearchClearBtn(inp);
+                    searchQuery = '';
+                    populateFilterControls(key);
+                    renderPowerBIView();
+                }
+                sug.classList.remove('visible');
+            });
+        });
+    }
+
+    function initSearch() {
+        const inp = document.getElementById('filter-search');
+        const sug = document.getElementById('filter-search-suggestions');
+        const clearBtn = document.getElementById('filter-search-clear-btn');
+        if (!inp || !sug) return;
+
+        let sugFocusIdx = -1;
+
+        function moveFocus(dir) {
+            const items = sug.querySelectorAll('.fss-item');
+            if (!items.length) return;
+            items[sugFocusIdx]?.classList.remove('fss-selected');
+            sugFocusIdx = Math.max(0, Math.min(sugFocusIdx + dir, items.length - 1));
+            items[sugFocusIdx].classList.add('fss-selected');
+            items[sugFocusIdx].scrollIntoView({ block: 'nearest' });
+        }
+
+        function clearSearch() {
+            inp.value = '';
+            inp.classList.remove('has-value');
+            searchQuery = '';
+            sugFocusIdx = -1;
+            sug.classList.remove('visible');
+            sug.innerHTML = '';
+            syncSearchClearBtn(inp);
+            powerBIState.filters = { areas: [], segmentos: [], etapas: [], fases: [], meses: [] };
+            populateFilterControls();
+            renderPowerBIView();
+        }
+
+        inp.addEventListener('input', () => {
+            const val = inp.value.trim();
+            sugFocusIdx = -1;
+            // Implicit clear of panel filters on every new keystroke
+            powerBIState.filters = { areas: [], segmentos: [], etapas: [], fases: [], meses: [] };
+            populateFilterControls();
+            searchQuery = val.toLowerCase();
+            inp.classList.toggle('has-value', !!val);
+            syncSearchClearBtn(inp);
+            updateSearchSuggestions(val, inp);
+            renderPowerBIView();
+        });
+
+        inp.addEventListener('keydown', e => {
+            const items = sug.querySelectorAll('.fss-item');
+            if (e.key === 'ArrowDown')  { e.preventDefault(); if (sug.classList.contains('visible')) moveFocus(1); }
+            else if (e.key === 'ArrowUp')   { e.preventDefault(); if (sug.classList.contains('visible')) moveFocus(-1); }
+            else if (e.key === 'Enter') {
+                if (sugFocusIdx >= 0 && items[sugFocusIdx]) {
+                    items[sugFocusIdx].dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+                } else { sug.classList.remove('visible'); }
+            } else if (e.key === 'Escape') { clearSearch(); }
+        });
+
+        inp.addEventListener('focus', () => { if (inp.value.trim()) updateSearchSuggestions(inp.value.trim(), inp); });
+        inp.addEventListener('blur',  () => { setTimeout(() => { sug.classList.remove('visible'); sugFocusIdx = -1; }, 200); });
+        document.addEventListener('click', e => {
+            if (!inp.contains(e.target) && !sug.contains(e.target)) sug.classList.remove('visible');
+        });
+
+        clearBtn?.addEventListener('mousedown', e => { e.preventDefault(); clearSearch(); inp.focus(); });
+    }
+
+    function rowMetric(row, name) {
+        return Object.prototype.hasOwnProperty.call(row, name) ? row[name] : field(row, name);
+    }
+
+    function renderMetrics(totals) {
+        const rdi = rowMetric(totals, 'RdiTotal');
+        const pptoEr = rowMetric(totals, 'PresupuestoErequester');
+        const ejecutado = rowMetric(totals, 'EjecutadoErequester');
+        const comprometido = rowMetric(totals, 'ComprometidoErequester');
+        const asignado = rowMetric(totals, 'AsignadoErequester');
+        const disponible = rowMetric(totals, 'DisponibleErequester');
+        const pctAsignado = rowMetric(totals, 'PorcentajeAsignado');
+        const pctDisponible = rowMetric(totals, 'PorcentajeDisponible');
+
+        setHtml('hm-rdi', fmtMillions(rdi));
+        setHtml('hm-ejecutado', fmtMillions(ejecutado));
+        setHtml('hm-avance', `${(pctAsignado * 100).toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span>%</span>`);
+        setHtml('kpi-rdi', fmtMillions(rdi));
+        setHtml('kpi-ejecutado', fmtMillions(ejecutado));
+        setHtml('kpi-ppto-er', fmtMillions(pptoEr));
+        setHtml('kpi-comprometido', fmtMillions(comprometido));
+        setHtml('kpi-asignado', fmtMillions(asignado));
+        setHtml('kpi-disponible', fmtMillions(disponible));
+        setHtml('kpi-pct-asignado', `${(pctAsignado * 100).toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span>%</span>`);
+        setText('gauge-pct', `${(pctAsignado * 100).toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%`);
+        setText('gauge-ppto', fmtMillionsText(rdi));
+        setText('gauge-asignado', fmtMillionsText(asignado));
+        setText('gauge-disponible', fmtMillionsText(disponible));
+
+        const assignedPct = Math.max(0, pctAsignado * 100);
+        const availablePct = assignedPct || pctDisponible ? Math.max(0, pctDisponible * 100) : 100;
+        gaugeRdiLabel = fmtMillionsText(rdi);
+        gaugeChart.data.datasets[0].data = [assignedPct, Math.max(0, 100 - assignedPct)];
+        gaugeChart.update();
+    }
+
+    function metricCells(row) {
+        const disp = rowMetric(row, 'PorcentajeDisponible');
+        return `<td>${fmtMoney(rowMetric(row,'RdiTotal'))}</td>
+                <td>${fmtMoney(rowMetric(row,'EjecutadoErequester'))}</td>
+                <td>${fmtMoney(rowMetric(row,'ComprometidoErequester'))}</td>
+                <td>${fmtMoney(rowMetric(row,'AsignadoErequester'))}</td>
+                <td>${fmtMoney(rowMetric(row,'DisponibleErequester'))}</td>
+                <td class="pct-asig">${fmtPct(rowMetric(row,'PorcentajeAsignado'))}</td>
+                <td class="${disp < 0 ? 'pct-neg' : 'pct-disp'}">${fmtPct(disp)}</td>`;
+    }
+
+    function renderSearchTable(areaBody, detailRows, totals) {
+        const q = searchQuery.toLowerCase();
+
+        // Identify which specific values match at each level (for badge labeling)
+        const etapaHits = new Set(detailRows.map(r => String(dimension(r,'Rubros[Etapa]')||'').trim()).filter(v => v && v.toLowerCase().includes(q)));
+        const segHits   = new Set(detailRows.map(r => String(dimension(r,'Rubros[Segmento]')||'').trim()).filter(v => v && v.toLowerCase().includes(q)));
+
+        // Notice bar
+        const noticeEl = document.getElementById('search-mode-notice');
+        if (noticeEl) {
+            noticeEl.style.display = 'flex';
+            noticeEl.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="var(--blue)" style="flex-shrink:0"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            Árbol filtrado para "<strong>${escapeHtml(searchQuery)}</strong>"`;
+        }
+
+        // Build full 3-level tree: Área → Segmento → Etapa, all expanded
+        const areaRows = groupRowsBy(detailRows, 'Rubros[Area]');
+        let html = '';
+
+        areaRows.forEach((areaRow, ai) => {
+            const rawName = String(areaRow.label || '').toUpperCase().trim();
+            const dispName = displayName(rawName) || rawName;
+            const cfg = AREA_CONFIG[rawName] || DEFAULT_AREA_CFG;
+            const areaDetail = detailRows.filter(r =>
+                String(dimension(r, 'Rubros[Area]') || '').toUpperCase().trim() === rawName);
+            const segRows = groupRowsBy(areaDetail, 'Rubros[Segmento]');
+
+            // L1 — Área (always expanded)
+            html += `<tr class="tr-l1 tr-expandable expanded tr-anim" data-ai="${ai}">
+                <td class="td-l1">
+                    <span class="row-chev"></span>
+                    <span class="row-dot" style="background:${cfg.color}22;border:2px solid ${cfg.color}"></span>
+                    ${escapeHtml(dispName)}
+                </td>${metricCells(areaRow)}</tr>`;
+
+            segRows.forEach((segRow, si) => {
+                const segName = String(segRow.label || '').trim();
+                const isSegMatch = segHits.has(segName);
+                const segDetail = areaDetail.filter(r =>
+                    String(dimension(r, 'Rubros[Segmento]') || '').trim() === segName);
+                const etapaRowsFiltered = groupRowsBy(segDetail, 'Rubros[Etapa]').filter(e => e.label);
+                const segExp = etapaRowsFiltered.length > 0;
+
+                // L2 — Segmento (visible + expanded)
+                html += `<tr class="tr-l2 tr-child${segExp ? ' tr-expandable expanded' : ''} tr-anim" data-ai="${ai}" data-si="${si}">
+                    <td class="td-l2" style="border-left:3px solid ${cfg.color}">
+                        ${segExp ? '<span class="row-chev"></span>' : '<span class="row-chev-ph"></span>'}
+                        ${isSegMatch ? `<span class="search-lvl-badge">Segmento</span>` : ''}
+                        ${escapeHtml(segName)}
+                    </td>${metricCells(segRow)}</tr>`;
+
+                // L3 — Etapas (visible)
+                etapaRowsFiltered.forEach(etRow => {
+                    const isEtMatch = etapaHits.has(String(etRow.label || '').trim());
+                    html += `<tr class="tr-l3 tr-child tr-anim" data-ai="${ai}" data-si="${si}">
+                        <td class="td-l3" style="border-left:3px solid ${cfg.color}44">
+                            ${isEtMatch ? `<span class="search-lvl-badge">Etapa</span>` : ''}
+                            ${escapeHtml(etRow.label)}
+                        </td>${metricCells(etRow)}</tr>`;
+                });
+            });
+        });
+
+        if (!areaRows.length) {
+            html = `<tr><td colspan="8" style="text-align:center;padding:20px;color:var(--gray2)">Sin resultados para "<strong>${escapeHtml(searchQuery)}</strong>".</td></tr>`;
+        }
+
+        const dispT = rowMetric(totals, 'PorcentajeDisponible');
+        html += `<tr class="total-row"><td>Total</td>
+            <td>${fmtMoney(rowMetric(totals,'RdiTotal'))}</td>
+            <td>${fmtMoney(rowMetric(totals,'EjecutadoErequester'))}</td>
+            <td>${fmtMoney(rowMetric(totals,'ComprometidoErequester'))}</td>
+            <td>${fmtMoney(rowMetric(totals,'AsignadoErequester'))}</td>
+            <td>${fmtMoney(rowMetric(totals,'DisponibleErequester'))}</td>
+            <td class="pct-asig">${fmtPct(rowMetric(totals,'PorcentajeAsignado'))}</td>
+            <td class="${dispT<0?'pct-neg':'pct-disp'}">${fmtPct(dispT)}</td></tr>`;
+        areaBody.innerHTML = html;
+        bindTableDrill(areaBody);
+    }
+
+    function renderAreaTable(areaRows, totals, detailRows) {
+        const areaBody = document.getElementById('resumen-area-body');
+        if (!areaBody) return;
+
+        // Hide/show notice bar
+        const noticeEl = document.getElementById('search-mode-notice');
+        if (noticeEl) noticeEl.style.display = 'none';
+
+        // Search mode: flat result rows
+        if (searchQuery && detailRows && detailRows.length) {
+            renderSearchTable(areaBody, detailRows, totals);
+            return;
+        }
+
+        const hasDetail = detailRows && detailRows.length > 0;
+        let html = '';
+
+        areaRows.forEach((areaRow, ai) => {
+            const rawName = String(areaRow.label || '').toUpperCase().trim();
+            const dispName = displayName(rawName) || rawName;
+            const cfg = AREA_CONFIG[rawName] || DEFAULT_AREA_CFG;
+
+            // Pre-compute segment rows so we know if expandable
+            let segRows = [];
+            let areaDetail = [];
+            if (hasDetail) {
+                areaDetail = detailRows.filter(r =>
+                    String(dimension(r, 'Rubros[Area]') || '').toUpperCase().trim() === rawName);
+                segRows = groupRowsBy(areaDetail, 'Rubros[Segmento]');
+            }
+            const expandable = segRows.length > 0;
+
+            // Level 1
+            html += `<tr class="tr-l1${expandable ? ' tr-expandable' : ''}" data-ai="${ai}" data-rawname="${rawName}">
+                <td class="td-l1">
+                    ${expandable ? '<span class="row-chev"></span>' : '<span class="row-chev-ph"></span>'}
+                    <span class="row-dot" style="background:${cfg.color}22;border:2px solid ${cfg.color}"></span>
+                    ${escapeHtml(dispName)}
+                </td>${metricCells(areaRow)}</tr>`;
+
+            // Level 2 — Segmentos
+            segRows.forEach((segRow, si) => {
+                const segName = String(segRow.label || '').trim();
+                const segDetail = areaDetail.filter(r =>
+                    String(dimension(r, 'Rubros[Segmento]') || '').trim() === segName);
+                const etapaRows = groupRowsBy(segDetail, 'Rubros[Etapa]').filter(e => e.label);
+                const segExp = etapaRows.length > 0;
+
+                html += `<tr class="tr-l2 tr-child${segExp ? ' tr-expandable' : ''} tr-hidden" data-ai="${ai}" data-si="${si}" data-rawseg="${segName}">
+                    <td class="td-l2" style="border-left:3px solid ${cfg.color}">
+                        ${segExp ? '<span class="row-chev"></span>' : '<span class="row-chev-ph"></span>'}
+                        ${escapeHtml(segName)}
+                    </td>${metricCells(segRow)}</tr>`;
+
+                // Level 3 — Etapas
+                etapaRows.forEach(etRow => {
+                    html += `<tr class="tr-l3 tr-child tr-hidden" data-ai="${ai}" data-si="${si}">
+                        <td class="td-l3" style="border-left:3px solid ${cfg.color}44">
+                            ${escapeHtml(etRow.label)}
+                        </td>${metricCells(etRow)}</tr>`;
+                });
+            });
+        });
+
+        if (!areaRows.length) html = '<tr><td colspan="8" style="text-align:center;padding:16px;color:var(--gray2)">Sin datos para los filtros seleccionados.</td></tr>';
+
+        const dispT = rowMetric(totals, 'PorcentajeDisponible');
+        html += `<tr class="total-row"><td>Total</td>
+            <td>${fmtMoney(rowMetric(totals,'RdiTotal'))}</td>
+            <td>${fmtMoney(rowMetric(totals,'EjecutadoErequester'))}</td>
+            <td>${fmtMoney(rowMetric(totals,'ComprometidoErequester'))}</td>
+            <td>${fmtMoney(rowMetric(totals,'AsignadoErequester'))}</td>
+            <td>${fmtMoney(rowMetric(totals,'DisponibleErequester'))}</td>
+            <td class="pct-asig">${fmtPct(rowMetric(totals,'PorcentajeAsignado'))}</td>
+            <td class="${dispT < 0 ? 'pct-neg' : 'pct-disp'}">${fmtPct(dispT)}</td></tr>`;
+
+        areaBody.innerHTML = html;
+        bindTableDrill(areaBody);
+    }
+
+    function bindTableDrill(tbody) {
+        tbody.addEventListener('click', e => {
+            const tr = e.target.closest('tr.tr-expandable');
+            if (!tr) return;
+            const ai = tr.dataset.ai;
+            const si = tr.dataset.si;
+            const isL1 = tr.classList.contains('tr-l1');
+            const isOpen = tr.classList.contains('expanded');
+
+            if (isL1) {
+                // Accordion: close other open areas
+                tbody.querySelectorAll('.tr-l1.expanded').forEach(other => {
+                    if (other === tr) return;
+                    const oai = other.dataset.ai;
+                    other.classList.remove('expanded');
+                    tbody.querySelectorAll(`.tr-child[data-ai="${oai}"]`).forEach(c => {
+                        c.classList.add('tr-hidden');
+                        c.classList.remove('expanded', 'tr-anim');
+                    });
+                });
+                if (isOpen) {
+                    tr.classList.remove('expanded');
+                    tbody.querySelectorAll(`.tr-child[data-ai="${ai}"]`).forEach(c => {
+                        c.classList.add('tr-hidden');
+                        c.classList.remove('expanded', 'tr-anim');
+                    });
+                } else {
+                    tr.classList.add('expanded');
+                    tbody.querySelectorAll(`.tr-l2[data-ai="${ai}"]`).forEach(c => {
+                        c.classList.remove('tr-hidden');
+                        void c.offsetWidth; // force reflow for animation restart
+                        c.classList.add('tr-anim');
+                    });
+                }
+            } else {
+                // Segmento accordion within same area
+                tbody.querySelectorAll(`.tr-l2.expanded[data-ai="${ai}"]`).forEach(other => {
+                    if (other === tr) return;
+                    const osi = other.dataset.si;
+                    other.classList.remove('expanded');
+                    tbody.querySelectorAll(`.tr-l3[data-ai="${ai}"][data-si="${osi}"]`).forEach(c => {
+                        c.classList.add('tr-hidden');
+                        c.classList.remove('tr-anim');
+                    });
+                });
+                if (isOpen) {
+                    tr.classList.remove('expanded');
+                    tbody.querySelectorAll(`.tr-l3[data-ai="${ai}"][data-si="${si}"]`).forEach(c =>
+                        c.classList.add('tr-hidden'));
+                } else {
+                    tr.classList.add('expanded');
+                    tbody.querySelectorAll(`.tr-l3[data-ai="${ai}"][data-si="${si}"]`).forEach(c => {
+                        c.classList.remove('tr-hidden');
+                        void c.offsetWidth;
+                        c.classList.add('tr-anim');
+                    });
+                }
+            }
+        });
+    }
+
+    const FASE_PALETTE = ['#3b5bdb','#10b981','#f59e0b','#8b5cf6','#ef4444','#0ea5e9','#f97316'];
+    let tendenciaChart = null;
+    let tendenciaDimension = 'Rubros[Fase]';
+    let tendenciaLastRows  = [];
+
+    const TENDENCIA_DIM_LABELS = {
+        'Rubros[Fase]':     'Fase',
+        'Rubros[Area]':     'Área',
+        'Rubros[Segmento]': 'Segmento'
+    };
+
+    function renderTendenciaFase(detailRows) {
+        if (detailRows && detailRows.length) tendenciaLastRows = detailRows;
+        const rows   = tendenciaLastRows;
+        const canvas = document.getElementById('tendenciaChart');
+        if (!canvas) return;
+
+        const dimKey = tendenciaDimension;
+
+        // Collect unique dim values and months
+        const dimSet = new Set();
+        const mesSet = new Set();
+        rows.forEach(r => {
+            const d = String(dimension(r, dimKey) || '').trim();
+            const m = String(dimension(r, 'Calendario[MesA]') || '').trim();
+            if (d) dimSet.add(d);
+            if (m) mesSet.add(m);
+        });
+
+        const dims = [...dimSet].sort();
+        const meses = sortMonths([...mesSet]);
+
+        // Build dim × mes matrix (Asignado)
+        const matrix = {};
+        dims.forEach(d => {
+            matrix[d] = {};
+            meses.forEach(m => { matrix[d][m] = 0; });
+        });
+        rows.forEach(r => {
+            const d = String(dimension(r, dimKey) || '').trim();
+            const m = String(dimension(r, 'Calendario[MesA]') || '').trim();
+            if (!d || !m || !matrix[d]) return;
+            matrix[d][m] += asNumber(rowMetric(r, 'AsignadoErequester'));
+        });
+
+        // Display label: "01" → "Fase 1" only for Fase dimension
+        const dimLabel = dimKey === 'Rubros[Fase]'
+            ? (f => /^\d+$/.test(f.trim()) ? `Fase ${parseInt(f, 10)}` : f)
+            : (f => f);
+        const faseName = dimLabel; // keep alias for leyenda block below
+
+        const datasets = dims.map((fase, i) => {
+            const color = FASE_PALETTE[i % FASE_PALETTE.length];
+            return {
+                label: faseName(fase),
+                data: meses.map(m => toMillions(matrix[fase][m])),
+                borderColor: color, backgroundColor: color + '15',
+                fill: true, tension: 0.4, borderWidth: 2.5,
+                pointRadius: 4, pointHoverRadius: 7, pointBackgroundColor: color,
+            };
+        });
+
+        const labelPlugin = {
+            id: 'faseLabels',
+            afterDatasetsDraw(chart) {
+                const { ctx, data } = chart;
+                const yAxis   = chart.scales.y;
+                const xAxis   = chart.scales.x;
+                const yTop    = yAxis.top;
+                const yBottom = yAxis.bottom;
+                const PILL_H  = 18, PILL_PAD = 9, MIN_GAP = 2;
+                const MIN_VAL = 0.05; // ocultar pills < 0.05M para no saturar
+
+                // ── 1. Píldoras de valor por mes (escalonadas, sin salir del área) ──
+                data.labels.forEach((_, mi) => {
+                    const pts = [];
+                    chart.data.datasets.forEach((ds, di) => {
+                        const meta = chart.getDatasetMeta(di);
+                        if (meta.hidden) return;
+                        const pt = meta.data[mi];
+                        const val = ds.data[mi] || 0;
+                        if (!pt || val < MIN_VAL) return;
+                        pts.push({ pt, ds, val });
+                    });
+                    if (!pts.length) return;
+
+                    // Más alto primero (menor Y en canvas)
+                    pts.sort((a, b) => a.pt.y - b.pt.y);
+
+                    // Calcular posiciones Y sin solaparse y sin salir del área
+                    const positions = [];
+                    pts.forEach((p, idx) => {
+                        const above = idx % 2 === 0;
+                        let y = p.pt.y + (above ? -(PILL_H + 5) : (PILL_H + 5));
+                        // Clamp dentro del área del chart
+                        y = Math.max(yTop + PILL_H / 2 + 2, Math.min(yBottom - PILL_H / 2 - 2, y));
+                        // Separar de posiciones ya asignadas
+                        let tries = 0;
+                        while (tries < 8 && positions.some(py => Math.abs(py - y) < PILL_H + MIN_GAP)) {
+                            y += above ? -(PILL_H + MIN_GAP) : (PILL_H + MIN_GAP);
+                            y = Math.max(yTop + PILL_H / 2 + 2, Math.min(yBottom - PILL_H / 2 - 2, y));
+                            tries++;
+                        }
+                        positions.push(y);
+
+                        const text = `${p.val.toFixed(2)}M`;
+                        ctx.save();
+                        ctx.font = '600 11px Inter, sans-serif';
+                        const tw = ctx.measureText(text).width;
+                        const pw = tw + PILL_PAD * 2;
+                        ctx.fillStyle = 'rgba(255,255,255,0.93)';
+                        ctx.beginPath();
+                        ctx.roundRect(p.pt.x - pw / 2, y - PILL_H / 2, pw, PILL_H, 4);
+                        ctx.fill();
+                        ctx.strokeStyle = p.ds.borderColor;
+                        ctx.lineWidth = 1.2;
+                        ctx.stroke();
+                        ctx.fillStyle = p.ds.borderColor;
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(text, p.pt.x, y);
+                        ctx.restore();
+                    });
+                });
+
+                // ── 2. Total por mes: línea separadora + monto bold debajo del eje ──
+                data.labels.forEach((_, mi) => {
+                    // Sumar directamente desde los datasets (ya están en millones)
+                    const total = chart.data.datasets.reduce((sum, ds, di) => {
+                        const meta = chart.getDatasetMeta(di);
+                        return sum + (meta.hidden ? 0 : (ds.data[mi] || 0));
+                    }, 0);
+                    if (total <= 0) return;
+                    const x = xAxis.getPixelForTick(mi);
+                    const text = `${total.toFixed(2)}M`;
+                    // Línea separadora sutil
+                    ctx.save();
+                    ctx.strokeStyle = '#e2e8f0';
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(x - 16, yBottom + 20);
+                    ctx.lineTo(x + 16, yBottom + 20);
+                    ctx.stroke();
+                    // Texto total
+                    ctx.font = '700 11.5px Inter, sans-serif';
+                    ctx.fillStyle = '#475569';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'top';
+                    ctx.fillText(text, x, yBottom + 26);
+                    ctx.restore();
+                });
+            }
+        };
+
+        if (!tendenciaChart) {
+            tendenciaChart = new Chart(canvas, {
+                type: 'line',
+                data: { labels: meses, datasets },
+                plugins: [labelPlugin],
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    layout: { padding: { top: 28, right: 16, bottom: 52 } },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(2)}M`,
+                                footer: items => `Total: ${items.reduce((s, i) => s + i.parsed.y, 0).toFixed(2)}M`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: '#f1f5f9' },
+                            ticks: { font: { size: 12 }, maxRotation: 0, color: '#64748b' }
+                        },
+                        y: {
+                            grid: { color: '#f1f5f9' }, beginAtZero: true,
+                            ticks: { callback: v => `${v}M`, font: { size: 12 }, color: '#64748b' }
+                        }
+                    }
+                }
+            });
+        } else {
+            tendenciaChart.data.labels   = meses;
+            tendenciaChart.data.datasets = datasets;
+            tendenciaChart.update();
+        }
+
+        // Título dinámico
+        const titleEl = document.getElementById('tendencia-title');
+        if (titleEl) titleEl.textContent = `Tendencia de Ejecución por ${TENDENCIA_DIM_LABELS[dimKey] || dimKey}`;
+
+        // Leyenda personalizada con total acumulado
+        const fmt2 = v => v >= 1 ? `${v.toFixed(2)}M` : `${Math.round(v * 1000)}K`;
+        const leyenda = document.getElementById('tendencia-leyenda');
+        if (leyenda) {
+            leyenda.innerHTML = dims.map((f, i) => {
+                const color  = FASE_PALETTE[i % FASE_PALETTE.length];
+                const total  = meses.reduce((s, m) => s + toMillions(matrix[f][m]), 0);
+                return `<div class="tendencia-leyenda-item">
+                    <div class="tendencia-dot" style="background:${color}"></div>
+                    <span>${faseName(f)}</span>
+                    <span class="tendencia-leyenda-total" style="color:${color}">${fmt2(total)}</span>
+                </div>`;
+            }).join('');
+        }
+
+        // Toggle buttons (bind once)
+        const toggle = document.getElementById('tendencia-toggle');
+        if (toggle && !toggle._bound) {
+            toggle._bound = true;
+            toggle.addEventListener('click', e => {
+                const btn = e.target.closest('.tendencia-btn');
+                if (!btn) return;
+                toggle.querySelectorAll('.tendencia-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                tendenciaDimension = btn.dataset.dim;
+                renderTendenciaFase();
+            });
+        }
+    }
+
+    function renderCharts(etapaRows, areaRows, segmentoRows) {
+        renderEjecucionArea(areaRows);
+
+        // Sort segments by Presupuesto SAP descending
+        const segs = [...(segmentoRows || [])].sort((a, b) =>
+            asNumber(rowMetric(b, 'RdiTotal')) - asNumber(rowMetric(a, 'RdiTotal'))
+        );
+
+
+        const safeLog = v => Math.max(0.01, v); // log scale requires > 0
+        areaChart.data.labels           = segs.map(r => String(r.label || dimension(r, 'Rubros[Segmento]') || '').toUpperCase());
+        areaChart.data.datasets[0].data = segs.map(r => safeLog(toMillions(rowMetric(r, 'AsignadoErequester'))));
+        areaChart.data.datasets[1].data = segs.map(r => {
+            const total = toMillions(rowMetric(r, 'RdiTotal'));
+            const asig  = toMillions(rowMetric(r, 'AsignadoErequester'));
+            return safeLog(Math.max(0, total - asig));
+        });
+        // Dynamic canvas height so bars have breathing room and container scrolls
+        const ROW_HEIGHT = 46;
+        const canvasEl = document.getElementById('faseChart');
+        const nRows = areaChart.data.labels.length;
+        const newH = Math.max(120, nRows * ROW_HEIGHT + 24);
+        canvasEl.style.height = newH + 'px';
+        areaChart.update();
+    }
+
+    function renderPowerBIView() {
+        const data = powerBIState.data;
+        const datasets = data?.datasets || {};
+        const detailRows = getDetailRows(data);
+        let totals = datasets.totales?.[0] ? metricFromRow(datasets.totales[0]) : makeEmptyMetrics();
+        let areaRows = datasets.porArea || [];
+        let etapaRows = datasets.porEtapa || [];
+
+        let rawDetailRows = [], segmentoRows = [];
+        if (detailRows.length) {
+            rawDetailRows = filteredDetailRows();
+            totals = aggregateDetailRows(rawDetailRows);
+            areaRows     = groupRowsBy(rawDetailRows, 'Rubros[Area]');
+            etapaRows    = groupRowsBy(rawDetailRows, 'Rubros[Etapa]');
+            segmentoRows = groupRowsBy(rawDetailRows, 'Rubros[Segmento]');
+        } else if (powerBIState.filters.meses.length) {
+            const monthRows = getMonthRows(data)
+                .filter(row => powerBIState.filters.meses.includes(cleanDimension(dimension(row, 'Calendario[MesA]'))));
+            if (monthRows.length) totals = sumRows(monthRows);
+        }
+
+        renderMetrics(totals);
+        renderAreaTable(areaRows, totals, rawDetailRows);
+        renderCharts(etapaRows, areaRows, segmentoRows);
+        renderTendenciaFase(rawDetailRows);
+
+        if (data?.metadata?.generatedAt) {
+            const updated = new Date(data.metadata.generatedAt);
+            const allMonthsSelected = powerBIState.options.meses.length
+                && powerBIState.filters.meses.length === powerBIState.options.meses.length;
+            const month = allMonthsSelected
+                ? 'Todos los meses'
+                : (powerBIState.filters.meses.length ? powerBIState.filters.meses.join(', ') : '');
+            setText('powerbi-updated', `Power BI Service: ${month} - ${updated.toLocaleString('es-GT')}`);
+        }
+    }
+
+    function renderPowerBIResumen(data) {
+        powerBIState.data = data;
+        powerBIState.filters = { areas: [], segmentos: [], fases: [], meses: [] };
+        powerBIState.options = { areas: [], segmentos: [], fases: [], meses: [] };
+        bindPowerBIFilters();
+        initSearch();
+        bindKpiCards();
+        bindChartFilters();
+        populateFilterControls();
+        renderPowerBIView();
+    }
+
+    async function loadPowerBIResumenFromSupabase() {
+        try {
+            const { data, error } = await client
+                .from('powerbi_resumen_cache')
+                .select('payload, mes_a, generated_at, updated_at')
+                .eq('project_key', POWERBI_PROJECT_KEY)
+                .single();
+
+            if (error || !data?.payload) return false;
+            renderPowerBIResumen(data.payload);
+            return true;
+        } catch (error) {
+            console.warn('No se pudieron cargar datos de Power BI desde Supabase.', error);
+            return false;
+        }
+    }
+
+    async function loadPowerBIResumenFromLocalJson() {
+        try {
+            const response = await fetch('data/powerbi/rdb/resumen-powerbi.json', { cache: 'no-store' });
+            if (!response.ok) return false;
+            renderPowerBIResumen(await response.json());
+            return true;
+        } catch (error) {
+            console.warn('No se pudieron cargar datos locales de Power BI.', error);
+            return false;
+        }
+    }
+
+    async function loadPowerBIResumen() {
+        const loadedFromSupabase = await loadPowerBIResumenFromSupabase();
+        if (!loadedFromSupabase) await loadPowerBIResumenFromLocalJson();
+    }
+
+    // ── Chart-click filters ──────────────────────────────────────
+    function bindChartFilters() {
+        const chip      = document.getElementById('kpi-active-chip');
+        const chipLbl   = document.getElementById('kpi-chip-lbl');
+        const chipClear = document.getElementById('kpi-chip-clear');
+        let cfKey = null, cfVal = null;
+
+        function clearVisualSelection() {
+            document.querySelectorAll('.eac-row.chart-selected').forEach(el => el.classList.remove('chart-selected'));
+            document.querySelectorAll('#resumen-area-body .chart-row-selected').forEach(el => el.classList.remove('chart-row-selected'));
+        }
+
+        function clearChartFilter(andRender) {
+            if (!cfKey) return;
+            powerBIState.filters[cfKey] = [];
+            populateFilterControls(cfKey);
+            cfKey = null; cfVal = null;
+            clearVisualSelection();
+            chip.classList.remove('visible');
+            if (andRender !== false) renderPowerBIView();
+        }
+
+        function applyChartFilter(key, value, triggerEl) {
+            if (cfKey === key && cfVal === value) { clearChartFilter(); return; }
+            if (cfKey && cfKey !== key) {
+                powerBIState.filters[cfKey] = [];
+                populateFilterControls(cfKey);
+            }
+            clearVisualSelection();
+            powerBIState.filters[key] = [value];
+            cfKey = key; cfVal = value;
+            if (triggerEl) {
+                triggerEl.classList.add(triggerEl.classList.contains('eac-row') ? 'chart-selected' : 'chart-row-selected');
+            }
+            const meta = CAT_META[key] || { label: key, color: '#0ea5e9' };
+            chip.style.background = meta.color;
+            chip.style.boxShadow  = `0 3px 10px ${meta.color}55`;
+            chipLbl.textContent   = `${meta.label}: ${value}`;
+            chip.classList.add('visible');
+            populateFilterControls(key);
+            renderPowerBIView();
+        }
+
+        // Chip X también limpia filtros de gráfica
+        chipClear.addEventListener('click', () => clearChartFilter());
+
+        // ── EAC rows → Área ──────────────────────────────────────
+        document.getElementById('eac-rows').addEventListener('click', e => {
+            const row = e.target.closest('[data-area]');
+            if (row) applyChartFilter('areas', row.dataset.area, row);
+        });
+
+        // ── Segmento chart (faseChart) → Segmento ────────────────
+        document.getElementById('faseChart').addEventListener('click', e => {
+            const pts = areaChart.getElementsAtEventForMode(e, 'nearest', { intersect: true }, false);
+            if (!pts.length) return;
+            const label = areaChart.data.labels[pts[0].index];
+            if (label) applyChartFilter('segmentos', label, null);
+        });
+
+        // ── Tendencia chart → Mes ────────────────────────────────
+        document.getElementById('tendenciaChart').addEventListener('click', e => {
+            if (!tendenciaChart) return;
+            const pts = tendenciaChart.getElementsAtEventForMode(e, 'index', { intersect: false }, false);
+            if (!pts.length) return;
+            const label = tendenciaChart.data.labels[pts[0].index];
+            if (label) applyChartFilter('meses', label, null);
+        });
+
+        // ── Tabla → Área (tr-l1) o Segmento (tr-l2) ─────────────
+        document.getElementById('resumen-area-body').addEventListener('click', e => {
+            const row = e.target.closest('tr');
+            if (!row || row.classList.contains('total-row')) return;
+            if (row.classList.contains('tr-l1') && row.dataset.rawname) {
+                applyChartFilter('areas', row.dataset.rawname, row);
+            } else if (row.classList.contains('tr-l2') && row.dataset.rawseg) {
+                applyChartFilter('segmentos', row.dataset.rawseg, row);
+            }
+        });
+    }
+    // ── /Chart-click filters ─────────────────────────────────────
+
+    loadPowerBIResumen();
+</script>
+<script src="assets/js/tracker.js"></script>
+
+<!-- ── CHAT WIDGET ── -->
+<style>
+  #chat-fab {
+    position: fixed; bottom: 24px; right: 24px; z-index: 1000;
+    width: 52px; height: 52px; border-radius: 50%;
+    background: linear-gradient(135deg, #C9A84C, #a8832e);
+    border: none; cursor: pointer;
+    box-shadow: 0 4px 20px rgba(201,168,76,0.45);
+    display: flex; align-items: center; justify-content: center;
+    transition: transform .2s, box-shadow .2s; color: #fff;
+  }
+  #chat-fab:hover { transform: scale(1.08); box-shadow: 0 6px 28px rgba(201,168,76,0.6); }
+  #chat-fab svg { width: 24px; height: 24px; fill: currentColor; }
+
+  #chat-panel {
+    position: fixed; bottom: 86px; right: 24px; z-index: 1000;
+    width: 360px; height: 500px;
+    background: #0f172a; border: 1px solid rgba(201,168,76,0.28);
+    border-radius: 16px; display: flex; flex-direction: column;
+    box-shadow: 0 16px 56px rgba(0,0,0,0.55);
+    overflow: hidden;
+    transform: scale(0.92) translateY(14px); opacity: 0; pointer-events: none;
+    transition: transform .22s ease, opacity .22s ease;
+  }
+  #chat-panel.open { transform: scale(1) translateY(0); opacity: 1; pointer-events: all; }
+
+  .cp-header {
+    background: linear-gradient(90deg, #0f172a, #1e293b);
+    border-bottom: 1px solid rgba(201,168,76,0.2);
+    padding: 13px 14px; display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+  }
+  .cp-icon {
+    width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0;
+    background: rgba(201,168,76,0.13); border: 1px solid rgba(201,168,76,0.28);
+    display: flex; align-items: center; justify-content: center; font-size: 15px;
+  }
+  .cp-title { font-size: 0.82rem; font-weight: 700; color: #fff; }
+  .cp-sub { font-size: 0.6rem; color: rgba(201,168,76,0.65); margin-top: 1px; }
+  .cp-close {
+    margin-left: auto; background: none; border: none; cursor: pointer;
+    color: rgba(255,255,255,0.35); padding: 4px; border-radius: 6px;
+    display: flex; transition: color .15s, background .15s;
+  }
+  .cp-close:hover { color: #fff; background: rgba(255,255,255,0.07); }
+  .cp-close svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; }
+
+  .cp-messages {
+    flex: 1; overflow-y: auto; padding: 14px 14px 6px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .cp-messages::-webkit-scrollbar { width: 4px; }
+  .cp-messages::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+
+  .cp-msg { display: flex; flex-direction: column; max-width: 86%; }
+  .cp-msg.user { align-self: flex-end; align-items: flex-end; }
+  .cp-msg.assistant { align-self: flex-start; align-items: flex-start; }
+
+  .cp-bubble {
+    padding: 9px 13px; border-radius: 12px;
+    font-size: 0.77rem; line-height: 1.55; color: #fff;
+    white-space: pre-wrap; word-break: break-word;
+  }
+  .cp-msg.user .cp-bubble {
+    background: linear-gradient(135deg, #C9A84C, #a8832e);
+    border-bottom-right-radius: 4px;
+  }
+  .cp-msg.assistant .cp-bubble {
+    background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1);
+    border-bottom-left-radius: 4px;
+  }
+
+  .cp-typing { display: flex; gap: 4px; padding: 9px 13px; }
+  .cp-typing span {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: rgba(201,168,76,0.55); animation: cpBounce .9s infinite;
+  }
+  .cp-typing span:nth-child(2) { animation-delay: .18s; }
+  .cp-typing span:nth-child(3) { animation-delay: .36s; }
+  @keyframes cpBounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-6px)} }
+
+  .cp-footer {
+    border-top: 1px solid rgba(255,255,255,0.07);
+    padding: 10px 12px; display: flex; gap: 8px; flex-shrink: 0;
+    background: rgba(0,0,0,0.18);
+  }
+  #cp-input {
+    flex: 1; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.13);
+    border-radius: 10px; padding: 8px 12px; color: #fff; font-size: 0.77rem;
+    font-family: inherit; outline: none; resize: none; line-height: 1.45;
+    transition: border-color .15s;
+  }
+  #cp-input::placeholder { color: rgba(255,255,255,0.28); }
+  #cp-input:focus { border-color: rgba(201,168,76,0.45); }
+  #cp-send {
+    width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
+    background: linear-gradient(135deg, #C9A84C, #a8832e); border: none;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    align-self: flex-end; transition: opacity .15s;
+  }
+  #cp-send:hover { opacity: 0.85; }
+  #cp-send:disabled { opacity: 0.38; cursor: not-allowed; }
+  #cp-send svg { width: 15px; height: 15px; fill: #fff; }
+</style>
+
+<button id="chat-fab" title="Asistente IA">
+  <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 10H6v-2h12v2zm0-3H6V7h12v2z"/></svg>
+</button>
+
+<div id="chat-panel">
+  <div class="cp-header">
+    <div class="cp-icon">🤖</div>
+    <div>
+      <div class="cp-title">Asistente BDJ</div>
+      <div class="cp-sub">Datos en tiempo real desde Power BI</div>
+    </div>
+    <button class="cp-close" id="cp-close">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="cp-messages" id="cp-messages">
+    <div class="cp-msg assistant">
+      <div class="cp-bubble">Hola 👋 Soy tu asistente para Residencias Del Bosque. Puedo responderte preguntas sobre presupuesto, ejecución, áreas y etapas del proyecto. ¿En qué te ayudo?</div>
+    </div>
+  </div>
+  <div class="cp-footer">
+    <textarea id="cp-input" rows="2" placeholder="Ej: ¿Cuánto hemos ejecutado en Urbanización?"></textarea>
+    <button id="cp-send">
+      <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+(function () {
+  const EDGE_URL = 'https://iipgrojliqeyycvgnkrc.supabase.co/functions/v1/ai-agent';
+  const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlpcGdyb2psaXFleXljdmdua3JjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NzA1NzYsImV4cCI6MjA5MTM0NjU3Nn0.Y6FQ-1qWd7HPMvTnK4alpKxM-YLJ5CsKmkorAZKMJrg';
+
+  const fab      = document.getElementById('chat-fab');
+  const panel    = document.getElementById('chat-panel');
+  const closeBtn = document.getElementById('cp-close');
+  const messages = document.getElementById('cp-messages');
+  const input    = document.getElementById('cp-input');
+  const sendBtn  = document.getElementById('cp-send');
+
+  let history = [];
+
+  fab.addEventListener('click', () => panel.classList.add('open'));
+  closeBtn.addEventListener('click', () => panel.classList.remove('open'));
+
+  function addMsg(role, text) {
+    const wrap   = document.createElement('div');
+    wrap.className = `cp-msg ${role}`;
+    const bubble = document.createElement('div');
+    bubble.className = 'cp-bubble';
+    bubble.textContent = text;
+    wrap.appendChild(bubble);
+    messages.appendChild(wrap);
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  function addTyping() {
+    const wrap = document.createElement('div');
+    wrap.className = 'cp-msg assistant';
+    wrap.id = 'cp-typing';
+    wrap.innerHTML = '<div class="cp-bubble cp-typing"><span></span><span></span><span></span></div>';
+    messages.appendChild(wrap);
+    messages.scrollTop = messages.scrollHeight;
+    return wrap;
+  }
+
+  async function send() {
+    const text = input.value.trim();
+    if (!text || sendBtn.disabled) return;
+
+    input.value = '';
+    sendBtn.disabled = true;
+    addMsg('user', text);
+    const typing = addTyping();
+
+    try {
+      const session = JSON.parse(localStorage.getItem('sb-iipgrojliqeyycvgnkrc-auth-token') || 'null');
+      const token   = session?.access_token ?? '';
+
+      const res  = await fetch(EDGE_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          'apikey': ANON_KEY,
+        },
+        body: JSON.stringify({ message: text, project_key: POWERBI_PROJECT_KEY, history }),
+      });
+
+      const json  = await res.json();
+      typing.remove();
+      const reply = json.reply || json.error || 'Sin respuesta del servidor.';
+      addMsg('assistant', reply);
+
+      history.push({ role: 'user', content: text });
+      history.push({ role: 'assistant', content: reply });
+      if (history.length > 12) history = history.slice(-12);
+
+    } catch {
+      typing.remove();
+      addMsg('assistant', 'Error al conectar. Verifica tu conexión e intenta de nuevo.');
+    } finally {
+      sendBtn.disabled = false;
+      input.focus();
+    }
+  }
+
+  sendBtn.addEventListener('click', send);
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+  });
+})();
+</script>
+<!-- ── /CHAT WIDGET ── -->
+
+<!-- ── TOUR ASSISTANT ── -->
+<style>
+  /* ── Dark overlay via box-shadow + highlight ── */
+  .tour-highlight {
+    position: relative !important;
+    z-index: 1200 !important;
+    border-radius: 12px;
+    box-shadow:
+      0 0 0 9999px rgba(0,0,0,0.52),
+      0 0 0 3px #0ea5e9,
+      0 0 28px rgba(14,165,233,0.5) !important;
+  }
+
+  /* ── Robot container ── */
+  #tour-robot {
+    position: fixed;
+    right: -220px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1300;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    transition: top 1.15s cubic-bezier(.34,1.28,.64,1), right 0.85s cubic-bezier(.34,1.56,.64,1);
+    pointer-events: none;
+  }
+  #tour-robot.visible { right: 12px; }
+
+  /* Entry spin animation on the image wrapper only */
+  #tour-robot-img-wrap {
+    width: 100px; height: 100px; flex-shrink: 0;
+    animation: tour-float 2.8s ease-in-out infinite;
+  }
+  #tour-robot-img-wrap img {
+    width: 100%; height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 6px 18px rgba(14,165,233,0.5));
+    display: block;
+  }
+  /* Entry: robot spins + scales in */
+  #tour-robot.entering #tour-robot-img-wrap {
+    animation: tour-enter-spin 1s cubic-bezier(.34,1.56,.64,1) forwards;
+  }
+  @keyframes tour-enter-spin {
+    0%   { transform: scale(0.2) rotate(-360deg) translateY(30px); opacity: 0; }
+    60%  { transform: scale(1.18) rotate(8deg) translateY(-6px); opacity: 1; }
+    80%  { transform: scale(0.94) rotate(-3deg) translateY(2px); }
+    100% { transform: scale(1) rotate(0deg) translateY(0); }
+  }
+  /* Idle float after entry */
+  #tour-robot.floating #tour-robot-img-wrap {
+    animation: tour-float 2.8s ease-in-out infinite;
+  }
+  @keyframes tour-float {
+    0%,100% { transform: translateY(0) rotate(0deg); }
+    35%     { transform: translateY(-9px) rotate(-2deg); }
+    70%     { transform: translateY(-5px) rotate(2deg); }
+  }
+  /* Bounce on step change */
+  #tour-robot.arriving #tour-robot-img-wrap {
+    animation: tour-arrive 0.55s cubic-bezier(.34,1.56,.64,1) forwards,
+               tour-float 2.8s ease-in-out 0.55s infinite;
+  }
+  @keyframes tour-arrive {
+    0%  { transform: scale(0.75) translateY(14px); }
+    65% { transform: scale(1.12) translateY(-5px); }
+    100%{ transform: scale(1) translateY(0); }
+  }
+
+  /* ── Speech bubble ── */
+  #tour-bubble {
+    position: absolute;
+    right: 108px;
+    top: 50%;
+    transform: translateY(-50%) scale(0.88) translateX(14px);
+    width: 318px;
+    background: #fff;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 18px 4px 18px 18px;
+    box-shadow: 0 10px 36px rgba(15,23,42,0.16);
+    padding: 18px 20px 15px;
+    pointer-events: all;
+    opacity: 0;
+    transition: opacity 0.32s ease, transform 0.32s ease;
+  }
+  #tour-bubble.show {
+    opacity: 1;
+    transform: translateY(-50%) scale(1) translateX(0);
+  }
+  #tour-bubble-step {
+    font-size: 0.68rem; font-weight: 700; letter-spacing: 0.8px;
+    text-transform: uppercase; color: #0ea5e9; margin-bottom: 5px;
+  }
+  #tour-bubble-title {
+    font-size: 1rem; font-weight: 800; color: #0f172a;
+    margin-bottom: 8px; line-height: 1.25;
+  }
+  #tour-bubble-text {
+    font-size: 0.86rem; color: #334155; line-height: 1.6;
+    margin-bottom: 14px;
+  }
+  #tour-progress-wrap {
+    width: 100%; height: 3px; background: #e2e8f0;
+    border-radius: 2px; margin-bottom: 14px; overflow: hidden;
+  }
+  #tour-progress-bar {
+    height: 100%; width: 0%; background: #0ea5e9;
+    border-radius: 2px; transition: width linear;
+  }
+  #tour-bubble-actions {
+    display: flex; justify-content: space-between; align-items: center; gap: 8px;
+  }
+  #tour-skip {
+    background: none; border: none; font-size: 0.76rem; color: #94a3b8;
+    cursor: pointer; padding: 4px 0; font-weight: 600; transition: color .15s;
+  }
+  #tour-skip:hover { color: #ef4444; }
+  #tour-next {
+    background: #0ea5e9; color: #fff; border: none;
+    border-radius: 8px; font-size: 0.78rem; font-weight: 700;
+    padding: 8px 18px; cursor: pointer;
+    transition: background .15s, transform .1s;
+  }
+  #tour-next:hover { background: #0284c7; transform: scale(1.04); }
+
+  /* ── Floating restart button ── */
+  #tour-fab {
+    position: fixed; bottom: 84px; right: 24px; z-index: 1000;
+    width: 48px; height: 48px; border-radius: 50%;
+    background: linear-gradient(135deg,#0ea5e9,#0284c7);
+    border: none; cursor: pointer;
+    box-shadow: 0 4px 18px rgba(14,165,233,0.5);
+    display: flex; align-items: center; justify-content: center;
+    transition: transform .2s, box-shadow .2s;
+  }
+  #tour-fab:hover { transform: scale(1.12); box-shadow: 0 6px 26px rgba(14,165,233,0.65); }
+  #tour-fab img { width: 30px; height: 30px; object-fit: contain; }
+</style>
+
+<!-- Robot -->
+<div id="tour-robot">
+  <div id="tour-bubble">
+    <div id="tour-bubble-step">Paso 1 de 11</div>
+    <div id="tour-bubble-title">Bienvenido</div>
+    <div id="tour-bubble-text">Hola, soy tu asistente de Residencias Del Bosque. Te llevaré paso a paso por todas las funciones del dashboard.</div>
+    <div id="tour-progress-wrap"><div id="tour-progress-bar"></div></div>
+    <div id="tour-bubble-actions">
+      <button id="tour-skip">Saltar recorrido</button>
+      <button id="tour-next">Siguiente →</button>
+    </div>
+  </div>
+  <div id="tour-robot-img-wrap">
+    <img src="imagenes de proyectos/Logos/vecteezy_illustration-vector-chat-robot-design-kawaii_22032633.svg" alt="Asistente">
+  </div>
+</div>
+
+<!-- Floating restart button -->
+<button id="tour-fab" title="Ver recorrido guiado">
+  <img src="imagenes de proyectos/Logos/vecteezy_illustration-vector-chat-robot-design-kawaii_22032633.svg" alt="Tour">
+</button>
+
+<script>
+(function() {
+  // Reading speed: ~170 wpm = 1 word / 353ms. Min 6s, max 13s.
+  function readMs(text) {
+    const words = text.trim().split(/\s+/).length;
+    return Math.max(6000, Math.min(13000, words * 353));
+  }
+
+  const STEPS = [
+    {
+      selector: null,
+      title: '¡Hola! Soy tu asistente',
+      text: 'Te llevaré en un recorrido por todas las funciones del dashboard de Residencias Del Bosque. Puedes avanzar manualmente o esperar y lo haré solo.'
+    },
+    {
+      selector: '.kpi-row',
+      title: 'Indicadores Clave del Proyecto',
+      text: 'Estas tarjetas resumen el estado financiero: Presupuesto SAP, Ejecutado, Comprometido, Asignado, Disponible y % Asignado. Haz clic en cualquiera para filtrar toda la vista por esa métrica.'
+    },
+    {
+      selector: '.table-gauge-row',
+      title: 'Tabla Resumen y Avance General',
+      text: 'La tabla muestra el detalle financiero por área. El velocímetro a la derecha indica el porcentaje de avance general del proyecto. Haz clic en la flecha de cada fila para ver el desglose por segmento.'
+    },
+    {
+      selector: '.filters-section',
+      title: 'Filtros Principales',
+      text: 'Desde aquí filtras todo el dashboard: Área, Segmento, Etapa, Fase y Meses. Al seleccionar cualquier opción, los indicadores, gráficas y tabla se actualizan en tiempo real automáticamente.'
+    },
+    {
+      selector: '.filter-search-wrap',
+      robotBelow: true,   // robot se posiciona más abajo para no tapar
+      title: 'Buscador Rápido',
+      text: 'Escribe el nombre de un área, segmento o etapa para encontrar información específica al instante, sin necesidad de abrir los filtros uno por uno.'
+    },
+    {
+      selector: '#kpi-active-chip',
+      robotBelow: true,   // igual, es elemento pequeño en zona alta
+      title: 'Filtros Activos',
+      text: 'Aquí verás los filtros que tienes activos en este momento. Haz clic en la X para quitar un filtro. Si seleccionas el mismo filtro dos veces, se desactiva solo y la vista regresa al total general.'
+    },
+    {
+      selector: '.chart-card.eac-card',
+      title: 'Control de Ejecución por Área',
+      text: 'Esta gráfica muestra el avance de cada área del proyecto: en azul lo Ejecutado, en naranja lo Comprometido, en negro el límite Asignado y en gris el Disponible restante del Presupuesto SAP.'
+    },
+    {
+      selector: '.segmento-card',
+      title: 'Avance por Segmento',
+      text: 'Aquí verás el avance de cada segmento del proyecto. La barra verde muestra lo Asignado y la gris el Presupuesto SAP disponible. Haz scroll dentro del gráfico si hay muchos segmentos.'
+    },
+    {
+      selector: '.tendencia-section',
+      title: 'Tendencia de Ejecución',
+      text: 'Esta gráfica de líneas muestra la evolución del presupuesto asignado a lo largo del tiempo, permitiendo ver la tendencia de ejecución mes a mes para cada área o fase del proyecto.'
+    },
+    {
+      selector: '#tendencia-toggle',
+      title: 'Switch Fase / Área',
+      text: '¡Este botón es clave! Puedes cambiar la vista de la gráfica de tendencia entre "Fase" y "Área" con un solo clic. Cada opción muestra una perspectiva diferente del mismo dato de ejecución.'
+    },
+    {
+      selector: null,
+      title: '¡Ya eres un experto!',
+      text: 'Conoces todas las funciones del dashboard. Usa los filtros, el buscador, las gráficas y el switch Fase/Área para explorar a fondo la información de Residencias Del Bosque. ¡Hasta pronto!'
+    }
+  ];
+
+  let step      = 0;
+  let timer     = null;
+  let hilighted = null;
+  let chipWas   = false;
+
+  const robot   = document.getElementById('tour-robot');
+  const imgWrap = document.getElementById('tour-robot-img-wrap');
+  const bubble  = document.getElementById('tour-bubble');
+  const stepLbl = document.getElementById('tour-bubble-step');
+  const titleEl = document.getElementById('tour-bubble-title');
+  const textEl  = document.getElementById('tour-bubble-text');
+  const bar     = document.getElementById('tour-progress-bar');
+  const skipBtn = document.getElementById('tour-skip');
+  const nextBtn = document.getElementById('tour-next');
+  const fab     = document.getElementById('tour-fab');
+
+  function clearHL() {
+    if (hilighted) { hilighted.classList.remove('tour-highlight'); hilighted = null; }
+    const chip = document.getElementById('kpi-active-chip');
+    if (chipWas && chip) { chip.style.display = ''; chipWas = false; }
+  }
+
+  function moveRobot(el, forceBelow) {
+    robot.classList.remove('arriving');
+    void robot.offsetWidth;
+    robot.classList.add('arriving');
+    setTimeout(() => robot.classList.remove('arriving'), 1200);
+
+    if (!el) { robot.style.top = '50%'; return; }
+
+    const rect = el.getBoundingClientRect();
+    const vp   = window.innerHeight;
+    const elMid = rect.top + rect.height / 2;
+
+    let targetY;
+    if (forceBelow) {
+      // Position robot well below the element so bubble doesn't cover it
+      targetY = Math.min(vp - 90, rect.bottom + 180);
+    } else if (elMid < vp * 0.38) {
+      // Element near top → robot below it
+      targetY = Math.min(vp - 90, rect.bottom + 150);
+    } else if (elMid > vp * 0.72) {
+      // Element near bottom → robot above it
+      targetY = Math.max(90, rect.top - 150);
+    } else {
+      targetY = elMid;
+    }
+    robot.style.top = Math.max(90, Math.min(vp - 90, targetY)) + 'px';
+  }
+
+  let currentDuration = 8000;
+
+  function startBar(ms) {
+    currentDuration = ms;
+    bar.style.transition = 'none';
+    bar.style.width = '0%';
+    clearTimeout(timer);
+    requestAnimationFrame(() => {
+      bar.style.transition = `width ${ms}ms linear`;
+      bar.style.width = '100%';
+    });
+    timer = setTimeout(() => {
+      step < STEPS.length - 1 ? goTo(step + 1) : endTour();
+    }, ms);
+  }
+
+  function goTo(idx) {
+    clearHL();
+    bubble.classList.remove('show');
+    step = idx;
+    const s     = STEPS[idx];
+    const total = STEPS.length;
+    const ms    = readMs(s.text);
+
+    stepLbl.textContent = `Paso ${idx + 1} de ${total}`;
+    titleEl.textContent = s.title;
+    textEl.textContent  = s.text;
+    nextBtn.textContent = idx === total - 1 ? 'Finalizar ✓' : 'Siguiente →';
+
+    if (s.selector) {
+      const el = document.querySelector(s.selector);
+      if (el) {
+        if (s.selector === '#kpi-active-chip' && el.style.display === 'none') {
+          el.style.display = 'flex';
+          const lbl = el.querySelector('#kpi-chip-lbl');
+          if (lbl) lbl.textContent = 'Ejemplo: Comprometido';
+          chipWas = true;
+        }
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(() => {
+          el.classList.add('tour-highlight');
+          hilighted = el;
+          moveRobot(el, !!s.robotBelow);
+        }, 380);
+      }
+    } else {
+      moveRobot(null, false);
+    }
+
+    setTimeout(() => bubble.classList.add('show'), 220);
+    startBar(ms);
+  }
+
+  function endTour() {
+    clearHL();
+    clearTimeout(timer);
+    bubble.classList.remove('show');
+    setTimeout(() => {
+      robot.classList.remove('visible', 'floating', 'entering');
+      robot.style.right = '-220px';
+    }, 350);
+  }
+
+  function startTour() {
+    step = 0;
+    // Entry animation: spin in
+    robot.classList.remove('visible', 'floating', 'entering', 'arriving');
+    robot.style.top = '50%';
+    void robot.offsetWidth;
+    robot.classList.add('visible', 'entering');
+    setTimeout(() => {
+      robot.classList.remove('entering');
+      robot.classList.add('floating');
+    }, 1100);
+    goTo(0);
+  }
+
+  nextBtn.addEventListener('click', () => {
+    clearTimeout(timer);
+    step < STEPS.length - 1 ? goTo(step + 1) : endTour();
+  });
+  skipBtn.addEventListener('click', endTour);
+  fab.addEventListener('click', startTour);
+
+  window.addEventListener('load', () => setTimeout(startTour, 1000));
+})();
+</script>
+<!-- ── /TOUR ASSISTANT ── -->
+</body>
+</html>
