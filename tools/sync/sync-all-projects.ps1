@@ -31,9 +31,8 @@ $errors    = [System.Collections.Generic.List[string]]::new()
 # ── BSE ──────────────────────────────────────────────────────────────────────
 try {
     Write-Host "[RV4] Sincronizando BSE ($mesA)..." -ForegroundColor Cyan
-    & (Join-Path $powerbIDir "sync-powerbi-resumen.ps1") `
+    & (Join-Path $powerbIDir "sync-powerbi-bse.ps1") `
         -MesA              $mesA `
-        -IncludeFilterDetail `
         -UploadSupabase `
         -SupabaseServiceKey $SupabaseServiceKey
     $completed.Add("BSE — Bosques de Santa Elena")
