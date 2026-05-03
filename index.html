@@ -267,10 +267,29 @@
         .categories-section { background: var(--surface); padding: 80px 50px; }
         .cat-header { text-align: center; margin-bottom: 50px; }
         .cat-header .section-sub { margin: 0 auto; }
-        .cat-grid {
-            display: grid; grid-template-columns: repeat(5, 1fr);
-            gap: 18px; max-width: 1140px; margin: 0 auto;
+
+        .cat-grid-wrapper { max-width: 920px; margin: 0 auto; }
+        .cat-row-active {
+            display: flex; justify-content: center; gap: 20px; margin-bottom: 36px;
         }
+        .cat-row-active .cat-card { width: 230px; flex-shrink: 0; }
+
+        .cat-wip-divider {
+            display: flex; align-items: center; gap: 16px; margin-bottom: 24px;
+        }
+        .cat-wip-divider::before, .cat-wip-divider::after {
+            content: ''; flex: 1; height: 1px; background: var(--border);
+        }
+        .cat-wip-divider span {
+            font-size: 0.65rem; font-weight: 700; letter-spacing: 1.2px;
+            text-transform: uppercase; color: var(--gray2); white-space: nowrap;
+        }
+
+        .cat-row-wip {
+            display: flex; justify-content: center; gap: 16px;
+        }
+        .cat-row-wip .cat-card { width: 185px; flex-shrink: 0; padding: 22px 14px 18px; }
+
         .cat-card {
             background: var(--surface); border: 1.5px solid var(--border);
             border-radius: 18px; padding: 28px 16px 24px;
@@ -278,13 +297,11 @@
             transition: all .32s cubic-bezier(.34,1.56,.64,1);
             position: relative; overflow: hidden;
         }
-        /* colored top stripe per card */
         .cat-card::before {
             content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
             background: var(--cat-c, var(--border));
             opacity: 0.35; transition: opacity .3s;
         }
-        /* bottom glow on hover */
         .cat-card::after {
             content: ''; position: absolute; inset: 0; border-radius: 18px;
             box-shadow: 0 0 0 0 var(--cat-c, transparent);
@@ -318,23 +335,26 @@
         .cat-card--wip {
             cursor: not-allowed;
             filter: grayscale(1);
-            opacity: 0.55;
+            opacity: 0.5;
+            border-style: dashed;
+            background: #f8fafc;
         }
         .cat-card--wip:hover {
             transform: none !important;
             border-color: var(--border) !important;
             box-shadow: none !important;
         }
-        .cat-card--wip::before { opacity: 0.08 !important; }
-        .cat-card--wip .cat-name { color: #94a3b8 !important; }
+        .cat-card--wip::before { opacity: 0 !important; }
+        .cat-card--wip .cat-icon { background: #f1f5f9; }
+        .cat-card--wip .cat-name { color: #94a3b8 !important; font-weight: 700; }
         .wip-badge {
             display: inline-flex; align-items: center; gap: 5px;
-            font-size: 0.60rem; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase;
-            color: #64748b;
+            font-size: 0.58rem; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
+            color: #94a3b8;
             background: #f1f5f9;
-            border: 1px solid #cbd5e1;
+            border: 1px solid #e2e8f0;
             padding: 3px 9px; border-radius: 20px;
-            margin-top: 2px;
+            margin-top: 4px;
         }
 
         /* ── PROJECTS + MAP ROW ── */
@@ -443,7 +463,8 @@
             .hero h1 { font-size: 2.4rem; }
             .hero-visual { max-width: 100%; }
             .section, .categories-section, .projects-section { padding: 60px 20px; }
-            .cat-grid { grid-template-columns: 1fr; }
+            .cat-row-active, .cat-row-wip { flex-direction: column; align-items: center; }
+            .cat-row-active .cat-card, .cat-row-wip .cat-card { width: 100%; max-width: 320px; }
             .props-grid { grid-template-columns: 1fr; max-height: none; }
             footer { flex-direction: column; gap: 10px; text-align: center; }
         }
@@ -509,31 +530,36 @@
         <div class="section-heading">Proyectos</div>
         <p class="section-sub">Selecciona una categoría para explorar los proyectos disponibles y su ubicación en el mapa.</p>
     </div>
-    <div class="cat-grid">
-        <div class="cat-card active" data-cat="todos" style="--cat-c:#0f172a" onclick="selectCategory(this, 'todos')">
-            <div class="cat-icon">🗂️</div>
-            <div class="cat-name">Todos</div>
-            <div class="cat-count">17 proyectos</div>
+    <div class="cat-grid-wrapper">
+        <div class="cat-row-active">
+            <div class="cat-card active" data-cat="todos" style="--cat-c:#0f172a" onclick="selectCategory(this, 'todos')">
+                <div class="cat-icon">🗂️</div>
+                <div class="cat-name">Todos</div>
+                <div class="cat-count">6 proyectos</div>
+            </div>
+            <div class="cat-card" data-cat="casas" style="--cat-c:#0ea5e9" onclick="selectCategory(this, 'casas')">
+                <div class="cat-icon">🏠</div>
+                <div class="cat-name">Casas</div>
+                <div class="cat-count">6 proyectos</div>
+            </div>
         </div>
-        <div class="cat-card" data-cat="casas" style="--cat-c:#0ea5e9" onclick="selectCategory(this, 'casas')">
-            <div class="cat-icon">🏠</div>
-            <div class="cat-name">Casas</div>
-            <div class="cat-count">6 proyectos</div>
-        </div>
-        <div class="cat-card cat-card--wip" data-cat="lotes" style="--cat-c:#10b981">
-            <div class="cat-icon">🌿</div>
-            <div class="cat-name">Lotes</div>
-            <div class="wip-badge">🚧 En desarrollo</div>
-        </div>
-        <div class="cat-card cat-card--wip" data-cat="edificios" style="--cat-c:#f97316">
-            <div class="cat-icon">🏢</div>
-            <div class="cat-name">Edificios</div>
-            <div class="wip-badge">🚧 En desarrollo</div>
-        </div>
-        <div class="cat-card cat-card--wip" data-cat="maquinaria" style="--cat-c:#f59e0b">
-            <div class="cat-icon">⚙️</div>
-            <div class="cat-name">Maquinaria</div>
-            <div class="wip-badge">🚧 En desarrollo</div>
+        <div class="cat-wip-divider"><span>🔭 Próximos desarrollos</span></div>
+        <div class="cat-row-wip">
+            <div class="cat-card cat-card--wip" data-cat="lotes" style="--cat-c:#10b981">
+                <div class="cat-icon">🌿</div>
+                <div class="cat-name">Lotes</div>
+                <div class="wip-badge">⏳ En desarrollo</div>
+            </div>
+            <div class="cat-card cat-card--wip" data-cat="edificios" style="--cat-c:#f97316">
+                <div class="cat-icon">🏢</div>
+                <div class="cat-name">Edificios</div>
+                <div class="wip-badge">⏳ En desarrollo</div>
+            </div>
+            <div class="cat-card cat-card--wip" data-cat="maquinaria" style="--cat-c:#f59e0b">
+                <div class="cat-icon">⚙️</div>
+                <div class="cat-name">Maquinaria</div>
+                <div class="wip-badge">⏳ En desarrollo</div>
+            </div>
         </div>
     </div>
 </section>
