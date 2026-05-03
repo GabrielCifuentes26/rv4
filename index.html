@@ -684,7 +684,7 @@
         </div>`;
     }
 
-    PROJECTS.forEach(p => {
+    PROJECTS.filter(p => !WIP_CATS.includes(p.cat)).forEach(p => {
         const marker = L.marker([p.lat, p.lng], { icon: makeIcon(CAT_COLORS[p.cat]) })
             .bindPopup(buildPopup(p));
         marker.addTo(map);
