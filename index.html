@@ -359,12 +359,20 @@
 
         /* ── PROJECTS + MAP ROW ── */
         .projects-section { background: var(--bg); padding: 80px 50px; }
-        .projects-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 36px; }
+        .projects-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 36px; }
+        .projects-header-left { display: flex; align-items: center; gap: 14px; }
+        .proj-count-badge {
+            background: var(--blue); color: #fff;
+            font-size: 0.72rem; font-weight: 800;
+            padding: 4px 11px; border-radius: 20px;
+            letter-spacing: 0.3px;
+        }
         .active-cat-pill {
             display: inline-flex; align-items: center; gap: 8px;
             background: var(--navy); color: #fff;
-            padding: 6px 16px; border-radius: 20px;
+            padding: 8px 18px; border-radius: 24px;
             font-size: 0.75rem; font-weight: 600;
+            box-shadow: 0 4px 14px rgba(15,23,42,0.22);
             transition: all .3s;
         }
         .projects-map-row {
@@ -375,63 +383,81 @@
         /* ── PROJECTS GRID ── */
         .props-grid {
             display: grid; grid-template-columns: 1fr 1fr;
-            gap: 18px; max-height: 680px; overflow-y: auto;
-            padding-right: 4px;
+            gap: 16px; max-height: 700px; overflow-y: auto;
+            padding-right: 6px;
         }
-        .props-grid::-webkit-scrollbar { width: 5px; }
-        .props-grid::-webkit-scrollbar-track { background: var(--border); border-radius: 3px; }
-        .props-grid::-webkit-scrollbar-thumb { background: var(--gray2); border-radius: 3px; }
+        .props-grid::-webkit-scrollbar { width: 4px; }
+        .props-grid::-webkit-scrollbar-track { background: transparent; }
+        .props-grid::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
         .prop-card {
-            background: var(--surface); border-radius: 16px;
-            border: 1px solid var(--border); overflow: hidden;
+            background: var(--surface); border-radius: 20px;
+            border: 1.5px solid var(--border); overflow: hidden;
             cursor: pointer;
-            transition: transform .25s, box-shadow .25s, border-color .25s;
+            transition: transform .3s cubic-bezier(.34,1.56,.64,1), box-shadow .3s, border-color .3s;
             animation: scaleIn .4s ease both;
             text-decoration: none; color: inherit; display: block;
         }
-        .prop-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); border-color: var(--blue); }
+        .prop-card:hover {
+            transform: translateY(-7px);
+            box-shadow: 0 20px 48px rgba(14,165,233,0.14), 0 0 0 2px rgba(14,165,233,0.18);
+            border-color: var(--blue);
+        }
         .prop-img {
-            height: 140px; display: flex; align-items: center;
-            justify-content: center; font-size: 3rem; position: relative;
+            height: 155px; display: flex; align-items: center;
+            justify-content: center; font-size: 3.4rem; position: relative; overflow: hidden;
         }
         .prop-img::after {
             content: ''; position: absolute; inset: 0;
-            background: linear-gradient(to bottom, transparent 50%, rgba(15,23,42,0.08));
+            background: linear-gradient(160deg, rgba(255,255,255,0.18) 0%, transparent 60%, rgba(15,23,42,0.14) 100%);
         }
-        .prop-info { padding: 16px; }
-        .prop-name { font-size: 0.88rem; font-weight: 700; color: var(--navy); margin-bottom: 3px; }
-        .prop-location { font-size: 0.72rem; color: var(--gray2); margin-bottom: 10px; display: flex; align-items: center; gap: 4px; }
-        .prop-price { font-size: 1.05rem; font-weight: 800; color: var(--blue-dark); }
+        .prop-info { padding: 16px 18px 18px; }
+        .prop-name { font-size: 0.90rem; font-weight: 800; color: var(--navy); margin-bottom: 4px; line-height: 1.3; }
+        .prop-location { font-size: 0.70rem; color: var(--gray2); margin-bottom: 12px; display: flex; align-items: center; gap: 4px; }
+        .prop-price {
+            font-size: 1.12rem; font-weight: 900; color: var(--blue-dark);
+            background: color-mix(in srgb, var(--blue) 9%, transparent);
+            display: inline-block; padding: 4px 10px; border-radius: 8px; margin-bottom: 2px;
+        }
         .prop-details {
-            display: flex; gap: 10px; margin-top: 10px; padding-top: 10px;
+            display: flex; align-items: center; justify-content: space-between;
+            margin-top: 12px; padding-top: 11px;
             border-top: 1px solid var(--border);
         }
+        .prop-details-left { display: flex; gap: 10px; }
         .prop-detail { font-size: 0.68rem; color: var(--gray2); display: flex; align-items: center; gap: 3px; }
+        .prop-cta {
+            font-size: 0.70rem; font-weight: 700; color: var(--blue);
+            display: flex; align-items: center; gap: 2px;
+            opacity: 0; transform: translateX(-6px);
+            transition: opacity .22s, transform .22s;
+            white-space: nowrap;
+        }
+        .prop-card:hover .prop-cta { opacity: 1; transform: translateX(0); }
 
         /* ── MAP ── */
         .map-container {
             border-radius: 20px; overflow: hidden;
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow);
+            border: 1.5px solid var(--border);
+            box-shadow: 0 8px 32px rgba(15,23,42,0.10);
             position: sticky; top: 90px;
         }
-        #map { height: 680px; width: 100%; }
+        #map { height: 700px; width: 100%; }
         .leaflet-popup-content-wrapper {
-            border-radius: 10px !important;
-            box-shadow: var(--shadow-lg) !important;
+            border-radius: 12px !important;
+            box-shadow: 0 12px 36px rgba(15,23,42,0.18) !important;
             font-family: 'Inter', sans-serif !important;
         }
-        .leaflet-popup-content { margin: 12px 16px !important; }
-        .map-popup-name { font-size: 0.88rem; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
-        .map-popup-cat { font-size: 0.7rem; color: var(--gray); margin-bottom: 10px; }
+        .leaflet-popup-content { margin: 14px 18px !important; }
+        .map-popup-name { font-size: 0.90rem; font-weight: 800; color: var(--navy); margin-bottom: 3px; }
+        .map-popup-cat { font-size: 0.68rem; color: var(--gray); margin-bottom: 12px; }
         .map-popup-btn {
-            display: block; background: var(--orange); color: #fff;
-            text-align: center; padding: 7px 14px; border-radius: 7px;
+            display: block; background: var(--navy); color: #fff;
+            text-align: center; padding: 8px 14px; border-radius: 8px;
             font-size: 0.75rem; font-weight: 700; text-decoration: none;
-            transition: background .2s;
+            transition: background .2s, transform .15s;
         }
-        .map-popup-btn:hover { background: var(--orange-dk); }
+        .map-popup-btn:hover { background: var(--blue-dark); transform: translateY(-1px); }
 
         /* ── EMPTY STATE ── */
         .empty-state {
@@ -567,9 +593,12 @@
 <!-- PROYECTOS EN EJECUCIÓN + MAPA -->
 <section class="projects-section">
     <div class="projects-header">
-        <div>
-            <div class="section-tag">Seguimiento</div>
-            <div class="section-heading">Proyectos en Ejecución</div>
+        <div class="projects-header-left">
+            <div>
+                <div class="section-tag">Seguimiento</div>
+                <div class="section-heading">Proyectos en Ejecución</div>
+            </div>
+            <span class="proj-count-badge" id="projCountBadge">6</span>
         </div>
         <div class="active-cat-pill" id="activePill">
             <span>🗂️</span> <span id="pillText">Todos los proyectos</span>
@@ -721,8 +750,11 @@
                     <div class="prop-location">📍 ${p.loc}</div>
                     <div class="prop-price">${p.price}</div>
                     <div class="prop-details">
-                        ${showHab ? `<span class="prop-detail">🛏 ${p.hab} hab.</span><span class="prop-detail">🚿 ${p.banos} baños</span>` : ''}
-                        <span class="prop-detail">📐 ${p.m2} m²</span>
+                        <div class="prop-details-left">
+                            ${showHab ? `<span class="prop-detail">🛏 ${p.hab} hab.</span><span class="prop-detail">🚿 ${p.banos}</span>` : ''}
+                            <span class="prop-detail">📐 ${p.m2} m²</span>
+                        </div>
+                        <span class="prop-cta">Ver →</span>
                     </div>
                 </div>`;
             grid.appendChild(card);
@@ -766,6 +798,11 @@
 
         renderCards(cat);
         filterMarkers(cat);
+
+        const count = cat === 'todos'
+            ? PROJECTS.filter(p => !WIP_CATS.includes(p.cat)).length
+            : PROJECTS.filter(p => p.cat === cat).length;
+        document.getElementById('projCountBadge').textContent = count;
     }
 
     // ── INIT ──────────────────────────────────────────────────────────────────
