@@ -71,6 +71,20 @@ try {
     Write-Warning "[RV4] Error BDP: $_"
 }
 
+# ── CSE ──────────────────────────────────────────────────────────────────────
+try {
+    Write-Host "[RV4] Sincronizando CSE ($mesA)..." -ForegroundColor Cyan
+    & (Join-Path $powerbIDir "sync-powerbi-cse.ps1") `
+        -MesA              $mesA `
+        -UploadSupabase `
+        -SupabaseServiceKey $SupabaseServiceKey
+    $completed.Add("CSE — Condado Santa Elena")
+    Write-Host "[RV4] CSE completado." -ForegroundColor Green
+} catch {
+    $errors.Add("CSE: $($_.Exception.Message)")
+    Write-Warning "[RV4] Error CSE: $_"
+}
+
 # ── RDB ──────────────────────────────────────────────────────────────────────
 try {
     Write-Host "[RV4] Sincronizando RDB ($mesA)..." -ForegroundColor Cyan

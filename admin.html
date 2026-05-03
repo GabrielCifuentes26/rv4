@@ -1810,7 +1810,7 @@ Si no solicitaste este cambio, por favor contacta de inmediato al área de Costo
             );
             const { data } = await sb2.from('powerbi_resumen_cache')
                 .select('project_key, updated_at')
-                .in('project_key', ['bse', 'hlq', 'bdj', 'bdp', 'rdb']);
+                .in('project_key', ['bse', 'hlq', 'bdj', 'bdp', 'rdb', 'cse']);
             if (!data) return;
             data.forEach(row => {
                 const el = document.getElementById(`pbi-last-${row.project_key}`);
