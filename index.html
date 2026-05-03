@@ -314,6 +314,29 @@
         .cat-name { font-size: 1rem; font-weight: 800; color: var(--navy); margin-bottom: 5px; }
         .cat-count { font-size: 0.73rem; font-weight: 600; color: var(--gray2); }
 
+        /* ── WIP CARDS ── */
+        .cat-card--wip {
+            cursor: not-allowed;
+            filter: grayscale(1);
+            opacity: 0.55;
+        }
+        .cat-card--wip:hover {
+            transform: none !important;
+            border-color: var(--border) !important;
+            box-shadow: none !important;
+        }
+        .cat-card--wip::before { opacity: 0.08 !important; }
+        .cat-card--wip .cat-name { color: #94a3b8 !important; }
+        .wip-badge {
+            display: inline-flex; align-items: center; gap: 5px;
+            font-size: 0.60rem; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase;
+            color: #64748b;
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            padding: 3px 9px; border-radius: 20px;
+            margin-top: 2px;
+        }
+
         /* ── PROJECTS + MAP ROW ── */
         .projects-section { background: var(--bg); padding: 80px 50px; }
         .projects-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 36px; }
@@ -497,20 +520,20 @@
             <div class="cat-name">Casas</div>
             <div class="cat-count">6 proyectos</div>
         </div>
-        <div class="cat-card" data-cat="lotes" style="--cat-c:#10b981" onclick="selectCategory(this, 'lotes')">
+        <div class="cat-card cat-card--wip" data-cat="lotes" style="--cat-c:#10b981">
             <div class="cat-icon">🌿</div>
             <div class="cat-name">Lotes</div>
-            <div class="cat-count">9 proyectos</div>
+            <div class="wip-badge">🚧 En desarrollo</div>
         </div>
-        <div class="cat-card" data-cat="edificios" style="--cat-c:#f97316" onclick="selectCategory(this, 'edificios')">
+        <div class="cat-card cat-card--wip" data-cat="edificios" style="--cat-c:#f97316">
             <div class="cat-icon">🏢</div>
             <div class="cat-name">Edificios</div>
-            <div class="cat-count">2 proyectos</div>
+            <div class="wip-badge">🚧 En desarrollo</div>
         </div>
-        <div class="cat-card" data-cat="maquinaria" style="--cat-c:#f59e0b" onclick="selectCategory(this, 'maquinaria')">
+        <div class="cat-card cat-card--wip" data-cat="maquinaria" style="--cat-c:#f59e0b">
             <div class="cat-icon">⚙️</div>
             <div class="cat-name">Maquinaria</div>
-            <div class="cat-count">0 proyectos</div>
+            <div class="wip-badge">🚧 En desarrollo</div>
         </div>
     </div>
 </section>
@@ -585,13 +608,17 @@
         return `${count} ${count === 1 ? 'proyecto' : 'proyectos'}`;
     }
 
+    const WIP_CATS = ['lotes', 'edificios', 'maquinaria'];
+
     function updateCategoryCounts() {
         Object.keys(CAT_LABELS).forEach(cat => {
-            const count = cat === 'todos' ? PROJECTS.length : PROJECTS.filter(p => p.cat === cat).length;
+            if (WIP_CATS.includes(cat)) return;
+            const count = cat === 'todos'
+                ? PROJECTS.filter(p => !WIP_CATS.includes(p.cat)).length
+                : PROJECTS.filter(p => p.cat === cat).length;
             const countEl = document.querySelector(`.cat-card[data-cat="${cat}"] .cat-count`);
             if (countEl) countEl.textContent = formatProjectCount(count);
         });
-
     }
 
     // ── MAPA ─────────────────────────────────────────────────────────────────
@@ -641,7 +668,9 @@
     // ── TARJETAS ─────────────────────────────────────────────────────────────
     function renderCards(cat) {
         const grid = document.getElementById('propsGrid');
-        const filtered = sortByName(cat === 'todos' ? PROJECTS : PROJECTS.filter(p => p.cat === cat));
+        const filtered = sortByName(cat === 'todos'
+            ? PROJECTS.filter(p => !WIP_CATS.includes(p.cat))
+            : PROJECTS.filter(p => p.cat === cat));
 
         grid.innerHTML = '';
 
