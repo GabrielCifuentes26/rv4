@@ -25,20 +25,21 @@
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth; }
 
         :root {
-            --bg:        #f0f4f8;
+            --bg:        #f5f5f3;
             --surface:   #ffffff;
             --navy:      #0f172a;
             --navy2:     #1e293b;
-            --gray:      #64748b;
-            --gray2:     #94a3b8;
-            --border:    #e2e8f0;
+            --gray:      #6b7280;
+            --gray2:     #9ca3af;
+            --border:    #e8e8e4;
             --blue:      #0ea5e9;
             --blue-dark: #0284c7;
             --orange:    #f97316;
             --orange-dk: #ea6c0a;
             --green:     #10b981;
-            --shadow:    0 4px 24px rgba(15,23,42,0.10);
-            --shadow-lg: 0 12px 40px rgba(15,23,42,0.14);
+            --shadow:    0 2px 16px rgba(15,23,42,0.07);
+            --shadow-md: 0 6px 28px rgba(15,23,42,0.10);
+            --shadow-lg: 0 16px 48px rgba(15,23,42,0.13);
         }
 
         body {
@@ -252,20 +253,48 @@
         .section { padding: 90px 50px; }
         .section-tag {
             display: inline-block;
-            color: var(--blue); font-size: 0.7rem; font-weight: 700;
-            text-transform: uppercase; letter-spacing: 2.5px; margin-bottom: 10px;
+            color: var(--ng); font-size: 0.68rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 2.5px; margin-bottom: 12px;
         }
         .section-heading {
-            font-size: 2.2rem; font-weight: 800; color: var(--navy);
-            letter-spacing: -0.5px; margin-bottom: 10px;
+            font-size: 2.4rem; font-weight: 900; color: var(--navy);
+            letter-spacing: -1px; margin-bottom: 12px; line-height: 1.1;
         }
         .section-sub {
-            color: var(--gray); font-size: 0.95rem; max-width: 480px;
+            color: var(--gray); font-size: 0.93rem; max-width: 480px; line-height: 1.7;
+        }
+
+        /* ── STATS BAR ── */
+        .stats-bar {
+            background: var(--navy);
+            padding: 0 50px;
+            display: flex; justify-content: center;
+            border-bottom: 1px solid rgba(201,168,76,0.18);
+        }
+        .stat-item {
+            display: flex; flex-direction: column; align-items: center;
+            padding: 32px 56px; text-align: center;
+            border-right: 1px solid rgba(255,255,255,0.07);
+            position: relative;
+        }
+        .stat-item:last-child { border-right: none; }
+        .stat-num {
+            font-size: 2.2rem; font-weight: 900; color: var(--ng);
+            letter-spacing: -1.5px; line-height: 1; margin-bottom: 7px;
+        }
+        .stat-label {
+            font-size: 0.64rem; font-weight: 600; letter-spacing: 1.2px;
+            text-transform: uppercase; color: rgba(255,255,255,0.35);
+            white-space: nowrap;
         }
 
         /* ── CATEGORIES ── */
-        .categories-section { background: var(--surface); padding: 80px 50px; }
-        .cat-header { text-align: center; margin-bottom: 50px; }
+        .categories-section {
+            background: #ffffff;
+            padding: 100px 50px;
+            border-bottom: 1px solid var(--border);
+        }
+        .cat-header { text-align: center; margin-bottom: 56px; }
         .cat-header .section-sub { margin: 0 auto; }
 
         .cat-grid-wrapper { max-width: 920px; margin: 0 auto; }
@@ -314,14 +343,15 @@
         }
         .cat-card:hover::before { opacity: 1; }
         .cat-card.active {
-            background: var(--navy); border-color: var(--navy);
-            transform: translateY(-5px);
-            box-shadow: 0 16px 40px rgba(15,23,42,0.28);
+            background: var(--navy);
+            border-color: rgba(201,168,76,0.55);
+            transform: translateY(-6px);
+            box-shadow: 0 20px 50px rgba(15,23,42,0.22), 0 0 0 1px rgba(201,168,76,0.2);
         }
-        .cat-card.active::before { background: var(--cat-c, var(--ng)); opacity: 0.8; }
-        .cat-card.active .cat-icon { background: rgba(255,255,255,0.08); font-size: 1.7rem; }
+        .cat-card.active::before { background: var(--ng); opacity: 1; height: 4px; }
+        .cat-card.active .cat-icon { background: rgba(201,168,76,0.12); font-size: 1.7rem; }
         .cat-card.active .cat-name { color: #fff; }
-        .cat-card.active .cat-count { color: rgba(255,255,255,0.45); }
+        .cat-card.active .cat-count { color: rgba(255,255,255,0.4); }
         .cat-icon {
             width: 58px; height: 58px; border-radius: 14px;
             background: var(--bg); display: flex; align-items: center;
@@ -358,21 +388,23 @@
         }
 
         /* ── PROJECTS + MAP ROW ── */
-        .projects-section { background: var(--bg); padding: 80px 50px; }
-        .projects-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 36px; }
+        .projects-section { background: var(--bg); padding: 90px 50px; }
+        .projects-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 40px; }
         .projects-header-left { display: flex; align-items: center; gap: 14px; }
         .proj-count-badge {
-            background: var(--blue); color: #fff;
-            font-size: 0.72rem; font-weight: 800;
-            padding: 4px 11px; border-radius: 20px;
+            background: rgba(201,168,76,0.15); color: var(--ng);
+            border: 1px solid rgba(201,168,76,0.35);
+            font-size: 0.70rem; font-weight: 800;
+            padding: 4px 12px; border-radius: 20px;
             letter-spacing: 0.3px;
         }
         .active-cat-pill {
             display: inline-flex; align-items: center; gap: 8px;
             background: var(--navy); color: #fff;
-            padding: 8px 18px; border-radius: 24px;
-            font-size: 0.75rem; font-weight: 600;
-            box-shadow: 0 4px 14px rgba(15,23,42,0.22);
+            padding: 9px 20px; border-radius: 24px;
+            font-size: 0.73rem; font-weight: 600;
+            border: 1px solid rgba(201,168,76,0.2);
+            box-shadow: 0 4px 18px rgba(15,23,42,0.20);
             transition: all .3s;
         }
         .projects-map-row {
@@ -469,13 +501,32 @@
 
         /* ── FOOTER ── */
         footer {
-            background: var(--navy); color: rgba(255,255,255,0.5);
-            padding: 30px 50px;
+            background: var(--navy);
+            border-top: 1px solid rgba(201,168,76,0.15);
+        }
+        .footer-top {
+            display: grid; grid-template-columns: 1fr auto;
+            gap: 80px; align-items: start;
+            max-width: 1140px; margin: 0 auto;
+            padding: 64px 50px 48px;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+        }
+        .footer-brand-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+        .footer-logo-img { height: 30px; filter: brightness(0) invert(1); }
+        .footer-logo { font-size: 0.95rem; font-weight: 900; color: #fff; letter-spacing: 2px; text-transform: uppercase; }
+        .footer-logo span { color: var(--ng); }
+        .footer-desc { font-size: 0.80rem; color: rgba(255,255,255,0.35); line-height: 1.75; max-width: 300px; }
+        .footer-nav { display: flex; flex-direction: column; gap: 4px; }
+        .footer-nav-label { font-size: 0.62rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.22); margin-bottom: 10px; }
+        .footer-nav a { font-size: 0.82rem; color: rgba(255,255,255,0.45); text-decoration: none; padding: 4px 0; transition: color .2s; display: block; }
+        .footer-nav a:hover { color: var(--ng); }
+        .footer-bottom {
+            max-width: 1140px; margin: 0 auto;
+            padding: 22px 50px;
             display: flex; justify-content: space-between; align-items: center;
         }
-        .footer-logo { font-size: 1rem; font-weight: 900; color: #fff; letter-spacing: 2px; }
-        .footer-logo span { color: var(--blue); }
-        .footer-copy { font-size: 0.72rem; }
+        .footer-copy { font-size: 0.70rem; color: rgba(255,255,255,0.22); }
+        .footer-version { font-size: 0.68rem; color: rgba(201,168,76,0.35); font-weight: 600; letter-spacing: 0.5px; }
 
         /* ── RESPONSIVE ── */
         @media (max-width: 1024px) {
@@ -489,10 +540,13 @@
             .hero h1 { font-size: 2.4rem; }
             .hero-visual { max-width: 100%; }
             .section, .categories-section, .projects-section { padding: 60px 20px; }
+            .stats-bar { padding: 0; flex-wrap: wrap; }
+            .stat-item { padding: 22px 30px; flex: 1 1 45%; border-bottom: 1px solid rgba(255,255,255,0.07); }
             .cat-row-active, .cat-row-wip { flex-direction: column; align-items: center; }
             .cat-row-active .cat-card, .cat-row-wip .cat-card { width: 100%; max-width: 320px; }
             .props-grid { grid-template-columns: 1fr; max-height: none; }
-            footer { flex-direction: column; gap: 10px; text-align: center; }
+            .footer-top { grid-template-columns: 1fr; gap: 32px; padding: 48px 20px 32px; }
+            .footer-bottom { padding: 18px 20px; flex-direction: column; gap: 6px; text-align: center; }
         }
     </style>
 </head>
@@ -547,6 +601,26 @@
         </div>
     </div>
     <div class="slider-dots" id="sliderDots"></div>
+</section>
+
+<!-- STATS BAR -->
+<section class="stats-bar">
+    <div class="stat-item">
+        <span class="stat-num">6</span>
+        <span class="stat-label">Proyectos activos</span>
+    </div>
+    <div class="stat-item">
+        <span class="stat-num">5</span>
+        <span class="stat-label">Municipios</span>
+    </div>
+    <div class="stat-item">
+        <span class="stat-num">Q 5.6M</span>
+        <span class="stat-label">En presupuesto</span>
+    </div>
+    <div class="stat-item">
+        <span class="stat-num">3</span>
+        <span class="stat-label">Próximas categorías</span>
+    </div>
 </section>
 
 <!-- CATEGORÍAS -->
@@ -618,8 +692,26 @@
 
 <!-- FOOTER -->
 <footer>
-    <div class="footer-logo">Costos&<span>Presupuestos</span></div>
-    <div class="footer-copy">© 2026 Costos&Presupuestos. Todos los derechos reservados.</div>
+    <div class="footer-top">
+        <div class="footer-brand">
+            <div class="footer-brand-wrap">
+                <img src="imagenes de proyectos/Logos/LOGO RV4 BLANCO.png" alt="RV4" class="footer-logo-img">
+                <span class="footer-logo">Costos&<span>Presupuestos</span></span>
+            </div>
+            <p class="footer-desc">Sistema de control presupuestario y seguimiento de proyectos inmobiliarios en Guatemala.</p>
+        </div>
+        <div class="footer-nav">
+            <div class="footer-nav-label">Módulos</div>
+            <a href="#proyectos">Proyectos</a>
+            <a href="cierre-contable.html">Cierre Contable</a>
+            <a href="creacion-tableros.html">Tableros</a>
+            <a href="avance-lotes.html">Avance Lotes</a>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <span class="footer-copy">© 2026 RV Cuatro. Todos los derechos reservados.</span>
+        <span class="footer-version">C&P v2.0</span>
+    </div>
 </footer>
 
 <script>
