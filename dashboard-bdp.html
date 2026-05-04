@@ -1523,8 +1523,10 @@
 
     function rowHasFilterValues(row) {
         if (!hasValue(row)) return false;
-        // Only require core structural dimensions; Etapa and MesA can be null for some rows
+        // Only require dimensions that have data; skip ones with no options (e.g. fases not in BDP)
         return ['areas', 'segmentos', 'fases'].every(key => {
+            const options = powerBIState.options[key] || [];
+            if (!options.length) return true;
             const config = FILTER_CONFIG.find(c => c.key === key);
             return config && filterDimension(row, config);
         });
@@ -2419,8 +2421,8 @@
 
     function renderPowerBIResumen(data) {
         powerBIState.data = data;
-        powerBIState.filters = { areas: [], segmentos: [], fases: [], meses: [] };
-        powerBIState.options = { areas: [], segmentos: [], fases: [], meses: [] };
+        powerBIState.filters = { areas: [], segmentos: [], etapas: [], fases: [], meses: [] };
+        powerBIState.options = { areas: [], segmentos: [], etapas: [], fases: [], meses: [] };
         bindPowerBIFilters();
         initSearch();
         bindKpiCards();
