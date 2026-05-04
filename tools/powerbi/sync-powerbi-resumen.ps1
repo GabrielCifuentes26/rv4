@@ -415,6 +415,7 @@ SUMMARIZECOLUMNS(
     $segmentoColumnDax,
     $etapaColumnDax,
 $($faseDaxLine)    $areaFilterDax,
+    $mainFilterDax
     "RdiTotal", $rdiMeasureDax,
     "PresupuestoErequester", $pptoErMeasureDax,
     "EjecutadoErequester", $ejecutadoMeasureDax,
