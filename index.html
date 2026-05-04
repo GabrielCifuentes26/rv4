@@ -18,8 +18,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
 
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth; }
@@ -472,28 +470,6 @@
         }
         .prop-card:hover .prop-cta { background: var(--blue); color: #fff; }
 
-        /* ── MAP ── */
-        .map-container {
-            border-radius: 20px; overflow: hidden;
-            border: 1.5px solid var(--border);
-            box-shadow: 0 8px 32px rgba(15,23,42,0.10);
-        }
-        #map { height: 480px; width: 100%; }
-        .leaflet-popup-content-wrapper {
-            border-radius: 12px !important;
-            box-shadow: 0 12px 36px rgba(15,23,42,0.18) !important;
-            font-family: 'Inter', sans-serif !important;
-        }
-        .leaflet-popup-content { margin: 14px 18px !important; }
-        .map-popup-name { font-size: 0.90rem; font-weight: 800; color: var(--navy); margin-bottom: 3px; }
-        .map-popup-cat { font-size: 0.68rem; color: var(--gray); margin-bottom: 12px; }
-        .map-popup-btn {
-            display: block; background: var(--navy); color: #fff;
-            text-align: center; padding: 8px 14px; border-radius: 8px;
-            font-size: 0.75rem; font-weight: 700; text-decoration: none;
-            transition: background .2s, transform .15s;
-        }
-        .map-popup-btn:hover { background: var(--blue-dark); transform: translateY(-1px); }
 
         /* ── EMPTY STATE ── */
         .empty-state {
@@ -645,10 +621,6 @@
         <!-- Tarjetas de proyectos -->
         <div class="props-grid" id="propsGrid"></div>
 
-        <!-- Mapa Leaflet -->
-        <div class="map-container">
-            <div id="map"></div>
-        </div>
     </div>
 </section>
 
@@ -869,52 +841,6 @@
         });
     }
 
-    // ── MAPA ─────────────────────────────────────────────────────────────────
-    const map = L.map('map', { zoomControl: true, scrollWheelZoom: true })
-        .setView([14.7000, -90.3000], 7);
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a>',
-        maxZoom: 18
-    }).addTo(map);
-
-    // Custom marker icon factory
-    function makeIcon(color) {
-        return L.divIcon({
-            className: '',
-            html: `<div style="
-                width:32px; height:32px; border-radius:50% 50% 50% 0;
-                background:${color}; border:3px solid #fff;
-                box-shadow:0 3px 10px rgba(0,0,0,0.25);
-                transform:rotate(-45deg);
-            "></div>`,
-            iconSize: [32, 32], iconAnchor: [16, 32], popupAnchor: [0, -34]
-        });
-    }
-
-    const CAT_COLORS = { casas:'#0ea5e9', lotes:'#10b981', edificios:'#f97316', maquinaria:'#f59e0b' };
-
-    let markers = {};
-
-    function buildPopup(p) {
-        const catLabel = { casas:'Casa', lotes:'Lote', edificios:'Edificio', maquinaria:'Maquinaria' }[p.cat];
-        const dashboardUrl = p.dashboardUrl || `dashboard.html?project=${encodeURIComponent(p.name)}`;
-        return `<div>
-            <div class="map-popup-name">${p.name}</div>
-            <div class="map-popup-cat">${catLabel} · ${p.loc}</div>
-            <a href="${dashboardUrl}" class="map-popup-btn">Ver dashboard →</a>
-        </div>`;
-    }
-
-    const casaLatLngs = [];
-    PROJECTS.filter(p => !WIP_CATS.includes(p.cat)).forEach(p => {
-        const marker = L.marker([p.lat, p.lng], { icon: makeIcon(CAT_COLORS[p.cat]) })
-            .bindPopup(buildPopup(p));
-        marker.addTo(map);
-        markers[p.id] = { marker, cat: p.cat };
-        if (p.cat === 'casas') casaLatLngs.push([p.lat, p.lng]);
-    });
-    if (casaLatLngs.length) map.fitBounds(casaLatLngs, { padding: [60, 60] });
 
     // ── TARJETAS ─────────────────────────────────────────────────────────────
     function renderCards(cat) {
@@ -953,28 +879,6 @@
         });
     }
 
-    // ── FILTRO MAPA ───────────────────────────────────────────────────────────
-    function filterMarkers(cat) {
-        Object.values(markers).forEach(({ marker, cat: mcat }) => {
-            if (cat === 'todos' || mcat === cat) {
-                if (!map.hasLayer(marker)) map.addLayer(marker);
-            } else {
-                if (map.hasLayer(marker)) map.removeLayer(marker);
-            }
-        });
-
-        // Ajustar vista del mapa
-        const visible = Object.values(markers)
-            .filter(({ cat: mcat }) => cat === 'todos' || mcat === cat)
-            .map(({ marker }) => marker.getLatLng());
-
-        if (visible.length > 0) {
-            const group = L.featureGroup(Object.values(markers)
-                .filter(({ cat: mcat }) => cat === 'todos' || mcat === cat)
-                .map(({ marker }) => marker));
-            map.fitBounds(group.getBounds().pad(0.2));
-        }
-    }
 
     // ── SELECCIÓN DE CATEGORÍA ────────────────────────────────────────────────
     function selectCategory(el, cat) {
@@ -989,7 +893,6 @@
         document.querySelector('.projects-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
 
         renderCards(cat);
-        filterMarkers(cat);
 
         const count = cat === 'todos'
             ? PROJECTS.filter(p => !WIP_CATS.includes(p.cat)).length
