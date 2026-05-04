@@ -2408,8 +2408,6 @@
 
     function renderPowerBIResumen(data) {
         powerBIState.data = data;
-        powerBIState.filters = { areas: [], segmentos: [], etapas: [], fases: [], meses: [] };
-        powerBIState.options = { areas: [], segmentos: [], etapas: [], fases: [], meses: [] };
         try {
             bindPowerBIFilters();
             initSearch();
@@ -2418,8 +2416,7 @@
         } catch(e) {
             console.warn('[BDP] Error en binding de controles:', e);
         }
-        populateFilterControls();
-        renderPowerBIView();
+        document.getElementById('filter-clear')?.click();
     }
 
     async function loadPowerBIResumenFromSupabase() {
