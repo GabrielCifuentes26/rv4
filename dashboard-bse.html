@@ -1989,7 +1989,7 @@
         bindTableDrill(areaBody);
     }
 
-    function renderAreaTable(areaRows, totals, detailRows) {
+    function renderAreaTable(areaRows, totals, detailRows, segmentoPool, etapaPool) {
         const areaBody = document.getElementById('resumen-area-body');
         if (!areaBody) return;
 
@@ -2034,21 +2034,27 @@
                 const segName = String(segRow.label || '').trim();
                 const segDetail = areaDetail.filter(r =>
                     String(dimension(r, 'Rubros[Segmento]') || '').trim() === segName);
-                const etapaRows = groupRowsBy(segDetail, 'Rubros[Etapa]').filter(e => e.label);
-                const segExp = etapaRows.length > 0;
+                const etapaRowsGrp = groupRowsBy(segDetail, 'Rubros[Etapa]').filter(e => e.label);
+                const segExp = etapaRowsGrp.length > 0;
+
+                // Use pre-aggregated porSegmento row when available for correct metrics
+                const segPoolRow = segmentoPool && segmentoPool.find(r =>
+                    String(dimension(r, 'Rubros[Segmento]') || '').trim() === segName);
 
                 html += `<tr class="tr-l2 tr-child${segExp ? ' tr-expandable' : ''} tr-hidden" data-ai="${ai}" data-si="${si}" data-rawseg="${segName}">
                     <td class="td-l2" style="border-left:3px solid ${cfg.color}">
                         ${segExp ? '<span class="row-chev"></span>' : '<span class="row-chev-ph"></span>'}
                         ${escapeHtml(segName)}
-                    </td>${metricCells(segRow)}</tr>`;
+                    </td>${metricCells(segPoolRow || segRow)}</tr>`;
 
                 // Level 3 — Etapas
-                etapaRows.forEach(etRow => {
+                etapaRowsGrp.forEach(etRow => {
+                    const etapaPoolRow = etapaPool && etapaPool.find(r =>
+                        String(dimension(r, 'Rubros[Etapa]') || '').trim() === String(etRow.label || '').trim());
                     html += `<tr class="tr-l3 tr-child tr-hidden" data-ai="${ai}" data-si="${si}">
                         <td class="td-l3" style="border-left:3px solid ${cfg.color}44">
                             ${escapeHtml(etRow.label)}
-                        </td>${metricCells(etRow)}</tr>`;
+                        </td>${metricCells(etapaPoolRow || etRow)}</tr>`;
                 });
             });
         });
@@ -2070,6 +2076,8 @@
     }
 
     function bindTableDrill(tbody) {
+        if (tbody.dataset.drillBound) return;
+        tbody.dataset.drillBound = '1';
         tbody.addEventListener('click', e => {
             const tr = e.target.closest('tr.tr-expandable');
             if (!tr) return;
@@ -2448,7 +2456,7 @@
         }
 
         renderMetrics(totals);
-        renderAreaTable(areaRows, totals, rawDetailRows);
+        renderAreaTable(areaRows, totals, rawDetailRows, segmentoRows, etapaRows);
         renderCharts(etapaRows, areaRows, segmentoRows);
         renderTendenciaFase(rawDetailRows);
 
@@ -2578,16 +2586,6 @@
             if (label) applyChartFilter('meses', label, null);
         });
 
-        // ── Tabla → Área (tr-l1) o Segmento (tr-l2) ─────────────
-        document.getElementById('resumen-area-body').addEventListener('click', e => {
-            const row = e.target.closest('tr');
-            if (!row || row.classList.contains('total-row')) return;
-            if (row.classList.contains('tr-l1') && row.dataset.rawname) {
-                applyChartFilter('areas', row.dataset.rawname, row);
-            } else if (row.classList.contains('tr-l2') && row.dataset.rawseg) {
-                applyChartFilter('segmentos', row.dataset.rawseg, row);
-            }
-        });
     }
     // ── /Chart-click filters ─────────────────────────────────────
 
