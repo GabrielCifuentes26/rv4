@@ -879,7 +879,7 @@
             </div>
             <div class="kpi-texts">
                 <div class="kpi-label">Comprometido</div>
-                <div class="kpi-value" id="kpi-comprometido">19.95 <span>mill.</span></div>
+                <div class="kpi-value" id="kpi-comprometido">-- <span>mill.</span></div>
             </div>
         </div>
         <div class="kpi-card" data-kpi="asignado">
@@ -888,7 +888,7 @@
             </div>
             <div class="kpi-texts">
                 <div class="kpi-label">Asignado</div>
-                <div class="kpi-value" id="kpi-asignado">149.33 <span>mill.</span></div>
+                <div class="kpi-value" id="kpi-asignado">-- <span>mill.</span></div>
             </div>
         </div>
         <div class="kpi-card" data-kpi="disponible">
@@ -897,7 +897,7 @@
             </div>
             <div class="kpi-texts">
                 <div class="kpi-label">Disponible</div>
-                <div class="kpi-value" id="kpi-disponible">13.06 <span>mill.</span></div>
+                <div class="kpi-value" id="kpi-disponible">-- <span>mill.</span></div>
             </div>
         </div>
         <div class="kpi-card" data-kpi="pct-asignado" style="cursor:default">
@@ -926,14 +926,6 @@
                         </tr>
                     </thead>
                     <tbody id="resumen-area-body">
-                        <tr><td>Construcción</td><td>120,477,476.11</td><td>123,454,431.78</td><td>98,168,770.89</td><td>16,540,708.91</td><td>114,709,479.80</td><td>8,744,951.98</td><td class="pct-asig">92.92%</td><td class="pct-disp">7.08%</td></tr>
-                        <tr><td>Urbanización</td><td>29,837,668.62</td><td>29,939,366.88</td><td>25,195,463.25</td><td>1,984,100.25</td><td>27,179,563.50</td><td>2,759,803.38</td><td class="pct-asig">90.79%</td><td class="pct-disp">9.21%</td></tr>
-                        <tr><td>I.7a Construcción</td><td>4,122,589.34</td><td>2,840,245.67</td><td>1,950,423.18</td><td>441,209.56</td><td>2,391,632.74</td><td>448,612.93</td><td class="pct-asig">84.20%</td><td class="pct-disp">15.80%</td></tr>
-                        <tr><td>I.7a Urbanización</td><td>2,358,147.25</td><td>1,640,198.45</td><td>1,278,456.83</td><td>218,643.21</td><td>1,497,100.04</td><td>143,098.41</td><td class="pct-asig">91.28%</td><td class="pct-disp">8.72%</td></tr>
-                        <tr><td>I.7a Infraestructura</td><td>1,036,089.81</td><td>299,982.34</td><td>584,814.64</td><td>165,579.51</td><td>750,394.15</td><td>-450,411.81</td><td class="pct-asig">250.15%</td><td class="pct-neg">-150.15%</td></tr>
-                        <tr><td>Megaproyecto Urbanización</td><td>1,000,000.00</td><td>980,000.00</td><td>789,234.56</td><td>140,000.00</td><td>929,234.56</td><td>50,765.44</td><td class="pct-asig">94.82%</td><td class="pct-disp">5.18%</td></tr>
-                        <tr><td>Megaproyecto Infraestructura</td><td>3,245,344.76</td><td>3,129,066.57</td><td>1,402,996.62</td><td>464,803.01</td><td>1,867,799.63</td><td>1,261,266.94</td><td class="pct-asig">59.69%</td><td class="pct-disp">40.31%</td></tr>
-                        <tr class="total-row"><td>Total</td><td>162,077,315.89</td><td>162,283,291.69</td><td>129,370,159.97</td><td>19,955,044.45</td><td>149,325,204.42</td><td>13,064,142.32</td><td class="pct-asig">91.98%</td><td class="pct-disp">8.04%</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -2418,10 +2410,14 @@
         powerBIState.data = data;
         powerBIState.filters = { areas: [], segmentos: [], etapas: [], fases: [], meses: [] };
         powerBIState.options = { areas: [], segmentos: [], etapas: [], fases: [], meses: [] };
-        bindPowerBIFilters();
-        initSearch();
-        bindKpiCards();
-        bindChartFilters();
+        try {
+            bindPowerBIFilters();
+            initSearch();
+            bindKpiCards();
+            bindChartFilters();
+        } catch(e) {
+            console.warn('[BDP] Error en binding de controles:', e);
+        }
         populateFilterControls();
         renderPowerBIView();
     }
