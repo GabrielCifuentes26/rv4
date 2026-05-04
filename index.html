@@ -417,20 +417,32 @@
         .prop-location { font-size: 0.67rem; color: var(--gray2); margin-bottom: 0; display: flex; align-items: center; gap: 3px; }
         /* Métricas en 3 columnas horizontales */
         .prop-budget-summary {
-            display: flex; gap: 0; margin-top: 12px;
+            display: flex; gap: 0; margin-top: 13px;
+            border-top: 1px solid var(--border); padding-top: 11px;
         }
         .prop-budget-col {
-            flex: 1; padding: 6px 0; display: flex; flex-direction: column; gap: 2px;
+            flex: 1; display: flex; flex-direction: column; gap: 4px;
+            padding-right: 10px;
         }
-        .prop-budget-col--pct { }
-        .prop-budget-lbl { font-size: 0.58rem; color: var(--gray2); font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; white-space: nowrap; }
-        .prop-budget-val { font-size: 0.82rem; font-weight: 900; color: var(--navy); line-height: 1; }
-        .prop-budget-val--pct { color: #059669; }
+        .prop-budget-col + .prop-budget-col {
+            padding-left: 10px; padding-right: 10px;
+            border-left: 1px solid var(--border);
+        }
+        .prop-budget-col:last-child { padding-right: 0; }
+        .prop-budget-col--pct .prop-budget-val { color: #059669; }
+        .prop-budget-lbl {
+            font-size: 0.60rem; color: #94a3b8; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap;
+        }
+        .prop-budget-val {
+            font-size: 0.88rem; font-weight: 900; color: var(--navy);
+            line-height: 1; letter-spacing: -0.3px;
+        }
         /* Barra de avance */
-        .prop-budget-track-wrap { margin-top: 10px; }
-        .prop-budget-track-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
-        .prop-budget-track-lbl { font-size: 0.60rem; color: var(--gray2); font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; }
-        .prop-budget-track-pct { font-size: 0.68rem; font-weight: 800; color: var(--blue-dark); }
+        .prop-budget-track-wrap { margin-top: 12px; }
+        .prop-budget-track-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+        .prop-budget-track-lbl { font-size: 0.60rem; color: #94a3b8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .prop-budget-track-pct { font-size: 0.72rem; font-weight: 900; color: #059669; }
         .prop-budget-track {
             height: 5px; border-radius: 999px; background: #e2e8f0; overflow: hidden;
         }
