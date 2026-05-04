@@ -418,14 +418,11 @@
         /* Métricas en 3 columnas horizontales */
         .prop-budget-summary {
             display: flex; gap: 0; margin-top: 12px;
-            border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
         }
         .prop-budget-col {
-            flex: 1; padding: 7px 8px; display: flex; flex-direction: column; gap: 2px;
-            border-right: 1px solid var(--border);
+            flex: 1; padding: 6px 0; display: flex; flex-direction: column; gap: 2px;
         }
-        .prop-budget-col:last-child { border-right: none; }
-        .prop-budget-col--pct { background: rgba(16,185,129,0.05); }
+        .prop-budget-col--pct { }
         .prop-budget-lbl { font-size: 0.58rem; color: var(--gray2); font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; white-space: nowrap; }
         .prop-budget-val { font-size: 0.82rem; font-weight: 900; color: var(--navy); line-height: 1; }
         .prop-budget-val--pct { color: #059669; }
