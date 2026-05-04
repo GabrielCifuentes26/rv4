@@ -381,8 +381,8 @@ ORDER BY $monthColumnDax
 }
 
 if ($IncludeFilterDetail) {
-    # bse model uses dimFase[Fase] instead of Rubros[Fase] — both profiles include Fase
-    $hasFaseColumn = $true
+    # bse model: Rubros only has Area, Segmento, Etapa — no Fase dimension exists
+    $hasFaseColumn = ($ModelProfile -ne "bse")
 
     if ($hasFaseColumn) {
         $queries.porFase = @"
