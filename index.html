@@ -742,6 +742,29 @@
 
     async function loadSapSummaries() {
         const projectsWithSap = PROJECTS.filter(project => SAP_PROJECT_KEYS[project.id]);
+        try {
+            const response = await fetch('assets/data/project-sap-summary.json', { cache: 'no-store' });
+            if (response.ok) {
+                const payload = await response.json();
+                projectsWithSap.forEach(project => {
+                    const summary = payload?.projects?.[project.id];
+                    if (!summary) return;
+
+                    const presupuestoSap = Number(summary.presupuestoSap) || 0;
+                    const asignado = Number(summary.asignado) || 0;
+                    const pct = Number(summary.pct ?? (presupuestoSap ? asignado / presupuestoSap : 0)) || 0;
+                    project.sapSummary = { presupuestoSap, asignado, pct };
+                });
+
+                if (projectsWithSap.every(project => project.sapSummary)) {
+                    renderCards(activeCategory);
+                    return;
+                }
+            }
+        } catch (error) {
+            console.warn('No se pudo cargar el resumen SAP publico; usando fallback local.', error);
+        }
+
         await Promise.all(projectsWithSap.map(async project => {
             const key = SAP_PROJECT_KEYS[project.id];
             try {
