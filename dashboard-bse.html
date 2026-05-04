@@ -2558,7 +2558,7 @@
         });
 
         // ── Tendencia chart → Mes ────────────────────────────────
-        document.getElementById('tendenciaChart').addEventListener('click', e => {
+        document.getElementById('tendenciaChart')?.addEventListener('click', e => {
             if (!tendenciaChart) return;
             const pts = tendenciaChart.getElementsAtEventForMode(e, 'index', { intersect: false }, false);
             if (!pts.length) return;
