@@ -376,8 +376,8 @@
             transition: all .3s;
         }
         .projects-map-row {
-            display: grid; grid-template-columns: 3fr 2fr;
-            gap: 28px; align-items: start;
+            display: flex; flex-direction: column;
+            gap: 28px;
         }
 
         /* ── PROJECTS GRID ── */
@@ -477,9 +477,8 @@
             border-radius: 20px; overflow: hidden;
             border: 1.5px solid var(--border);
             box-shadow: 0 8px 32px rgba(15,23,42,0.10);
-            position: sticky; top: 90px;
         }
-        #map { height: 700px; width: 100%; }
+        #map { height: 480px; width: 100%; }
         .leaflet-popup-content-wrapper {
             border-radius: 12px !important;
             box-shadow: 0 12px 36px rgba(15,23,42,0.18) !important;
