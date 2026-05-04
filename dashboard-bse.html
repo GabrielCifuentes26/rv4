@@ -1324,7 +1324,7 @@
     const FILTER_CONFIG = [
         { key: 'areas',     optionKey: 'areas',     dimensionName: 'Rubros[Area]',        fallbackDataset: 'porArea',       cardId: 'area-filter-card',    buttonId: 'filter-area-button',    menuId: 'filter-area-menu',    labelId: 'filter-area-label' },
         { key: 'segmentos', optionKey: 'segmentos', dimensionName: 'Rubros[Segmento]',    fallbackDataset: 'porSegmento',   cardId: 'segmento-filter-card', buttonId: 'filter-segmento-button', menuId: 'filter-segmento-menu', labelId: 'filter-segmento-label' },
-        { key: 'etapas',    optionKey: 'etapas',    dimensionName: 'Rubros[Etapa]',       fallbackDataset: 'porArea',       cardId: 'etapa-filter-card',   buttonId: 'filter-etapa-button',   menuId: 'filter-etapa-menu',   labelId: 'filter-etapa-label' },
+        { key: 'etapas',    optionKey: 'etapas',    dimensionName: 'Rubros[Etapa]',       fallbackDataset: 'porEtapa',      cardId: 'etapa-filter-card',   buttonId: 'filter-etapa-button',   menuId: 'filter-etapa-menu',   labelId: 'filter-etapa-label' },
         { key: 'fases',     optionKey: 'fases',     dimensionName: 'Rubros[Fase]',        fallbackDataset: 'porFase',       cardId: 'fase-filter-card',    buttonId: 'filter-fase-button',    menuId: 'filter-fase-menu',    labelId: 'filter-fase-label' },
         { key: 'meses',     optionKey: 'meses',     dimensionName: 'Calendario[MesA]',    fallbackDataset: 'porMesResumen', cardId: 'mes-filter-card',     buttonId: 'filter-mes-button',     menuId: 'filter-mes-menu',     labelId: 'filter-mes-label' }
     ];
@@ -2141,7 +2141,36 @@
 
     function renderTendenciaFase(detailRows) {
         if (detailRows && detailRows.length) tendenciaLastRows = detailRows;
-        const rows   = tendenciaLastRows;
+        let rows = tendenciaLastRows;
+
+        // Fallback: sin detalleFiltros, construir filas sintéticas desde porArea × porMesResumen
+        if ((!rows || !rows.length) && powerBIState.data) {
+            const areaRowsFb  = powerBIState.data.datasets?.porArea       || [];
+            const monthRowsFb = powerBIState.data.datasets?.porMesResumen || [];
+            if (areaRowsFb.length && monthRowsFb.length) {
+                const totalPpto = areaRowsFb.reduce((s, r) => s + field(r, 'PresupuestoErequester'), 0) || 1;
+                rows = [];
+                monthRowsFb.forEach(mr => {
+                    const mes = dimension(mr, 'Calendario[MesA]');
+                    if (!mes) return;
+                    areaRowsFb.forEach(ar => {
+                        const areaPct = field(ar, 'PresupuestoErequester') / totalPpto;
+                        const synth = { ...mr };
+                        synth['[Rubros[Area]]'] = dimension(ar, 'Rubros[Area]');
+                        synth['[Rubros[Segmento]]'] = dimension(ar, 'Rubros[Area]');
+                        synth['[Rubros[Etapa]]'] = '';
+                        synth['[Rubros[Fase]]'] = '';
+                        ['EjecutadoErequester', 'ComprometidoErequester', 'AsignadoErequester', 'DisponibleErequester'].forEach(m => {
+                            synth[`[${m}]`] = field(mr, m) * areaPct;
+                        });
+                        synth['[PresupuestoErequester]'] = field(ar, 'PresupuestoErequester');
+                        rows.push(synth);
+                    });
+                });
+                tendenciaLastRows = rows;
+            }
+        }
+
         const canvas = document.getElementById('tendenciaChart');
         if (!canvas) return;
 
@@ -2393,10 +2422,13 @@
             areaRows     = groupRowsBy(rawDetailRows, 'Rubros[Area]');
             etapaRows    = groupRowsBy(rawDetailRows, 'Rubros[Etapa]');
             segmentoRows = groupRowsBy(rawDetailRows, 'Rubros[Segmento]');
-        } else if (powerBIState.filters.meses.length) {
-            const monthRows = getMonthRows(data)
-                .filter(row => powerBIState.filters.meses.includes(cleanDimension(dimension(row, 'Calendario[MesA]'))));
-            if (monthRows.length) totals = sumRows(monthRows);
+        } else {
+            segmentoRows = datasets.porSegmento || [];
+            if (powerBIState.filters.meses.length) {
+                const monthRows = getMonthRows(data)
+                    .filter(row => powerBIState.filters.meses.includes(cleanDimension(dimension(row, 'Calendario[MesA]'))));
+                if (monthRows.length) totals = sumRows(monthRows);
+            }
         }
 
         renderMetrics(totals);
@@ -2417,8 +2449,8 @@
 
     function renderPowerBIResumen(data) {
         powerBIState.data = data;
-        powerBIState.filters = { areas: [], segmentos: [], fases: [], meses: [] };
-        powerBIState.options = { areas: [], segmentos: [], fases: [], meses: [] };
+        powerBIState.filters = { areas: [], segmentos: [], etapas: [], fases: [], meses: [] };
+        powerBIState.options = { areas: [], segmentos: [], etapas: [], fases: [], meses: [] };
         bindPowerBIFilters();
         initSearch();
         bindKpiCards();

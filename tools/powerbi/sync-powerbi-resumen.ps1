@@ -381,7 +381,11 @@ ORDER BY $monthColumnDax
 }
 
 if ($IncludeFilterDetail) {
-    $queries.porFase = @"
+    # bse model: Rubros[Fase] does not exist — skip porFase and omit it from detalleFiltros
+    $hasFaseColumn = ($ModelProfile -ne "bse")
+
+    if ($hasFaseColumn) {
+        $queries.porFase = @"
 EVALUATE
 SUMMARIZECOLUMNS(
     $faseColumnDax,
@@ -398,6 +402,10 @@ SUMMARIZECOLUMNS(
 )
 ORDER BY $faseColumnDax
 "@
+    }
+
+    $faseDaxLine  = if ($hasFaseColumn) { "    $faseColumnDax,`n" } else { "" }
+    $faseOrderDax = if ($hasFaseColumn) { ", $faseColumnDax" } else { "" }
 
     $queries.detalleFiltros = @"
 EVALUATE
@@ -406,8 +414,7 @@ SUMMARIZECOLUMNS(
     $areaColumnDax,
     $segmentoColumnDax,
     $etapaColumnDax,
-    $faseColumnDax,
-    $areaFilterDax,
+$($faseDaxLine)    $areaFilterDax,
     "RdiTotal", $rdiMeasureDax,
     "PresupuestoErequester", $pptoErMeasureDax,
     "EjecutadoErequester", $ejecutadoMeasureDax,
@@ -417,7 +424,7 @@ SUMMARIZECOLUMNS(
     "PorcentajeAsignado", $pctAsignadoMeasureDax,
     "PorcentajeDisponible", $pctDisponibleMeasureDax
 )
-ORDER BY $monthColumnDax, $areaColumnDax, $segmentoColumnDax, $etapaColumnDax, $faseColumnDax
+ORDER BY $monthColumnDax, $areaColumnDax, $segmentoColumnDax, $etapaColumnDax$faseOrderDax
 "@
 }
 
