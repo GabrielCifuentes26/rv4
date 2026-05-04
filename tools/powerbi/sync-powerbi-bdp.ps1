@@ -17,7 +17,7 @@ $syncArgs = @{
     ModelProfile         = "bse"
     OutputDir            = "data/powerbi/bdp"
     IncludeFilterDetail  = $true
-    AreaFilterValues     = @(("CONSTRUCCI" + $accentUpperO + "N"), ("URBANIZACI" + $accentUpperO + "N"))
+    AreaFilterValues     = @(("CONSTRUCCI" + $accentUpperO + "N"), ("URBANIZACI" + $accentUpperO + "N"), "COSTO INDIRECTO", "PRELIMINAR")
     SupabaseServiceKey   = $SupabaseServiceKey
 }
 
