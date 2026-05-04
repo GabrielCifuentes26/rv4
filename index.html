@@ -413,26 +413,34 @@
             pointer-events: none;
         }
         .prop-info { padding: 13px 15px 15px; }
-        .prop-name { font-size: 0.86rem; font-weight: 800; color: var(--navy); margin-bottom: 3px; line-height: 1.25; letter-spacing: -0.2px; }
-        .prop-location { font-size: 0.68rem; color: var(--gray2); margin-bottom: 10px; display: flex; align-items: center; gap: 4px; }
+        .prop-name { font-size: 0.92rem; font-weight: 800; color: var(--navy); margin-bottom: 2px; line-height: 1.2; letter-spacing: -0.3px; }
+        .prop-location { font-size: 0.67rem; color: var(--gray2); margin-bottom: 0; display: flex; align-items: center; gap: 3px; }
+        /* Métricas en 3 columnas horizontales */
         .prop-budget-summary {
-            display: grid; gap: 6px; margin-top: 10px;
+            display: flex; gap: 0; margin-top: 12px;
+            border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
         }
-        .prop-budget-row {
-            display: flex; align-items: baseline; justify-content: space-between; gap: 8px;
-            font-size: 0.67rem; color: var(--gray);
+        .prop-budget-col {
+            flex: 1; padding: 7px 8px; display: flex; flex-direction: column; gap: 2px;
+            border-right: 1px solid var(--border);
         }
-        .prop-budget-row strong {
-            color: var(--navy); font-size: 0.76rem; font-weight: 900; white-space: nowrap;
-        }
-        .prop-budget-row--pct strong { color: var(--blue-dark); }
+        .prop-budget-col:last-child { border-right: none; }
+        .prop-budget-col--pct { background: rgba(16,185,129,0.05); }
+        .prop-budget-lbl { font-size: 0.58rem; color: var(--gray2); font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; white-space: nowrap; }
+        .prop-budget-val { font-size: 0.82rem; font-weight: 900; color: var(--navy); line-height: 1; }
+        .prop-budget-val--pct { color: #059669; }
+        /* Barra de avance */
+        .prop-budget-track-wrap { margin-top: 10px; }
+        .prop-budget-track-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+        .prop-budget-track-lbl { font-size: 0.60rem; color: var(--gray2); font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; }
+        .prop-budget-track-pct { font-size: 0.68rem; font-weight: 800; color: var(--blue-dark); }
         .prop-budget-track {
-            height: 5px; border-radius: 999px; background: #e2e8f0; overflow: hidden; margin-top: 2px;
+            height: 5px; border-radius: 999px; background: #e2e8f0; overflow: hidden;
         }
         .prop-budget-fill {
             display: block; height: 100%; width: var(--pct, 0%);
             background: linear-gradient(90deg, var(--blue), var(--green));
-            border-radius: inherit;
+            border-radius: inherit; transition: width 1s ease;
         }
         .prop-budget-loading,
         .prop-budget-error {
@@ -441,13 +449,12 @@
         .prop-budget-error { color: #ef4444; }
         .prop-details {
             display: flex; align-items: center; justify-content: flex-end;
-            margin-top: 12px; padding-top: 10px;
+            margin-top: 10px; padding-top: 9px;
             border-top: 1px solid var(--border);
         }
         .prop-details-left { display: flex; gap: 10px; }
-        .prop-detail { font-size: 0.68rem; color: var(--gray2); display: flex; align-items: center; gap: 3px; }
         .prop-cta {
-            font-size: 0.68rem; font-weight: 800; color: var(--blue);
+            font-size: 0.67rem; font-weight: 800; color: var(--blue);
             display: inline-flex; align-items: center; gap: 4px;
             background: rgba(14,165,233,0.08); border-radius: 6px;
             padding: 4px 10px; letter-spacing: 0.2px;
@@ -724,17 +731,23 @@
         const pctValue = Math.max(0, Math.min(100, summary.pct * 100));
         return `
             <div class="prop-budget-summary" aria-label="Resumen SAP">
-                <div class="prop-budget-row">
-                    <span>Presupuesto SAP</span>
-                    <strong>${formatCompactMoney(summary.presupuestoSap)}</strong>
+                <div class="prop-budget-col">
+                    <span class="prop-budget-lbl">Ppto. SAP</span>
+                    <span class="prop-budget-val">${formatCompactMoney(summary.presupuestoSap)}</span>
                 </div>
-                <div class="prop-budget-row">
-                    <span>Asignado</span>
-                    <strong>${formatCompactMoney(summary.asignado)}</strong>
+                <div class="prop-budget-col">
+                    <span class="prop-budget-lbl">Asignado</span>
+                    <span class="prop-budget-val">${formatCompactMoney(summary.asignado)}</span>
                 </div>
-                <div class="prop-budget-row prop-budget-row--pct">
-                    <span>% asignado</span>
-                    <strong>${formatPct(summary.pct)}</strong>
+                <div class="prop-budget-col prop-budget-col--pct">
+                    <span class="prop-budget-lbl">% Asignado</span>
+                    <span class="prop-budget-val prop-budget-val--pct">${formatPct(summary.pct)}</span>
+                </div>
+            </div>
+            <div class="prop-budget-track-wrap">
+                <div class="prop-budget-track-header">
+                    <span class="prop-budget-track-lbl">Avance de asignación</span>
+                    <span class="prop-budget-track-pct">${formatPct(summary.pct)}</span>
                 </div>
                 <div class="prop-budget-track" aria-hidden="true">
                     <span class="prop-budget-fill" style="--pct:${pctValue}%"></span>
