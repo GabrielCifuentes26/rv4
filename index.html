@@ -376,22 +376,21 @@
             transition: all .3s;
         }
         .projects-map-row {
-            display: grid; grid-template-columns: 1fr 1fr;
+            display: grid; grid-template-columns: 3fr 2fr;
             gap: 28px; align-items: start;
         }
 
         /* ── PROJECTS GRID ── */
         .props-grid {
-            display: grid; grid-template-columns: 1fr 1fr;
-            gap: 16px; max-height: 700px; overflow-y: auto;
-            padding-right: 6px;
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
         }
         .props-grid::-webkit-scrollbar { width: 4px; }
         .props-grid::-webkit-scrollbar-track { background: transparent; }
         .props-grid::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
         .prop-card {
-            background: var(--surface); border-radius: 20px;
+            background: var(--surface); border-radius: 16px;
             border: 1.5px solid var(--border); overflow: hidden;
             cursor: pointer;
             transition: transform .3s cubic-bezier(.34,1.56,.64,1), box-shadow .3s, border-color .3s;
@@ -404,30 +403,31 @@
             border-color: var(--blue);
         }
         .prop-img {
-            height: 155px; display: flex; align-items: center;
-            justify-content: center; font-size: 3.4rem; position: relative; overflow: hidden;
+            height: 148px; display: flex; align-items: center;
+            justify-content: center; font-size: 3.2rem; position: relative; overflow: hidden;
         }
         .prop-img img { width:100%; height:100%; object-fit:cover; object-position:center; display:block; }
         .prop-img::after {
             content: ''; position: absolute; inset: 0;
-            background: linear-gradient(160deg, rgba(255,255,255,0.18) 0%, transparent 60%, rgba(15,23,42,0.14) 100%);
+            background: linear-gradient(180deg, transparent 40%, rgba(15,23,42,0.10) 100%);
+            pointer-events: none;
         }
-        .prop-info { padding: 16px 18px 18px; }
-        .prop-name { font-size: 0.90rem; font-weight: 800; color: var(--navy); margin-bottom: 4px; line-height: 1.3; }
-        .prop-location { font-size: 0.70rem; color: var(--gray2); margin-bottom: 12px; display: flex; align-items: center; gap: 4px; }
+        .prop-info { padding: 13px 15px 15px; }
+        .prop-name { font-size: 0.86rem; font-weight: 800; color: var(--navy); margin-bottom: 3px; line-height: 1.25; letter-spacing: -0.2px; }
+        .prop-location { font-size: 0.68rem; color: var(--gray2); margin-bottom: 10px; display: flex; align-items: center; gap: 4px; }
         .prop-budget-summary {
-            display: grid; gap: 7px; margin-top: 12px;
+            display: grid; gap: 6px; margin-top: 10px;
         }
         .prop-budget-row {
-            display: flex; align-items: baseline; justify-content: space-between; gap: 10px;
-            font-size: 0.68rem; color: var(--gray);
+            display: flex; align-items: baseline; justify-content: space-between; gap: 8px;
+            font-size: 0.67rem; color: var(--gray);
         }
         .prop-budget-row strong {
-            color: var(--navy); font-size: 0.78rem; font-weight: 900; white-space: nowrap;
+            color: var(--navy); font-size: 0.76rem; font-weight: 900; white-space: nowrap;
         }
         .prop-budget-row--pct strong { color: var(--blue-dark); }
         .prop-budget-track {
-            height: 6px; border-radius: 999px; background: #e2e8f0; overflow: hidden;
+            height: 5px; border-radius: 999px; background: #e2e8f0; overflow: hidden; margin-top: 2px;
         }
         .prop-budget-fill {
             display: block; height: 100%; width: var(--pct, 0%);
@@ -436,24 +436,25 @@
         }
         .prop-budget-loading,
         .prop-budget-error {
-            margin-top: 12px; font-size: 0.72rem; font-weight: 700; color: var(--gray2);
+            margin-top: 10px; font-size: 0.70rem; font-weight: 700; color: var(--gray2);
         }
         .prop-budget-error { color: #ef4444; }
         .prop-details {
-            display: flex; align-items: center; justify-content: space-between;
-            margin-top: 12px; padding-top: 11px;
+            display: flex; align-items: center; justify-content: flex-end;
+            margin-top: 12px; padding-top: 10px;
             border-top: 1px solid var(--border);
         }
         .prop-details-left { display: flex; gap: 10px; }
         .prop-detail { font-size: 0.68rem; color: var(--gray2); display: flex; align-items: center; gap: 3px; }
         .prop-cta {
-            font-size: 0.70rem; font-weight: 700; color: var(--blue);
-            display: flex; align-items: center; gap: 2px;
-            opacity: 0; transform: translateX(-6px);
-            transition: opacity .22s, transform .22s;
+            font-size: 0.68rem; font-weight: 800; color: var(--blue);
+            display: inline-flex; align-items: center; gap: 4px;
+            background: rgba(14,165,233,0.08); border-radius: 6px;
+            padding: 4px 10px; letter-spacing: 0.2px;
+            transition: background .18s, color .18s;
             white-space: nowrap;
         }
-        .prop-card:hover .prop-cta { opacity: 1; transform: translateX(0); }
+        .prop-card:hover .prop-cta { background: var(--blue); color: #fff; }
 
         /* ── MAP ── */
         .map-container {
@@ -511,7 +512,7 @@
             .section, .categories-section, .projects-section { padding: 60px 20px; }
             .cat-row-active, .cat-row-wip { flex-direction: column; align-items: center; }
             .cat-row-active .cat-card, .cat-row-wip .cat-card { width: 100%; max-width: 320px; }
-            .props-grid { grid-template-columns: 1fr; max-height: none; }
+            .props-grid { grid-template-columns: 1fr; }
             footer { flex-direction: column; gap: 10px; text-align: center; }
         }
     </style>
@@ -923,8 +924,7 @@
                     <div class="prop-location">📍 ${p.loc}</div>
                     ${renderBudgetSummary(p)}
                     <div class="prop-details">
-                        <div class="prop-details-left"></div>
-                        <span class="prop-cta">Ver →</span>
+                        <span class="prop-cta">Ver proyecto →</span>
                     </div>
                 </div>`;
             grid.appendChild(card);
