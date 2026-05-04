@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -34,6 +34,17 @@
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('project-title').textContent = PROJECT_NAME;
             document.title = `${PROJECT_NAME} — Dashboard`;
+            // Project selector dropdown
+            const _sel = document.getElementById('proj-selector');
+            document.querySelectorAll('.proj-opt').forEach(a => {
+                if (a.dataset.key === POWERBI_PROJECT_KEY) a.classList.add('active');
+            });
+            _sel.addEventListener('click', e => {
+                if (!e.target.closest('.proj-opt')) _sel.classList.toggle('open');
+            });
+            document.addEventListener('click', e => {
+                if (!_sel.contains(e.target)) _sel.classList.remove('open');
+            });
             document.getElementById('btn-logout').addEventListener('click', () => {
                 client.auth.signOut().then(() => window.location.href = 'login.html');
             });
@@ -205,11 +216,32 @@
         .project-badge {
             display: inline-flex; align-items: center; gap: 7px;
             background: rgba(201,168,76,0.13); border: 1px solid rgba(201,168,76,0.35);
-            color: #C9A84C; padding: 5px 14px; border-radius: 20px;
+            color: #C9A84C; padding: 5px 12px 5px 14px; border-radius: 20px;
             font-size: 0.73rem; font-weight: 700; letter-spacing: 0.2px;
-            white-space: nowrap;
+            white-space: nowrap; cursor: pointer; position: relative; user-select: none;
         }
         .project-badge svg { width: 13px; height: 13px; fill: currentColor; flex-shrink: 0; }
+        .proj-chevron { width: 10px; height: 10px; fill: currentColor; transition: transform .22s; flex-shrink: 0; }
+        .project-badge.open .proj-chevron { transform: rotate(180deg); }
+        .proj-dropdown {
+            position: absolute; top: calc(100% + 10px); left: 0;
+            background: #162030; border: 1px solid rgba(201,168,76,0.25);
+            border-radius: 12px; min-width: 230px; padding: 5px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.40);
+            display: none; flex-direction: column; gap: 1px; z-index: 200;
+        }
+        .project-badge.open .proj-dropdown { display: flex; }
+        .proj-opt {
+            display: flex; align-items: center; gap: 9px;
+            padding: 9px 12px; border-radius: 8px;
+            color: rgba(255,255,255,0.70); font-size: 0.74rem; font-weight: 600;
+            text-decoration: none; transition: background .14s, color .14s;
+        }
+        .proj-opt svg { width: 13px; height: 13px; fill: currentColor; flex-shrink: 0; opacity: 0.6; }
+        .proj-opt:hover { background: rgba(201,168,76,0.14); color: #C9A84C; }
+        .proj-opt:hover svg { opacity: 1; }
+        .proj-opt.active { background: rgba(201,168,76,0.20); color: #C9A84C; font-weight: 800; }
+        .proj-opt.active svg { opacity: 1; }
 
         /* ── derecha ── */
         .topbar-right { display: flex; align-items: center; gap: 10px; }
@@ -773,9 +805,18 @@
                 <div class="topbar-sub">Control Presupuestario de Obra</div>
             </div>
             <div class="topbar-divider"></div>
-            <div class="project-badge">
+            <div class="project-badge" id="proj-selector">
                 <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 6h-2.18c.07-.44.18-.86.18-1a3 3 0 0 0-6 0c0 .14.11.56.18 1H10c0-.6-.04-1-.1-1.38A3 3 0 0 0 4 5v1H2v14h20V6zm-10-.93a1 1 0 0 1 2 0c0 .34-.33 1.22-.54 1.88L11 7.67c-.21-.67-.54-1.55-.54-1.88-.02-.21.27-.72.54-.72zm8 12.93H6V8h2v1h8V8h2v10z"/></svg>
                 <span id="project-title">Proyecto</span>
+                <svg class="proj-chevron" viewBox="0 0 10 6" xmlns="http://www.w3.org/2000/svg"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+                <div class="proj-dropdown">
+                    <a href="dashboard-bdj.html" class="proj-opt" data-key="bdj"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Bosques de Jalapa</a>
+                    <a href="dashboard-bdp.html" class="proj-opt" data-key="bdp"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Bosques de Pinula</a>
+                    <a href="dashboard-bse.html" class="proj-opt" data-key="bse"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Bosques de Santa Elena</a>
+                    <a href="dashboard-cse.html" class="proj-opt" data-key="cse"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Condado Santa Elena</a>
+                    <a href="dashboard-hlq.html" class="proj-opt" data-key="hlq"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Hacienda La Querencia</a>
+                    <a href="dashboard-rdb.html" class="proj-opt" data-key="rdb"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Reserva del Bosque</a>
+                </div>
             </div>
         </div>
         <div class="topbar-right">
@@ -3138,3 +3179,4 @@
 <!-- ── /TOUR ASSISTANT ── -->
 </body>
 </html>
+
