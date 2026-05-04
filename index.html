@@ -740,53 +740,96 @@
             </div>`;
     }
 
+    function setSapSummary(project, summary) {
+        if (!project || !summary) return;
+
+        const presupuestoSap = Number(summary.presupuestoSap) || 0;
+        const asignado = Number(summary.asignado) || 0;
+        const pct = Number(summary.pct ?? (presupuestoSap ? asignado / presupuestoSap : 0)) || 0;
+        project.sapSummary = { presupuestoSap, asignado, pct };
+    }
+
+    function setSapSummaryFromRow(project, row) {
+        if (!project || !row) return;
+
+        const presupuestoSap = readMetric(row, 'PresupuestoErequester');
+        const asignado = readMetric(row, 'AsignadoErequester');
+        const pctFromSap = readMetric(row, 'PorcentajeAsignado');
+        setSapSummary(project, {
+            presupuestoSap,
+            asignado,
+            pct: presupuestoSap ? (pctFromSap || asignado / presupuestoSap) : 0
+        });
+    }
+
+    async function loadSapSummariesFromSupabase(projectsWithSap) {
+        const projectKeys = projectsWithSap.map(project => SAP_PROJECT_KEYS[project.id]);
+        const { data, error } = await client
+            .from('powerbi_resumen_cache')
+            .select('project_key, payload, updated_at')
+            .in('project_key', projectKeys);
+
+        if (error || !Array.isArray(data) || data.length === 0) return false;
+
+        data.forEach(cacheRow => {
+            const project = projectsWithSap.find(item => SAP_PROJECT_KEYS[item.id] === cacheRow.project_key);
+            const totalsRow = cacheRow.payload?.datasets?.totales?.[0] || cacheRow.payload?.rows?.[0];
+            setSapSummaryFromRow(project, totalsRow);
+        });
+
+        return projectsWithSap.some(project => project.sapSummary && !project.sapSummary.error);
+    }
+
+    async function loadSapSummariesFromPublicFile(projectsWithSap) {
+        const response = await fetch('assets/data/project-sap-summary.json', { cache: 'no-store' });
+        if (!response.ok) return false;
+
+        const payload = await response.json();
+        projectsWithSap
+            .filter(project => !project.sapSummary || project.sapSummary.error)
+            .forEach(project => setSapSummary(project, payload?.projects?.[project.id]));
+        return projectsWithSap.some(project => project.sapSummary && !project.sapSummary.error);
+    }
+
+    async function loadSapSummariesFromLocalJson(projectsWithSap) {
+        await Promise.all(projectsWithSap
+            .filter(project => !project.sapSummary || project.sapSummary.error)
+            .map(async project => {
+                const key = SAP_PROJECT_KEYS[project.id];
+                try {
+                    const response = await fetch(`data/powerbi/${key}/totales.json`, { cache: 'no-store' });
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+                    const payload = await response.json();
+                    setSapSummaryFromRow(project, payload?.rows?.[0]);
+                } catch (error) {
+                    console.warn(`No se pudo cargar SAP para ${project.name}`, error);
+                    project.sapSummary = { error: true };
+                }
+            }));
+
+        return projectsWithSap.some(project => project.sapSummary && !project.sapSummary.error);
+    }
+
     async function loadSapSummaries() {
         const projectsWithSap = PROJECTS.filter(project => SAP_PROJECT_KEYS[project.id]);
         try {
-            const response = await fetch('assets/data/project-sap-summary.json', { cache: 'no-store' });
-            if (response.ok) {
-                const payload = await response.json();
-                projectsWithSap.forEach(project => {
-                    const summary = payload?.projects?.[project.id];
-                    if (!summary) return;
-
-                    const presupuestoSap = Number(summary.presupuestoSap) || 0;
-                    const asignado = Number(summary.asignado) || 0;
-                    const pct = Number(summary.pct ?? (presupuestoSap ? asignado / presupuestoSap : 0)) || 0;
-                    project.sapSummary = { presupuestoSap, asignado, pct };
-                });
-
-                if (projectsWithSap.every(project => project.sapSummary)) {
-                    renderCards(activeCategory);
-                    return;
-                }
-            }
+            await loadSapSummariesFromSupabase(projectsWithSap);
         } catch (error) {
-            console.warn('No se pudo cargar el resumen SAP publico; usando fallback local.', error);
+            console.warn('No se pudo cargar el resumen SAP desde Supabase; usando respaldo publico.', error);
         }
 
-        await Promise.all(projectsWithSap.map(async project => {
-            const key = SAP_PROJECT_KEYS[project.id];
+        if (projectsWithSap.some(project => !project.sapSummary || project.sapSummary.error)) {
             try {
-                const response = await fetch(`data/powerbi/${key}/totales.json`, { cache: 'no-store' });
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-                const payload = await response.json();
-                const row = payload?.rows?.[0] || {};
-                const presupuestoSap = readMetric(row, 'PresupuestoErequester');
-                const asignado = readMetric(row, 'AsignadoErequester');
-                const pctFromSap = readMetric(row, 'PorcentajeAsignado');
-
-                project.sapSummary = {
-                    presupuestoSap,
-                    asignado,
-                    pct: presupuestoSap ? (pctFromSap || asignado / presupuestoSap) : 0
-                };
+                await loadSapSummariesFromPublicFile(projectsWithSap);
             } catch (error) {
-                console.warn(`No se pudo cargar SAP para ${project.name}`, error);
-                project.sapSummary = { error: true };
+                console.warn('No se pudo cargar el resumen SAP publico; usando fallback local.', error);
             }
-        }));
+        }
+
+        if (projectsWithSap.some(project => !project.sapSummary || project.sapSummary.error)) {
+            await loadSapSummariesFromLocalJson(projectsWithSap);
+        }
 
         renderCards(activeCategory);
     }
@@ -935,7 +978,6 @@
     // ── INIT ──────────────────────────────────────────────────────────────────
     updateCategoryCounts();
     renderCards('todos');
-    loadSapSummaries();
 
     // ── HERO SLIDER ──────────────────────────────────────────────────────────
     const KB = ['kb1','kb2','kb3','kb4'];
@@ -997,6 +1039,7 @@
         'https://iipgrojliqeyycvgnkrc.supabase.co',
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlpcGdyb2psaXFleXljdmdua3JjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NzA1NzYsImV4cCI6MjA5MTM0NjU3Nn0.Y6FQ-1qWd7HPMvTnK4alpKxM-YLJ5CsKmkorAZKMJrg'
     );
+    loadSapSummaries();
 
     async function doLogout() {
         await client.auth.signOut();
