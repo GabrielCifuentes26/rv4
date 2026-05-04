@@ -407,6 +407,7 @@
             height: 155px; display: flex; align-items: center;
             justify-content: center; font-size: 3.4rem; position: relative; overflow: hidden;
         }
+        .prop-img img { width:100%; height:100%; object-fit:cover; object-position:center; display:block; }
         .prop-img::after {
             content: ''; position: absolute; inset: 0;
             background: linear-gradient(160deg, rgba(255,255,255,0.18) 0%, transparent 60%, rgba(15,23,42,0.14) 100%);
@@ -650,7 +651,7 @@
     // ── DATA ─────────────────────────────────────────────────────────────────
     const PROJECTS = [
         // CASAS
-        { id:'bosquesdejalapa',    cat:'casas',    name:'Bosques de Jalapa',       icon:'🏠', bg:'#ede9fe', loc:'Jalapa, JA',     hab:'3', banos:'2', m2:'120', lat:14.6620805, lng:-89.9969111, dashboardUrl:'dashboard-bdj.html' },
+        { id:'bosquesdejalapa',    cat:'casas',    name:'Bosques de Jalapa',       icon:'🏠', bg:'#ede9fe', loc:'Jalapa, JA',     hab:'3', banos:'2', m2:'120', lat:14.6620805, lng:-89.9969111, dashboardUrl:'dashboard-bdj.html', render:'https://raw.githubusercontent.com/GabrielCifuentes26/rv4/master/imagenes%20de%20proyectos/Logos%20Casas/BDJ%20RENDER.png' },
         { id:'bosquesdepinula',    cat:'casas',    name:'Bosques de Pinula',       icon:'🌳', bg:'#ecfdf5', loc:'San José Pinula', hab:'3', banos:'2', m2:'135', lat:14.5570744, lng:-90.4131027, dashboardUrl:'dashboard-bdp.html' },
         { id:'bosquessantaelena',  cat:'casas',    name:'Bosques de Santa Elena',  icon:'🏡', bg:'#f0fdf4', loc:'Santa Elena, PT', hab:'3', banos:'2', m2:'125', lat:14.4630055, lng:-90.4897385, dashboardUrl:'dashboard-bse.html' },
         { id:'condadosantaelena',  cat:'casas',    name:'Condado Santa Elena',     icon:'🏘️', bg:'#fef3c7', loc:'Santa Elena, PT', hab:'2', banos:'2', m2:'110', lat:14.4612589, lng:-90.4887595, dashboardUrl:'dashboard-cse.html' },
@@ -882,12 +883,15 @@
         </div>`;
     }
 
+    const casaLatLngs = [];
     PROJECTS.filter(p => !WIP_CATS.includes(p.cat)).forEach(p => {
         const marker = L.marker([p.lat, p.lng], { icon: makeIcon(CAT_COLORS[p.cat]) })
             .bindPopup(buildPopup(p));
         marker.addTo(map);
         markers[p.id] = { marker, cat: p.cat };
+        if (p.cat === 'casas') casaLatLngs.push([p.lat, p.lng]);
     });
+    if (casaLatLngs.length) map.fitBounds(casaLatLngs, { padding: [60, 60] });
 
     // ── TARJETAS ─────────────────────────────────────────────────────────────
     function renderCards(cat) {
@@ -910,20 +914,16 @@
             card.className = 'prop-card';
             card.style.animationDelay = `${i * 0.06}s`;
 
-            const showHab = p.hab !== '—';
             card.innerHTML = `
                 <div class="prop-img" style="background:${p.bg}">
-                    ${p.icon}
+                    ${p.render ? `<img src="${p.render}" alt="${p.name}">` : p.icon}
                 </div>
                 <div class="prop-info">
                     <div class="prop-name">${p.name}</div>
                     <div class="prop-location">📍 ${p.loc}</div>
                     ${renderBudgetSummary(p)}
                     <div class="prop-details">
-                        <div class="prop-details-left">
-                            ${showHab ? `<span class="prop-detail">🛏 ${p.hab} hab.</span><span class="prop-detail">🚿 ${p.banos}</span>` : ''}
-                            <span class="prop-detail">📐 ${p.m2} m²</span>
-                        </div>
+                        <div class="prop-details-left"></div>
                         <span class="prop-cta">Ver →</span>
                     </div>
                 </div>`;
