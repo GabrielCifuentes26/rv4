@@ -674,7 +674,7 @@
         .seg-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
         .segmento-body {
             position: relative; flex: 1; min-height: 0;
-            overflow-y: auto; max-height: 340px;
+            overflow-y: auto; max-height: 440px;
         }
         .segmento-body::-webkit-scrollbar { width: 6px; }
         .segmento-body::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 3px; }
@@ -986,27 +986,7 @@
 
     </div>
 
-    <!-- Tendencia por Fase -->
-    <div class="tendencia-section">
-        <div class="chart-card">
-            <div class="tendencia-header">
-                <div style="display:flex;align-items:center;gap:8px;">
-                    <span class="chart-title" style="margin:0" id="tendencia-title">Tendencia de Ejecución por Fase</span>
-                    <span class="tendencia-metric-badge">Asignado</span>
-                </div>
-                <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
-                    <div class="tendencia-toggle" id="tendencia-toggle">
-                        <button class="tendencia-btn active" data-dim="Rubros[Fase]">Fase</button>
-                        <button class="tendencia-btn" data-dim="Rubros[Area]">Área</button>
-                    </div>
-                    <div class="tendencia-leyenda" id="tendencia-leyenda"></div>
-                </div>
-            </div>
-            <div class="tendencia-body">
-                <canvas id="tendenciaChart"></canvas>
-            </div>
-        </div>
-    </div>
+    <!-- Tendencia eliminada (un solo punto de datos con sync mensual) -->
 
     <!-- Footer -->
     <div class="footer-bar">
@@ -1256,7 +1236,7 @@
         options: {
             indexAxis: 'y',
             responsive: true, maintainAspectRatio: false,
-            layout: { padding: { right: 60, top: 6, bottom: 6, left: 0 } },
+            layout: { padding: { right: 60, top: 6, bottom: 28, left: 0 } },
             plugins: {
                 legend: { display: false },
                 tooltip: {
