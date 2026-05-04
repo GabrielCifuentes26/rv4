@@ -2456,8 +2456,9 @@
     }
 
     async function loadPowerBIResumen() {
-        const loadedFromSupabase = await loadPowerBIResumenFromSupabase();
-        if (!loadedFromSupabase) await loadPowerBIResumenFromLocalJson();
+        // JSON local primero (siempre sincronizado), Supabase como respaldo
+        const loadedLocal = await loadPowerBIResumenFromLocalJson();
+        if (!loadedLocal) await loadPowerBIResumenFromSupabase();
     }
 
     // ── Chart-click filters ──────────────────────────────────────
