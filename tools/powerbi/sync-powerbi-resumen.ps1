@@ -262,7 +262,7 @@ if ($ModelProfile -eq "hlq") {
     $areaColumnDax = ConvertTo-DaxIdentifier -TableName "Rubros" -ObjectName "Area"
     $segmentoColumnDax = ConvertTo-DaxIdentifier -TableName "Rubros" -ObjectName "Segmento"
     $etapaColumnDax = ConvertTo-DaxIdentifier -TableName "Rubros" -ObjectName "Etapa"
-    $faseColumnDax = ConvertTo-DaxIdentifier -TableName "Rubros" -ObjectName "Fase"
+    $faseColumnDax = ConvertTo-DaxIdentifier -TableName "dimFase" -ObjectName "Fase"
     $monthColumnDax = ConvertTo-DaxIdentifier -TableName "Calendario" -ObjectName "MesA"
 
     $rdiMeasureDax = ConvertTo-DaxIdentifier -TableName "Medidas" -ObjectName "RDI Total"
@@ -381,8 +381,8 @@ ORDER BY $monthColumnDax
 }
 
 if ($IncludeFilterDetail) {
-    # bse model: Rubros[Fase] does not exist — skip porFase and omit it from detalleFiltros
-    $hasFaseColumn = ($ModelProfile -ne "bse")
+    # bse model uses dimFase[Fase] instead of Rubros[Fase] — both profiles include Fase
+    $hasFaseColumn = $true
 
     if ($hasFaseColumn) {
         $queries.porFase = @"
