@@ -3133,6 +3133,7 @@
   }
 
   function endTour() {
+    sessionStorage.setItem('cp_tour_seen', '1');
     clearHL();
     clearTimeout(timer);
     bubble.classList.remove('show');
@@ -3163,11 +3164,12 @@
   skipBtn.addEventListener('click', endTour);
   fab.addEventListener('click', startTour);
 
-  window.addEventListener('load', () => setTimeout(startTour, 1000));
+  window.addEventListener('load', () => { if (!sessionStorage.getItem('cp_tour_seen')) setTimeout(startTour, 1000); });
 })();
 </script>
 <!-- ── /TOUR ASSISTANT ── -->
 </body>
 </html>
+
 
 
