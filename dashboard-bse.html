@@ -2417,20 +2417,34 @@
         let areaRows = datasets.porArea || [];
         let etapaRows = datasets.porEtapa || [];
 
-        let rawDetailRows = [], segmentoRows = [];
+        let rawDetailRows = [], segmentoRows = datasets.porSegmento || [];
+
         if (detailRows.length) {
+            // BSE medidas no son aditivas a nivel Rubro×Etapa; usar datasets pre-agregados
+            // para métricas correctas y detalleFiltros sólo para filtros y tendencia.
             rawDetailRows = filteredDetailRows();
-            totals = aggregateDetailRows(rawDetailRows);
-            areaRows     = groupRowsBy(rawDetailRows, 'Rubros[Area]');
-            etapaRows    = groupRowsBy(rawDetailRows, 'Rubros[Etapa]');
-            segmentoRows = groupRowsBy(rawDetailRows, 'Rubros[Segmento]');
-        } else {
-            segmentoRows = datasets.porSegmento || [];
-            if (powerBIState.filters.meses.length) {
-                const monthRows = getMonthRows(data)
-                    .filter(row => powerBIState.filters.meses.includes(cleanDimension(dimension(row, 'Calendario[MesA]'))));
-                if (monthRows.length) totals = sumRows(monthRows);
+
+            const selAreas   = powerBIState.filters.areas    || [];
+            const selSegs    = powerBIState.filters.segmentos || [];
+            const selEtapas  = powerBIState.filters.etapas   || [];
+
+            const matchDim = (row, dimName, sel) => {
+                if (!sel.length) return true;
+                const v = String(dimension(row, dimName) || '').toUpperCase().trim();
+                return sel.some(s => s.toUpperCase() === v);
+            };
+
+            areaRows     = (datasets.porArea     || []).filter(r => matchDim(r, 'Rubros[Area]',     selAreas));
+            segmentoRows = (datasets.porSegmento || []).filter(r => matchDim(r, 'Rubros[Segmento]', selSegs));
+            etapaRows    = (datasets.porEtapa    || []).filter(r => matchDim(r, 'Rubros[Etapa]',    selEtapas));
+
+            if (selAreas.length || selSegs.length || selEtapas.length) {
+                totals = sumRows(areaRows.length ? areaRows : (datasets.totales || []));
             }
+        } else if (powerBIState.filters.meses.length) {
+            const monthRows = getMonthRows(data)
+                .filter(row => powerBIState.filters.meses.includes(cleanDimension(dimension(row, 'Calendario[MesA]'))));
+            if (monthRows.length) totals = sumRows(monthRows);
         }
 
         renderMetrics(totals);
