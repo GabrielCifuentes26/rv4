@@ -401,7 +401,7 @@
             border-color: var(--blue);
         }
         .prop-img {
-            aspect-ratio: 16/7; display: flex; align-items: center;
+            aspect-ratio: 16/5; display: flex; align-items: center;
             justify-content: center; font-size: 3.2rem; position: relative; overflow: hidden;
             background: #fff !important;
         }
@@ -411,7 +411,7 @@
             background: linear-gradient(180deg, transparent 40%, rgba(15,23,42,0.10) 100%);
             pointer-events: none;
         }
-        .prop-info { padding: 0 15px 14px; }
+        .prop-info { padding: 0 15px 11px; }
         .prop-info::before {
             content: ''; display: block; height: 2px;
             background: linear-gradient(90deg, transparent 0%, var(--ng) 45%, transparent 100%);
@@ -424,8 +424,8 @@
             display: flex; gap: 0; margin-top: 0;
         }
         .prop-budget-col {
-            flex: 1; display: flex; flex-direction: column; gap: 4px;
-            padding-right: 10px;
+            flex: 1; display: flex; flex-direction: column; gap: 3px;
+            padding-right: 10px; align-items: center; text-align: center;
         }
         .prop-budget-col + .prop-budget-col {
             padding-left: 10px; padding-right: 10px;
@@ -452,7 +452,7 @@
         }
         .prop-budget-fill {
             display: block; height: 100%; width: var(--pct, 0%);
-            background: linear-gradient(90deg, var(--blue), var(--green));
+            background: linear-gradient(90deg, var(--nn), var(--ng));
             border-radius: inherit; transition: width 1s ease;
         }
         .prop-budget-loading,
@@ -469,7 +469,7 @@
         .prop-desglose-row { display: grid; grid-template-columns: 1.35fr 1.4fr 0.85fr 0.95fr 0.85fr; gap: 3px; font-size: 0.61rem; color: var(--navy); line-height: 1.55; }
         .prop-desglose-head { font-size: 0.52rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.4px; padding-bottom: 5px; border-bottom: 1px solid var(--border); }
         .prop-desglose-total { font-weight: 800; border-top: 1px solid var(--border); padding-top: 4px; margin-top: 3px; color: #15803d; }
-        .prop-desglose-row span:not(:first-child) { text-align: right; }
+        .prop-desglose-row span:not(:first-child) { text-align: center; }
         .prop-desglose-loading { margin-top: 8px; font-size: 0.68rem; color: var(--gray2); }
 
         .prop-details {
