@@ -457,11 +457,12 @@
 
         /* ── DESGLOSE FINANCIERO ── */
         .prop-desglose { margin-top: 12px; border-top: 1px solid var(--border); padding-top: 10px; }
-        .prop-desglose-title { font-size: 0.60rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #94a3b8; margin-bottom: 6px; }
+        .prop-desglose-title { font-size: 0.60rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; margin-bottom: 8px; display: flex; align-items: center; gap: 5px; }
+        .prop-desglose-title svg { flex-shrink: 0; }
         .prop-desglose-table { display: flex; flex-direction: column; gap: 1px; }
-        .prop-desglose-row { display: grid; grid-template-columns: 1.5fr 1.1fr 1.1fr 1.1fr; gap: 4px; font-size: 0.70rem; color: var(--navy); line-height: 1.5; }
-        .prop-desglose-head { font-size: 0.57rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.3px; padding-bottom: 4px; border-bottom: 1px solid var(--border); }
-        .prop-desglose-total { font-weight: 800; border-top: 1px solid var(--border); padding-top: 3px; margin-top: 2px; }
+        .prop-desglose-row { display: grid; grid-template-columns: 1.35fr 1.4fr 0.85fr 0.95fr 0.85fr; gap: 3px; font-size: 0.60rem; color: var(--navy); line-height: 1.5; }
+        .prop-desglose-head { font-size: 0.50rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.3px; padding-bottom: 4px; border-bottom: 1px solid var(--border); }
+        .prop-desglose-total { font-weight: 800; border-top: 1px solid var(--border); padding-top: 3px; margin-top: 2px; color: #15803d; }
         .prop-desglose-row span:not(:first-child) { text-align: right; }
         .prop-desglose-loading { margin-top: 8px; font-size: 0.68rem; color: var(--gray2); }
 
@@ -721,10 +722,16 @@
     }
 
     function fmtM2(v) {
-        return v.toLocaleString('es-GT', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+        return Number(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
     function fmtCostM2(v) {
-        return `Q ${Math.round(v).toLocaleString('es-GT')}`;
+        return `Q ${Number(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    }
+    function fmtFullMoney(v) {
+        return `Q ${Number(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    }
+    function fmtCostUSD(v) {
+        return `$${Number(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     }
 
     function renderDesgloseFinanciero(project) {
@@ -733,30 +740,45 @@
         const m2 = PROJECT_M2[key];
         if (!project.sapAreas) return '<div class="prop-desglose-loading">Cargando desglose...</div>';
         const { construccion, urbanizacion, total } = project.sapAreas;
+        const RATE = 7.8;
+        const qm2Casa = m2.casas > 0 ? construccion / m2.casas : 0;
+        const qm2Urb  = m2.urbanizacion > 0 ? urbanizacion / m2.urbanizacion : 0;
+        const qm2Tot  = qm2Casa + qm2Urb;
+        let dateLabel = '—';
+        if (project.sapUpdatedAt) {
+            const d = new Date(project.sapUpdatedAt);
+            dateLabel = `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()}`;
+        }
         return `
             <div class="prop-desglose">
-                <div class="prop-desglose-title">Desglose financiero</div>
+                <div class="prop-desglose-title">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                    Desglose financiero
+                </div>
                 <div class="prop-desglose-table">
                     <div class="prop-desglose-row prop-desglose-head">
-                        <span>Concepto</span><span>Ppto. ER</span><span>M²</span><span>Q/m²</span>
+                        <span>Concepto</span><span>Costos al ${dateLabel}</span><span>M² Constr.</span><span>Costo X M²</span><span>Costo X M² $</span>
                     </div>
                     <div class="prop-desglose-row">
-                        <span>Construcción</span>
-                        <span>${formatCompactMoney(construccion)}</span>
+                        <span>Casas S/Iva</span>
+                        <span>${fmtFullMoney(construccion)}</span>
                         <span>${fmtM2(m2.casas)}</span>
-                        <span>${fmtCostM2(construccion / m2.casas)}</span>
+                        <span>${fmtCostM2(qm2Casa)}</span>
+                        <span>${fmtCostUSD(qm2Casa / RATE)}</span>
                     </div>
                     <div class="prop-desglose-row">
-                        <span>Urbanización</span>
-                        <span>${formatCompactMoney(urbanizacion)}</span>
+                        <span>Urbanización S/Iva</span>
+                        <span>${fmtFullMoney(urbanizacion)}</span>
                         <span>${fmtM2(m2.urbanizacion)}</span>
-                        <span>${fmtCostM2(urbanizacion / m2.urbanizacion)}</span>
+                        <span>${fmtCostM2(qm2Urb)}</span>
+                        <span>${fmtCostUSD(qm2Urb / RATE)}</span>
                     </div>
                     <div class="prop-desglose-row prop-desglose-total">
-                        <span>Total</span>
-                        <span>${formatCompactMoney(total)}</span>
+                        <span>Total Proyecto</span>
+                        <span>${fmtFullMoney(total)}</span>
                         <span>${fmtM2(m2.total)}</span>
-                        <span>${fmtCostM2(total / m2.total)}</span>
+                        <span>${fmtCostM2(qm2Tot)}</span>
+                        <span>${fmtCostUSD(qm2Tot / RATE)}</span>
                     </div>
                 </div>
             </div>`;
@@ -849,6 +871,7 @@
             const totalsRow = cacheRow.payload?.datasets?.totales?.[0] || cacheRow.payload?.rows?.[0];
             setSapSummaryFromRow(project, totalsRow);
             setSapAreasFromRows(project, cacheRow.payload?.datasets?.porArea);
+            if (project && cacheRow.updated_at) project.sapUpdatedAt = cacheRow.updated_at;
         });
 
         return projectsWithSap.some(project => project.sapSummary && !project.sapSummary.error);
@@ -891,8 +914,25 @@
         return projectsWithSap.some(project => project.sapSummary && !project.sapSummary.error);
     }
 
+    async function loadM2FromSupabase() {
+        try {
+            const { data, error } = await client.from('project_m2').select('project_key, m2_casas, m2_urbanizacion, m2_total');
+            if (error || !Array.isArray(data) || data.length === 0) return;
+            data.forEach(row => {
+                if (PROJECT_M2[row.project_key]) {
+                    PROJECT_M2[row.project_key] = {
+                        casas:        Number(row.m2_casas)        || PROJECT_M2[row.project_key].casas,
+                        urbanizacion: Number(row.m2_urbanizacion) || PROJECT_M2[row.project_key].urbanizacion,
+                        total:        Number(row.m2_total)        || PROJECT_M2[row.project_key].total,
+                    };
+                }
+            });
+        } catch (_) {}
+    }
+
     async function loadSapSummaries() {
         const projectsWithSap = PROJECTS.filter(project => SAP_PROJECT_KEYS[project.id]);
+        await loadM2FromSupabase();
         try {
             await loadSapSummariesFromSupabase(projectsWithSap);
         } catch (error) {
