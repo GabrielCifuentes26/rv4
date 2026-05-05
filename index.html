@@ -411,7 +411,7 @@
             pointer-events: none;
         }
         .prop-info { padding: 13px 15px 15px; }
-        .prop-name { font-size: 0.92rem; font-weight: 800; color: var(--navy); margin-bottom: 2px; line-height: 1.2; letter-spacing: -0.3px; }
+        .prop-name { font-size: 0.82rem; font-weight: 800; color: var(--navy); line-height: 1.2; letter-spacing: -0.3px; }
         .prop-location { font-size: 0.67rem; color: var(--gray2); margin-bottom: 0; display: flex; align-items: center; gap: 3px; }
         /* Métricas en 3 columnas horizontales */
         .prop-budget-summary {
@@ -467,7 +467,7 @@
         .prop-desglose-loading { margin-top: 8px; font-size: 0.68rem; color: var(--gray2); }
 
         .prop-details {
-            display: flex; align-items: center; justify-content: flex-end;
+            display: flex; align-items: center; justify-content: space-between;
             margin-top: 10px; padding-top: 9px;
             border-top: 1px solid var(--border);
         }
@@ -1005,9 +1005,8 @@
                 </div>
                 <div class="prop-info">
                     ${renderBudgetSummary(p)}
-                    <div class="prop-name">${p.name}</div>
-                    <div class="prop-location">📍 ${p.loc}</div>
                     <div class="prop-details">
+                        <span class="prop-name">${p.name}</span>
                         <span class="prop-cta">Ver proyecto →</span>
                     </div>
                 </div>`;
