@@ -3,8 +3,7 @@ $ProjectRef  = "iipgrojliqeyycvgnkrc"
 $SupabaseCLI = "$env:USERPROFILE\bin\supabase.exe"
 $HUB_SECRET  = "8d98ed6a141f8a44ab565ac5200b89fbc178c2252778bed216b5d8b1a0b45858"
 $HUB_API_KEY = "dba354b3d0fa795bfe0501b4d91123287c1a164fa6bfc99dffcf62372c879ad6"
-# Actualiza esta URL cuando tengas el Firebase project ID
-$TABLERO_URL = "https://tu-tablero.web.app"
+$TABLERO_URL = "https://gabrielcifuentes26.github.io/rv4"
 
 Write-Host "[1/4] Configurando secretos en Supabase..." -ForegroundColor Cyan
 & $SupabaseCLI secrets set HUB_SECRET=$HUB_SECRET     --project-ref $ProjectRef
@@ -32,4 +31,4 @@ Write-Host "Secretos para compartir con el Hub (por canal seguro):" -ForegroundC
 Write-Host "  HUB_SECRET  (para SSO):  $HUB_SECRET"
 Write-Host "  HUB_API_KEY (para APIs): $HUB_API_KEY"
 Write-Host ""
-Write-Host "PENDIENTE: Actualiza TABLERO_URL en este script con tu URL de Firebase." -ForegroundColor Red
+Write-Host "URL del tablero: $TABLERO_URL" -ForegroundColor Green
