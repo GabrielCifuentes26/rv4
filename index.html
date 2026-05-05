@@ -824,8 +824,9 @@
         if (!project || !Array.isArray(rows) || rows.length === 0) return;
         const getArea = (kw) => {
             const row = rows.find(r => {
-                const areaVal = Object.entries(r).find(([k]) => k.toLowerCase().includes('area'))?.[1];
-                return typeof areaVal === 'string' && areaVal.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().includes(kw);
+                const areaKey = Object.keys(r).find(k => k.toLowerCase().includes('area'));
+                if (!areaKey) return false;
+                return typeof r[areaKey] === 'string' && r[areaKey].toLowerCase().includes(kw);
             });
             return row ? (Number(row['[PresupuestoErequester]']) || 0) : 0;
         };
