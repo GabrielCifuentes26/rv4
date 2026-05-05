@@ -723,16 +723,16 @@
     }
 
     function fmtM2(v) {
-        return Number(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        return Number(v).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
     }
     function fmtCostM2(v) {
-        return `Q ${Number(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        return `Q ${Number(v).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
     }
     function fmtFullMoney(v) {
-        return `Q ${Number(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        return `Q ${Number(v).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
     }
     function fmtCostUSD(v) {
-        return `$${Number(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        return `$${Number(v).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
     }
 
     function renderDesgloseFinanciero(project) {
@@ -758,24 +758,24 @@
                 </div>
                 <div class="prop-desglose-table">
                     <div class="prop-desglose-row prop-desglose-head">
-                        <span>Concepto</span><span>Costos al ${dateLabel}</span><span>M² Constr.</span><span>Costo X M²</span><span>Costo X M² $</span>
+                        <span>Concepto</span><span>Costos</span><span>M² Constr.</span><span>Costo X M²</span><span>Costo X M² $</span>
                     </div>
                     <div class="prop-desglose-row">
-                        <span>Casas S/Iva</span>
+                        <span>Casas</span>
                         <span>${fmtFullMoney(construccion)}</span>
                         <span>${fmtM2(m2.casas)}</span>
                         <span>${fmtCostM2(qm2Casa)}</span>
                         <span>${fmtCostUSD(qm2Casa / RATE)}</span>
                     </div>
                     <div class="prop-desglose-row">
-                        <span>Urbanización S/Iva</span>
+                        <span>Urbanización</span>
                         <span>${fmtFullMoney(urbanizacion)}</span>
                         <span>${fmtM2(m2.urbanizacion)}</span>
                         <span>${fmtCostM2(qm2Urb)}</span>
                         <span>${fmtCostUSD(qm2Urb / RATE)}</span>
                     </div>
                     <div class="prop-desglose-row prop-desglose-total">
-                        <span>Total Proyecto</span>
+                        <span>Total con Iva</span>
                         <span>${fmtFullMoney(total)}</span>
                         <span>${fmtM2(m2.total)}</span>
                         <span>${fmtCostM2(qm2Tot)}</span>
