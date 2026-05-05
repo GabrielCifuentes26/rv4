@@ -17,7 +17,7 @@
     const HEARTBEAT_INTERVAL = 30000; // 30 s
 
     // ── Idle timeout ──────────────────────────────────────────────────────────
-    const IDLE_TIMEOUT   = 2 * 60 * 1000;  // 2 min (prueba — cambiar a 20*60*1000 en prod)
+    const IDLE_TIMEOUT   = 20 * 60 * 1000;  // 20 min
     const IDLE_WARN_AT   = 30 * 1000;       // mostrar aviso 30 s antes
     let idleTimer        = null;
     let idleWarnTimer    = null;
