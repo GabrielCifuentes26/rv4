@@ -34,32 +34,36 @@ Deno.serve(async (req) => {
 
     const { data: rows, error } = await admin
       .from('powerbi_resumen_cache')
-      .select('payload, updated_at')
+      .select('payload, mes_a, updated_at')
       .order('updated_at', { ascending: false })
 
     if (error) throw error
 
-    let presupuesto = 0, ejecutado = 0, asignado = 0, disponible = 0
+    let presupuesto = 0, ejecutado = 0, comprometido = 0, disponible = 0
+    let mesRef = ''
 
     for (const row of rows ?? []) {
-      const totales = (row.payload?.datasets?.totales?.[0]) ?? {}
-      presupuesto += totales.PresupuestoErequester ?? 0
-      ejecutado   += totales.EjecutadoErequester   ?? 0
-      asignado    += totales.AsignadoErequester     ?? 0
-      disponible  += totales.DisponibleErequester   ?? 0
+      // Los campos en el JSON vienen con corchetes: [PresupuestoErequester]
+      const t = (row.payload?.datasets?.totales?.[0]) ?? {}
+      presupuesto  += (t['[PresupuestoErequester]']  ?? t.PresupuestoErequester  ?? 0) as number
+      ejecutado    += (t['[EjecutadoErequester]']    ?? t.EjecutadoErequester    ?? 0) as number
+      comprometido += (t['[ComprometidoErequester]'] ?? t.ComprometidoErequester ?? 0) as number
+      disponible   += (t['[DisponibleErequester]']   ?? t.DisponibleErequester   ?? 0) as number
+      if (!mesRef && row.mes_a) mesRef = row.mes_a
     }
 
     const pctEjecutado  = presupuesto > 0 ? ejecutado  / presupuesto : 0
     const pctDisponible = presupuesto > 0 ? disponible / presupuesto : 0
+    const proyectos     = (rows ?? []).length
 
     return new Response(JSON.stringify({
-      sistema:     'Ejecución de Costos',
-      generadoEn:  new Date().toISOString(),
+      sistema:    'Ejecución de Costos',
+      generadoEn: new Date().toISOString(),
       metricas: [
-        { label: 'Presupuesto total', value: fmt(presupuesto), trend: null },
-        { label: 'Ejecutado',         value: fmt(ejecutado),   trend: fmtPct(pctEjecutado) },
-        { label: 'Comprometido',      value: fmt(asignado),    trend: null },
-        { label: 'Disponible',        value: fmt(disponible),  trend: `${fmtPct(pctDisponible)} libre` },
+        { label: 'Proyectos activos', value: `${proyectos}`,       trend: mesRef },
+        { label: 'Presupuesto total', value: fmt(presupuesto),     trend: null },
+        { label: 'Ejecutado',         value: fmt(ejecutado),       trend: fmtPct(pctEjecutado) },
+        { label: 'Disponible',        value: fmt(disponible),      trend: `${fmtPct(pctDisponible)} libre` },
       ],
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
