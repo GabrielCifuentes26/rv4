@@ -703,6 +703,10 @@
                     <div id="m-online-list">
                         <div class="empty-state"><div class="empty-icon" style="font-size:1.5rem">👤</div><div class="empty-text">Nadie activo en este momento</div></div>
                     </div>
+                    <div id="m-recent-list" style="margin-top:12px;border-top:1px solid var(--border);padding-top:10px;display:none;">
+                        <div style="font-size:0.65rem;color:var(--gray2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Última conexión hoy</div>
+                        <div id="m-recent-rows"></div>
+                    </div>
                 </div>
 
                 <div class="m-card">
@@ -1350,6 +1354,7 @@
 
         document.getElementById('m-online').textContent = online?.length ?? 0;
         const onlineList = document.getElementById('m-online-list');
+        const onlineNames = new Set((online || []).map(s => s.user_nombre));
         if (!online?.length) {
             onlineList.innerHTML = `<div class="empty-state" style="padding:20px 0"><div class="empty-icon" style="font-size:1.5rem">👤</div><div class="empty-text">Nadie activo en este momento</div></div>`;
         } else {
@@ -1361,8 +1366,40 @@
                 </div>`).join('');
         }
 
+        // ── Última conexión hoy (usuarios offline que estuvieron activos hoy) ──
+        const todayStart = new Date(); todayStart.setHours(0,0,0,0);
+        const { data: recentSes } = await SERVICE_CLIENT
+            .from('sesiones')
+            .select('user_nombre, last_seen')
+            .gte('last_seen', todayStart.toISOString())
+            .lt('last_seen', twoMinAgo)
+            .order('last_seen', { ascending: false });
+        // Dedup: quedarse con el last_seen más reciente por usuario, excluir online
+        const recentMap = {};
+        (recentSes || []).forEach(s => {
+            const n = s.user_nombre || '—';
+            if (!onlineNames.has(n) && !recentMap[n]) recentMap[n] = s.last_seen;
+        });
+        const recentEntries = Object.entries(recentMap);
+        const recentSection = document.getElementById('m-recent-list');
+        const recentRows = document.getElementById('m-recent-rows');
+        if (recentEntries.length) {
+            recentRows.innerHTML = recentEntries.map(([name, ls]) => {
+                const diffMin = Math.round((Date.now() - new Date(ls)) / 60000);
+                const ago = diffMin < 60 ? `hace ${diffMin}m` : `hace ${Math.round(diffMin/60)}h ${diffMin%60}m`;
+                return `<div class="online-row">
+                    <div style="width:8px;height:8px;border-radius:50%;background:var(--gray2);flex-shrink:0;margin-right:8px;"></div>
+                    <div class="online-name" style="color:var(--gray)">${name}</div>
+                    <div class="online-page">${ago}</div>
+                </div>`;
+            }).join('');
+            recentSection.style.display = 'block';
+        } else {
+            recentSection.style.display = 'none';
+        }
+
         // ── Sesiones totales y tiempo promedio ──
-        let sesQ = SERVICE_CLIENT.from('sesiones').select('duracion_min, user_nombre, inicio', { count: 'exact' });
+        let sesQ = SERVICE_CLIENT.from('sesiones').select('duracion_min, user_nombre, inicio, last_seen', { count: 'exact' });
         if (df) sesQ = sesQ.gte('inicio', df.from).lte('inicio', df.to);
         const { data: sesData, count: sesCount } = await sesQ;
 
@@ -1403,7 +1440,7 @@
             if (!userStats[n]) userStats[n] = { sesiones: 0, minutos: 0, ultimo: null };
             userStats[n].sesiones++;
             userStats[n].minutos += s.duracion_min || 0;
-            const t = new Date(s.inicio);
+            const t = new Date(s.last_seen || s.inicio);
             if (!userStats[n].ultimo || t > userStats[n].ultimo) userStats[n].ultimo = t;
         });
         const userRows = Object.entries(userStats).sort((a,b)=>b[1].sesiones-a[1].sesiones);
