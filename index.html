@@ -454,6 +454,17 @@
             margin-top: 10px; font-size: 0.70rem; font-weight: 700; color: var(--gray2);
         }
         .prop-budget-error { color: #ef4444; }
+
+        /* ── DESGLOSE FINANCIERO ── */
+        .prop-desglose { margin-top: 12px; border-top: 1px solid var(--border); padding-top: 10px; }
+        .prop-desglose-title { font-size: 0.60rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #94a3b8; margin-bottom: 6px; }
+        .prop-desglose-table { display: flex; flex-direction: column; gap: 1px; }
+        .prop-desglose-row { display: grid; grid-template-columns: 1.5fr 1.1fr 1.1fr 1.1fr; gap: 4px; font-size: 0.70rem; color: var(--navy); line-height: 1.5; }
+        .prop-desglose-head { font-size: 0.57rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.3px; padding-bottom: 4px; border-bottom: 1px solid var(--border); }
+        .prop-desglose-total { font-weight: 800; border-top: 1px solid var(--border); padding-top: 3px; margin-top: 2px; }
+        .prop-desglose-row span:not(:first-child) { text-align: right; }
+        .prop-desglose-loading { margin-top: 8px; font-size: 0.68rem; color: var(--gray2); }
+
         .prop-details {
             display: flex; align-items: center; justify-content: flex-end;
             margin-top: 10px; padding-top: 9px;
@@ -680,6 +691,14 @@
         haciendalaquerencia: 'hlq',
         reservadelbosque: 'rdb'
     };
+    const PROJECT_M2 = {
+        bdj: { casas: 16566.48, urbanizacion: 36248.76, total: 52815.24 },
+        bdp: { casas: 30715.06, urbanizacion: 23331.69, total: 54046.75 },
+        bse: { casas: 41272.94, urbanizacion: 27442.78, total: 68715.72 },
+        cse: { casas: 42630.21, urbanizacion: 19427.66, total: 62057.87 },
+        hlq: { casas: 10388.90, urbanizacion: 7282.77,  total: 17671.67 },
+        rdb: { casas: 29940.56, urbanizacion: 33784.09, total: 63724.65 },
+    };
     let activeCategory = 'todos';
 
     function readMetric(row, name) {
@@ -699,6 +718,48 @@
 
     function formatPct(value) {
         return `${((Number(value) || 0) * 100).toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%`;
+    }
+
+    function fmtM2(v) {
+        return v.toLocaleString('es-GT', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    }
+    function fmtCostM2(v) {
+        return `Q ${Math.round(v).toLocaleString('es-GT')}`;
+    }
+
+    function renderDesgloseFinanciero(project) {
+        const key = SAP_PROJECT_KEYS[project.id];
+        if (!key || !PROJECT_M2[key]) return '';
+        const m2 = PROJECT_M2[key];
+        if (!project.sapAreas) return '<div class="prop-desglose-loading">Cargando desglose...</div>';
+        const { construccion, urbanizacion, total } = project.sapAreas;
+        return `
+            <div class="prop-desglose">
+                <div class="prop-desglose-title">Desglose financiero</div>
+                <div class="prop-desglose-table">
+                    <div class="prop-desglose-row prop-desglose-head">
+                        <span>Concepto</span><span>Ppto. ER</span><span>M²</span><span>Q/m²</span>
+                    </div>
+                    <div class="prop-desglose-row">
+                        <span>Construcción</span>
+                        <span>${formatCompactMoney(construccion)}</span>
+                        <span>${fmtM2(m2.casas)}</span>
+                        <span>${fmtCostM2(construccion / m2.casas)}</span>
+                    </div>
+                    <div class="prop-desglose-row">
+                        <span>Urbanización</span>
+                        <span>${formatCompactMoney(urbanizacion)}</span>
+                        <span>${fmtM2(m2.urbanizacion)}</span>
+                        <span>${fmtCostM2(urbanizacion / m2.urbanizacion)}</span>
+                    </div>
+                    <div class="prop-desglose-row prop-desglose-total">
+                        <span>Total</span>
+                        <span>${formatCompactMoney(total)}</span>
+                        <span>${fmtM2(m2.total)}</span>
+                        <span>${fmtCostM2(total / m2.total)}</span>
+                    </div>
+                </div>
+            </div>`;
     }
 
     function renderBudgetSummary(project) {
@@ -733,7 +794,8 @@
                 <div class="prop-budget-track" aria-hidden="true">
                     <span class="prop-budget-fill" style="--pct:${pctValue}%"></span>
                 </div>
-            </div>`;
+            </div>
+            ${renderDesgloseFinanciero(project)}`;
     }
 
     function setSapSummary(project, summary) {
@@ -758,6 +820,20 @@
         });
     }
 
+    function setSapAreasFromRows(project, rows) {
+        if (!project || !Array.isArray(rows) || rows.length === 0) return;
+        const getArea = (kw) => {
+            const row = rows.find(r => {
+                const areaVal = Object.entries(r).find(([k]) => k.toLowerCase().includes('area'))?.[1];
+                return typeof areaVal === 'string' && areaVal.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().includes(kw);
+            });
+            return row ? (Number(row['[PresupuestoErequester]']) || 0) : 0;
+        };
+        const construccion = getArea('construcc');
+        const urbanizacion = getArea('urbaniz');
+        project.sapAreas = { construccion, urbanizacion, total: construccion + urbanizacion };
+    }
+
     async function loadSapSummariesFromSupabase(projectsWithSap) {
         const projectKeys = projectsWithSap.map(project => SAP_PROJECT_KEYS[project.id]);
         const { data, error } = await client
@@ -771,6 +847,7 @@
             const project = projectsWithSap.find(item => SAP_PROJECT_KEYS[item.id] === cacheRow.project_key);
             const totalsRow = cacheRow.payload?.datasets?.totales?.[0] || cacheRow.payload?.rows?.[0];
             setSapSummaryFromRow(project, totalsRow);
+            setSapAreasFromRows(project, cacheRow.payload?.datasets?.porArea);
         });
 
         return projectsWithSap.some(project => project.sapSummary && !project.sapSummary.error);
@@ -793,11 +870,17 @@
             .map(async project => {
                 const key = SAP_PROJECT_KEYS[project.id];
                 try {
-                    const response = await fetch(`data/powerbi/${key}/totales.json`, { cache: 'no-store' });
-                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-                    const payload = await response.json();
+                    const [totRes, areaRes] = await Promise.all([
+                        fetch(`data/powerbi/${key}/totales.json`, { cache: 'no-store' }),
+                        fetch(`data/powerbi/${key}/porArea.json`, { cache: 'no-store' })
+                    ]);
+                    if (!totRes.ok) throw new Error(`HTTP ${totRes.status}`);
+                    const payload = await totRes.json();
                     setSapSummaryFromRow(project, payload?.rows?.[0]);
+                    if (areaRes.ok) {
+                        const areaPayload = await areaRes.json();
+                        setSapAreasFromRows(project, areaPayload?.rows);
+                    }
                 } catch (error) {
                     console.warn(`No se pudo cargar SAP para ${project.name}`, error);
                     project.sapSummary = { error: true };
