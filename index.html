@@ -411,13 +411,17 @@
             background: linear-gradient(180deg, transparent 40%, rgba(15,23,42,0.10) 100%);
             pointer-events: none;
         }
-        .prop-info { padding: 13px 15px 15px; }
+        .prop-info { padding: 0 15px 14px; }
+        .prop-info::before {
+            content: ''; display: block; height: 3px;
+            background: linear-gradient(90deg, var(--blue), var(--green));
+            margin: 0 -15px 11px;
+        }
         .prop-name { font-size: 0.82rem; font-weight: 800; color: var(--navy); line-height: 1.2; letter-spacing: -0.3px; }
         .prop-location { font-size: 0.67rem; color: var(--gray2); margin-bottom: 0; display: flex; align-items: center; gap: 3px; }
         /* Métricas en 3 columnas horizontales */
         .prop-budget-summary {
-            display: flex; gap: 0; margin-top: 13px;
-            border-top: 1px solid var(--border); padding-top: 11px;
+            display: flex; gap: 0; margin-top: 0;
         }
         .prop-budget-col {
             flex: 1; display: flex; flex-direction: column; gap: 4px;
@@ -428,22 +432,23 @@
             border-left: 1px solid var(--border);
         }
         .prop-budget-col:last-child { padding-right: 0; }
-        .prop-budget-col--pct .prop-budget-val { color: #059669; }
+        .prop-budget-col--pct .prop-budget-val { color: #059669; font-size: 1.05rem; font-weight: 900; }
         .prop-budget-lbl {
-            font-size: 0.60rem; color: #94a3b8; font-weight: 700;
-            text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap;
+            font-size: 0.58rem; color: #64748b; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.8px; white-space: nowrap;
+            margin-bottom: 3px;
         }
         .prop-budget-val {
-            font-size: 0.88rem; font-weight: 900; color: var(--navy);
-            line-height: 1; letter-spacing: -0.3px;
+            font-size: 0.92rem; font-weight: 800; color: var(--navy);
+            line-height: 1.1; letter-spacing: -0.3px;
         }
         /* Barra de avance */
-        .prop-budget-track-wrap { margin-top: 12px; }
-        .prop-budget-track-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-        .prop-budget-track-lbl { font-size: 0.60rem; color: #94a3b8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-        .prop-budget-track-pct { font-size: 0.72rem; font-weight: 900; color: #059669; }
+        .prop-budget-track-wrap { margin-top: 11px; }
+        .prop-budget-track-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+        .prop-budget-track-lbl { font-size: 0.58rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; }
+        .prop-budget-track-pct { font-size: 0.75rem; font-weight: 900; color: #059669; }
         .prop-budget-track {
-            height: 5px; border-radius: 999px; background: #e2e8f0; overflow: hidden;
+            height: 6px; border-radius: 999px; background: #e2e8f0; overflow: hidden;
         }
         .prop-budget-fill {
             display: block; height: 100%; width: var(--pct, 0%);
@@ -457,13 +462,13 @@
         .prop-budget-error { color: #ef4444; }
 
         /* ── DESGLOSE FINANCIERO ── */
-        .prop-desglose { margin-top: 12px; border-top: 1px solid var(--border); padding-top: 10px; }
-        .prop-desglose-title { font-size: 0.60rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; margin-bottom: 8px; display: flex; align-items: center; gap: 5px; }
+        .prop-desglose { margin-top: 11px; border-top: 1px solid var(--border); padding-top: 9px; }
+        .prop-desglose-title { font-size: 0.58rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #059669; margin-bottom: 7px; display: flex; align-items: center; gap: 5px; }
         .prop-desglose-title svg { flex-shrink: 0; }
-        .prop-desglose-table { display: flex; flex-direction: column; gap: 1px; }
-        .prop-desglose-row { display: grid; grid-template-columns: 1.35fr 1.4fr 0.85fr 0.95fr 0.85fr; gap: 3px; font-size: 0.60rem; color: var(--navy); line-height: 1.5; }
-        .prop-desglose-head { font-size: 0.50rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.3px; padding-bottom: 4px; border-bottom: 1px solid var(--border); }
-        .prop-desglose-total { font-weight: 800; border-top: 1px solid var(--border); padding-top: 3px; margin-top: 2px; color: #15803d; }
+        .prop-desglose-table { display: flex; flex-direction: column; gap: 2px; }
+        .prop-desglose-row { display: grid; grid-template-columns: 1.35fr 1.4fr 0.85fr 0.95fr 0.85fr; gap: 3px; font-size: 0.61rem; color: var(--navy); line-height: 1.55; }
+        .prop-desglose-head { font-size: 0.52rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.4px; padding-bottom: 5px; border-bottom: 1px solid var(--border); }
+        .prop-desglose-total { font-weight: 800; border-top: 1px solid var(--border); padding-top: 4px; margin-top: 3px; color: #15803d; }
         .prop-desglose-row span:not(:first-child) { text-align: right; }
         .prop-desglose-loading { margin-top: 8px; font-size: 0.68rem; color: var(--gray2); }
 
