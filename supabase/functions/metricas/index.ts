@@ -39,20 +39,19 @@ Deno.serve(async (req) => {
 
     if (error) throw error
 
-    let presupuesto = 0, ejecutado = 0, comprometido = 0, disponible = 0
+    let presupuesto = 0, asignado = 0, disponible = 0
     let mesRef = ''
 
     for (const row of rows ?? []) {
       // Los campos en el JSON vienen con corchetes: [PresupuestoErequester]
       const t = (row.payload?.datasets?.totales?.[0]) ?? {}
-      presupuesto  += (t['[PresupuestoErequester]']  ?? t.PresupuestoErequester  ?? 0) as number
-      ejecutado    += (t['[EjecutadoErequester]']    ?? t.EjecutadoErequester    ?? 0) as number
-      comprometido += (t['[ComprometidoErequester]'] ?? t.ComprometidoErequester ?? 0) as number
-      disponible   += (t['[DisponibleErequester]']   ?? t.DisponibleErequester   ?? 0) as number
+      presupuesto += (t['[PresupuestoErequester]'] ?? t.PresupuestoErequester ?? 0) as number
+      asignado    += (t['[AsignadoErequester]']    ?? t.AsignadoErequester    ?? 0) as number
+      disponible  += (t['[DisponibleErequester]']  ?? t.DisponibleErequester  ?? 0) as number
       if (!mesRef && row.mes_a) mesRef = row.mes_a
     }
 
-    const pctEjecutado  = presupuesto > 0 ? ejecutado  / presupuesto : 0
+    const pctAsignado   = presupuesto > 0 ? asignado   / presupuesto : 0
     const pctDisponible = presupuesto > 0 ? disponible / presupuesto : 0
     const proyectos     = (rows ?? []).length
 
@@ -60,10 +59,10 @@ Deno.serve(async (req) => {
       sistema:    'Ejecución de Costos',
       generadoEn: new Date().toISOString(),
       metricas: [
-        { label: 'Proyectos activos', value: `${proyectos}`,       trend: mesRef },
-        { label: 'Presupuesto total', value: fmt(presupuesto),     trend: null },
-        { label: 'Ejecutado',         value: fmt(ejecutado),       trend: fmtPct(pctEjecutado) },
-        { label: 'Disponible',        value: fmt(disponible),      trend: `${fmtPct(pctDisponible)} libre` },
+        { label: 'Proyectos activos', value: `${proyectos}`,   trend: mesRef },
+        { label: 'Presupuesto total', value: fmt(presupuesto), trend: null },
+        { label: 'Asignado',          value: fmt(asignado),    trend: fmtPct(pctAsignado) },
+        { label: 'Disponible',        value: fmt(disponible),  trend: `${fmtPct(pctDisponible)} libre` },
       ],
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
