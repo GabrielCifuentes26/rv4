@@ -672,6 +672,7 @@
                         <option value="all">Todo el tiempo</option>
                     </select>
                     <button class="btn-add" onclick="loadMetrics()" style="padding:8px 16px;font-size:0.78rem;">↺ Actualizar</button>
+                    <button onclick="expulsarTodos()" style="padding:8px 16px;font-size:0.78rem;background:#ef4444;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;">🚪 Expulsar todos</button>
                 </div>
             </div>
 
@@ -1494,6 +1495,44 @@
                 return `<div class="day-bar" style="height:${h}px" title="${lbl}: ${count} sesiones"></div>`;
               }).join('')
             : `<div style="color:var(--gray2);font-size:0.8rem;margin:auto">Sin datos aún</div>`;
+    }
+
+    // ── EXPULSAR TODOS ────────────────────────────────────────────────────────
+    async function expulsarTodos() {
+        if (!confirm('¿Cerrar sesión a todos los usuarios (no-admin) ahora mismo?')) return;
+        const btn = event.target;
+        btn.disabled = true;
+        btn.textContent = 'Expulsando...';
+        try {
+            // Obtener todos los usuarios no-admin
+            const { data: usuarios } = await SERVICE_CLIENT
+                .from('usuarios').select('id, nombre, rol').neq('rol', 'admin');
+            if (!usuarios?.length) { showToast('No hay usuarios activos', 'info'); return; }
+
+            // Invalidar tokens via Supabase Auth Admin API
+            const results = await Promise.allSettled(usuarios.map(u =>
+                fetch(`${SUPABASE_URL}/auth/v1/admin/users/${u.id}/logout?scope=global`, {
+                    method: 'POST',
+                    headers: { 'apikey': SERVICE_KEY, 'Authorization': `Bearer ${SERVICE_KEY}` }
+                })
+            ));
+
+            // Marcar sesiones abiertas como cerradas
+            await SERVICE_CLIENT
+                .from('sesiones')
+                .update({ fin: new Date().toISOString() })
+                .is('fin', null)
+                .in('user_id', usuarios.map(u => u.id));
+
+            const ok = results.filter(r => r.status === 'fulfilled').length;
+            showToast(`${ok} usuario(s) expulsado(s) correctamente`, 'success');
+            setTimeout(loadMetrics, 1500);
+        } catch(e) {
+            showToast('Error al expulsar usuarios', 'error');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = '🚪 Expulsar todos';
+        }
     }
 
     // ── SOLICITUDES ───────────────────────────────────────────────────────────
