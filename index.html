@@ -910,6 +910,18 @@
             await loadSapSummariesFromLocalJson(projectsWithSap);
         }
 
+        // Cargar areas desde archivos locales para proyectos sin sapAreas (cache de Supabase sin campo Area)
+        const missingAreas = projectsWithSap.filter(p => !p.sapAreas);
+        if (missingAreas.length > 0) {
+            await Promise.all(missingAreas.map(async project => {
+                const key = SAP_PROJECT_KEYS[project.id];
+                try {
+                    const res = await fetch(`data/powerbi/${key}/porArea.json`, { cache: 'no-store' });
+                    if (res.ok) setSapAreasFromRows(project, (await res.json())?.rows);
+                } catch (_) {}
+            }));
+        }
+
         renderCards(activeCategory);
     }
 
