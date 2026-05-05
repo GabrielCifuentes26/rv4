@@ -1004,9 +1004,9 @@
                     ${p.render ? `<img src="${p.render}" alt="${p.name}">` : p.icon}
                 </div>
                 <div class="prop-info">
+                    ${renderBudgetSummary(p)}
                     <div class="prop-name">${p.name}</div>
                     <div class="prop-location">📍 ${p.loc}</div>
-                    ${renderBudgetSummary(p)}
                     <div class="prop-details">
                         <span class="prop-cta">Ver proyecto →</span>
                     </div>
