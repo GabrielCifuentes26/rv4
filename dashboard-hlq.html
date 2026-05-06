@@ -1671,6 +1671,7 @@
     let kpiFilter = null; // 'ejecutado'|'comprometido'|'asignado'|'disponible'|null
     let tableSelection = null;
     const tableRowMeta = {};
+    let tableDrillBound = false;
 
     const KPI_FILTER_FIELD = {
         ejecutado:    'EjecutadoErequester',
@@ -2120,6 +2121,8 @@
     }
 
     function bindTableDrill(tbody) {
+        if (tableDrillBound) return;
+        tableDrillBound = true;
         tbody.addEventListener('click', e => {
             const tr = e.target.closest('tr');
             if (!tr || tr.classList.contains('total-row')) return;
