@@ -93,61 +93,65 @@
         /* sidebar removed */
 
         /* ── CONTROL EJECUCIÓN POR ÁREA ── */
-        .eac-card { display: flex; flex-direction: column; }
-        .eac-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; gap: 12px; }
-        .eac-legend { display: flex; gap: 16px; }
+        .eac-card { display: flex; flex-direction: column; background: #f8fafc; border: none; box-shadow: none; padding: 20px 22px; }
+        .eac-header { display: flex; align-items: center; gap: 18px; margin-bottom: 16px; flex-wrap: wrap; }
+        .eac-legend { display: flex; gap: 14px; flex-wrap: wrap; }
         .eac-legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.68rem; color: var(--gray); font-weight: 500; }
-        .eac-dot { width: 12px; height: 12px; border-radius: 4px; flex-shrink: 0; }
+        .eac-dot { width: 11px; height: 11px; border-radius: 3px; flex-shrink: 0; }
         .eac-dot-ej   { background: var(--c-ejecutado); }
         .eac-dot-comp { background: var(--c-comprometido); }
         .eac-dot-asig { background: #0f172a; border-radius: 2px; }
         .eac-dot-disp { background: #c8d0db; }
-        /* Regla Asignado "|————|" debajo de la barra */
-        .eac-asig-wrap { position: relative; height: 26px; margin-top: 4px; overflow: visible; }
-        .eac-asig-bracket {
-            position: absolute; left: 0; top: 4px;
-            height: 10px;
-            border-top: 2px solid #64748b;
-            border-left: 2.5px solid #64748b;
-            border-right: 2.5px solid #64748b;
-            box-sizing: border-box;
-            min-width: 8px;
+        .eac-rows { display: flex; flex-direction: column; gap: 10px; flex: 1; }
+        .eac-row {
+            background: #fff; border-radius: 16px;
+            box-shadow: 0 2px 10px rgba(15,23,42,0.06);
+            padding: 18px 22px 14px;
+            display: grid; grid-template-columns: 200px 1fr 106px;
+            align-items: center; gap: 18px;
         }
-        .eac-asig-val {
-            position: absolute; top: 15px;
-            transform: translateX(-50%);
-            font-size: 0.65rem; font-weight: 700; color: #334155;
-            white-space: nowrap;
-        }
-        .eac-pct-header { font-size: 0.7rem; font-weight: 700; color: var(--gray); white-space: nowrap; }
-        .eac-rows { display: flex; flex-direction: column; gap: 18px; flex: 1; justify-content: center; }
-        .eac-row { display: grid; grid-template-columns: 175px 1fr 90px; align-items: center; gap: 14px; }
-        .eac-area { display: flex; align-items: center; gap: 12px; }
+        .eac-area { display: flex; align-items: center; gap: 14px; }
         .eac-icon-wrap {
-            width: 46px; height: 46px; border-radius: 12px; flex-shrink: 0;
+            width: 54px; height: 54px; border-radius: 14px; flex-shrink: 0;
             display: flex; align-items: center; justify-content: center;
         }
-        .eac-icon-wrap svg { width: 24px; height: 24px; }
-        .eac-name { font-size: 0.72rem; font-weight: 800; color: var(--navy); line-height: 1.25; text-transform: uppercase; letter-spacing: 0.3px; }
+        .eac-icon-wrap svg { width: 28px; height: 28px; }
+        .eac-name { font-size: 0.76rem; font-weight: 800; color: var(--navy); line-height: 1.25; text-transform: uppercase; letter-spacing: 0.3px; }
         .eac-bar-outer { position: relative; }
         .eac-bar-track {
-            height: 34px; border-radius: 10px;
-            background: var(--c-disponible); overflow: hidden; display: flex;
+            height: 46px; border-radius: 12px;
+            background: #e2e8f0; overflow: hidden; display: flex;
         }
         .eac-seg {
             height: 100%; display: flex; align-items: center; justify-content: center;
             overflow: hidden; white-space: nowrap; flex-shrink: 0;
-            transition: width 0.65s cubic-bezier(.4,0,.2,1);
+            transition: width 0.7s cubic-bezier(.4,0,.2,1);
         }
-        .eac-seg-ej   { background: var(--c-ejecutado);    border-right: 3px solid rgba(255,255,255,0.8); border-radius: 0 6px 6px 0; }
-        .eac-seg-comp { background: var(--c-comprometido); border-right: 3px solid rgba(255,255,255,0.8); border-radius: 0 6px 6px 0; }
+        .eac-seg-ej   { background: var(--c-ejecutado); border-right: 3px solid rgba(255,255,255,0.7); border-radius: 0 8px 8px 0; }
+        .eac-seg-comp { background: var(--c-comprometido); border-right: 3px solid rgba(255,255,255,0.7); border-radius: 0 8px 8px 0; }
         .eac-seg-disp { background: transparent; flex: 1; }
-        .eac-seg-lbl { font-size: 0.7rem; font-weight: 700; padding: 0 8px; }
+        .eac-seg-lbl { font-size: 0.72rem; font-weight: 700; padding: 0 10px; }
         .eac-seg-ej .eac-seg-lbl, .eac-seg-comp .eac-seg-lbl { color: #fff; }
-        .eac-seg-disp .eac-seg-lbl { color: var(--gray); }
-        /* Badge comprometido cuando el segmento es muy pequeño */
+        .eac-seg-disp .eac-seg-lbl { color: #64748b; }
+        /* Bracket "|——suma——|" debajo de la barra */
+        .eac-asig-wrap { position: relative; height: 28px; margin-top: 5px; overflow: visible; }
+        .eac-asig-bracket {
+            position: absolute; left: 0; top: 3px;
+            height: 11px;
+            border-top: 2.5px solid #94a3b8;
+            border-left: 2.5px solid #94a3b8;
+            border-right: 2.5px solid #94a3b8;
+            box-sizing: border-box; min-width: 8px;
+        }
+        .eac-asig-val {
+            position: absolute; top: 16px;
+            transform: translateX(-50%);
+            font-size: 0.67rem; font-weight: 700; color: #475569;
+            white-space: nowrap;
+        }
+        /* Badge para comprometido muy pequeño */
         .eac-comp-badge {
-            position: absolute; bottom: calc(100% + 5px);
+            position: absolute; bottom: calc(100% + 6px);
             transform: translateX(-50%);
             background: var(--c-comprometido); color: #fff;
             font-size: 0.62rem; font-weight: 700;
@@ -162,8 +166,8 @@
             border-top-color: var(--c-comprometido);
         }
         .eac-pct-col { text-align: right; }
-        .eac-pct-val { font-size: 1.15rem; font-weight: 800; color: var(--c-asignado); display: block; line-height: 1.1; }
-        .eac-pct-of  { font-size: 0.75rem; font-weight: 600; color: var(--c-ppto-sap); display: block; margin-top: 3px; }
+        .eac-pct-val { font-size: 1.55rem; font-weight: 800; color: #10b981; display: block; line-height: 1.1; }
+        .eac-pct-of  { font-size: 0.72rem; font-weight: 600; color: var(--c-ppto-sap); display: block; margin-top: 4px; }
 
         /* ── MAIN ── */
         .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
@@ -1000,10 +1004,9 @@
                 <div class="eac-legend">
                     <span class="eac-legend-item"><span class="eac-dot eac-dot-ej"></span>Ejecutado</span>
                     <span class="eac-legend-item"><span class="eac-dot eac-dot-comp"></span>Comprometido</span>
-                    <span class="eac-legend-item"><span class="eac-dot eac-dot-asig"></span>Asignado</span>
                     <span class="eac-legend-item"><span class="eac-dot eac-dot-disp"></span>Disponible</span>
+                    <span class="eac-legend-item"><span class="eac-dot" style="background:#10b981;border-radius:50%"></span>% Ejecución</span>
                 </div>
-                <span class="eac-pct-header">% Ejecución</span>
             </div>
             <div id="eac-rows" class="eac-rows"></div>
         </div>
@@ -1111,20 +1114,19 @@
             const rdi        = asNumber(rowMetric(row, 'RdiTotal'));
             const ejecutado  = asNumber(rowMetric(row, 'EjecutadoErequester'));
             const comprom    = asNumber(rowMetric(row, 'ComprometidoErequester'));
-            const asignado   = asNumber(rowMetric(row, 'AsignadoErequester'));
             const disponible = asNumber(rowMetric(row, 'DisponibleErequester'));
-            const pctAsig   = asNumber(rowMetric(row, 'PorcentajeAsignado'));
-            const pctText   = (pctAsig * 100).toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            const ejPct     = rdi > 0 ? Math.min(100, (ejecutado / rdi) * 100) : 0;
-            const compPct   = rdi > 0 ? Math.min(100 - ejPct, (comprom  / rdi) * 100) : 0;
-            const asigPct   = rdi > 0 ? Math.min(100, (asignado / rdi) * 100) : 0;
+            const ejComp     = ejecutado + comprom;
+            const ejPct      = rdi > 0 ? Math.min(100, (ejecutado / rdi) * 100) : 0;
+            const compPct    = rdi > 0 ? Math.min(100 - ejPct, (comprom  / rdi) * 100) : 0;
+            const ejCompPct  = rdi > 0 ? Math.min(100, (ejComp / rdi) * 100) : 0;
+            const pctText    = ejCompPct.toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             const seg = (pct, cls, val) => pct > 0
-                ? `<div class="eac-seg ${cls}" style="width:${pct.toFixed(2)}%"><span class="eac-seg-lbl">${pct >= 9 ? fmt(val) : ''}</span></div>`
+                ? `<div class="eac-seg ${cls}" style="width:${pct.toFixed(2)}%"><span class="eac-seg-lbl">${pct >= 8 ? fmt(val) : ''}</span></div>`
                 : '';
             const badgeLeft = (ejPct + compPct / 2).toFixed(2);
-            const showBadge = compPct > 0 && compPct < 9;
-            // Clamp label center so it never overflows the bar area
-            const asigLabelLeft = Math.max(6, Math.min(94, asigPct / 2)).toFixed(2);
+            const showBadge = compPct > 0 && compPct < 8;
+            const bracketLabelLeft = Math.max(6, Math.min(93, ejCompPct / 2)).toFixed(2);
+            const dispPct = 100 - ejPct - compPct;
             return `
             <div class="eac-row">
                 <div class="eac-area">
@@ -1136,12 +1138,12 @@
                     <div class="eac-bar-track">
                         ${seg(ejPct,   'eac-seg-ej',   ejecutado)}
                         ${seg(compPct, 'eac-seg-comp', comprom)}
-                        <div class="eac-seg eac-seg-disp"><span class="eac-seg-lbl">${fmt(disponible)}</span></div>
+                        <div class="eac-seg eac-seg-disp" style="width:${dispPct.toFixed(2)}%"><span class="eac-seg-lbl">${dispPct >= 8 ? fmt(disponible) : ''}</span></div>
                     </div>
-                    <div class="eac-asig-wrap">
-                        <div class="eac-asig-bracket" style="width:${asigPct.toFixed(2)}%"></div>
-                        <div class="eac-asig-val" style="left:${asigLabelLeft}%">${fmt(asignado)}</div>
-                    </div>
+                    ${ejCompPct > 0 ? `<div class="eac-asig-wrap">
+                        <div class="eac-asig-bracket" style="width:${ejCompPct.toFixed(2)}%"></div>
+                        <div class="eac-asig-val" style="left:${bracketLabelLeft}%">${fmt(ejComp)}</div>
+                    </div>` : ''}
                 </div>
                 <div class="eac-pct-col">
                     <span class="eac-pct-val">${pctText}%</span>
