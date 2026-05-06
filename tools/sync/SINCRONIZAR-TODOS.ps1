@@ -1,5 +1,5 @@
 param(
-    [string]$MesA = "may 26",
+    [string]$MesA = "abr 26",
     [string]$SupabaseServiceKey = $env:SUPABASE_SERVICE_ROLE_KEY,
     [string]$StatusFile = ""
 )
