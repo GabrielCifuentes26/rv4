@@ -188,8 +188,19 @@ $repoRoot = Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..\..")
 $outputPath = Join-Path $repoRoot $OutputDir
 New-Item -ItemType Directory -Force -Path $outputPath | Out-Null
 
-Write-Info "Iniciando sesion. Usa tu cuenta de Microsoft con acceso al reporte."
-Connect-PowerBIServiceAccount | Out-Null
+$tokenFromEnv = $env:PBI_ACCESS_TOKEN
+if (-not [string]::IsNullOrWhiteSpace($tokenFromEnv)) {
+    Write-Info "Usando token Power BI del entorno (modo servidor)."
+    Connect-PowerBIServiceAccount -Token $tokenFromEnv | Out-Null
+} else {
+    try {
+        Get-PowerBIAccessToken -ErrorAction Stop | Out-Null
+        Write-Info "Sesion Power BI activa, reutilizando."
+    } catch {
+        Write-Info "Iniciando sesion. Usa tu cuenta de Microsoft con acceso al reporte."
+        Connect-PowerBIServiceAccount | Out-Null
+    }
+}
 
 if (-not [string]::IsNullOrWhiteSpace($ReportName)) {
     $resolvedReport = Resolve-PowerBIReportByName -WorkspaceId $WorkspaceId -ReportName $ReportName
