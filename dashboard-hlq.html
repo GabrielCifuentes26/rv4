@@ -1671,7 +1671,6 @@
     let kpiFilter = null; // 'ejecutado'|'comprometido'|'asignado'|'disponible'|null
     let tableSelection = null;
     const tableRowMeta = {};
-    let tableDrillBound = false;
 
     const KPI_FILTER_FIELD = {
         ejecutado:    'EjecutadoErequester',
@@ -2121,17 +2120,16 @@
     }
 
     function bindTableDrill(tbody) {
-        if (tableDrillBound) return;
-        tableDrillBound = true;
+        if (tbody.dataset.drillBound) return;
+        tbody.dataset.drillBound = '1';
         tbody.addEventListener('click', e => {
             const tr = e.target.closest('tr');
             if (!tr || tr.classList.contains('total-row')) return;
             const onChevron = !!e.target.closest('.row-chev');
             if (onChevron && tr.classList.contains('tr-expandable')) {
                 handleExpand(tbody, tr);
-            } else if (!onChevron) {
-                handleRowSelect(tbody, tr);
             }
+            handleRowSelect(tbody, tr);
         });
     }
 
@@ -2221,6 +2219,11 @@
         tr.classList.add('tr-row-selected');
         if (isL1) {
             tbody.querySelectorAll(`.tr-child[data-ai="${ai}"]`).forEach(r => r.classList.remove('tr-dimmed'));
+        } else if (isL2) {
+            tbody.querySelectorAll(`.tr-l1[data-ai="${ai}"]`).forEach(r => r.classList.remove('tr-dimmed'));
+        } else if (isL3) {
+            tbody.querySelectorAll(`.tr-l1[data-ai="${ai}"]`).forEach(r => r.classList.remove('tr-dimmed'));
+            tbody.querySelectorAll(`.tr-l2[data-ai="${ai}"][data-si="${si}"]`).forEach(r => r.classList.remove('tr-dimmed'));
         }
 
         applySelectionRender();
