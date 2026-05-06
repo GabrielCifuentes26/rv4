@@ -16,17 +16,17 @@ function Set-Status {
         ConvertTo-Json | Set-Content $StatusFile -Encoding UTF8
 }
 
+# Limpiar sesion previa para forzar un solo login
+$env:PBI_SESSION_ACTIVE = ""
+
 Write-Host ""
 Write-Host "=============================================" -ForegroundColor Cyan
 Write-Host "  RV4 - Sincronizacion Power BI" -ForegroundColor Cyan
 Write-Host "  Mes: $MesA" -ForegroundColor Cyan
 Write-Host "=============================================" -ForegroundColor Cyan
 Write-Host ""
-
-Set-Status -State "running" -Message "Autenticando con Power BI..."
-Write-Host "[1/7] Autenticando con Power BI..." -ForegroundColor Yellow
-Connect-PowerBIServiceAccount | Out-Null
-Write-Host "      Sesion iniciada." -ForegroundColor Green
+Write-Host "Selecciona tu cuenta de Microsoft cuando se abra el navegador." -ForegroundColor Yellow
+Write-Host "(Solo se pedira una vez para todos los proyectos)" -ForegroundColor Yellow
 Write-Host ""
 
 $proyectos = @(
@@ -40,10 +40,10 @@ $proyectos = @(
 
 $ok = @()
 $err = @()
-$i = 2
+$i = 1
 
 foreach ($p in $proyectos) {
-    Write-Host "[$i/7] $($p.Nombre)..." -ForegroundColor Yellow
+    Write-Host "[$i/6] $($p.Nombre)..." -ForegroundColor Yellow
     Set-Status -State "running" -Message "Sincronizando $($p.Nombre)..."
     try {
         & (Join-Path $pbiDir $p.Script) -MesA $MesA -UploadSupabase -SupabaseServiceKey $SupabaseServiceKey
