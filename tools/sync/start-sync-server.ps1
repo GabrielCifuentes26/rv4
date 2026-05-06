@@ -13,6 +13,19 @@ function Get-StatusJson {
     return '{"state":"idle","message":"Servidor listo","updatedAt":""}'
 }
 
+function Get-FreshPbiToken {
+    try { return (Get-PowerBIAccessToken -ErrorAction Stop).Token } catch { return "" }
+}
+
+# Autenticar con Power BI al iniciar el servidor
+Write-Host "[RV4 Server] Autenticando con Power BI..." -ForegroundColor Yellow
+try {
+    Connect-PowerBIServiceAccount | Out-Null
+    Write-Host "[RV4 Server] Autenticacion exitosa." -ForegroundColor Green
+} catch {
+    Write-Warning "[RV4 Server] No se pudo autenticar con Power BI: $_"
+}
+
 Write-Status -State "idle" -Message "Servidor listo"
 
 $listener = [System.Net.HttpListener]::new()
@@ -51,9 +64,15 @@ while ($listener.IsListening) {
                 } else {
                     Write-Status -State "running" -Message "Iniciando sincronizacion..."
 
+                    # Obtener token fresco antes de lanzar el job
+                    $pbiToken = Get-FreshPbiToken
+
                     Start-Job -ScriptBlock {
-                        param($script, $file, $key)
+                        param($script, $file, $key, $token)
                         $env:SUPABASE_SERVICE_ROLE_KEY = $key
+                        if (-not [string]::IsNullOrWhiteSpace($token)) {
+                            $env:PBI_ACCESS_TOKEN = $token
+                        }
                         try {
                             & $script
                             @{ state="completed"; message="Dashboards actualizados correctamente"; updatedAt=(Get-Date -Format "dd/MM/yyyy HH:mm") } |
@@ -62,7 +81,7 @@ while ($listener.IsListening) {
                             @{ state="error"; message=$_.Exception.Message; updatedAt=(Get-Date -Format "dd/MM/yyyy HH:mm") } |
                                 ConvertTo-Json | Set-Content $file -Encoding UTF8
                         }
-                    } -ArgumentList $syncScript, $statusFile, $env:SUPABASE_SERVICE_ROLE_KEY | Out-Null
+                    } -ArgumentList $syncScript, $statusFile, $env:SUPABASE_SERVICE_ROLE_KEY, $pbiToken | Out-Null
 
                     '{"state":"running","message":"Sincronizacion iniciada"}'
                 }
