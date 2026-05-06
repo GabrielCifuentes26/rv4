@@ -753,20 +753,64 @@
             <div class="section-header">
                 <div>
                     <div class="section-title">Sincronización Power BI</div>
-                    <div class="section-sub">Actualiza los dashboards BSE y HLQ desde el modelo semántico de Power BI.</div>
+                    <div class="section-sub">Estado de los 6 proyectos conectados al modelo semántico de Power BI.</div>
                 </div>
             </div>
 
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;">
-                <div class="m-card" style="padding:20px;">
-                    <div class="m-card-title" style="margin-bottom:12px;">BSE — Bosques de Santa Elena</div>
-                    <div style="font-size:0.78rem;color:var(--gray);margin-bottom:8px;">Último sync: <span id="pbi-last-bse">—</span></div>
-                    <a href="dashboard.html" target="_blank" style="font-size:0.75rem;color:var(--blue);text-decoration:none;">↗ Ver dashboard</a>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px;" id="pbi-projects-grid">
+                <!-- BSE -->
+                <div class="m-card" style="padding:16px 18px;">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+                        <span id="pbi-dot-bse" style="width:10px;height:10px;border-radius:50%;background:var(--gray2);flex-shrink:0;"></span>
+                        <div class="m-card-title" style="margin:0;font-size:0.83rem;">BSE — Bosques de Santa Elena</div>
+                    </div>
+                    <div style="font-size:0.75rem;color:var(--gray);margin-bottom:10px;">Último sync: <span id="pbi-last-bse">—</span></div>
+                    <a href="dashboard.html?project=Bosques%20de%20Santa%20Elena&pbi=bse" target="_blank" style="font-size:0.73rem;color:var(--blue);text-decoration:none;">↗ Ver dashboard</a>
                 </div>
-                <div class="m-card" style="padding:20px;">
-                    <div class="m-card-title" style="margin-bottom:12px;">HLQ — Hacienda La Querencia</div>
-                    <div style="font-size:0.78rem;color:var(--gray);margin-bottom:8px;">Último sync: <span id="pbi-last-hlq">—</span></div>
-                    <a href="dashboard-hlq.html" target="_blank" style="font-size:0.75rem;color:var(--blue);text-decoration:none;">↗ Ver dashboard</a>
+                <!-- BDJ -->
+                <div class="m-card" style="padding:16px 18px;">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+                        <span id="pbi-dot-bdj" style="width:10px;height:10px;border-radius:50%;background:var(--gray2);flex-shrink:0;"></span>
+                        <div class="m-card-title" style="margin:0;font-size:0.83rem;">BDJ — Bosques de Jalapa</div>
+                    </div>
+                    <div style="font-size:0.75rem;color:var(--gray);margin-bottom:10px;">Último sync: <span id="pbi-last-bdj">—</span></div>
+                    <a href="dashboard.html?project=Bosques%20de%20Jalapa&pbi=bdj" target="_blank" style="font-size:0.73rem;color:var(--blue);text-decoration:none;">↗ Ver dashboard</a>
+                </div>
+                <!-- BDP -->
+                <div class="m-card" style="padding:16px 18px;">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+                        <span id="pbi-dot-bdp" style="width:10px;height:10px;border-radius:50%;background:var(--gray2);flex-shrink:0;"></span>
+                        <div class="m-card-title" style="margin:0;font-size:0.83rem;">BDP — Bosques de Pinula</div>
+                    </div>
+                    <div style="font-size:0.75rem;color:var(--gray);margin-bottom:10px;">Último sync: <span id="pbi-last-bdp">—</span></div>
+                    <a href="dashboard.html?project=Bosques%20de%20Pinula&pbi=bdp" target="_blank" style="font-size:0.73rem;color:var(--blue);text-decoration:none;">↗ Ver dashboard</a>
+                </div>
+                <!-- CSE -->
+                <div class="m-card" style="padding:16px 18px;">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+                        <span id="pbi-dot-cse" style="width:10px;height:10px;border-radius:50%;background:var(--gray2);flex-shrink:0;"></span>
+                        <div class="m-card-title" style="margin:0;font-size:0.83rem;">CSE — Condado Santa Elena</div>
+                    </div>
+                    <div style="font-size:0.75rem;color:var(--gray);margin-bottom:10px;">Último sync: <span id="pbi-last-cse">—</span></div>
+                    <a href="dashboard.html?project=Condado%20Santa%20Elena&pbi=cse" target="_blank" style="font-size:0.73rem;color:var(--blue);text-decoration:none;">↗ Ver dashboard</a>
+                </div>
+                <!-- RDB -->
+                <div class="m-card" style="padding:16px 18px;">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+                        <span id="pbi-dot-rdb" style="width:10px;height:10px;border-radius:50%;background:var(--gray2);flex-shrink:0;"></span>
+                        <div class="m-card-title" style="margin:0;font-size:0.83rem;">RDB — Residencias Del Bosque</div>
+                    </div>
+                    <div style="font-size:0.75rem;color:var(--gray);margin-bottom:10px;">Último sync: <span id="pbi-last-rdb">—</span></div>
+                    <a href="dashboard.html?project=Residencias%20Del%20Bosque&pbi=rdb" target="_blank" style="font-size:0.73rem;color:var(--blue);text-decoration:none;">↗ Ver dashboard</a>
+                </div>
+                <!-- HLQ -->
+                <div class="m-card" style="padding:16px 18px;">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+                        <span id="pbi-dot-hlq" style="width:10px;height:10px;border-radius:50%;background:var(--gray2);flex-shrink:0;"></span>
+                        <div class="m-card-title" style="margin:0;font-size:0.83rem;">HLQ — Hacienda La Querencia</div>
+                    </div>
+                    <div style="font-size:0.75rem;color:var(--gray);margin-bottom:10px;">Último sync: <span id="pbi-last-hlq">—</span></div>
+                    <a href="dashboard.html?project=Hacienda%20La%20Querencia&pbi=hlq" target="_blank" style="font-size:0.73rem;color:var(--blue);text-decoration:none;">↗ Ver dashboard</a>
                 </div>
             </div>
 
@@ -1888,11 +1932,20 @@ Si no solicitaste este cambio, por favor contacta de inmediato al área de Costo
                 .select('project_key, updated_at')
                 .in('project_key', ['bse', 'hlq', 'bdj', 'bdp', 'rdb', 'cse']);
             if (!data) return;
+            const now = new Date();
+            const todayStr = now.toDateString();
+            const weekAgo = new Date(now - 7 * 86400000);
             data.forEach(row => {
                 const el = document.getElementById(`pbi-last-${row.project_key}`);
+                const dot = document.getElementById(`pbi-dot-${row.project_key}`);
                 if (el && row.updated_at) {
                     const d = new Date(row.updated_at);
                     el.textContent = d.toLocaleString('es-GT', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+                    if (dot) {
+                        if (d.toDateString() === todayStr)  { dot.style.background = '#10b981'; dot.title = 'Actualizado hoy'; }
+                        else if (d >= weekAgo)              { dot.style.background = '#f59e0b'; dot.title = 'Actualizado esta semana'; }
+                        else                                { dot.style.background = '#94a3b8'; dot.title = 'Sin actualizar recientemente'; }
+                    }
                 }
             });
         } catch (_) {}
