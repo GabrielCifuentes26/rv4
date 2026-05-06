@@ -640,22 +640,21 @@
             margin-right: 7px; vertical-align: middle; flex-shrink: 0;
         }
         /* Level 1 — Área */
-        .tr-l1 { background: var(--surface) !important; }
-        .tr-l1.tr-expandable { cursor: pointer; }
-        .tr-l1.tr-expandable:hover td { background: rgba(14,165,233,0.03); }
+        .tr-l1 { background: var(--surface) !important; cursor: pointer; }
+        .tr-l1:hover td { background: rgba(201,168,76,0.04) !important; }
         .tr-l1.tr-expandable:hover .row-chev { background: rgba(14,165,233,0.14); color: var(--blue); }
         .tr-l1.expanded .row-chev { transform: rotate(90deg); background: rgba(14,165,233,0.14); color: var(--blue); }
         .td-l1 { font-weight: 600 !important; color: var(--navy) !important; }
         /* Level 2 — Segmento */
-        .tr-l2 { background: #f8fafc !important; }
-        .tr-l2.tr-expandable { cursor: pointer; }
-        .tr-l2.tr-expandable:hover td { background: #f0f4f8 !important; }
+        .tr-l2 { background: #f8fafc !important; cursor: pointer; }
         .tr-l2.tr-expandable:hover .row-chev { background: rgba(14,165,233,0.14); color: var(--blue); }
         .tr-l2.expanded .row-chev { transform: rotate(90deg); background: rgba(14,165,233,0.14); color: var(--blue); }
+        .tr-l2:hover td { background: rgba(201,168,76,0.04) !important; }
         .td-l2 { padding-left: 30px !important; font-size: 0.71rem !important; color: var(--gray) !important; }
         .tr-l2 td:not(:first-child) { color: var(--gray); font-size: 0.71rem; }
         /* Level 3 — Etapa */
-        .tr-l3 { background: #f1f5f9 !important; }
+        .tr-l3 { background: #f1f5f9 !important; cursor: pointer; }
+        .tr-l3:hover td { background: rgba(201,168,76,0.04) !important; }
         .td-l3 { padding-left: 52px !important; font-size: 0.69rem !important; color: var(--gray2) !important; font-weight: 400 !important; }
         .tr-l3 td:not(:first-child) { color: var(--gray2); font-size: 0.69rem; }
         /* Table row selection */
