@@ -2590,6 +2590,30 @@
                 areaRows     = groupRowsBy(rawDetailRows, 'Rubros[Area]');
                 etapaRows    = groupRowsBy(rawDetailRows, 'Rubros[Etapa]');
                 segmentoRows = groupRowsBy(rawDetailRows, 'Rubros[Segmento]');
+                // PPTO ER: usar porArea (no filtrado por mes) para valores correctos
+                if (datasets.porArea && datasets.porArea.length) {
+                    const porAreaPptoMap = new Map(
+                        datasets.porArea.map(row => [cleanDimension(dimension(row, 'Rubros[Area]')), field(row, 'PresupuestoErequester')])
+                    );
+                    const porAreaTotal = [...porAreaPptoMap.values()].reduce((s, v) => s + v, 0);
+                    const selAreas = (powerBIState.filters.areas || []).map(a => a.toUpperCase().trim());
+                    const filteredPptoTotal = selAreas.length
+                        ? datasets.porArea.filter(row => selAreas.includes(String(dimension(row, 'Rubros[Area]') || '').toUpperCase().trim()))
+                              .reduce((s, row) => s + field(row, 'PresupuestoErequester'), 0)
+                        : porAreaTotal;
+                    totals.PresupuestoErequester = filteredPptoTotal;
+                    totals.DisponibleErequester  = filteredPptoTotal - asNumber(totals.AsignadoErequester);
+                    finalizeMetrics(totals);
+                    areaRows = areaRows.map(r => {
+                        const ppto = porAreaPptoMap.get(r.label);
+                        if (ppto !== undefined) {
+                            r.PresupuestoErequester = ppto;
+                            r.DisponibleErequester  = ppto - asNumber(r.AsignadoErequester);
+                            finalizeMetrics(r);
+                        }
+                        return r;
+                    });
+                }
             } else if (powerBIState.filters.meses.length === 1) {
                 // Mes histórico seleccionado (no en detalleFiltros) → usar porMesResumen
                 const selMes = powerBIState.filters.meses[0];
