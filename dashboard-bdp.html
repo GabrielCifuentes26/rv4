@@ -1077,7 +1077,7 @@
             const rawName = String(row.label || dimension(row, 'Rubros[Area]') || '').toUpperCase().trim();
             const label = displayName(rawName) || rawName;
             const cfg = AREA_CONFIG[rawName] || DEFAULT_AREA_CFG;
-            const rdi        = asNumber(rowMetric(row, 'RdiTotal')) || asNumber(rowMetric(row, 'PresupuestoErequester'));
+            const rdi        = asNumber(rowMetric(row, 'PresupuestoErequester'));
             const ejecutado  = asNumber(rowMetric(row, 'EjecutadoErequester'));
             const comprom    = asNumber(rowMetric(row, 'ComprometidoErequester'));
             const disponible = asNumber(rowMetric(row, 'DisponibleErequester'));
@@ -2507,19 +2507,6 @@
                 areaRows     = groupRowsBy(rawDetailRows, 'Rubros[Area]');
                 etapaRows    = groupRowsBy(rawDetailRows, 'Rubros[Etapa]');
                 segmentoRows = groupRowsBy(rawDetailRows, 'Rubros[Segmento]');
-                // Enriquecer RdiTotal desde porArea cuando los detalles lo traen nulo
-                const porAreaMap = new Map((datasets.porArea || []).map(r => [
-                    cleanDimension(dimension(r, 'Rubros[Area]')).toUpperCase(),
-                    asNumber(field(r, 'RdiTotal'))
-                ]));
-                areaRows = areaRows.map(row => {
-                    if (!asNumber(row.RdiTotal)) {
-                        const key = String(row.label || '').toUpperCase().trim();
-                        const rdi = porAreaMap.get(key);
-                        if (rdi) row.RdiTotal = rdi;
-                    }
-                    return row;
-                });
             } else if (powerBIState.filters.meses.length === 1) {
                 // Mes histórico seleccionado (no en detalleFiltros) → usar porMesResumen
                 const selMes = powerBIState.filters.meses[0];
