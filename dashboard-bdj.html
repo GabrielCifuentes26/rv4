@@ -2355,7 +2355,9 @@
         const faseName = dimLabel; // keep alias for leyenda block below
 
         const datasets = dims.map((fase, i) => {
-            const color = FASE_PALETTE[i % FASE_PALETTE.length];
+            const rawFase = fase.toUpperCase().trim();
+            const areaColor = dimKey === 'Rubros[Area]' ? (AREA_CONFIG[rawFase] || null) : null;
+            const color = areaColor ? areaColor.color : FASE_PALETTE[i % FASE_PALETTE.length];
             return {
                 label: faseName(fase),
                 data: meses.map(m => toMillions(matrix[fase][m])),
@@ -2501,7 +2503,9 @@
         const leyenda = document.getElementById('tendencia-leyenda');
         if (leyenda) {
             leyenda.innerHTML = dims.map((f, i) => {
-                const color  = FASE_PALETTE[i % FASE_PALETTE.length];
+                const rawF = f.toUpperCase().trim();
+                const areaColorL = dimKey === 'Rubros[Area]' ? (AREA_CONFIG[rawF] || null) : null;
+                const color = areaColorL ? areaColorL.color : FASE_PALETTE[i % FASE_PALETTE.length];
                 const total  = meses.reduce((s, m) => s + toMillions(matrix[f][m]), 0);
                 return `<div class="tendencia-leyenda-item">
                     <div class="tendencia-dot" style="background:${color}"></div>
