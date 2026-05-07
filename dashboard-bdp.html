@@ -2288,6 +2288,7 @@
             tbody.querySelectorAll(`.tr-child[data-ai="${ai}"]`).forEach(r => r.classList.remove('tr-dimmed'));
         } else if (isL2) {
             tbody.querySelectorAll(`.tr-l1[data-ai="${ai}"]`).forEach(r => r.classList.remove('tr-dimmed'));
+            tbody.querySelectorAll(`.tr-l3[data-ai="${ai}"][data-si="${si}"]`).forEach(r => r.classList.remove('tr-dimmed'));
         } else if (isL3) {
             tbody.querySelectorAll(`.tr-l1[data-ai="${ai}"]`).forEach(r => r.classList.remove('tr-dimmed'));
             tbody.querySelectorAll(`.tr-l2[data-ai="${ai}"][data-si="${si}"]`).forEach(r => r.classList.remove('tr-dimmed'));
@@ -2298,7 +2299,7 @@
 
     function applySelectionRender() {
         if (!tableSelection) return;
-        const allRows = filteredDetailRows();
+        const allRows = filteredDetailRowsNoMonth();
         let sel;
         if (tableSelection.level === 1) {
             sel = allRows.filter(r =>
@@ -2316,7 +2317,7 @@
         const segR   = groupRowsBy(sel, 'Rubros[Segmento]');
         renderMetrics(totals);
         renderCharts(etapaR, areaR, segR);
-        renderTendenciaFase(sel);
+        renderTendenciaFase(sel, sel);
     }
 
     function clearTableSelection() {
@@ -2336,7 +2337,7 @@
         'Rubros[Segmento]': 'Segmento'
     };
 
-    function renderTendenciaFase(detailRows) {
+    function renderTendenciaFase(detailRows, overrideRows) {
         if (detailRows && detailRows.length) tendenciaLastRows = detailRows;
         const canvas = document.getElementById('tendenciaChart');
         if (!canvas) return;
@@ -2353,7 +2354,7 @@
                 return selAreas.includes(String(dimension(r, 'Rubros[Area]') || '').toUpperCase().trim());
             });
         } else {
-            rows = filteredDetailRowsNoMonth();
+            rows = (overrideRows && overrideRows.length) ? overrideRows : filteredDetailRowsNoMonth();
             if (!rows.length) rows = tendenciaLastRows;
         }
 
