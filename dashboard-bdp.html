@@ -2361,7 +2361,11 @@
         });
 
         const dims = [...dimSet].sort();
-        const meses = sortMonths([...mesSet]);
+        const TENDENCIA_START = { year: 2025, month: 7 }; // ago 25 en adelante
+        const meses = sortMonths([...mesSet]).filter(m => {
+            const p = parseMonthKey(m);
+            return p.year > TENDENCIA_START.year || (p.year === TENDENCIA_START.year && p.month >= TENDENCIA_START.month);
+        });
 
         // Build dim × mes matrix
         const matrix = {};
