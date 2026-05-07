@@ -2373,8 +2373,18 @@
 
         const usingMfData = mfData.length > 0 && dimKey === 'Rubros[Area]';
         if (!usingMfData && (tendenciaMetric === 'DisponibleErequester' || tendenciaMetric === 'PresupuestoErequester')) {
-            const dimGroups = groupRowsBy(rows, dimKey);
-            const budgetByDim = Object.fromEntries(dimGroups.map(g => [g.label, asNumber(g.PresupuestoErequester)]));
+            // Presupuesto desde porArea (no filtrado por mes) para evitar valores desactualizados
+            const porAreaData = powerBIState.data?.datasets?.porArea || [];
+            let budgetByDim;
+            if (porAreaData.length && dimKey === 'Rubros[Area]') {
+                budgetByDim = Object.fromEntries(porAreaData.map(row => [
+                    cleanDimension(dimension(row, 'Rubros[Area]')),
+                    field(row, 'PresupuestoErequester')
+                ]));
+            } else {
+                const dimGroups = groupRowsBy(rows, dimKey);
+                budgetByDim = Object.fromEntries(dimGroups.map(g => [g.label, asNumber(g.PresupuestoErequester)]));
+            }
             const asigByDim = {};
             dims.forEach(d => { asigByDim[d] = {}; meses.forEach(m => { asigByDim[d][m] = 0; }); });
             rows.forEach(r => {
