@@ -2400,8 +2400,14 @@
             });
         }
 
-        // Ocultar meses sin datos en ninguna dimensión
-        const mesesVisible = meses.filter(m => dims.some(d => (matrix[d][m] || 0) > 0));
+        // Ocultar meses sin actividad real (Asignado o Ejecutado > 0 en los rows fuente)
+        const mesConActividad = new Set();
+        rows.forEach(r => {
+            const m = String(dimension(r, 'Calendario[MesA]') || '').trim();
+            if (m && (asNumber(field(r, 'AsignadoErequester')) > 0 || asNumber(field(r, 'EjecutadoErequester')) > 0))
+                mesConActividad.add(m);
+        });
+        const mesesVisible = meses.filter(m => mesConActividad.has(m));
 
         // Display label: "01" → "Fase 1" only for Fase dimension
         const dimLabel = dimKey === 'Rubros[Fase]'
