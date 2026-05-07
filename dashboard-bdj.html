@@ -94,7 +94,7 @@
 
         /* ── CONTROL EJECUCIÓN POR ÁREA ── */
         .eac-card { display: flex; flex-direction: column; }
-        .eac-header { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; margin-bottom: 28px; }
+        .eac-header { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; margin-bottom: 32px; }
         .eac-header .chart-title { margin: 0 !important; }
         .eac-legend { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
         .eac-legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.68rem; color: var(--gray); font-weight: 500; }
@@ -114,7 +114,7 @@
             box-sizing: border-box; min-width: 8px;
         }
         .eac-asig-val { position: absolute; top: 13px; transform: translateX(-50%); font-size: 0.65rem; font-weight: 700; color: #1e3a5f; white-space: nowrap; }
-        .eac-rows { display: flex; flex-direction: column; gap: 44px; flex: 1; justify-content: center; }
+        .eac-rows { display: flex; flex-direction: column; gap: 56px; flex: 1; justify-content: center; }
         /* Badge flotante por segmento */
         .eac-seg-badge {
             position: absolute; bottom: calc(100% + 6px); transform: translateX(-50%);
@@ -1000,7 +1000,7 @@
                 <div class="eac-legend">
                     <span class="eac-legend-item"><span class="eac-dot eac-dot-ej"></span>Ejecutado</span>
                     <span class="eac-legend-item"><span class="eac-dot eac-dot-comp"></span>Comprometido</span>
-                    <span class="eac-legend-item"><span class="eac-dot eac-dot-asig"></span>Ej. + Comp.</span>
+                    <span class="eac-legend-item"><span class="eac-dot eac-dot-asig"></span>Asignado</span>
                     <span class="eac-legend-item"><span class="eac-dot eac-dot-disp"></span>Disponible</span>
                     <span class="eac-legend-item"><span class="eac-dot eac-dot-pct"></span>% Ejecución</span>
                 </div>
@@ -1099,8 +1099,9 @@
         }
         const THRESH = 15;
         const fmt = v => (v / 1e6).toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + 'M';
-        const badge = (left, bg, val) =>
-            `<div class="eac-seg-badge" style="left:${left.toFixed(2)}%;background:${bg};--arrow-color:${bg}">${fmt(val)}</div>`;
+        const badgeWrap = (leftPct, widthPct, bg, val) =>
+            `<div style="position:absolute;left:${leftPct.toFixed(2)}%;width:${widthPct.toFixed(2)}%;top:0;bottom:0;pointer-events:none;overflow:visible;z-index:5">` +
+            `<div class="eac-seg-badge" style="left:50%;background:${bg};--arrow-color:${bg}">${fmt(val)}</div></div>`;
         container.innerHTML = areaRows.map(row => {
             const rawName = String(row.label || dimension(row, 'Rubros[Area]') || '').toUpperCase().trim();
             const label = displayName(rawName) || rawName;
@@ -1118,11 +1119,11 @@
             const ejCompVal = ejecutado + comprom;
             const bracketLeft = Math.max(6, Math.min(94, ejCompPct / 2)).toFixed(2);
             const ejBadge   = ejPct > 0 && ejPct < THRESH
-                ? badge(ejPct / 2, '#3b82f6', ejecutado) : '';
+                ? badgeWrap(0, ejPct, '#3b82f6', ejecutado) : '';
             const compBadge = compPct > 0 && compPct < THRESH
-                ? badge(ejPct + compPct / 2, '#f59e0b', comprom) : '';
+                ? badgeWrap(ejPct, compPct, '#f59e0b', comprom) : '';
             const dispBadge = dispPct > 0 && dispPct < THRESH
-                ? badge(ejCompPct + dispPct / 2, '#94a3b8', disponible) : '';
+                ? badgeWrap(ejCompPct, dispPct, '#94a3b8', disponible) : '';
             const seg = (pct, cls, val) => pct > 0
                 ? `<div class="eac-seg ${cls}" style="width:${pct.toFixed(2)}%"><span class="eac-seg-lbl">${pct >= THRESH ? fmt(val) : ''}</span></div>`
                 : '';
