@@ -1507,7 +1507,27 @@
         if (!menu) return;
         const selected = powerBIState.filters[config.key] || [];
         const options = powerBIState.options[config.optionKey] || [];
-        // all checked only when ALL options are explicitly selected (not when empty/cleared)
+
+        // Meses: radio button (single-select), sin "Seleccionar todo"
+        if (config.key === 'meses') {
+            menu.innerHTML = options.map(option => `
+                <label class="filter-option">
+                    <input type="radio" name="bse-mes-radio" value="${escapeHtml(option)}" ${selected.includes(option) ? 'checked' : ''}>
+                    <span>${escapeHtml(displayName(option))}</span>
+                </label>
+            `).join('');
+            menu.querySelectorAll('input[type="radio"]').forEach(input => {
+                input.addEventListener('change', () => {
+                    powerBIState.filters.meses = [input.value];
+                    populateFilterControls('meses');
+                    renderPowerBIView();
+                });
+            });
+            updateFilterLabel(config);
+            return;
+        }
+
+        // Resto de filtros: checkboxes con "Seleccionar todo"
         const allChecked = options.length > 0 && selected.length === options.length;
         const allIndeterminate = selected.length > 0 && selected.length < options.length;
         menu.innerHTML = `
@@ -1526,7 +1546,6 @@
         if (selectAllInput) {
             selectAllInput.indeterminate = allIndeterminate;
             selectAllInput.addEventListener('change', () => {
-                // checked → selecciona todo; unchecked → limpia este filtro (toggle real)
                 powerBIState.filters[config.key] = selectAllInput.checked ? [...options] : [];
                 populateFilterControls(config.key);
                 renderPowerBIView();
@@ -1537,7 +1556,6 @@
             input.addEventListener('change', () => {
                 const opts = powerBIState.options[config.optionKey] || [];
                 const checked = [...menu.querySelectorAll('input[data-filter-option="true"]:checked')].map(item => item.value);
-                // si queda todo marcado → guardar como "todos" explícito; si queda vacío → cleared
                 powerBIState.filters[config.key] = checked.length === opts.length ? [...opts] : checked;
                 populateFilterControls(config.key);
                 renderPowerBIView();
@@ -1666,8 +1684,10 @@
             if (changedKey && config.key === changedKey) {
                 powerBIState.filters[config.key] = selected;
             } else if (!changedKey && !prior.hadOptions && prior.wasEmpty) {
-                // Carga inicial — MESES selecciona todo; el resto arranca vacío (= Todas, Power BI style)
-                powerBIState.filters[config.key] = config.key === 'meses' ? [...options] : [];
+                // Carga inicial — MESES selecciona último mes; el resto arranca vacío (= Todas, Power BI style)
+                powerBIState.filters[config.key] = config.key === 'meses'
+                    ? (options.length ? [options[options.length - 1]] : [])
+                    : [];
             } else if (prior.wasAll) {
                 // Estaba en "Todas" → mantener "Todas" con el nuevo set de opciones
                 powerBIState.filters[config.key] = [...options];
@@ -1687,6 +1707,14 @@
                 powerBIState.options[config.optionKey] = buildFilterOptions(config);
             });
             syncFilterSelections(previous, changedKey);
+        }
+        // Meses: single-select — siempre forzar exactamente 1 mes (el último si vacío)
+        const mesesOpts = powerBIState.options.meses || [];
+        if (mesesOpts.length) {
+            const selMeses = powerBIState.filters.meses || [];
+            if (!selMeses.length || selMeses.length > 1) {
+                powerBIState.filters.meses = [mesesOpts[mesesOpts.length - 1]];
+            }
         }
 
         FILTER_CONFIG.forEach(populateFilterMenu);
@@ -2301,25 +2329,31 @@
 
     function renderTendenciaFase(detailRows) {
         if (detailRows && detailRows.length) tendenciaLastRows = detailRows;
-        let rows = tendenciaLastRows;
+        const canvas = document.getElementById('tendenciaChart');
+        if (!canvas) return;
 
-        // Fallback: sin detalleFiltros, construir filas sintéticas desde porArea × porMesResumen
-        if ((!rows || !rows.length) && powerBIState.data) {
+        const dimKey = tendenciaDimension;
+        let rows;
+
+        // Vista por Área: siempre usar porArea × porMesResumen (todos los meses, sin filtro de mes)
+        if (dimKey === 'Rubros[Area]' && powerBIState.data) {
             const areaRowsFb  = powerBIState.data.datasets?.porArea       || [];
             const monthRowsFb = powerBIState.data.datasets?.porMesResumen || [];
-            if (areaRowsFb.length && monthRowsFb.length) {
-                const totalPpto = areaRowsFb.reduce((s, r) => s + field(r, 'PresupuestoErequester'), 0) || 1;
+            const selAreas = (powerBIState.filters.areas || []).map(a => a.toUpperCase().trim());
+            const filteredAreas = selAreas.length
+                ? areaRowsFb.filter(r => selAreas.includes(String(dimension(r, 'Rubros[Area]') || '').toUpperCase().trim()))
+                : areaRowsFb;
+            if (filteredAreas.length && monthRowsFb.length) {
+                const totalPpto = filteredAreas.reduce((s, r) => s + field(r, 'PresupuestoErequester'), 0) || 1;
                 rows = [];
                 monthRowsFb.forEach(mr => {
                     const mes = dimension(mr, 'Calendario[MesA]');
                     if (!mes) return;
-                    areaRowsFb.forEach(ar => {
+                    filteredAreas.forEach(ar => {
                         const areaPct = field(ar, 'PresupuestoErequester') / totalPpto;
-                        const synth = { ...mr };
-                        synth['[Rubros[Area]]'] = dimension(ar, 'Rubros[Area]');
-                        synth['[Rubros[Segmento]]'] = dimension(ar, 'Rubros[Area]');
-                        synth['[Rubros[Etapa]]'] = '';
-                        synth['[Rubros[Fase]]'] = '';
+                        const synth = {};
+                        synth['Calendario[MesA]'] = mes;
+                        synth['Rubros[Area]'] = dimension(ar, 'Rubros[Area]');
                         ['EjecutadoErequester', 'ComprometidoErequester', 'AsignadoErequester', 'DisponibleErequester'].forEach(m => {
                             synth[`[${m}]`] = field(mr, m) * areaPct;
                         });
@@ -2327,14 +2361,12 @@
                         rows.push(synth);
                     });
                 });
-                tendenciaLastRows = rows;
             }
         }
 
-        const canvas = document.getElementById('tendenciaChart');
-        if (!canvas) return;
-
-        const dimKey = tendenciaDimension;
+        // Para otras vistas o si no hay datos → usar tendenciaLastRows
+        if (!rows || !rows.length) rows = tendenciaLastRows;
+        if (!rows || !rows.length) return;
 
         // Collect unique dim values and months
         const dimSet = new Set();
@@ -2347,15 +2379,29 @@
         });
 
         const dims = [...dimSet].sort();
-        const meses = sortMonths([...mesSet]);
+        const TENDENCIA_START = { year: 2025, month: 7 }; // ago 25 en adelante
+        const meses = sortMonths([...mesSet]).filter(m => {
+            const p = parseMonthKey(m);
+            return p.year > TENDENCIA_START.year || (p.year === TENDENCIA_START.year && p.month >= TENDENCIA_START.month);
+        });
 
         // Build dim × mes matrix
         const matrix = {};
         dims.forEach(d => { matrix[d] = {}; meses.forEach(m => { matrix[d][m] = 0; }); });
 
         if (tendenciaMetric === 'DisponibleErequester' || tendenciaMetric === 'PresupuestoErequester') {
-            const dimGroups = groupRowsBy(rows, dimKey);
-            const budgetByDim = Object.fromEntries(dimGroups.map(g => [g.label, asNumber(g.PresupuestoErequester)]));
+            // Presupuesto desde porArea (no filtrado por mes) para valores correctos
+            const porAreaData = powerBIState.data?.datasets?.porArea || [];
+            let budgetByDim;
+            if (porAreaData.length && dimKey === 'Rubros[Area]') {
+                budgetByDim = Object.fromEntries(porAreaData.map(row => [
+                    cleanDimension(dimension(row, 'Rubros[Area]')),
+                    field(row, 'PresupuestoErequester')
+                ]));
+            } else {
+                const dimGroups = groupRowsBy(rows, dimKey);
+                budgetByDim = Object.fromEntries(dimGroups.map(g => [g.label, asNumber(g.PresupuestoErequester)]));
+            }
             const asigByDim = {};
             dims.forEach(d => { asigByDim[d] = {}; meses.forEach(m => { asigByDim[d][m] = 0; }); });
             rows.forEach(r => {
@@ -2381,6 +2427,15 @@
             });
         }
 
+        // Ocultar meses sin actividad real (Asignado > 0 en los rows fuente)
+        const mesConActividad = new Set();
+        rows.forEach(r => {
+            const m = String(dimension(r, 'Calendario[MesA]') || '').trim();
+            if (m && asNumber(field(r, 'AsignadoErequester')) > 0)
+                mesConActividad.add(m);
+        });
+        const mesesVisible = meses.filter(m => mesConActividad.has(m));
+
         // Display label: "01" → "Fase 1" only for Fase dimension
         const dimLabel = dimKey === 'Rubros[Fase]'
             ? (f => /^\d+$/.test(f.trim()) ? `Fase ${parseInt(f, 10)}` : f)
@@ -2393,7 +2448,7 @@
             const color = areaColor ? areaColor.color : FASE_PALETTE[i % FASE_PALETTE.length];
             return {
                 label: faseName(fase),
-                data: meses.map(m => toMillions(matrix[fase][m])),
+                data: mesesVisible.map(m => toMillions(matrix[fase][m])),
                 borderColor: color, backgroundColor: color + '15',
                 fill: true, tension: 0.4, borderWidth: 2.5,
                 pointRadius: 4, pointHoverRadius: 7, pointBackgroundColor: color,
@@ -2492,7 +2547,7 @@
         if (!tendenciaChart) {
             tendenciaChart = new Chart(canvas, {
                 type: 'line',
-                data: { labels: meses, datasets },
+                data: { labels: mesesVisible, datasets },
                 plugins: [labelPlugin],
                 options: {
                     responsive: true, maintainAspectRatio: false,
@@ -2520,7 +2575,7 @@
                 }
             });
         } else {
-            tendenciaChart.data.labels   = meses;
+            tendenciaChart.data.labels   = mesesVisible;
             tendenciaChart.data.datasets = datasets;
             tendenciaChart.update();
         }
@@ -2537,7 +2592,7 @@
                 const rawF = f.toUpperCase().trim();
                 const areaColorL = dimKey === 'Rubros[Area]' ? (AREA_CONFIG[rawF] || null) : null;
                 const color = areaColorL ? areaColorL.color : FASE_PALETTE[i % FASE_PALETTE.length];
-                const total  = meses.reduce((s, m) => s + toMillions(matrix[f][m]), 0);
+                const total  = mesesVisible.reduce((s, m) => s + toMillions(matrix[f][m]), 0);
                 return `<div class="tendencia-leyenda-item">
                     <div class="tendencia-dot" style="background:${color}"></div>
                     <span>${faseName(f)}</span>
