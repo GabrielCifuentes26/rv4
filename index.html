@@ -858,7 +858,7 @@
     const PROJECTS = [
         // CASAS
         { id:'bosquesdejalapa',    cat:'casas',    name:'Bosques de Jalapa',       icon:'🏠', bg:'#ede9fe', loc:'Jalapa, JA',     hab:'3', banos:'2', m2:'120', lat:14.6620805, lng:-89.9969111, dashboardUrl:'dashboard-bdj.html', render:'https://raw.githubusercontent.com/GabrielCifuentes26/rv4/master/imagenes%20de%20proyectos/Logos%20Casas/BOSQUES%20DE%20JALAPA%20RENDER.png' },
-        { id:'bosquesdepinula',    cat:'casas',    name:'Bosques de Pinula',       icon:'🌳', bg:'#ecfdf5', loc:'San José Pinula', hab:'3', banos:'2', m2:'135', lat:14.5570744, lng:-90.4131027, dashboardUrl:'dashboard-bdp.html', render:'https://raw.githubusercontent.com/GabrielCifuentes26/rv4/master/imagenes%20de%20proyectos/Logos%20Casas/BOSQUES%20DE%20PINULA%20RENDER.png', budgetLabel:'Ppto. ER' },
+        { id:'bosquesdepinula',    cat:'casas',    name:'Bosques de Pinula',       icon:'🌳', bg:'#ecfdf5', loc:'San José Pinula', hab:'3', banos:'2', m2:'135', lat:14.5570744, lng:-90.4131027, dashboardUrl:'dashboard-bdp.html', render:'https://raw.githubusercontent.com/GabrielCifuentes26/rv4/master/imagenes%20de%20proyectos/Logos%20Casas/BOSQUES%20DE%20PINULA%20RENDER.png', budgetLabel:'Ppto. ER', budgetAreaFilter:['construcc','urbaniz'] },
         { id:'bosquessantaelena',  cat:'casas',    name:'Bosques de Santa Elena',  icon:'🏡', bg:'#f0fdf4', loc:'Santa Elena, PT', hab:'3', banos:'2', m2:'125', lat:14.4630055, lng:-90.4897385, dashboardUrl:'dashboard-bse.html', render:'https://raw.githubusercontent.com/GabrielCifuentes26/rv4/master/imagenes%20de%20proyectos/Logos%20Casas/BOSQUES%20DE%20SANTA%20ELENA%20RENDER.png', budgetLabel:'Ppto. ER' },
         { id:'condadosantaelena',  cat:'casas',    name:'Condado Santa Elena',     icon:'🏘️', bg:'#fef3c7', loc:'Santa Elena, PT', hab:'2', banos:'2', m2:'110', lat:14.4612589, lng:-90.4887595, dashboardUrl:'dashboard-cse.html', render:'https://raw.githubusercontent.com/GabrielCifuentes26/rv4/master/imagenes%20de%20proyectos/Logos%20Casas/CONDADO%20SANTA%20ELENA%20RENDER.png' },
         { id:'haciendalaquerencia',cat:'casas',    name:'Hacienda La Querencia',   icon:'🏡', bg:'#fee2e2', loc:'Guatemala, GT',  hab:'4', banos:'3', m2:'200', lat:14.4272593, lng:-90.4719499, dashboardUrl:'dashboard-hlq.html', render:'https://raw.githubusercontent.com/GabrielCifuentes26/rv4/master/imagenes%20de%20proyectos/Logos%20Casas/HACIENDA%20LA%20QUERENCIA%20RENDER.png' },
@@ -1061,17 +1061,36 @@
 
     function setSapAreasFromRows(project, rows) {
         if (!project || !Array.isArray(rows) || rows.length === 0) return;
-        const getArea = (kw) => {
-            const row = rows.find(r => {
-                const areaKey = Object.keys(r).find(k => k.toLowerCase().includes('area'));
-                if (!areaKey) return false;
-                return typeof r[areaKey] === 'string' && r[areaKey].toLowerCase().includes(kw);
-            });
-            return row ? (Number(row['[PresupuestoErequester]']) || 0) : 0;
-        };
-        const construccion = getArea('construcc');
-        const urbanizacion = getArea('urbaniz');
-        project.sapAreas = { construccion, urbanizacion, total: construccion + urbanizacion };
+        const getAreaRow = (kw) => rows.find(r => {
+            const areaKey = Object.keys(r).find(k => k.toLowerCase().includes('area'));
+            if (!areaKey) return false;
+            return typeof r[areaKey] === 'string' && r[areaKey].toLowerCase().includes(kw);
+        });
+        const construccionRow = getAreaRow('construcc');
+        const urbanizacionRow = getAreaRow('urbaniz');
+        const construccion     = Number(construccionRow?.['[PresupuestoErequester]']) || 0;
+        const urbanizacion     = Number(urbanizacionRow?.['[PresupuestoErequester]']) || 0;
+        const construccionAsig = Number(construccionRow?.['[AsignadoErequester]'])    || 0;
+        const urbanizacionAsig = Number(urbanizacionRow?.['[AsignadoErequester]'])    || 0;
+        project.sapAreas = { construccion, urbanizacion, total: construccion + urbanizacion,
+                             construccionAsig, urbanizacionAsig };
+        if (project.budgetAreaFilter) {
+            const filteredPpto = project.budgetAreaFilter.reduce((sum, kw) => {
+                if (kw === 'construcc') return sum + construccion;
+                if (kw === 'urbaniz')   return sum + urbanizacion;
+                return sum;
+            }, 0);
+            const filteredAsig = project.budgetAreaFilter.reduce((sum, kw) => {
+                if (kw === 'construcc') return sum + construccionAsig;
+                if (kw === 'urbaniz')   return sum + urbanizacionAsig;
+                return sum;
+            }, 0);
+            project.sapSummary = {
+                presupuestoSap: filteredPpto,
+                asignado: filteredAsig,
+                pct: filteredPpto ? filteredAsig / filteredPpto : 0
+            };
+        }
     }
 
     async function loadSapSummariesFromSupabase(projectsWithSap) {
