@@ -540,6 +540,53 @@
         }
         .summary-metric--pct .summary-metric-val { color: #059669; }
 
+        /* ── DEV SELECTOR ── */
+        .dev-selector {
+            display: flex; align-items: center; gap: 3px;
+            background: #f1f5f9; padding: 4px; border-radius: 12px;
+            border: 1px solid #e2e8f0; flex-shrink: 0;
+        }
+        .dev-tab {
+            display: flex; align-items: center; gap: 6px;
+            padding: 7px 13px; border-radius: 8px;
+            font-size: 0.74rem; font-weight: 700; letter-spacing: 0.2px;
+            cursor: pointer; border: none; font-family: inherit;
+            background: transparent; color: #94a3b8;
+            transition: background .18s, color .18s, box-shadow .18s;
+            white-space: nowrap; position: relative;
+        }
+        .dev-tab:not(.dev-tab--disabled):hover {
+            background: rgba(15,23,42,0.06); color: var(--navy);
+        }
+        .dev-tab.dev-tab--active {
+            background: var(--navy); color: var(--ng);
+            box-shadow: 0 2px 10px rgba(15,23,42,0.2);
+        }
+        .dev-tab.dev-tab--disabled {
+            color: #cbd5e1; cursor: not-allowed; opacity: 0.7;
+        }
+        .dev-tab-icon { font-size: 0.88rem; line-height: 1; }
+        /* tooltip "Próximamente" */
+        .dev-tab.dev-tab--disabled::after {
+            content: 'Próximamente'; position: absolute;
+            bottom: calc(100% + 7px); left: 50%; transform: translateX(-50%);
+            background: var(--navy); color: #fff;
+            font-size: 0.6rem; font-weight: 600; letter-spacing: 0.3px;
+            padding: 4px 9px; border-radius: 6px; white-space: nowrap;
+            opacity: 0; pointer-events: none;
+            transition: opacity .18s ease;
+            box-shadow: 0 4px 12px rgba(15,23,42,0.2);
+        }
+        .dev-tab.dev-tab--disabled::before {
+            content: ''; position: absolute;
+            bottom: calc(100% + 2px); left: 50%; transform: translateX(-50%);
+            border: 5px solid transparent; border-top-color: var(--navy);
+            opacity: 0; pointer-events: none;
+            transition: opacity .18s ease;
+        }
+        .dev-tab.dev-tab--disabled:hover::after,
+        .dev-tab.dev-tab--disabled:hover::before { opacity: 1; }
+
         /* ── DESGLOSE FINANCIERO ── */
         .prop-desglose {
             max-height: 0; overflow: hidden; opacity: 0; margin-top: 0;
@@ -714,7 +761,20 @@
 <section class="projects-section">
     <div class="summary-bar">
         <div class="summary-bar-left">
-            <div class="summary-cat-pill" id="summaryPill">Casas</div>
+            <div class="dev-selector">
+                <button class="dev-tab dev-tab--active" id="devTabCasas">
+                    <span class="dev-tab-icon">🏠</span> Casas
+                </button>
+                <button class="dev-tab dev-tab--disabled" disabled title="Próximamente">
+                    <span class="dev-tab-icon">🌿</span> Lotes
+                </button>
+                <button class="dev-tab dev-tab--disabled" disabled title="Próximamente">
+                    <span class="dev-tab-icon">🏢</span> Edificios
+                </button>
+                <button class="dev-tab dev-tab--disabled" disabled title="Próximamente">
+                    <span class="dev-tab-icon">⚙️</span> Maquinaria
+                </button>
+            </div>
             <div class="summary-title-wrap">
                 <span class="summary-title">Proyectos en Ejecución</span>
                 <span class="proj-count-badge" id="projCountBadge">6</span>
