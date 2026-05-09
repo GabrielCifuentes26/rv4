@@ -1187,9 +1187,9 @@
     }
 
     const DIMENSION_ALIASES = {
-        'Rubros[Area]':     ['Rubros[Area]',     'dimSegmentación[Area]',     'Segmentación[Area]',     'dimFase[Fase]', 'Area'],
-        'Rubros[Segmento]': ['Rubros[Segmento]', 'dimSegmentación[Segmento]', 'Segmentación[Segmento]', 'dimFase[Fase]', 'Segmento'],
-        'Rubros[Etapa]':    ['Rubros[Etapa]',    'dimSegmentación[Etapa]',    'Segmentación[Etapa]',    'dimFase[Fase]', 'Etapa'],
+        'Rubros[Area]':     ['Rubros[Area]',     'dimSegmentacion[Area]',     'dimSegmentación[Area]',     'Segmentación[Area]',     'Area'],
+        'Rubros[Segmento]': ['Rubros[Segmento]', 'dimSegmentacion[Segmento]', 'dimSegmentación[Segmento]', 'Segmentación[Segmento]', 'Segmento'],
+        'Rubros[Etapa]':    ['Rubros[Etapa]',    'dimSegmentacion[Etapa]',    'dimSegmentación[Etapa]',    'Segmentación[Etapa]',    'Etapa'],
         'Rubros[Fase]':     ['Rubros[Fase]',     'dimFase[Fase]',             'Fase[Fase]',             'Fase'],
         'Calendario[MesA]': ['Calendario[MesA]', 'MesA', 'Mes']
     };
@@ -1601,8 +1601,8 @@
 
     function rowHasFilterValues(row) {
         if (!hasValue(row)) return false;
-        // Only require core structural dimensions; Etapa and MesA can be null for some rows
-        return ['areas', 'segmentos', 'fases'].every(key => {
+        // Only require area and segmento; etapa, fase, and mes can be absent for some models/rows
+        return ['areas', 'segmentos'].every(key => {
             const config = FILTER_CONFIG.find(c => c.key === key);
             return config && filterDimension(row, config);
         });
