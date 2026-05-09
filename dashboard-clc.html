@@ -2309,9 +2309,28 @@
 
     function renderTendenciaFase(detailRows) {
         if (detailRows && detailRows.length) tendenciaLastRows = detailRows;
-        const rows   = tendenciaLastRows;
+        let rows = tendenciaLastRows;
         const canvas = document.getElementById('tendenciaChart');
         if (!canvas) return;
+
+        // Si los detalle rows no tienen mes, usar porMesFiltros como fuente de tendencia
+        const hasMes = rows.some(r => String(dimension(r, 'Calendario[MesA]') || '').trim());
+        if (!hasMes) {
+            const fallback = powerBIState.data?.datasets?.porMesFiltros || [];
+            if (fallback.length) rows = fallback;
+        }
+
+        // Ocultar/mostrar botón Fase según si hay datos de esa dimensión
+        const hasFaseData = rows.some(r => String(dimension(r, 'Rubros[Fase]') || '').trim());
+        document.querySelectorAll('.tendencia-btn[data-dim="Rubros[Fase]"]').forEach(btn => {
+            btn.style.display = hasFaseData ? '' : 'none';
+        });
+        if (!hasFaseData && tendenciaDimension === 'Rubros[Fase]') {
+            tendenciaDimension = 'Rubros[Area]';
+            document.querySelectorAll('.tendencia-btn[data-dim]').forEach(b => {
+                b.classList.toggle('active', b.dataset.dim === tendenciaDimension);
+            });
+        }
 
         const dimKey = tendenciaDimension;
 
