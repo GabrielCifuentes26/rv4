@@ -1618,7 +1618,7 @@
             const meta = CAT_META[key] || { label: key, color: '#0ea5e9' };
             chip.style.background = meta.color;
             chip.style.boxShadow  = `0 3px 10px ${meta.color}55`;
-            chipLbl.textContent   = `\: \`;
+            chipLbl.textContent   = `${meta.label}: ${value}`;
             chip.classList.add('visible');
             populateFilterControls(key);
             renderPowerBIView();
