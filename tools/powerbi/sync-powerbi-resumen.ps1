@@ -244,17 +244,17 @@ $metadata = [ordered]@{
     source = "Power BI Service"
 }
 
-if ($ModelProfile -eq "clc") {
-    # CLC model: dimFase[Fase] as primary dimension, no Area/Segmento/Etapa
-    $faseColumnDax           = ConvertTo-DaxIdentifier -TableName "dimFase" -ObjectName "Fase"
-    $monthColumnDax          = ConvertTo-DaxIdentifier -TableName "Calendario" -ObjectName "MesA"
-    $areaColumnDax           = $faseColumnDax
-    $segmentoColumnDax       = $faseColumnDax
-    $etapaColumnDax          = $faseColumnDax
+if ($ModelProfile -eq "clc" -or $ModelProfile -eq "hsl") {
+    # CLC/HSL: dimSegmentacion (no accent) with Area/Segmento/Etapa columns
+    $areaColumnDax           = ConvertTo-DaxIdentifier -TableName "dimSegmentacion" -ObjectName "Area"
+    $segmentoColumnDax       = ConvertTo-DaxIdentifier -TableName "dimSegmentacion" -ObjectName "Segmento"
+    $etapaColumnDax          = ConvertTo-DaxIdentifier -TableName "dimSegmentacion" -ObjectName "Etapa"
+    $faseColumnDax           = ConvertTo-DaxIdentifier -TableName "dimFase"         -ObjectName "Fase"
+    $monthColumnDax          = ConvertTo-DaxIdentifier -TableName "Calendario"      -ObjectName "MesA"
 
-    # No Presupuesto/RDI in CLC — Asignado is the budget reference
-    $rdiMeasureDax           = "[Asignado]"
-    $pptoErMeasureDax        = "[Asignado]"
+    # Presupuesto SAP = Asignado + Disponible (no dedicated RDI measure in CLC)
+    $rdiMeasureDax           = "[Asignado] + [Disponible]"
+    $pptoErMeasureDax        = "[Asignado] + [Disponible]"
     $ejecutadoMeasureDax     = "[Ejecutado]"
     $comprometidoMeasureDax  = "[Comprometido]"
     $asignadoMeasureDax      = "[Asignado]"
@@ -262,7 +262,9 @@ if ($ModelProfile -eq "clc") {
     $pctAsignadoMeasureDax   = "[% Asignado]"
     $pctDisponibleMeasureDax = "[% Disponible]"
 
-    $AreaFilterValues = @()
+    if ($AreaFilterValues.Count -eq 0) {
+        $AreaFilterValues = @("CONSTRUCCION", "URBANIZACION")
+    }
 } elseif ($ModelProfile -eq "hlq") {
     $accentO = [char]0x00f3
     $accentU = [char]0x00fa
@@ -311,13 +313,9 @@ if ($ModelProfile -eq "clc") {
 }
 
 $areaFilterListDax = ($AreaFilterValues | ForEach-Object { ConvertTo-DaxStringLiteral $_ }) -join ", "
-$areaFilterDax = if ($ModelProfile -eq "clc") {
-    "TREATAS(VALUES($areaColumnDax), $areaColumnDax)"
-} else {
-    "TREATAS({$areaFilterListDax}, $areaColumnDax)"
-}
+$areaFilterDax = "TREATAS({$areaFilterListDax}, $areaColumnDax)"
 $monthFilterDax = "TREATAS({$(ConvertTo-DaxStringLiteral $MesA)}, $monthColumnDax)"
-$mainFilterDax = if ($ModelProfile -eq "hlq" -or $ModelProfile -eq "clc") { "" } else { "$monthFilterDax," }
+$mainFilterDax = if ($ModelProfile -eq "hlq" -or $ModelProfile -eq "clc" -or $ModelProfile -eq "hsl") { "" } else { "$monthFilterDax," }
 $metadata.filters.areas = @($AreaFilterValues)
 
 $queries = [ordered]@{
@@ -415,8 +413,8 @@ ORDER BY $monthColumnDax
 }
 
 if ($IncludeFilterDetail) {
-    # bse model: Rubros[Fase] does not exist — skip porFase and omit it from detalleFiltros
-    $hasFaseColumn = ($ModelProfile -ne "bse" -and $ModelProfile -ne "clc")
+    # bse/clc: no Fase column — hsl uses clc model but does have dimFase[Fase]
+    $hasFaseColumn = ($ModelProfile -ne "bse" -and $ModelProfile -ne "clc") -or ($ModelProfile -eq "hsl")
 
     if ($hasFaseColumn) {
         $queries.porFase = @"
