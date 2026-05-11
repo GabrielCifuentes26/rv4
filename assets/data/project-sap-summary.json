@@ -1,59 +1,40 @@
-{
-  "generatedAt": "2026-05-04T18:53:43.946Z",
-  "projects": {
-    "bosquesdejalapa": {
-      "projectKey": "bdj",
-      "projectName": "Bosques de Jalapa",
-      "source": "Power BI Service",
-      "sourceGeneratedAt": "2026-04-30T21:20:30.8764230Z",
-      "presupuestoSap": 99857449.53953062,
-      "asignado": 40745666.01,
-      "pct": 0.4080383206049138
-    },
-    "bosquesdepinula": {
-      "projectKey": "bdp",
-      "projectName": "Bosques de Pinula",
-      "source": "Power BI Service",
-      "sourceGeneratedAt": "2026-05-04T16:51:27.2658637Z",
-      "presupuestoSap": 158283328.47399995,
-      "asignado": 153897325.72999993,
-      "pct": 0.9722901787175869
-    },
-    "bosquessantaelena": {
-      "projectKey": "bse",
-      "projectName": "Bosques de Santa Elena",
-      "source": "Power BI Service",
-      "sourceGeneratedAt": "2026-05-04T15:04:29.0463865Z",
-      "presupuestoSap": 162393291.95,
-      "asignado": 151856593.56599998,
-      "pct": 0.9351161722416207
-    },
-    "condadosantaelena": {
-      "projectKey": "cse",
-      "projectName": "Condado Santa Elena",
-      "source": "Power BI Service",
-      "sourceGeneratedAt": "2026-05-03T07:34:15.9674061Z",
-      "presupuestoSap": 144705202.8671321,
-      "asignado": 64691278.42,
-      "pct": 0.44705564926645625
-    },
-    "haciendalaquerencia": {
-      "projectKey": "hlq",
-      "projectName": "Hacienda La Querencia",
-      "source": "Power BI Service",
-      "sourceGeneratedAt": "2026-04-29T21:05:37.4551747Z",
-      "presupuestoSap": 54339119.61824341,
-      "asignado": 19985918.5,
-      "pct": 0.36779982157256147
-    },
-    "reservadelbosque": {
-      "projectKey": "rdb",
-      "projectName": "Residencias Del Bosque",
-      "source": "Power BI Service",
-      "sourceGeneratedAt": "2026-05-03T07:20:33.4804433Z",
-      "presupuestoSap": 103668725.0390003,
-      "asignado": 45753253.59,
-      "pct": 0.4413409499614042
-    }
-  }
+﻿{
+    "generatedAt":  "2026-05-11T15:14:13.5886190Z",
+    "projects":  {
+                     "bosquesdepinula":  {
+                                             "presupuestoSap":  158283328.47399998,
+                                             "asignado":  154186835.89999998,
+                                             "pct":  0.974119
+                                         },
+                     "haciendalaquerencia":  {
+                                                 "presupuestoSap":  54370674.368243411,
+                                                 "asignado":  20210885.09,
+                                                 "pct":  0.371724
+                                             },
+                     "bosquessantaelena":  {
+                                               "presupuestoSap":  162393291.952,
+                                               "asignado":  152303879.32200003,
+                                               "pct":  0.937871
+                                           },
+                     "condadosantaelena":  {
+                                               "presupuestoSap":  144743702.9351747,
+                                               "asignado":  65469616.72,
+                                               "pct":  0.452314
+                                           },
+                     "condadolaceiba":  {
+                                            "presupuestoSap":  14416623,
+                                            "asignado":  6615552.15,
+                                            "pct":  0.458884
+                                        },
+                     "reservadelbosque":  {
+                                              "presupuestoSap":  103703330.0390003,
+                                              "asignado":  46213030.92,
+                                              "pct":  0.445627
+                                          },
+                     "bosquesdejalapa":  {
+                                             "presupuestoSap":  99857449.53953062,
+                                             "asignado":  40859486.45,
+                                             "pct":  0.409178
+                                         }
+                 }
 }
