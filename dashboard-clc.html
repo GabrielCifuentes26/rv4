@@ -2343,6 +2343,7 @@
 
         const totalPpto = groups.reduce((s, g) => s + asNumber(g.PresupuestoErequester), 0);
         const availW = (W - PAD_L - PAD_R) - (groups.length - 1) * GAP;
+        const colWFixed = availW / groups.length;
         const fmtVal = v => v >= 1e6 ? `${(v/1e6).toFixed(2)}M` : v >= 1000 ? `${Math.round(v/1000)}K` : `${Math.round(v)}`;
 
         const parts = [];
@@ -2357,7 +2358,7 @@
         let xCursor = PAD_L;
         groups.forEach((g, i) => {
             const ppto = asNumber(g.PresupuestoErequester);
-            const colW = Math.max(1, (ppto / totalPpto) * availW);
+            const colW = colWFixed;
             const ejec = Math.min(asNumber(g.EjecutadoErequester), ppto);
             const comp = Math.min(Math.max(0, asNumber(g.ComprometidoErequester)), ppto - ejec);
             const disp = Math.max(0, ppto - ejec - comp);
