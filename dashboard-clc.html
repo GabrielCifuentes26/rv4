@@ -2377,13 +2377,20 @@
             parts.push(seg(yComp, hComp, C_COMP));
             parts.push(seg(yEjec, hEjec, C_EJEC));
 
-            const MIN_H = 16;
-            if (hDisp > MIN_H && colW > 14)
-                parts.push(`<text x="${cx}" y="${(yDisp + hDisp/2 + 4).toFixed(1)}" text-anchor="middle" font-size="9" fill="#64748b" font-weight="600" pointer-events="none">${Math.round(pDisp*100)}%</text>`);
-            if (hComp > MIN_H && colW > 14)
-                parts.push(`<text x="${cx}" y="${(yComp + hComp/2 + 4).toFixed(1)}" text-anchor="middle" font-size="9" fill="#fff" font-weight="600" pointer-events="none">${Math.round(pComp*100)}%</text>`);
-            if (hEjec > MIN_H && colW > 14)
-                parts.push(`<text x="${cx}" y="${(yEjec + hEjec/2 + 4).toFixed(1)}" text-anchor="middle" font-size="9" fill="#fff" font-weight="600" pointer-events="none">${Math.round(pEjec*100)}%</text>`);
+            const MIN_H1 = 14, MIN_H2 = 26;
+            const segLabel = (y, h, pct, val, fillPct, fillVal) => {
+                if (h <= MIN_H1 || colW <= 14) return '';
+                const mid = (y + h / 2).toFixed(1);
+                if (h > MIN_H2) {
+                    // Two lines: amount top, % bottom
+                    return `<text x="${cx}" y="${(+mid - 5).toFixed(1)}" text-anchor="middle" font-size="9" fill="${fillVal}" font-weight="700" pointer-events="none">${val}</text>` +
+                           `<text x="${cx}" y="${(+mid + 7).toFixed(1)}" text-anchor="middle" font-size="8" fill="${fillPct}" font-weight="500" pointer-events="none">${pct}%</text>`;
+                }
+                return `<text x="${cx}" y="${(+mid + 4).toFixed(1)}" text-anchor="middle" font-size="9" fill="${fillVal}" font-weight="700" pointer-events="none">${val}</text>`;
+            };
+            parts.push(segLabel(yDisp, hDisp, Math.round(pDisp*100), fmtVal(disp), '#475569', '#64748b'));
+            parts.push(segLabel(yComp, hComp, Math.round(pComp*100), fmtVal(comp), 'rgba(255,255,255,0.8)', '#fff'));
+            parts.push(segLabel(yEjec, hEjec, Math.round(pEjec*100), fmtVal(ejec), 'rgba(255,255,255,0.8)', '#fff'));
 
             const labelY = PAD_T + CHART_H + 14;
             const shortLabel = mekkoDim === 'Rubros[Fase]'
