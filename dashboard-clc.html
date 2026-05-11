@@ -2455,7 +2455,7 @@
         renderMetrics(totals);
         renderAreaTable(areaRows, totals, rawDetailRows);
         renderCharts(etapaRows, areaRows, segmentoRows);
-        renderTendenciaFase(rawDetailRows);
+        renderMarimekko(rawDetailRows);
 
         if (data?.metadata?.generatedAt) {
             const updated = new Date(data.metadata.generatedAt);
