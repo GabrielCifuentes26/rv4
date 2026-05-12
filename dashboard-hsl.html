@@ -128,7 +128,7 @@
         .eac-row.eac-active { background: rgba(14,165,233,0.09); outline: 1.5px solid rgba(14,165,233,0.35); outline-offset: 2px; }
         .eac-row.chart-selected { background: rgba(14,165,233,0.13); outline: 2px solid rgba(14,165,233,0.45); outline-offset: 2px; }
         #faseChart { cursor: pointer; }
-        #tendenciaChart { cursor: pointer; }
+        #mekko-container { cursor: default; }
         .eac-area { display: flex; align-items: center; gap: 12px; }
         .eac-icon-wrap {
             width: 46px; height: 46px; border-radius: 12px; flex-shrink: 0;
@@ -719,27 +719,26 @@
         .segmento-body::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 3px; }
         .segmento-body::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
         .segmento-body::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-        /* ── TENDENCIA POR FASE ── */
+        /* ── MARIMEKKO POR FASE ── */
         .tendencia-section { padding: 0 22px 16px; flex-shrink: 0; }
         .tendencia-header {
             display: flex; align-items: center; justify-content: space-between;
             margin-bottom: 14px; gap: 12px; flex-wrap: wrap;
         }
-        .tendencia-leyenda { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-        .tendencia-leyenda-item {
-            display: flex; align-items: center; gap: 6px;
-            background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 20px;
-            padding: 3px 10px 3px 8px;
-            font-size: 0.67rem; color: var(--gray); font-weight: 500;
+        .tendencia-body { position: relative; min-height: 320px; }
+        .mekko-col { transition: opacity .18s; }
+        #mekko-tooltip {
+            display: none; position: fixed; pointer-events: none;
+            background: #fff; border: 1px solid #e2e8f0; border-radius: 10px;
+            padding: 10px 14px; box-shadow: 0 8px 24px rgba(30,58,95,0.13);
+            min-width: 185px; z-index: 9999; font-family: Inter, sans-serif;
         }
-        .tendencia-leyenda-total { font-size: 0.72rem; font-weight: 800; }
-        .tendencia-dot { width: 22px; height: 3px; border-radius: 2px; flex-shrink: 0; }
-        .tendencia-metric-badge {
-            font-size: 0.62rem; font-weight: 700; color: var(--c-asignado);
-            background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.25);
-            border-radius: 4px; padding: 1px 6px; white-space: nowrap;
-        }
-        .tendencia-body { position: relative; height: 300px; }
+        .mekko-tip-title { font-weight: 700; color: #1e3a5f; margin-bottom: 7px; font-size: 0.78rem; }
+        .mekko-tip-ppto { font-size: 0.7rem; color: #64748b; padding-bottom: 7px; margin-bottom: 7px; border-bottom: 1px solid #f1f5f9; display:flex; justify-content:space-between; }
+        .mekko-tip-ppto strong { color: #1e3a5f; font-size: 0.78rem; }
+        .mekko-tip-row { display: flex; align-items: center; gap: 6px; padding: 2px 0; font-size: 0.72rem; color: #475569; }
+        .mekko-tip-row span:nth-child(2) { flex: 1; }
+        .mekko-tip-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
         .tendencia-toggle {
             display: flex; gap: 0; flex-shrink: 0;
             background: #e2e8f0; border-radius: 8px; padding: 2px;
@@ -1032,34 +1031,38 @@
     </div>
 
     <!-- Tendencia por Fase -->
+    <!-- Marimekko por Fase -->
     <div class="tendencia-section">
         <div class="chart-card">
             <div class="tendencia-header">
                 <div style="display:flex;flex-direction:column;gap:6px;">
-                    <span class="chart-title" style="margin:0" id="tendencia-title">Tendencia de Ejecución por Fase</span>
-                    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-                        <div style="display:flex;align-items:center;gap:6px;">
-                            <span class="tendencia-toggle-label">Ver por:</span>
-                            <div class="tendencia-toggle" id="tendencia-toggle">
-                                <button class="tendencia-btn active" data-dim="Rubros[Fase]">Fase</button>
-                                <button class="tendencia-btn" data-dim="Rubros[Area]">Área</button>
-                            </div>
-                        </div>
-                        <div style="display:flex;align-items:center;gap:6px;margin-left:16px;">
-                            <span class="tendencia-toggle-label">Métrica:</span>
-                            <div class="tendencia-toggle" id="tendencia-metric-toggle">
-                                <button class="tendencia-btn active" data-metric="AsignadoErequester">Asignado</button>
-                                <button class="tendencia-btn" data-metric="EjecutadoErequester">Ejecutado</button>
-                                <button class="tendencia-btn" data-metric="ComprometidoErequester">Comprometido</button>
-                                <button class="tendencia-btn" data-metric="DisponibleErequester">Disponible</button>
-                            </div>
+                    <span class="chart-title" style="margin:0">Distribución de Presupuesto por Fase</span>
+                    <div style="display:flex;align-items:center;gap:6px;">
+                        <span class="tendencia-toggle-label">Ver por:</span>
+                        <div class="tendencia-toggle" id="mekko-dim-toggle">
+                            <button class="tendencia-btn active" data-dim="Rubros[Fase]">Fase</button>
+                            <button class="tendencia-btn" data-dim="Rubros[Etapa]">Etapa</button>
                         </div>
                     </div>
                 </div>
-                <div class="tendencia-leyenda" id="tendencia-leyenda"></div>
+                <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;">
+                    <div style="display:flex;align-items:center;gap:5px;">
+                        <div style="width:12px;height:12px;border-radius:2px;background:#10b981;flex-shrink:0"></div>
+                        <span style="font-size:0.7rem;color:#475569;font-weight:500">Ejecutado</span>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:5px;">
+                        <div style="width:12px;height:12px;border-radius:2px;background:#f59e0b;flex-shrink:0"></div>
+                        <span style="font-size:0.7rem;color:#475569;font-weight:500">Comprometido</span>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:5px;">
+                        <div style="width:12px;height:12px;border-radius:2px;background:#dde3ed;border:1px solid #cbd5e1;flex-shrink:0"></div>
+                        <span style="font-size:0.7rem;color:#475569;font-weight:500">Disponible</span>
+                    </div>
+                </div>
             </div>
             <div class="tendencia-body">
-                <canvas id="tendenciaChart"></canvas>
+                <div id="mekko-container" style="width:100%"></div>
+                <div id="mekko-tooltip"></div>
             </div>
         </div>
     </div>
@@ -1637,13 +1640,6 @@
             if (label) applyChartFilter('segmentos', label, null);
         });
 
-        document.getElementById('tendenciaChart')?.addEventListener('click', e => {
-            if (!tendenciaChart) return;
-            const pts = tendenciaChart.getElementsAtEventForMode(e, 'index', { intersect: false }, false);
-            if (!pts.length) return;
-            const label = tendenciaChart.data.labels[pts[0].index];
-            if (label) applyChartFilter('meses', label, null);
-        });
 
         // Botón ✕ por filtro individual
         document.querySelectorAll('.filter-clear-one[data-clear-filter]').forEach(btn => {
@@ -2357,7 +2353,7 @@
         const segR     = groupRowsBy(sel, 'Rubros[Segmento]');
         renderMetrics(totals);
         renderCharts(etapaR, areaR, segR);
-        renderTendenciaFase(sel);
+        renderMarimekko(sel);
     }
 
     function clearTableSelection() {
@@ -2365,260 +2361,35 @@
         renderPowerBIView();
     }
 
-    const FASE_PALETTE = ['#3b5bdb','#10b981','#f59e0b','#8b5cf6','#ef4444','#0ea5e9','#f97316'];
-    let tendenciaChart = null;
-    let tendenciaDimension = 'Rubros[Fase]';
-    let tendenciaMetric    = 'AsignadoErequester';
-    let tendenciaLastRows  = [];
+    let marimekkoLastRows = [];
+    let mekkoDim = 'Rubros[Fase]';
 
-    const TENDENCIA_DIM_LABELS = {
-        'Rubros[Fase]':     'Fase',
-        'Rubros[Area]':     'Área',
-        'Rubros[Segmento]': 'Segmento'
-    };
+    function renderMarimekko(detailRows) {
+        if (detailRows && detailRows.length) marimekkoLastRows = detailRows;
+        const rows = marimekkoLastRows;
+        const container = document.getElementById('mekko-container');
+        if (!container) return;
 
-    function renderTendenciaFase(detailRows) {
-        if (detailRows && detailRows.length) tendenciaLastRows = detailRows;
-        let rows = tendenciaLastRows;
-        const canvas = document.getElementById('tendenciaChart');
-        if (!canvas) return;
-
-        // Si los detalle rows no tienen mes, usar porMesFiltros como fuente de tendencia
-        const hasMes = rows.some(r => String(dimension(r, 'Calendario[MesA]') || '').trim());
-        if (!hasMes) {
-            const fallback = powerBIState.data?.datasets?.porMesFiltros || [];
-            if (fallback.length) rows = fallback;
-        }
-
-        // Ocultar/mostrar botón Fase según si hay datos de esa dimensión
         const hasFaseData = rows.some(r => String(dimension(r, 'Rubros[Fase]') || '').trim());
-        document.querySelectorAll('.tendencia-btn[data-dim="Rubros[Fase]"]').forEach(btn => {
+        document.querySelectorAll('#mekko-dim-toggle .tendencia-btn[data-dim="Rubros[Fase]"]').forEach(btn => {
             btn.style.display = hasFaseData ? '' : 'none';
         });
-        if (!hasFaseData && tendenciaDimension === 'Rubros[Fase]') {
-            tendenciaDimension = 'Rubros[Area]';
-            document.querySelectorAll('.tendencia-btn[data-dim]').forEach(b => {
-                b.classList.toggle('active', b.dataset.dim === tendenciaDimension);
+        if (!hasFaseData && mekkoDim === 'Rubros[Fase]') {
+            mekkoDim = 'Rubros[Etapa]';
+            document.querySelectorAll('#mekko-dim-toggle .tendencia-btn').forEach(b => {
+                b.classList.toggle('active', b.dataset.dim === mekkoDim);
             });
         }
 
-        const dimKey = tendenciaDimension;
-
-        // Collect unique dim values and months
-        const dimSet = new Set();
-        const mesSet = new Set();
-        rows.forEach(r => {
-            const d = String(dimension(r, dimKey) || '').trim();
-            const m = String(dimension(r, 'Calendario[MesA]') || '').trim();
-            if (d) dimSet.add(d);
-            if (m) mesSet.add(m);
-        });
-
-        const dims = [...dimSet].sort();
-        const meses = sortMonths([...mesSet]);
-
-        // Build dim × mes matrix
-        const matrix = {};
-        dims.forEach(d => { matrix[d] = {}; meses.forEach(m => { matrix[d][m] = 0; }); });
-
-        if (tendenciaMetric === 'DisponibleErequester' || tendenciaMetric === 'PresupuestoErequester') {
-            // Usar groupRowsBy (misma lógica que la tabla) para obtener budget correcto por dimensión
-            const dimGroups = groupRowsBy(rows, dimKey);
-            const budgetByDim = Object.fromEntries(dimGroups.map(g => [g.label, asNumber(g.PresupuestoErequester)]));
-            const asigByDim = {};
-            dims.forEach(d => { asigByDim[d] = {}; meses.forEach(m => { asigByDim[d][m] = 0; }); });
-            rows.forEach(r => {
-                const d = String(dimension(r, dimKey) || '').trim();
-                const m = String(dimension(r, 'Calendario[MesA]') || '').trim();
-                if (!d || !m || !asigByDim[d]) return;
-                asigByDim[d][m] += asNumber(field(r, 'AsignadoErequester'));
-            });
-            dims.forEach(d => {
-                const budget = budgetByDim[d] || 0;
-                meses.forEach(m => {
-                    matrix[d][m] = tendenciaMetric === 'PresupuestoErequester'
-                        ? budget
-                        : Math.max(0, budget - asigByDim[d][m]);
-                });
-            });
-        } else {
-            rows.forEach(r => {
-                const d = String(dimension(r, dimKey) || '').trim();
-                const m = String(dimension(r, 'Calendario[MesA]') || '').trim();
-                if (!d || !m || !matrix[d]) return;
-                matrix[d][m] += asNumber(rowMetric(r, tendenciaMetric));
-            });
+        const groups = groupRowsBy(rows, mekkoDim).filter(g => asNumber(g.PresupuestoErequester) > 0);
+        if (!groups.length) {
+            container.innerHTML = '<div style="height:200px;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:0.8rem">Sin datos</div>';
+            return;
         }
 
-        // Display label: "01" → "Fase 1" only for Fase dimension
-        const dimLabel = dimKey === 'Rubros[Fase]'
-            ? (f => /^\d+$/.test(f.trim()) ? `Fase ${parseInt(f, 10)}` : f)
-            : (f => f);
-        const faseName = dimLabel; // keep alias for leyenda block below
+        drawMekko(container, groups);
 
-        const datasets = dims.map((fase, i) => {
-            const rawFase = fase.toUpperCase().trim();
-            const areaColor = dimKey === 'Rubros[Area]' ? (AREA_CONFIG[rawFase] || null) : null;
-            const color = areaColor ? areaColor.color : FASE_PALETTE[i % FASE_PALETTE.length];
-            return {
-                label: faseName(fase),
-                data: meses.map(m => toMillions(matrix[fase][m])),
-                borderColor: color, backgroundColor: color + '15',
-                fill: true, tension: 0.4, borderWidth: 2.5,
-                pointRadius: 4, pointHoverRadius: 7, pointBackgroundColor: color,
-            };
-        });
-
-        const labelPlugin = {
-            id: 'faseLabels',
-            afterDatasetsDraw(chart) {
-                const { ctx, data } = chart;
-                const yAxis   = chart.scales.y;
-                const xAxis   = chart.scales.x;
-                const yTop    = yAxis.top;
-                const yBottom = yAxis.bottom;
-                const PILL_H  = 18, PILL_PAD = 9, MIN_GAP = 2;
-                const MIN_VAL = 0.05; // ocultar pills < 0.05M para no saturar
-
-                // ── 1. Píldoras de valor por mes (escalonadas, sin salir del área) ──
-                data.labels.forEach((_, mi) => {
-                    const pts = [];
-                    chart.data.datasets.forEach((ds, di) => {
-                        const meta = chart.getDatasetMeta(di);
-                        if (meta.hidden) return;
-                        const pt = meta.data[mi];
-                        const val = ds.data[mi] || 0;
-                        if (!pt || val < MIN_VAL) return;
-                        pts.push({ pt, ds, val });
-                    });
-                    if (!pts.length) return;
-
-                    // Mayor valor arriba (mayor val = menor Y en canvas)
-                    pts.sort((a, b) => b.val - a.val);
-
-                    // Calcular posiciones Y sin solaparse — mayor valor siempre más arriba
-                    const positions = [];
-                    pts.forEach((p, idx) => {
-                        let y = p.pt.y - PILL_H - 5;
-                        // Clamp dentro del área del chart
-                        y = Math.max(yTop + PILL_H / 2 + 2, Math.min(yBottom - PILL_H / 2 - 2, y));
-                        // Separar hacia abajo si se solapa con píldoras ya colocadas
-                        let tries = 0;
-                        while (tries < 12 && positions.some(py => Math.abs(py - y) < PILL_H + MIN_GAP)) {
-                            y += PILL_H + MIN_GAP;
-                            y = Math.max(yTop + PILL_H / 2 + 2, Math.min(yBottom - PILL_H / 2 - 2, y));
-                            tries++;
-                        }
-                        positions.push(y);
-
-                        const text = `${p.val.toFixed(2)}M`;
-                        ctx.save();
-                        ctx.font = '600 11px Inter, sans-serif';
-                        const tw = ctx.measureText(text).width;
-                        const pw = tw + PILL_PAD * 2;
-                        ctx.fillStyle = 'rgba(255,255,255,0.93)';
-                        ctx.beginPath();
-                        ctx.roundRect(p.pt.x - pw / 2, y - PILL_H / 2, pw, PILL_H, 4);
-                        ctx.fill();
-                        ctx.strokeStyle = p.ds.borderColor;
-                        ctx.lineWidth = 1.2;
-                        ctx.stroke();
-                        ctx.fillStyle = p.ds.borderColor;
-                        ctx.textAlign = 'center';
-                        ctx.textBaseline = 'middle';
-                        ctx.fillText(text, p.pt.x, y);
-                        ctx.restore();
-                    });
-                });
-
-                // ── 2. Total por mes: línea separadora + monto bold debajo del eje ──
-                data.labels.forEach((_, mi) => {
-                    // Sumar directamente desde los datasets (ya están en millones)
-                    const total = chart.data.datasets.reduce((sum, ds, di) => {
-                        const meta = chart.getDatasetMeta(di);
-                        return sum + (meta.hidden ? 0 : (ds.data[mi] || 0));
-                    }, 0);
-                    if (total <= 0) return;
-                    const x = xAxis.getPixelForTick(mi);
-                    const text = `${total.toFixed(2)}M`;
-                    // Línea separadora sutil
-                    ctx.save();
-                    ctx.strokeStyle = '#e2e8f0';
-                    ctx.lineWidth = 1;
-                    ctx.beginPath();
-                    ctx.moveTo(x - 16, yBottom + 20);
-                    ctx.lineTo(x + 16, yBottom + 20);
-                    ctx.stroke();
-                    // Texto total
-                    ctx.font = '700 11.5px Inter, sans-serif';
-                    ctx.fillStyle = '#475569';
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'top';
-                    ctx.fillText(text, x, yBottom + 26);
-                    ctx.restore();
-                });
-            }
-        };
-
-        if (!tendenciaChart) {
-            tendenciaChart = new Chart(canvas, {
-                type: 'line',
-                data: { labels: meses, datasets },
-                plugins: [labelPlugin],
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    interaction: { mode: 'index', intersect: false },
-                    layout: { padding: { top: 28, right: 16, bottom: 52 } },
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            callbacks: {
-                                label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(2)}M`,
-                                footer: items => `Total: ${items.reduce((s, i) => s + i.parsed.y, 0).toFixed(2)}M`
-                            }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            grid: { color: '#f1f5f9' },
-                            ticks: { font: { size: 12 }, maxRotation: 0, color: '#64748b' }
-                        },
-                        y: {
-                            grid: { color: '#f1f5f9' }, beginAtZero: true,
-                            ticks: { callback: v => `${v}M`, font: { size: 12 }, color: '#64748b' }
-                        }
-                    }
-                }
-            });
-        } else {
-            tendenciaChart.data.labels   = meses;
-            tendenciaChart.data.datasets = datasets;
-            tendenciaChart.update();
-        }
-
-        // Título dinámico
-        const titleEl = document.getElementById('tendencia-title');
-        if (titleEl) titleEl.textContent = `Tendencia de Ejecución por ${TENDENCIA_DIM_LABELS[dimKey] || dimKey}`;
-
-        // Leyenda personalizada con total acumulado
-        const fmt2 = v => v >= 1 ? `${v.toFixed(2)}M` : `${Math.round(v * 1000)}K`;
-        const leyenda = document.getElementById('tendencia-leyenda');
-        if (leyenda) {
-            leyenda.innerHTML = dims.map((f, i) => {
-                const rawF = f.toUpperCase().trim();
-                const areaColorL = dimKey === 'Rubros[Area]' ? (AREA_CONFIG[rawF] || null) : null;
-                const color = areaColorL ? areaColorL.color : FASE_PALETTE[i % FASE_PALETTE.length];
-                const total  = meses.reduce((s, m) => s + toMillions(matrix[f][m]), 0);
-                return `<div class="tendencia-leyenda-item">
-                    <div class="tendencia-dot" style="background:${color}"></div>
-                    <span>${faseName(f)}</span>
-                    <span class="tendencia-leyenda-total" style="color:${color}">${fmt2(total)}</span>
-                </div>`;
-            }).join('');
-        }
-
-        // Toggle dimensión (bind once)
-        const toggle = document.getElementById('tendencia-toggle');
+        const toggle = document.getElementById('mekko-dim-toggle');
         if (toggle && !toggle._bound) {
             toggle._bound = true;
             toggle.addEventListener('click', e => {
@@ -2626,23 +2397,143 @@
                 if (!btn) return;
                 toggle.querySelectorAll('.tendencia-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-                tendenciaDimension = btn.dataset.dim;
-                renderTendenciaFase();
+                mekkoDim = btn.dataset.dim;
+                renderMarimekko();
             });
         }
-        // Toggle métrica (bind once)
-        const metricToggle = document.getElementById('tendencia-metric-toggle');
-        if (metricToggle && !metricToggle._bound) {
-            metricToggle._bound = true;
-            metricToggle.addEventListener('click', e => {
-                const btn = e.target.closest('.tendencia-btn');
-                if (!btn) return;
-                metricToggle.querySelectorAll('.tendencia-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                tendenciaMetric = btn.dataset.metric;
-                renderTendenciaFase();
-            });
+
+        if (!container._roAttached) {
+            container._roAttached = true;
+            new ResizeObserver(() => {
+                if (!marimekkoLastRows.length) return;
+                const gs = groupRowsBy(marimekkoLastRows, mekkoDim).filter(g => asNumber(g.PresupuestoErequester) > 0);
+                if (gs.length) drawMekko(container, gs);
+            }).observe(container);
         }
+    }
+
+    function drawMekko(container, groups) {
+        const W = container.clientWidth || 800;
+        const PAD_L = 42, PAD_R = 36, PAD_T = 16, PAD_B = 52;
+        const CHART_H = 268;
+        const H = CHART_H + PAD_T + PAD_B;
+        const GAP = 3;
+        const C_EJEC = '#10b981', C_COMP = '#f59e0b', C_DISP = '#e8edf6';
+        const R = 2;
+
+        const totalPpto = groups.reduce((s, g) => s + asNumber(g.PresupuestoErequester), 0);
+        const totalEjec = groups.reduce((s, g) => s + asNumber(g.EjecutadoErequester), 0);
+        const avgEjecPct = totalPpto > 0 ? totalEjec / totalPpto : 0;
+        const availW = (W - PAD_L - PAD_R) - (groups.length - 1) * GAP;
+        const colW = availW / groups.length;
+        const fmtVal = v => v >= 1e6 ? `${(v/1e6).toFixed(2)}M` : v >= 1000 ? `${Math.round(v/1000)}K` : `${Math.round(v)}`;
+
+        const parts = [];
+
+        parts.push(`<rect x="${PAD_L}" y="${PAD_T}" width="${(W-PAD_L-PAD_R).toFixed(1)}" height="${CHART_H}" fill="#fafbfd" rx="${R}"/>`);
+
+        [0, 0.25, 0.5, 0.75, 1].forEach(pct => {
+            const y = (PAD_T + CHART_H * (1 - pct)).toFixed(1);
+            const isEdge = pct === 0 || pct === 1;
+            parts.push(`<text x="${PAD_L - 7}" y="${(+y + 4).toFixed(1)}" text-anchor="end" font-size="9.5" fill="#94a3b8">${Math.round(pct*100)}%</text>`);
+            parts.push(`<line x1="${PAD_L}" y1="${y}" x2="${W-PAD_R}" y2="${y}" stroke="${isEdge ? '#dde3ed' : '#eef1f7'}" stroke-width="${isEdge ? 1.5 : 1}"/>`);
+        });
+
+        if (avgEjecPct > 0.01 && avgEjecPct < 0.99) {
+            const yAvg = (PAD_T + CHART_H * (1 - avgEjecPct)).toFixed(1);
+            parts.push(`<line x1="${PAD_L}" y1="${yAvg}" x2="${W-PAD_R}" y2="${yAvg}" stroke="#6366f1" stroke-width="1.5" stroke-dasharray="5,3" opacity="0.7"/>`);
+            parts.push(`<text x="${W-PAD_R+5}" y="${(+yAvg).toFixed(1)}" font-size="8.5" fill="#6366f1" font-weight="600">Prom.</text>`);
+            parts.push(`<text x="${W-PAD_R+5}" y="${(+yAvg+11).toFixed(1)}" font-size="8.5" fill="#6366f1" font-weight="700">ejec. ${Math.round(avgEjecPct*100)}%</text>`);
+        }
+
+        let xCursor = PAD_L;
+        groups.forEach((g, i) => {
+            const ppto = asNumber(g.PresupuestoErequester);
+            const ejec = Math.min(asNumber(g.EjecutadoErequester), ppto);
+            const comp = Math.min(Math.max(0, asNumber(g.ComprometidoErequester)), ppto - ejec);
+            const disp = Math.max(0, ppto - ejec - comp);
+            const pEjec = ejec/ppto, pComp = comp/ppto, pDisp = disp/ppto;
+
+            const yDisp = PAD_T, hDisp = CHART_H * pDisp;
+            const yComp = yDisp + hDisp, hComp = CHART_H * pComp;
+            const yEjec = yComp + hComp, hEjec = CHART_H * pEjec;
+            const cx = (xCursor + colW / 2).toFixed(1);
+
+            const isDimFase = mekkoDim === 'Rubros[Fase]';
+            const fullLabel = isDimFase && /^\d+$/.test((g.label||'').trim()) ? `Fase ${parseInt(g.label,10)}` : g.label;
+
+            parts.push(`<g class="mekko-col" data-label="${fullLabel}" data-ppto="${ppto}" data-ejec="${ejec}" data-comp="${comp}" data-disp="${disp}" data-pejec="${pEjec.toFixed(4)}" data-pcomp="${pComp.toFixed(4)}" data-pdisp="${pDisp.toFixed(4)}" style="cursor:pointer">`);
+
+            const rect = (x, y, w, h, fill) => h > 0.5
+                ? `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}" fill="${fill}" rx="${R}"/>`
+                : '';
+            parts.push(rect(xCursor, yDisp, colW, hDisp, C_DISP));
+            parts.push(rect(xCursor, yComp, colW, hComp, C_COMP));
+            parts.push(rect(xCursor, yEjec, colW, hEjec, C_EJEC));
+
+            const MIN1 = 14, MIN2 = 28;
+            const lbl = (y, h, val, pct, cv, cp) => {
+                if (h <= MIN1 || colW <= 16) return '';
+                const my = (y + h/2).toFixed(1);
+                return h > MIN2
+                    ? `<text x="${cx}" y="${(+my-5).toFixed(1)}" text-anchor="middle" font-size="9" fill="${cv}" font-weight="700" pointer-events="none">${val}</text><text x="${cx}" y="${(+my+7).toFixed(1)}" text-anchor="middle" font-size="7.5" fill="${cp}" pointer-events="none">${pct}%</text>`
+                    : `<text x="${cx}" y="${(+my+4).toFixed(1)}" text-anchor="middle" font-size="9" fill="${cv}" font-weight="700" pointer-events="none">${val}</text>`;
+            };
+            parts.push(lbl(yDisp, hDisp, fmtVal(disp),  Math.round(pDisp*100), '#475569', '#94a3b8'));
+            parts.push(lbl(yComp, hComp, fmtVal(comp),  Math.round(pComp*100), '#fff',    'rgba(255,255,255,0.75)'));
+            parts.push(lbl(yEjec, hEjec, fmtVal(ejec),  Math.round(pEjec*100), '#fff',    'rgba(255,255,255,0.75)'));
+
+            parts.push(`</g>`);
+
+            const lY = PAD_T + CHART_H + 14;
+            const shortLbl = isDimFase
+                ? (/^\d+$/.test((g.label||'').trim()) ? `F${parseInt(g.label,10)}` : String(g.label).substring(0,4))
+                : String(g.label).substring(0,9);
+            if (colW > 10)
+                parts.push(`<text x="${cx}" y="${lY}" text-anchor="middle" font-size="9" fill="#334155" font-weight="600">${shortLbl}</text>`);
+            if (colW > 32)
+                parts.push(`<text x="${cx}" y="${lY+13}" text-anchor="middle" font-size="8" fill="#94a3b8">${fmtVal(ppto)}</text>`);
+
+            if (i < groups.length - 1)
+                parts.push(`<line x1="${(xCursor+colW).toFixed(1)}" y1="${PAD_T}" x2="${(xCursor+colW).toFixed(1)}" y2="${PAD_T+CHART_H}" stroke="#fff" stroke-width="${GAP}"/>`);
+
+            xCursor += colW + GAP;
+        });
+
+        parts.push(`<rect x="${PAD_L}" y="${PAD_T}" width="${(W-PAD_L-PAD_R).toFixed(1)}" height="${CHART_H}" fill="none" stroke="#dde3ed" stroke-width="1" rx="${R}"/>`);
+
+        container.innerHTML = `<svg width="${W}" height="${H}" style="display:block;overflow:visible;font-family:Inter,sans-serif">${parts.join('')}</svg>`;
+
+        const tooltip = document.getElementById('mekko-tooltip');
+        const cols = container.querySelectorAll('.mekko-col');
+
+        cols.forEach(col => {
+            col.addEventListener('mouseenter', e => {
+                const d = col.dataset;
+                const ejec = +d.ejec, comp = +d.comp, disp = +d.disp, ppto = +d.ppto;
+                const pEjec = +d.pejec, pComp = +d.pcomp, pDisp = +d.pdisp;
+                if (tooltip) {
+                    tooltip.innerHTML = `
+                        <div class="mekko-tip-title">${d.label}</div>
+                        <div class="mekko-tip-ppto"><span>Presupuesto</span><strong>${fmtVal(ppto)}</strong></div>
+                        <div class="mekko-tip-row"><span class="mekko-tip-dot" style="background:${C_EJEC}"></span><span>Ejecutado</span><span style="font-weight:700;color:${C_EJEC}">${fmtVal(ejec)}</span><span style="color:#94a3b8">${Math.round(pEjec*100)}%</span></div>
+                        <div class="mekko-tip-row"><span class="mekko-tip-dot" style="background:${C_COMP}"></span><span>Comprometido</span><span style="font-weight:700;color:${C_COMP}">${fmtVal(comp)}</span><span style="color:#94a3b8">${Math.round(pComp*100)}%</span></div>
+                        <div class="mekko-tip-row"><span class="mekko-tip-dot" style="background:#94a3b8"></span><span>Disponible</span><span style="font-weight:700;color:#475569">${fmtVal(disp)}</span><span style="color:#94a3b8">${Math.round(pDisp*100)}%</span></div>`;
+                    const cRect = col.getBoundingClientRect();
+                    const tipW = 195, tipH = 135;
+                    let tx = cRect.left + cRect.width/2 - tipW/2;
+                    let ty = cRect.top - tipH - 10;
+                    if (ty < 8) ty = cRect.bottom + 8;
+                    tx = Math.max(8, Math.min(tx, window.innerWidth - tipW - 8));
+                    tooltip.style.cssText = `display:block;left:${tx}px;top:${ty}px;`;
+                }
+                cols.forEach(c => { c.style.opacity = c === col ? '1' : '0.35'; });
+            });
+            col.addEventListener('mouseleave', () => {
+                if (tooltip) tooltip.style.display = 'none';
+                cols.forEach(c => { c.style.opacity = '1'; });
+            });
+        });
     }
 
     function renderCharts(etapaRows, areaRows, segmentoRows) {
@@ -2697,7 +2588,7 @@
         renderMetrics(totals);
         renderAreaTable(areaRows, totals, rawDetailRows);
         renderCharts(etapaRows, areaRows, segmentoRows);
-        renderTendenciaFase(rawDetailRows);
+        renderMarimekko(rawDetailRows);
 
         if (data?.metadata?.generatedAt) {
             const updated = new Date(data.metadata.generatedAt);
