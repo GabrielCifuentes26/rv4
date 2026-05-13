@@ -10,21 +10,29 @@ const fmt = (n: number | null | undefined) =>
 const fmtPct = (n: number | null | undefined) =>
   n != null ? `${(n * 100).toFixed(1)}%` : 'N/D'
 
+// Detecta dinámicamente la clave de etiqueta (la que no empieza con '[')
+function labelKey(record: Record<string, unknown>): string {
+  return Object.keys(record).find(k => !k.startsWith('[')) ?? ''
+}
+
 function buildProjectContext(row: Record<string, unknown>): string {
   const datasets = ((row.payload as Record<string, unknown>)?.datasets ?? {}) as Record<string, unknown>
   const totales = ((datasets.totales as Record<string, number>[])?.[0]) ?? {}
-  const porArea: Record<string, number>[] = (datasets.porArea as Record<string, number>[]) ?? []
-  const porEtapa: Record<string, number>[] = (datasets.porEtapa as Record<string, number>[]) ?? []
+  const porArea: Record<string, unknown>[] = (datasets.porArea as Record<string, unknown>[]) ?? []
+  const porEtapa: Record<string, unknown>[] = (datasets.porEtapa as Record<string, unknown>[]) ?? []
+
+  const areaKey  = porArea[0]  ? labelKey(porArea[0])  : ''
+  const etapaKey = porEtapa[0] ? labelKey(porEtapa[0]) : ''
 
   const areaLines = porArea.map(r =>
-    `    ${r['Rubros[Area]'] ?? 'Área'}: Ejecutado ${fmt(r['[EjecutadoErequester]'])}, Asignado ${fmt(r['[AsignadoErequester]'])}, Disponible ${fmt(r['[DisponibleErequester]'])}`
+    `    ${r[areaKey] ?? 'Área'}: Ejecutado ${fmt(r['[EjecutadoErequester]'] as number)}, Asignado ${fmt(r['[AsignadoErequester]'] as number)}, Disponible ${fmt(r['[DisponibleErequester]'] as number)}`
   ).join('\n') || '    Sin datos'
 
   const etapaLines = [...porEtapa]
     .sort((a, b) => ((b['[AsignadoErequester]'] as number) ?? 0) - ((a['[AsignadoErequester]'] as number) ?? 0))
     .slice(0, 8)
     .map(r =>
-      `    ${r['Rubros[Etapa]'] ?? 'Etapa'}: Ppto ${fmt(r['[PresupuestoErequester]'])}, Ejecutado ${fmt(r['[EjecutadoErequester]'])}, Asignado ${fmt(r['[AsignadoErequester]'])}`
+      `    ${r[etapaKey] ?? 'Etapa'}: Ppto ${fmt(r['[PresupuestoErequester]'] as number)}, Ejecutado ${fmt(r['[EjecutadoErequester]'] as number)}, Asignado ${fmt(r['[AsignadoErequester]'] as number)}`
     ).join('\n') || '    Sin datos'
 
   return `
