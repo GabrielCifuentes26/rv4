@@ -84,6 +84,15 @@ ${etapaLines}
 ${mesLines}`
 }
 
+// Resumen compacto (solo totales) para proyectos no activos
+function buildProjectSummary(row: Record<string, unknown>): string {
+  const datasets  = ((row.payload as Record<string, unknown>)?.datasets ?? {}) as Record<string, unknown>
+  const totales   = ((datasets.totales as Record<string, number>[])?.[0]) ?? {}
+  const pptoLabel = PPTO_LABEL[row.project_key as string] ?? 'Presupuesto SAP'
+  return `  ### ${row.project_name} (${row.project_key}) — Datos al: ${row.mes_a}
+  ${pptoLabel}: ${fmt(totales['[PresupuestoErequester]'])} | Ejecutado: ${fmt(totales['[EjecutadoErequester]'])} | Asignado: ${fmt(totales['[AsignadoErequester]'])} | Disponible: ${fmt(totales['[DisponibleErequester]'])} | % Asig: ${fmtPct(totales['[PorcentajeAsignado]'])}`
+}
+
 const SYSTEM_BASE = `Eres un asistente financiero experto del sistema Costos & Presupuestos de RV4.
 Tu trabajo es responder preguntas sobre presupuesto, ejecución y avance de proyectos de construcción.
 
@@ -143,7 +152,7 @@ Deno.serve(async (req) => {
       })
     }
 
-    const { message, history = [] } = await req.json()
+    const { message, project_key = '', history = [] } = await req.json()
 
     if (!message?.trim()) {
       return new Response(JSON.stringify({ error: 'Mensaje vacío.' }), {
@@ -185,13 +194,20 @@ ESTADO ACTUAL: No hay datos sincronizados desde Power BI todavía.
 Indica que deben correr el script de sincronización para que los datos estén disponibles.`
     } else {
       const projectList = rows.map(r => `${r.project_name} (${r.project_key})`).join(', ')
-      const allContexts = rows.map(r => buildProjectContext(r as Record<string, unknown>)).join('\n---\n')
+
+      // Contexto completo para el proyecto activo, resumen para los demás
+      const allContexts = rows.map(r => {
+        const isActive = project_key && r.project_key === project_key
+        return isActive
+          ? buildProjectContext(r as Record<string, unknown>)
+          : buildProjectSummary(r as Record<string, unknown>)
+      }).join('\n---\n')
 
       systemPrompt = `${SYSTEM_BASE}
 
 PROYECTOS DISPONIBLES (${rows.length}): ${projectList}
 
-DATOS DETALLADOS DE TODOS LOS PROYECTOS:
+DATOS DE PROYECTOS:
 ${allContexts}`
     }
 
@@ -214,8 +230,12 @@ ${allContexts}`
     })
 
     const groqData = await groqRes.json()
+    if (!groqRes.ok) {
+      console.error('Groq error:', groqRes.status, JSON.stringify(groqData))
+    }
     const reply: string = groqData.choices?.[0]?.message?.content
-      ?? 'No pude generar una respuesta. Intenta de nuevo.'
+      ?? groqData.error?.message
+      ?? `Error del modelo (${groqRes.status}). Intenta de nuevo.`
 
     return new Response(JSON.stringify({ reply }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
