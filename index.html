@@ -661,24 +661,24 @@
 
         /* ── LOTES SECTION ── */
         .lotes-section {
-            background: linear-gradient(180deg, #f0fdf4 0%, #f8fafc 100%);
+            background: linear-gradient(180deg, #f0f5ff 0%, #f4f8fb 100%);
             padding: 0 50px 80px;
         }
         .lotes-section-divider {
             display: flex; align-items: center; gap: 20px;
             padding: 56px 0 40px;
         }
-        .lotes-divider-line { flex: 1; height: 1px; background: rgba(16,185,129,0.3); }
+        .lotes-divider-line { flex: 1; height: 1px; background: rgba(14,165,233,0.25); }
         .lotes-divider-pill {
             display: flex; align-items: center; gap: 8px;
             font-size: 0.65rem; font-weight: 800; letter-spacing: 2px;
-            text-transform: uppercase; color: #059669;
+            text-transform: uppercase; color: var(--blue-dark);
             padding: 7px 20px; border-radius: 20px;
-            border: 1.5px solid rgba(16,185,129,0.45);
-            background: rgba(16,185,129,0.08);
+            border: 1.5px solid rgba(14,165,233,0.4);
+            background: rgba(14,165,233,0.07);
             white-space: nowrap;
         }
-        .lotes-summary-bar .proj-count-badge { background: #059669 !important; }
+        .lotes-summary-bar .proj-count-badge { background: var(--blue-dark) !important; }
         @media (max-width: 768px) {
             .lotes-section { padding: 0 20px 60px; }
         }
@@ -811,7 +811,7 @@
     <div class="summary-bar">
         <div class="summary-bar-left">
             <div class="summary-title-wrap">
-                <span class="summary-title">Proyectos en Ejecución</span>
+                <span class="summary-title">Proyectos en Ejecución — Casas</span>
                 <span class="proj-count-badge" id="projCountBadge">6</span>
             </div>
             <button class="btn-desglose-toggle" id="btnDesgloseToggle" onclick="toggleDesglose()">
@@ -857,7 +857,7 @@
     <div class="summary-bar lotes-summary-bar">
         <div class="summary-bar-left">
             <div class="summary-title-wrap">
-                <span class="summary-title">Proyectos en Ejecución</span>
+                <span class="summary-title">Proyectos en Ejecución — Lotes</span>
                 <span class="proj-count-badge" id="lotesCountBadge">2</span>
             </div>
         </div>
@@ -1420,6 +1420,35 @@
             document.getElementById('devDropdownPanel')?.classList.remove('open');
         }
     });
+
+    // ── SCROLL-SPY CATEGORÍAS ────────────────────────────────────────────────
+    function initScrollSpy() {
+        const spySections = [
+            { el: document.querySelector('.projects-section'), cat: 'casas' },
+            { el: document.getElementById('seccionLotes'),    cat: 'lotes' }
+        ];
+        let ticking = false;
+        window.addEventListener('scroll', () => {
+            if (ticking) return;
+            ticking = true;
+            requestAnimationFrame(() => {
+                const mid = window.innerHeight * 0.45;
+                let found = null;
+                spySections.forEach(({ el, cat }) => {
+                    if (!el) return;
+                    const r = el.getBoundingClientRect();
+                    if (r.top <= mid && r.bottom >= mid) found = cat;
+                });
+                if (found) {
+                    document.querySelectorAll('.cat-card').forEach(c => c.classList.remove('active'));
+                    const chip = document.querySelector(`.cat-card[data-cat="${found}"]`);
+                    if (chip) chip.classList.add('active');
+                }
+                ticking = false;
+            });
+        }, { passive: true });
+    }
+    initScrollSpy();
 
     initSlider();
 </script>
