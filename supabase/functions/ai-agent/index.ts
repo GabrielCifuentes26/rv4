@@ -307,6 +307,19 @@ TOTALES GLOBALES POR ÁREA (proyectos de casas):
   CONSTRUCCIÓN: Presupuesto ${fmt(globalTotals.areaConstruccionPpto)}, Ejecutado ${fmt(globalTotals.areaConstruccionEjecutado)}, Asignado ${fmt(globalTotals.areaConstruccionAsignado)}, Disponible ${fmt(globalTotals.areaConstruccionDisponible)}
   URBANIZACIÓN: Presupuesto ${fmt(globalTotals.areaUrbanizacionPpto)}, Ejecutado ${fmt(globalTotals.areaUrbanizacionEjecutado)}, Asignado ${fmt(globalTotals.areaUrbanizacionAsignado)}, Disponible ${fmt(globalTotals.areaUrbanizacionDisponible)}
 
+COSTO POR M² — TODOS LOS PROYECTOS DE CASAS (presupuesto planificado):
+${rows.filter(r => PROJECT_M2[r.project_key as string]).map(r => {
+  const m2   = PROJECT_M2[r.project_key as string]
+  const ds   = ((r.payload as Record<string,unknown>)?.datasets ?? {}) as Record<string,unknown>
+  const areas: Record<string,unknown>[] = (ds.porArea as Record<string,unknown>[]) ?? []
+  const aKey = areas[0] ? labelKey(areas[0]) : ''
+  const constrRow = areas.find(a => String(a[aKey]??'').toLowerCase().includes('construcc') || String(a[aKey]??'').toLowerCase().includes('casas'))
+  const urbaRow   = areas.find(a => String(a[aKey]??'').toLowerCase().includes('urbaniz'))
+  const ppCasas = constrRow ? Math.round(((constrRow['[PresupuestoErequester]'] as number)??0) / m2.casas) : 0
+  const ppUrba  = urbaRow   ? Math.round(((urbaRow['[PresupuestoErequester]']   as number)??0) / m2.urbanizacion) : 0
+  return `  ${r.project_name} (${r.project_key}): Casas ${m2.casas.toLocaleString()}m² → Q${ppCasas.toLocaleString()}/m² ($${Math.round(ppCasas/USD_RATE).toLocaleString()}/m²) | Urba ${m2.urbanizacion.toLocaleString()}m² → Q${ppUrba.toLocaleString()}/m² ($${Math.round(ppUrba/USD_RATE).toLocaleString()}/m²)`
+}).join('\n')}
+
 DATOS DE PROYECTOS:
 ${allContexts}`
     }
