@@ -203,8 +203,17 @@ LO QUE PUEDES RESPONDER:
 ✓ Comparación entre proyectos
 ✓ Cuál proyecto tiene más/menos ejecución, más/menos disponible, menor/mayor costo por m²
 
-LO QUE AÚN NO TIENES (indícalo si preguntan):
-✗ Datos históricos anteriores a los sincronizados`
+COSTO POR M² — SOLO DISPONIBLE PARA PROYECTOS DE CASAS:
+Los proyectos CLC y HSL son de LOTES, no de casas. No tienen datos de m² de construcción.
+Si preguntan por m² de CLC o HSL, responde que ese dato no está disponible para proyectos de lotes.
+
+LO QUE AÚN NO TIENES — responde con claridad si preguntan:
+✗ Número de casas o lotes por proyecto — no está en los datos
+✗ Fecha de entrega o fin de construcción — no está en los datos
+✗ Datos de ventas o ingresos — no está en los datos
+✗ Avance físico de obra (% de trabajo físico ejecutado) — solo tienes avance financiero
+✗ Datos históricos anteriores a los sincronizados
+✗ Costo por m² de proyectos de lotes (CLC, HSL)`
 
 async function callGroq(
   systemPrompt: string,
@@ -299,9 +308,29 @@ Indica que deben correr el script de sincronización para que los datos estén d
           : buildProjectSummary(r as Record<string, unknown>)
       }).join('\n---\n')
 
+      // Pre-calcular totales globales para evitar que el agente sume incorrectamente
+      const globalTotals = rows.reduce((acc, r) => {
+        const ds = ((r.payload as Record<string, unknown>)?.datasets ?? {}) as Record<string, unknown>
+        const t  = ((ds.totales as Record<string, number>[])?.[0]) ?? {}
+        acc.ppto      += (t['[PresupuestoErequester]'] as number) ?? 0
+        acc.ejecutado += (t['[EjecutadoErequester]']   as number) ?? 0
+        acc.asignado  += (t['[AsignadoErequester]']    as number) ?? 0
+        acc.disponible+= (t['[DisponibleErequester]']  as number) ?? 0
+        acc.comprometido += (t['[ComprometidoErequester]'] as number) ?? 0
+        return acc
+      }, { ppto: 0, ejecutado: 0, asignado: 0, disponible: 0, comprometido: 0 })
+
       systemPrompt = `${SYSTEM_BASE}
 
 PROYECTOS DISPONIBLES (${rows.length}): ${projectList}
+
+TOTALES GLOBALES (suma de todos los proyectos):
+  Presupuesto total: ${fmt(globalTotals.ppto)}
+  Ejecutado total: ${fmt(globalTotals.ejecutado)}
+  Asignado total: ${fmt(globalTotals.asignado)}
+  Disponible total: ${fmt(globalTotals.disponible)}
+  Comprometido total: ${fmt(globalTotals.comprometido)}
+  % Asignado global: ${fmtPct(globalTotals.ppto > 0 ? globalTotals.asignado / globalTotals.ppto : 0)}
 
 DATOS DE PROYECTOS:
 ${allContexts}`
