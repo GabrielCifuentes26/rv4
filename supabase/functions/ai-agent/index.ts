@@ -165,6 +165,11 @@ REGLAS IMPORTANTES:
 4. Nunca inventes datos. Si no está en el contexto, dilo claramente.
 5. Usa el formato Q X.XXM para montos en millones de Quetzales.
 
+CLASIFICACIÓN DE PROYECTOS:
+- Proyectos de CASAS (vivienda): Bosques de Jalapa (bdj), Bosques de Pinula (bdp), Bosques de Santa Elena (bse), Condado Santa Elena (cse), Hacienda La Querencia (hlq), Reserva del Bosque (rdb)
+- Proyectos de LOTES: Condado La Ceiba (clc), Hacienda El Sol (hsl)
+- Total: 8 proyectos activos — 6 de casas y 2 de lotes
+
 SINÓNIMOS Y TÉRMINOS QUE DEBES RECONOCER:
 - "Presupuesto SAP / PPTO ER / Presupuesto ER / presupuesto / budget / SAP / costo total" → el presupuesto aprobado del proyecto
 - "Ejecutado / gasto / gastado / invertido / erogado / avance económico / lo que se ha pagado" → monto ejecutado
