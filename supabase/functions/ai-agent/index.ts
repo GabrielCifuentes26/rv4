@@ -32,12 +32,12 @@ function buildProjectContext(row: Record<string, unknown>): string {
     .sort((a, b) => ((b['[AsignadoErequester]'] as number) ?? 0) - ((a['[AsignadoErequester]'] as number) ?? 0))
     .slice(0, 8)
     .map(r =>
-      `    ${r[etapaKey] ?? 'Etapa'}: Ppto ${fmt(r['[PresupuestoErequester]'] as number)}, Ejecutado ${fmt(r['[EjecutadoErequester]'] as number)}, Asignado ${fmt(r['[AsignadoErequester]'] as number)}`
+      `    ${r[etapaKey] ?? 'Etapa'}: SAP ${fmt(r['[PresupuestoErequester]'] as number)}, Ejecutado ${fmt(r['[EjecutadoErequester]'] as number)}, Asignado ${fmt(r['[AsignadoErequester]'] as number)}`
     ).join('\n') || '    Sin datos'
 
   return `
   ### ${row.project_name} (${row.project_key}) — Mes: ${row.mes_a}
-  RDI: ${fmt(totales['[RdiTotal]'])} | Presupuesto ER: ${fmt(totales['[PresupuestoErequester]'])}
+  Presupuesto SAP: ${fmt(totales['[PresupuestoErequester]'])} | RDI: ${fmt(totales['[RdiTotal]'])}
   Ejecutado: ${fmt(totales['[EjecutadoErequester]'])} | Comprometido: ${fmt(totales['[ComprometidoErequester]'])}
   Asignado: ${fmt(totales['[AsignadoErequester]'])} | Disponible: ${fmt(totales['[DisponibleErequester]'])}
   % Asignado: ${fmtPct(totales['[PorcentajeAsignado]'])} | % Disponible: ${fmtPct(totales['[PorcentajeDisponible]'])}
