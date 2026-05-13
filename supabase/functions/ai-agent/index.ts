@@ -221,12 +221,20 @@ Deno.serve(async (req) => {
       })
     }
 
-    // Rate limiting por usuario: máx 25 preguntas por día
-    const DAILY_LIMIT = 25
     const admin = createClient(
       Deno.env.get('SUPABASE_URL')!,
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     )
+
+    // Límite diario según rol: admin/gerente = sin límite, otros = 25/día
+    const { data: perfil } = await admin
+      .from('usuarios')
+      .select('rol')
+      .eq('id', user.id)
+      .single()
+    const rol = perfil?.rol ?? 'usuario'
+    const DAILY_LIMIT = (rol === 'admin' || rol === 'gerente') ? Infinity : 25
+
     const today = new Date().toISOString().split('T')[0]
     const { data: usageRow } = await admin
       .from('ai_agent_usage')
@@ -240,7 +248,7 @@ Deno.serve(async (req) => {
         reply: `Has alcanzado el límite de ${DAILY_LIMIT} preguntas por hoy. El límite se reinicia a medianoche (hora UTC). Si necesitas más consultas, contacta al administrador.`
       }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }
-    // Incrementar contador
+    // Incrementar contador (siempre, para monitoreo aunque no haya límite)
     await admin.from('ai_agent_usage').upsert(
       { user_id: user.id, usage_date: today, requests: usedToday + 1 },
       { onConflict: 'user_id,usage_date' }
