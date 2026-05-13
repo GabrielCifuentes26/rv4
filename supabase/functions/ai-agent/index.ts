@@ -138,9 +138,17 @@ ${mesLines}`
 function buildProjectSummary(row: Record<string, unknown>): string {
   const datasets  = ((row.payload as Record<string, unknown>)?.datasets ?? {}) as Record<string, unknown>
   const totales   = ((datasets.totales as Record<string, number>[])?.[0]) ?? {}
+  const porEtapa: Record<string, unknown>[] = (datasets.porEtapa as Record<string, unknown>[]) ?? []
   const pptoLabel = PPTO_LABEL[row.project_key as string] ?? 'Presupuesto SAP'
+  const etapaKey  = porEtapa[0] ? labelKey(porEtapa[0]) : ''
+  const etapaLines = [...porEtapa]
+    .sort((a, b) => ((b['[PresupuestoErequester]'] as number) ?? 0) - ((a['[PresupuestoErequester]'] as number) ?? 0))
+    .map(r => `    ${r[etapaKey] ?? '?'}: ppto ${fmt(r['[PresupuestoErequester]'] as number)} ejec ${fmt(r['[EjecutadoErequester]'] as number)} disp ${fmt(r['[DisponibleErequester]'] as number)}`)
+    .join('\n')
   return `  ### ${row.project_name} (${row.project_key}) — Datos al: ${row.mes_a}
-  ${pptoLabel}: ${fmt(totales['[PresupuestoErequester]'])} | RDI: ${fmt(totales['[RdiTotal]'])} | Ejecutado: ${fmt(totales['[EjecutadoErequester]'])} | Asignado: ${fmt(totales['[AsignadoErequester]'])} | Disponible: ${fmt(totales['[DisponibleErequester]'])} | % Asig: ${fmtPct(totales['[PorcentajeAsignado]'])}`
+  ${pptoLabel}: ${fmt(totales['[PresupuestoErequester]'])} | RDI: ${fmt(totales['[RdiTotal]'])} | Ejecutado: ${fmt(totales['[EjecutadoErequester]'])} | Asignado: ${fmt(totales['[AsignadoErequester]'])} | Disponible: ${fmt(totales['[DisponibleErequester]'])} | % Asig: ${fmtPct(totales['[PorcentajeAsignado]'])}
+  Etapas:
+${etapaLines || '    Sin datos'}`
 }
 
 const SYSTEM_BASE = `Eres el asistente financiero de RV4 — sistema Costos & Presupuestos. Responde en español, breve y directo.
