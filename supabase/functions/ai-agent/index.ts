@@ -76,9 +76,10 @@ function buildProjectContext(row: Record<string, unknown>): string {
     `    ${r[areaKey] ?? 'Área'}: ${pptoLabel} ${fmt(r['[PresupuestoErequester]'] as number)}, Ejecutado ${fmt(r['[EjecutadoErequester]'] as number)}, Asignado ${fmt(r['[AsignadoErequester]'] as number)}, Disponible ${fmt(r['[DisponibleErequester]'] as number)}, % Asig ${fmtPct(r['[PorcentajeAsignado]'] as number)}`
   ).join('\n') || '    Sin datos'
 
-  // Todas las etapas ordenadas por asignado
+  // Etapas — top 30 por asignado
   const etapaLines = [...porEtapa]
     .sort((a, b) => ((b['[AsignadoErequester]'] as number) ?? 0) - ((a['[AsignadoErequester]'] as number) ?? 0))
+    .slice(0, 30)
     .map(r =>
       `    ${r[etapaKey] ?? 'Etapa'}: ${pptoLabel} ${fmt(r['[PresupuestoErequester]'] as number)}, Ejecutado ${fmt(r['[EjecutadoErequester]'] as number)}, Asignado ${fmt(r['[AsignadoErequester]'] as number)}, Disponible ${fmt(r['[DisponibleErequester]'] as number)}`
     ).join('\n') || '    Sin datos'
@@ -95,10 +96,11 @@ function buildProjectContext(row: Record<string, unknown>): string {
       ).join('\n')
     : '    Sin datos'
 
-  // Todos los meses disponibles
+  // Meses — últimos 12
   const mesKey = porMes[0] ? findKey(porMes[0], 'MesA') : 'Calendario[MesA]'
   const mesLines = porMes
     .filter(r => r[mesKey] != null)
+    .slice(-12)
     .map(r =>
       `    ${r[mesKey]}: Ejecutado ${fmt(r['[EjecutadoErequester]'] as number)}, Asignado ${fmt(r['[AsignadoErequester]'] as number)}, Comprometido ${fmt(r['[ComprometidoErequester]'] as number)}`
     ).join('\n') || '    Sin datos'
