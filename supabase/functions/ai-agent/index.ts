@@ -76,12 +76,11 @@ function buildProjectContext(row: Record<string, unknown>): string {
     `    ${r[areaKey] ?? 'Área'}: ${pptoLabel} ${fmt(r['[PresupuestoErequester]'] as number)}, Ejecutado ${fmt(r['[EjecutadoErequester]'] as number)}, Asignado ${fmt(r['[AsignadoErequester]'] as number)}, Disponible ${fmt(r['[DisponibleErequester]'] as number)}, % Asig ${fmtPct(r['[PorcentajeAsignado]'] as number)}`
   ).join('\n') || '    Sin datos'
 
-  // Etapas — top 10 por presupuesto (cubre etapas sin ejecución aún)
+  // Todas las etapas ordenadas por presupuesto — formato compacto para no exceder tokens
   const etapaLines = [...porEtapa]
     .sort((a, b) => ((b['[PresupuestoErequester]'] as number) ?? 0) - ((a['[PresupuestoErequester]'] as number) ?? 0))
-    .slice(0, 10)
     .map(r =>
-      `    ${r[etapaKey] ?? 'Etapa'}: ${pptoLabel} ${fmt(r['[PresupuestoErequester]'] as number)}, Ejec ${fmt(r['[EjecutadoErequester]'] as number)}, Asig ${fmt(r['[AsignadoErequester]'] as number)}, Disp ${fmt(r['[DisponibleErequester]'] as number)}`
+      `    ${r[etapaKey] ?? 'Etapa'}: ppto ${fmt(r['[PresupuestoErequester]'] as number)} ejec ${fmt(r['[EjecutadoErequester]'] as number)} disp ${fmt(r['[DisponibleErequester]'] as number)}`
     ).join('\n') || '    Sin datos'
 
   // Fases completas
@@ -91,11 +90,11 @@ function buildProjectContext(row: Record<string, unknown>): string {
       ).join('\n')
     : '    Sin datos'
 
-  // Meses — últimos 5
+  // Meses — últimos 12
   const mesKey = porMes[0] ? findKey(porMes[0], 'MesA') : 'Calendario[MesA]'
   const mesLines = porMes
     .filter(r => r[mesKey] != null)
-    .slice(-5)
+    .slice(-12)
     .map(r =>
       `    ${r[mesKey]}: Ejec ${fmt(r['[EjecutadoErequester]'] as number)}, Asig ${fmt(r['[AsignadoErequester]'] as number)}, Comp ${fmt(r['[ComprometidoErequester]'] as number)}`
     ).join('\n') || '    Sin datos'
