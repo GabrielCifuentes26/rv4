@@ -659,6 +659,50 @@
         .empty-state .empty-icon { font-size: 3rem; margin-bottom: 14px; }
         .empty-state p { font-size: 0.9rem; }
 
+        /* ── ANÁLISIS SECTION ── */
+        .analisis-section {
+            background: var(--bg);
+            padding: 0 50px 60px;
+        }
+        .analisis-cat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 28px;
+        }
+        .analisis-cat-card {
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 32px 28px;
+            box-shadow: var(--shadow);
+            display: flex; flex-direction: column; gap: 4px;
+            border-top: 3px solid transparent;
+        }
+        .analisis-cat-card--casas { border-top-color: #0ea5e9; }
+        .analisis-cat-card--lotes { border-top-color: #10b981; }
+        .analisis-cat-header {
+            font-size: 0.7rem; font-weight: 800; letter-spacing: 2px;
+            text-transform: uppercase; color: var(--gray); margin-bottom: 6px;
+        }
+        .analisis-cat-count {
+            font-size: 2.4rem; font-weight: 900; color: var(--navy); line-height: 1;
+        }
+        .analisis-cat-sub { font-size: 0.78rem; color: var(--gray2); margin-bottom: 4px; }
+        .analisis-metrics-row {
+            display: flex; gap: 24px; flex-wrap: wrap;
+            margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--border);
+        }
+        .analisis-metric { display: flex; flex-direction: column; gap: 3px; }
+        .analisis-metric-lbl {
+            font-size: 0.62rem; font-weight: 700; letter-spacing: 1px;
+            text-transform: uppercase; color: var(--gray2);
+        }
+        .analisis-metric-val { font-size: 1rem; font-weight: 800; color: var(--navy); }
+        .analisis-metric-val--pct { color: var(--green); }
+        @media (max-width: 768px) {
+            .analisis-section { padding: 0 20px 50px; }
+        }
+
         /* ── LOTES SECTION ── */
         .lotes-section {
             background: var(--bg);
@@ -777,10 +821,9 @@
     </div>
     <div class="cat-grid-wrapper">
         <div class="cat-row-active">
-            <div class="cat-card active" data-cat="todos" style="--cat-c:#0f172a" onclick="selectCategory(this, 'todos')">
-                <div class="cat-icon">🗂️</div>
-                <div class="cat-name">Todos</div>
-                <div class="cat-count">6 proyectos</div>
+            <div class="cat-card active" data-cat="todos" style="--cat-c:#6366f1" onclick="selectCategory(this, 'todos')">
+                <div class="cat-icon">📊</div>
+                <div class="cat-name">Análisis</div>
             </div>
             <div class="cat-card" data-cat="casas" style="--cat-c:#0ea5e9" onclick="selectCategory(this, 'casas')">
                 <div class="cat-icon">🏠</div>
@@ -804,6 +847,76 @@
                 <div class="cat-icon">⚙️</div>
                 <div class="cat-name">Maquinaria</div>
                 <div class="wip-badge">⏳ En desarrollo</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ANÁLISIS GENERAL -->
+<section class="analisis-section" id="seccionAnalisis">
+    <div class="summary-bar" style="margin-top:0; margin-bottom:0;">
+        <div class="summary-bar-left">
+            <div class="summary-title-wrap">
+                <span class="summary-title">Análisis General de Proyectos</span>
+                <span class="proj-count-badge" style="background:#6366f1">8</span>
+            </div>
+        </div>
+        <div class="summary-bar-right">
+            <div class="summary-total-label">TOTAL PORTAFOLIO</div>
+            <div class="summary-divider-v"></div>
+            <div class="summary-metrics">
+                <div class="summary-metric">
+                    <div class="summary-metric-lbl">Presupuesto</div>
+                    <div class="summary-metric-val" id="analisisTotalPpto">—</div>
+                </div>
+                <div class="summary-metric">
+                    <div class="summary-metric-lbl">Asignado</div>
+                    <div class="summary-metric-val" id="analisisTotalAsig">—</div>
+                </div>
+                <div class="summary-metric summary-metric--pct">
+                    <div class="summary-metric-lbl">% Asignado</div>
+                    <div class="summary-metric-val" id="analisisTotalPct">—</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="analisis-cat-grid">
+        <div class="analisis-cat-card analisis-cat-card--casas">
+            <div class="analisis-cat-header">🏠 Casas</div>
+            <div class="analisis-cat-count">6</div>
+            <div class="analisis-cat-sub">Proyectos en ejecución</div>
+            <div class="analisis-metrics-row">
+                <div class="analisis-metric">
+                    <div class="analisis-metric-lbl">Presupuesto</div>
+                    <div class="analisis-metric-val" id="analisisCasasPpto">—</div>
+                </div>
+                <div class="analisis-metric">
+                    <div class="analisis-metric-lbl">Asignado</div>
+                    <div class="analisis-metric-val" id="analisisCasasAsig">—</div>
+                </div>
+                <div class="analisis-metric">
+                    <div class="analisis-metric-lbl">% Asignado</div>
+                    <div class="analisis-metric-val analisis-metric-val--pct" id="analisisCasasPct">—</div>
+                </div>
+            </div>
+        </div>
+        <div class="analisis-cat-card analisis-cat-card--lotes">
+            <div class="analisis-cat-header">🌿 Lotes</div>
+            <div class="analisis-cat-count">2</div>
+            <div class="analisis-cat-sub">Proyectos en ejecución</div>
+            <div class="analisis-metrics-row">
+                <div class="analisis-metric">
+                    <div class="analisis-metric-lbl">Presupuesto</div>
+                    <div class="analisis-metric-val" id="analisisLotesPpto">—</div>
+                </div>
+                <div class="analisis-metric">
+                    <div class="analisis-metric-lbl">Asignado</div>
+                    <div class="analisis-metric-val" id="analisisLotesAsig">—</div>
+                </div>
+                <div class="analisis-metric">
+                    <div class="analisis-metric-lbl">% Asignado</div>
+                    <div class="analisis-metric-val analisis-metric-val--pct" id="analisisLotesPct">—</div>
+                </div>
             </div>
         </div>
     </div>
@@ -1241,6 +1354,7 @@
         renderTotalBar();
         renderCards('lotes', document.getElementById('lotesGrid'));
         renderLotesTotalBar();
+        renderAnalisis();
     }
 
     function updateCategoryCounts() {
@@ -1267,6 +1381,27 @@
         if (elPpto) elPpto.textContent = formatCompactMoney(totalPpto);
         if (elAsig) elAsig.textContent = formatCompactMoney(totalAsig);
         if (elPct)  elPct.textContent  = formatPct(pct);
+    }
+
+    function renderAnalisis() {
+        const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+        const casas = PROJECTS.filter(p => p.cat === 'casas' && SAP_PROJECT_KEYS[p.id] && p.sapSummary && !p.sapSummary.error);
+        const lotes = PROJECTS.filter(p => p.cat === 'lotes' && !p.wip && p.sapSummary && !p.sapSummary.error);
+        const casasPpto = casas.reduce((s, p) => s + (p.sapSummary.presupuestoSap || 0), 0);
+        const casasAsig = casas.reduce((s, p) => s + (p.sapSummary.asignado || 0), 0);
+        const lotesPpto = lotes.reduce((s, p) => s + (p.sapSummary.presupuestoSap || 0), 0);
+        const lotesAsig = lotes.reduce((s, p) => s + (p.sapSummary.asignado || 0), 0);
+        const totalPpto = casasPpto + lotesPpto;
+        const totalAsig = casasAsig + lotesAsig;
+        set('analisisCasasPpto', formatCompactMoney(casasPpto));
+        set('analisisCasasAsig', formatCompactMoney(casasAsig));
+        set('analisisCasasPct',  formatPct(casasPpto ? casasAsig / casasPpto : 0));
+        set('analisisLotesPpto', formatCompactMoney(lotesPpto));
+        set('analisisLotesAsig', formatCompactMoney(lotesAsig));
+        set('analisisLotesPct',  formatPct(lotesPpto ? lotesAsig / lotesPpto : 0));
+        set('analisisTotalPpto', formatCompactMoney(totalPpto));
+        set('analisisTotalAsig', formatCompactMoney(totalAsig));
+        set('analisisTotalPct',  formatPct(totalPpto ? totalAsig / totalPpto : 0));
     }
 
     function renderLotesTotalBar() {
@@ -1331,7 +1466,9 @@
         document.querySelectorAll('.cat-card').forEach(c => c.classList.remove('active'));
         el.classList.add('active');
 
-        if (cat === 'lotes') {
+        if (cat === 'todos') {
+            document.getElementById('seccionAnalisis').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else if (cat === 'lotes') {
             document.getElementById('seccionLotes').scrollIntoView({ behavior: 'smooth', block: 'start' });
         } else {
             document.querySelector('.projects-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
