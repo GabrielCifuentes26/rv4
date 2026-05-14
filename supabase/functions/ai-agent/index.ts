@@ -385,24 +385,37 @@ ${allContexts}`
     }
 
     // ── CALL GROQ ────────────────────────────────────────────────
+    // Guard: truncar system prompt si supera ~12 000 chars para evitar 413
+    const MAX_PROMPT_CHARS = 12_000
+    if (systemPrompt.length > MAX_PROMPT_CHARS) {
+      console.warn(`System prompt truncado: ${systemPrompt.length} → ${MAX_PROMPT_CHARS} chars`)
+      systemPrompt = systemPrompt.slice(0, MAX_PROMPT_CHARS) + '\n\n[Contexto truncado por longitud]'
+    }
+
+    console.log(`Prompt size: ${systemPrompt.length} chars | project: "${activeKey || 'global'}"`)
+
     const models = ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant', 'gemma2-9b-it']
     let groqRes: Response | null = null
     let groqData: Record<string, unknown> = {}
+    let lastStatus = 0
 
     for (const model of models) {
-      groqRes  = await callGroq(systemPrompt, history, message, model)
-      groqData = await groqRes.json() as Record<string, unknown>
+      groqRes   = await callGroq(systemPrompt, history, message, model)
+      groqData  = await groqRes.json() as Record<string, unknown>
+      lastStatus = groqRes.status
       if (groqRes.ok) break
-      console.warn(`Error ${groqRes.status} en ${model}, probando siguiente...`)
+      console.warn(`Groq error ${groqRes.status} en ${model}:`, JSON.stringify(groqData).slice(0, 300))
     }
 
     if (!groqRes!.ok) {
-      console.error('Groq error final:', groqRes!.status, JSON.stringify(groqData))
+      console.error(`Groq falló en todos los modelos. Último status: ${lastStatus}`)
     }
 
     const reply: string = (groqData.choices as { message: { content: string } }[])?.[0]?.message?.content
-      ?? (groqRes!.status === 429
+      ?? (lastStatus === 429
         ? 'El asistente está temporalmente no disponible por límite de uso. Intenta en unos minutos.'
+        : lastStatus === 401
+        ? 'Error de configuración del asistente (clave API inválida). Contacta al administrador.'
         : 'No se pudo obtener respuesta en este momento. Intenta de nuevo.')
 
     // ── CACHE STORE (fire and forget) ───────────────────────────
