@@ -1,12 +1,9 @@
-# Leer Memoria
+# Instrucciones para Claude
 
-La memoria interna del proyecto esta centralizada en `memory/`.
+Al iniciar cualquier sesión en este proyecto, leer en este orden:
 
-Leer primero:
+1. `memory/SESION_INICIO.md` — reglas de comportamiento + estado actual + últimos cambios + pendientes
+2. `memory/PROJECT_CONTEXT.md` — arquitectura técnica completa (leer solo si la tarea lo requiere)
+3. `memory/MAP.md` — mapa de todos los archivos y carpetas (leer solo si necesitas ubicar algo)
 
-1. `memory/README.md`
-2. `memory/AI_GUIDE.md`
-3. `memory/PROJECT_CONTEXT.md`
-4. `memory/DAILY_LOG.md`
-
-Este archivo solo es un apuntador para que Claude encuentre la memoria. La documentacion real debe mantenerse dentro de `memory/`.
+Con solo leer `memory/SESION_INICIO.md` ya tienes suficiente para retomar el trabajo.
