@@ -25,12 +25,16 @@
 
 ---
 
-## FLUJO DE BRANCHES
+## FLUJO DE TRABAJO — DOS REPOSITORIOS
 
-- `dev` → desarrollo activo, features nuevas, rediseños visuales
-- `master` → producción; recibe merges desde `dev` o fixes urgentes del agente
-- Regla general: trabajar en `dev`, pasar a `master` cuando el usuario apruebe
-- Excepción: fixes críticos del ai-agent pueden ir directo a `master` + deploy inmediato
+- **`rv4-dev`** → desarrollo activo. Aquí se hacen TODOS los cambios y pruebas.
+  - GitHub Pages: `https://gabrielcifuentes26.github.io/rv4-dev/`
+  - Repo: `https://github.com/GabrielCifuentes26/rv4-dev`
+- **`rv4`** → producción. Solo recibe cambios cuando el usuario los aprueba desde dev.
+  - GitHub Pages: `https://gabrielcifuentes26.github.io/rv4/`
+  - Repo: `https://github.com/GabrielCifuentes26/rv4`
+
+**Regla:** Nunca trabajar directo en `rv4`. Todo pasa primero por `rv4-dev`.
 
 **Deploy ai-agent (cuando hay cambio en la Edge Function):**
 ```powershell
