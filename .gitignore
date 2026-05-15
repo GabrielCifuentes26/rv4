@@ -7,6 +7,7 @@ data/powerbi/*.log
 data/powerbi/*.json
 data/powerbi/**/*.log
 data/powerbi/**/*.json
+!data/powerbi/**/resumen-powerbi.json
 data/powerbi/**/*.pbix
 data/powerbi/**/pbix-extract/
 data/powerbi/metadata-*.json
