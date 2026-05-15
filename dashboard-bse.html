@@ -2703,6 +2703,7 @@
             // BSE medidas no son aditivas a nivel Rubro×Etapa; usar datasets pre-agregados
             // para métricas correctas y detalleFiltros sólo para filtros y tendencia.
             rawDetailRows = filteredDetailRows();
+            if (!rawDetailRows.length) rawDetailRows = detailRows;
 
             const selAreas   = powerBIState.filters.areas    || [];
             const selSegs    = powerBIState.filters.segmentos || [];

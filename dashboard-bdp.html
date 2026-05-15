@@ -2678,6 +2678,7 @@
 
         if (detailRows.length) {
             rawDetailRows = filteredDetailRows();
+            if (!rawDetailRows.length) rawDetailRows = detailRows;
 
             const selAreas   = powerBIState.filters.areas    || [];
             const selSegs    = powerBIState.filters.segmentos || [];
