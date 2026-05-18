@@ -299,10 +299,10 @@ Deno.serve(async (req) => {
       })
     }
 
-    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    const isServiceRole  = serviceRoleKey && authHeader === `Bearer ${serviceRoleKey}`
+    const seedSecret  = Deno.env.get('SEED_SECRET') ?? ''
+    const isSeedMode  = seedSecret && req.headers.get('X-Seed-Key') === seedSecret
 
-    if (!isServiceRole) {
+    if (!isSeedMode) {
       const supabase = createClient(
         Deno.env.get('SUPABASE_URL')!,
         Deno.env.get('SUPABASE_ANON_KEY')!,

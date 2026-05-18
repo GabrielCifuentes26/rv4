@@ -9,15 +9,10 @@ $ErrorActionPreference = "Stop"
 $SUPABASE_URL    = "https://iipgrojliqeyycvgnkrc.supabase.co"
 $EDGE_URL        = "$SUPABASE_URL/functions/v1/ai-agent"
 $ANON_KEY        = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlpcGdyb2psaXFleXljdmdua3JjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NzA1NzYsImV4cCI6MjA5MTM0NjU3Nn0.Y6FQ-1qWd7HPMvTnK4alpKxM-YLJ5CsKmkorAZKMJrg"
-$SERVICE_KEY     = $env:SUPABASE_SERVICE_ROLE_KEY
+$SEED_SECRET     = "rv4seedd0a152b8aa1f4514"
 
 Write-Host ""
-Write-Host "[1/3] Verificando service role key..." -NoNewline
-if (-not $SERVICE_KEY) {
-    Write-Host " FALLO" -ForegroundColor Red
-    Write-Error "Variable de entorno SUPABASE_SERVICE_ROLE_KEY no encontrada."
-    exit 1
-}
+Write-Host "[1/3] Verificando seed secret..." -NoNewline
 Write-Host " OK" -ForegroundColor Green
 
 # PASO 2: LIMPIAR QA_CACHE
@@ -25,9 +20,10 @@ Write-Host "[2/3] Limpiando qa_cache..." -NoNewline
 
 $restHeaders = @{
     "apikey"        = $ANON_KEY
-    "Authorization" = "Bearer $SERVICE_KEY"
+    "Authorization" = "Bearer $ANON_KEY"
     "Content-Type"  = "application/json"
     "Prefer"        = "return=minimal"
+    "X-Seed-Key"    = $SEED_SECRET
 }
 
 try {
@@ -96,8 +92,9 @@ $PREGUNTAS = @(
 
 $agentHeaders = @{
     "Content-Type"  = "application/json"
-    "Authorization" = "Bearer $SERVICE_KEY"
+    "Authorization" = "Bearer $ANON_KEY"
     "apikey"        = $ANON_KEY
+    "X-Seed-Key"    = $SEED_SECRET
 }
 
 $total   = $PREGUNTAS.Count
