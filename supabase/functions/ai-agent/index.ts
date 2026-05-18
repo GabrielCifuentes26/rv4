@@ -53,30 +53,18 @@ function detectProjectKey(message: string): string {
 }
 
 // ── EMBEDDING ─────────────────────────────────────────────────────────────
-// Modelo multilingual 384-dim: pequeño, rápido, excelente en español
-const HF_MODEL = 'sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2'
+// gte-small: 384-dim, corre dentro del Edge Runtime de Supabase (sin API externa)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+declare const Supabase: any
 
 async function getEmbedding(text: string): Promise<number[] | null> {
-  // HF_API_KEY > HUB_API_KEY > anonymous (rate-limited but functional for low usage)
-  const apiKey = Deno.env.get('HF_API_KEY') ?? Deno.env.get('HUB_API_KEY') ?? ''
   try {
-    const headers: Record<string, string> = { 'Content-Type': 'application/json' }
-    if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`
-    const res = await fetch(
-      `https://api-inference.huggingface.co/pipeline/feature-extraction/${HF_MODEL}`,
-      {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({ inputs: text, options: { wait_for_model: true } }),
-        signal: AbortSignal.timeout(8000),
-      }
-    )
-    if (!res.ok) return null
-    const data = await res.json() as number[][]
-    // pipeline/feature-extraction returns [[f1, f2, ...]] for a single sentence
-    const emb = Array.isArray(data[0]) ? data[0] as number[] : data as unknown as number[]
-    return emb.length > 0 ? emb : null
-  } catch {
+    const session = new Supabase.ai.Session('gte-small')
+    const output = await session.run(text, { mean_pool: true, normalize: true })
+    const arr = Array.from(output as Float32Array)
+    return arr.length > 0 ? arr : null
+  } catch (err) {
+    console.warn(`Embedding error: ${String(err)}`)
     return null
   }
 }
@@ -340,7 +328,6 @@ Deno.serve(async (req) => {
         : rows.reduce((max, r) => (r.mes_a > max ? r.mes_a : max), '')
     }
 
-    // Calcular embedding en paralelo con la lectura de datos
     let embedding: number[] | null = null
     if (rows && rows.length > 0 && cacheValidMesA) {
       embedding = await getEmbedding(message)
@@ -349,17 +336,15 @@ Deno.serve(async (req) => {
         const { data: hits } = await admin.rpc('find_similar_question', {
           query_embedding: embedding,
           query_project_key: activeKey || null,
-          similarity_threshold: 0.88,
+          similarity_threshold: 0.99,
           match_count: 1,
         })
 
         if (hits?.length && hits[0].mes_a === cacheValidMesA) {
-          // Cache HIT — actualizar stats sin bloquear la respuesta
           admin.from('qa_cache')
             .update({ hit_count: hits[0].hit_count + 1, last_used_at: new Date().toISOString() })
             .eq('id', hits[0].id)
             .then(() => {})
-
           console.log(`Cache HIT (sim=${hits[0].similarity?.toFixed(3)}): "${hits[0].question}"`)
           return new Response(JSON.stringify({ reply: hits[0].answer }), {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
