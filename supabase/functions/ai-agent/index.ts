@@ -219,6 +219,29 @@ ${areaLines}${segLines ? `\n  Segmentos:\n${segLines}` : ''}${faseLines ? `\n  F
 ${etapaLines || '    Sin datos'}${mesLines ? `\n  Últimos 6 meses:\n${mesLines}` : ''}`
 }
 
+function buildPortfolioRow(row: Record<string, unknown>): string {
+  const datasets    = ((row.payload as Record<string, unknown>)?.datasets ?? {}) as Record<string, unknown>
+  const totales     = ((datasets.totales as Record<string, number>[])?.[0]) ?? {}
+  const porArea:    Record<string, unknown>[] = (datasets.porArea     as Record<string, unknown>[]) ?? []
+  const porSegmento:Record<string, unknown>[] = (datasets.porSegmento as Record<string, unknown>[]) ?? []
+  const areaKey     = porArea[0]     ? labelKey(porArea[0])     : ''
+  const segKey      = porSegmento[0] ? labelKey(porSegmento[0]) : ''
+
+  const areaLines = porArea.map(r =>
+    `      ${r[areaKey] ?? 'Área'}: ppto ${fmt(r['[PresupuestoErequester]'] as number)} asig ${fmt(r['[AsignadoErequester]'] as number)} disp ${fmt(r['[DisponibleErequester]'] as number)} (${fmtPct(r['[PorcentajeAsignado]'] as number)})`
+  ).join('\n')
+
+  const segLines = porSegmento.length
+    ? '\n' + porSegmento.map(r =>
+        `      ${r[segKey] ?? 'Seg'}: ppto ${fmt(r['[PresupuestoErequester]'] as number)} asig ${fmt(r['[AsignadoErequester]'] as number)} disp ${fmt(r['[DisponibleErequester]'] as number)}`
+      ).join('\n')
+    : ''
+
+  return `  ${row.project_name} (${row.project_key}) al ${row.mes_a}:
+    Ppto ${fmt(totales['[PresupuestoErequester]'])} | Ejec ${fmt(totales['[EjecutadoErequester]'])} | Comp ${fmt(totales['[ComprometidoErequester]'])} | Asig ${fmt(totales['[AsignadoErequester]'])} | Disp ${fmt(totales['[DisponibleErequester]'])} | %Asig ${fmtPct(totales['[PorcentajeAsignado]'])}
+${areaLines}${segLines}`
+}
+
 const SYSTEM_BASE = `Eres el asistente financiero de RV4 — sistema Costos & Presupuestos. Responde en español, breve y directo.
 REGLAS: (1) Si tienes el dato, dalo de inmediato — nunca digas "no tengo información" si luego lo vas a dar. (2) Nunca inventes datos. (3) Usa Q X.XXM para millones de Quetzales.
 Proyectos de CASAS (tienen m²): bdj=Bosques de Jalapa, bdp=Bosques de Pinula, bse=Bosques de Santa Elena, cse=Condado Santa Elena, hlq=Hacienda La Querencia, rdb=Reserva del Bosque.
@@ -351,12 +374,15 @@ Indica que deben correr el script de sincronización para que los datos estén d
     } else {
       const projectList = rows.map(r => `${r.project_name} (${r.project_key})`).join(', ')
 
-      const allContexts = rows.map(r => {
-        const isActive = activeKey && r.project_key === activeKey
-        return isActive
-          ? buildProjectContext(r as Record<string, unknown>)
-          : buildProjectSummary(r as Record<string, unknown>)
-      }).join('\n---\n')
+      const isPortfolioMode = !activeKey
+      const allContexts = isPortfolioMode
+        ? rows.map(r => buildPortfolioRow(r as Record<string, unknown>)).join('\n')
+        : rows.map(r => {
+            const isActive = r.project_key === activeKey
+            return isActive
+              ? buildProjectContext(r as Record<string, unknown>)
+              : buildProjectSummary(r as Record<string, unknown>)
+          }).join('\n---\n')
 
       const lastSync = rows.reduce((latest, r) => {
         const d = String(r.mes_a ?? '')
@@ -399,7 +425,13 @@ Indica que deben correr el script de sincronización para que los datos estén d
         areaUrbanizacionPpto: 0, areaUrbanizacionEjecutado: 0, areaUrbanizacionAsignado: 0, areaUrbanizacionDisponible: 0,
       })
 
+      const modeInstruction = isPortfolioMode
+        ? `MODO PORTAFOLIO: El usuario consulta el conjunto de proyectos. Compara, rankea y analiza TODOS los proyectos. No te limites a uno solo. Usa los datos de PORTAFOLIO COMPLETO para responder rankings, alertas, totales y comparaciones.`
+        : `PROYECTO ACTIVO: ${rows.find(r => r.project_key === activeKey)?.project_name ?? activeKey} (${activeKey}). Enfócate en este proyecto. Puedes comparar con otros si se solicita.`
+
       systemPrompt = `${SYSTEM_BASE}
+
+${modeInstruction}
 
 PROYECTOS DISPONIBLES (${rows.length}): ${projectList}
 DATOS ACTUALIZADOS AL: ${lastSync} (fecha de última sincronización de Power BI)
@@ -430,7 +462,7 @@ ${rows.filter(r => PROJECT_M2[r.project_key as string]).map(r => {
   return `  ${r.project_name} (${r.project_key}): Casas ${m2.casas.toLocaleString()}m² → Q${ppCasas.toLocaleString()}/m² ($${Math.round(ppCasas/USD_RATE).toLocaleString()}/m²) | Urba ${m2.urbanizacion.toLocaleString()}m² → Q${ppUrba.toLocaleString()}/m² ($${Math.round(ppUrba/USD_RATE).toLocaleString()}/m²)`
 }).join('\n')}
 
-DATOS DE PROYECTOS:
+${isPortfolioMode ? 'PORTAFOLIO COMPLETO (todos los proyectos — datos para comparación):' : 'DATOS DE PROYECTOS:'}
 ${allContexts}`
     }
 
