@@ -699,51 +699,6 @@
         }
         .analisis-metric-val { font-size: 1rem; font-weight: 800; color: var(--navy); }
         .analisis-metric-val--pct { color: var(--green); }
-
-        /* ── ANALISIS STACK BAR ── */
-        .analisis-stack-wrap { margin-top: 20px; }
-        .analisis-stack-labels {
-            display: flex; justify-content: space-between;
-            margin-bottom: 5px;
-        }
-        .analisis-stack-lbl {
-            font-size: 0.68rem; font-weight: 800; color: var(--navy);
-        }
-        .analisis-stack-lbl span {
-            font-size: 0.58rem; font-weight: 600; color: var(--gray2); margin-left: 3px;
-        }
-        .analisis-stack-bar {
-            height: 26px; border-radius: 8px; overflow: hidden;
-            display: flex; background: #e2e8f0;
-        }
-        .analisis-stack-seg {
-            height: 100%; transition: width 1s ease;
-            display: flex; align-items: center; justify-content: center;
-            min-width: 0;
-        }
-        .analisis-stack-seg-val {
-            font-size: 0.68rem; font-weight: 800; color: #fff;
-            white-space: nowrap; overflow: hidden; padding: 0 6px;
-        }
-        .analisis-stack-seg--disp .analisis-stack-seg-val { color: #94a3b8; }
-        .analisis-cat-card--casas .analisis-stack-seg--asig { background: #0ea5e9; }
-        .analisis-cat-card--lotes .analisis-stack-seg--asig { background: #10b981; }
-        .analisis-stack-seg--disp { background: #e2e8f0; }
-        .analisis-stack-legend {
-            display: flex; gap: 14px; margin-top: 9px; align-items: center;
-        }
-        .analisis-stack-legend-item {
-            display: flex; align-items: center; gap: 5px;
-            font-size: 0.62rem; font-weight: 600; color: var(--gray2);
-            letter-spacing: 0.5px; text-transform: uppercase;
-        }
-        .analisis-stack-dot {
-            width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
-        }
-        .analisis-cat-card--casas .analisis-stack-dot--asig { background: #0ea5e9; }
-        .analisis-cat-card--lotes .analisis-stack-dot--asig { background: #10b981; }
-        .analisis-stack-dot--disp { background: #cbd5e1; }
-
         @media (max-width: 768px) {
             .analisis-section { padding: 0 20px 50px; }
         }
@@ -944,20 +899,6 @@
                     <div class="analisis-metric-val analisis-metric-val--pct" id="analisisCasasPct">—</div>
                 </div>
             </div>
-            <div class="analisis-stack-wrap">
-                <div class="analisis-stack-labels">
-                    <div class="analisis-stack-lbl" id="analisisCasasBarAsigLbl">—<span>Asignado</span></div>
-                    <div class="analisis-stack-lbl" id="analisisCasasBarDispLbl">—<span>Disponible</span></div>
-                </div>
-                <div class="analisis-stack-bar">
-                    <div class="analisis-stack-seg analisis-stack-seg--asig" id="analisisCasasBarAsig" style="width:0%"></div>
-                    <div class="analisis-stack-seg analisis-stack-seg--disp" id="analisisCasasBarDisp" style="width:100%"></div>
-                </div>
-                <div class="analisis-stack-legend">
-                    <div class="analisis-stack-legend-item"><span class="analisis-stack-dot analisis-stack-dot--asig"></span>Asignado</div>
-                    <div class="analisis-stack-legend-item"><span class="analisis-stack-dot analisis-stack-dot--disp"></span>Disponible</div>
-                </div>
-            </div>
         </div>
         <div class="analisis-cat-card analisis-cat-card--lotes">
             <div class="analisis-cat-header">🌿 Lotes</div>
@@ -975,20 +916,6 @@
                 <div class="analisis-metric">
                     <div class="analisis-metric-lbl">% Asignado</div>
                     <div class="analisis-metric-val analisis-metric-val--pct" id="analisisLotesPct">—</div>
-                </div>
-            </div>
-            <div class="analisis-stack-wrap">
-                <div class="analisis-stack-labels">
-                    <div class="analisis-stack-lbl" id="analisisLotesBarAsigLbl">—<span>Asignado</span></div>
-                    <div class="analisis-stack-lbl" id="analisisLotesBarDispLbl">—<span>Disponible</span></div>
-                </div>
-                <div class="analisis-stack-bar">
-                    <div class="analisis-stack-seg analisis-stack-seg--asig" id="analisisLotesBarAsig" style="width:0%"></div>
-                    <div class="analisis-stack-seg analisis-stack-seg--disp" id="analisisLotesBarDisp" style="width:100%"></div>
-                </div>
-                <div class="analisis-stack-legend">
-                    <div class="analisis-stack-legend-item"><span class="analisis-stack-dot analisis-stack-dot--asig"></span>Asignado</div>
-                    <div class="analisis-stack-legend-item"><span class="analisis-stack-dot analisis-stack-dot--disp"></span>Disponible</div>
                 </div>
             </div>
         </div>
@@ -1475,22 +1402,6 @@
         set('analisisTotalPpto', formatCompactMoney(totalPpto));
         set('analisisTotalAsig', formatCompactMoney(totalAsig));
         set('analisisTotalPct',  formatPct(totalPpto ? totalAsig / totalPpto : 0));
-
-        // ── barras apiladas ──
-        const setBar = (prefix, asig, ppto) => {
-            const pct = ppto ? asig / ppto : 0;
-            const disp = ppto - asig;
-            const elAsig = document.getElementById(prefix + 'BarAsig');
-            const elDisp = document.getElementById(prefix + 'BarDisp');
-            const elAsigLbl = document.getElementById(prefix + 'BarAsigLbl');
-            const elDispLbl = document.getElementById(prefix + 'BarDispLbl');
-            if (elAsig) elAsig.style.width = (pct * 100).toFixed(1) + '%';
-            if (elDisp) elDisp.style.width = ((1 - pct) * 100).toFixed(1) + '%';
-            if (elAsigLbl) elAsigLbl.innerHTML = formatCompactMoney(asig) + '<span>Asignado</span>';
-            if (elDispLbl) elDispLbl.innerHTML = formatCompactMoney(disp) + '<span>Disponible</span>';
-        };
-        setBar('analisisCasas', casasAsig, casasPpto);
-        setBar('analisisLotes', lotesAsig, lotesPpto);
     }
 
     function renderLotesTotalBar() {
