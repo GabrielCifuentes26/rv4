@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Análisis Casas — Costos&Presupuestos</title>
+    <title>Costos por M² — Casas</title>
     <style>html{visibility:hidden}</style>
     <script>
     (function(){
@@ -16,35 +16,28 @@
     })();
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
-        const { createClient } = supabase;
-        const client = createClient(
-            'https://iipgrojliqeyycvgnkrc.supabase.co',
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlpcGdyb2psaXFleXljdmdua3JjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NzA1NzYsImV4cCI6MjA5MTM0NjU3Nn0.Y6FQ-1qWd7HPMvTnK4alpKxM-YLJ5CsKmkorAZKMJrg'
-        );
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('btn-logout').addEventListener('click', () => {
-                client.auth.signOut().then(() => window.location.href = 'login.html');
-            });
-        });
-    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', 'Segoe UI', sans-serif; background: #f0f4f8; color: #0f172a; min-height: 100vh; }
+        :root {
+            --bg: #f0f4f8; --surface: #fff; --navy: #0f172a; --navy2: #1e293b;
+            --gray: #64748b; --gray2: #94a3b8; --border: #e2e8f0;
+            --green: #10b981; --ng: #C9A84C;
+            --shadow: 0 4px 24px rgba(15,23,42,0.10);
+        }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--navy); min-height: 100vh; }
 
+        /* ── TOPBAR ── */
         .topbar {
             position: sticky; top: 0; z-index: 300;
-            background: #0f172a;
-            border-bottom: 1px solid rgba(255,255,255,0.07);
+            background: #0f172a; border-bottom: 1px solid rgba(255,255,255,0.07);
             padding: 0 22px; height: 56px;
             display: flex; align-items: center; justify-content: space-between;
             box-shadow: 0 2px 16px rgba(15,23,42,0.25);
         }
         .topbar::before {
-            content: '';
-            position: absolute; top: 0; left: 0; right: 0; height: 2px;
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
             background: linear-gradient(90deg, transparent 0%, #C9A84C 35%, #C9A84C 65%, transparent 100%);
         }
         .topbar-left { display: flex; align-items: center; }
@@ -58,10 +51,9 @@
         .home-link:hover { background: #C9A84C; color: #fff; border-color: #C9A84C; }
         .home-link svg { width: 15px; height: 15px; fill: currentColor; }
         .brand-link { text-decoration: none; color: inherit; }
-        .brand-link:hover .topbar-brand { color: #C9A84C; transition: color .18s; }
         .topbar-brand { font-size: 0.95rem; font-weight: 900; color: #fff; letter-spacing: 0.5px; }
         .topbar-brand span { color: #C9A84C; }
-        .topbar-sub { font-size: 0.62rem; color: rgba(255,255,255,0.38); margin-top: 1px; letter-spacing: 0.2px; }
+        .topbar-sub { font-size: 0.62rem; color: rgba(255,255,255,0.38); margin-top: 1px; }
         .topbar-right { display: flex; align-items: center; gap: 10px; }
         .btn-logout {
             display: flex; align-items: center; gap: 6px;
@@ -73,10 +65,126 @@
         .btn-logout:hover { background: rgba(239,68,68,0.22); border-color: rgba(239,68,68,0.55); color: #fca5a5; }
         .btn-logout svg { width: 13px; height: 13px; fill: currentColor; }
 
-        .page-content {
+        /* ── PAGE HEADER ── */
+        .page-header {
+            padding: 36px 40px 0;
+            display: flex; align-items: baseline; gap: 12px;
+        }
+        .page-title { font-size: 1.35rem; font-weight: 900; color: var(--navy); }
+        .page-subtitle { font-size: 0.8rem; color: var(--gray2); font-weight: 600; }
+
+        /* ── GRID ── */
+        .m2-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 20px;
+            padding: 28px 40px 60px;
+        }
+
+        /* ── CARD ── */
+        .m2-card {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 22px 22px 18px;
+            box-shadow: var(--shadow);
+            border: 1.5px solid var(--border);
+            display: flex; flex-direction: column; gap: 0;
+            transition: box-shadow .22s, border-color .22s;
+            position: relative;
+        }
+        .m2-card:hover { box-shadow: 0 8px 32px rgba(15,23,42,0.13); }
+        .m2-card--costoso { border-color: #fca5a5; background: #fff8f8; }
+        .m2-card--eficiente { border-color: #6ee7b7; background: #f0fdf9; }
+
+        .m2-card-header {
+            display: flex; align-items: flex-start; justify-content: space-between;
+            margin-bottom: 14px;
+        }
+        .m2-card-left { display: flex; align-items: center; gap: 10px; }
+        .m2-num {
+            width: 26px; height: 26px; border-radius: 50%;
+            background: var(--navy); color: #fff;
+            font-size: 0.72rem; font-weight: 900;
             display: flex; align-items: center; justify-content: center;
-            min-height: calc(100vh - 56px);
-            color: #94a3b8; font-size: 0.9rem; font-weight: 600;
+            flex-shrink: 0;
+        }
+        .m2-name { font-size: 0.95rem; font-weight: 800; color: var(--navy); }
+        .m2-total-label { font-size: 0.58rem; font-weight: 700; color: var(--gray2); text-transform: uppercase; letter-spacing: 0.5px; }
+        .m2-total-val { font-size: 0.9rem; font-weight: 900; color: var(--green); text-align: right; }
+
+        /* KPI chips */
+        .m2-kpis {
+            display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap;
+        }
+        .m2-kpi {
+            display: flex; align-items: center; gap: 6px;
+            background: #f8fafc; border: 1px solid var(--border);
+            border-radius: 8px; padding: 6px 10px;
+            flex: 1; min-width: 0;
+        }
+        .m2-kpi-icon { font-size: 0.9rem; flex-shrink: 0; }
+        .m2-kpi-body { display: flex; flex-direction: column; min-width: 0; }
+        .m2-kpi-lbl { font-size: 0.52rem; font-weight: 700; color: var(--gray2); text-transform: uppercase; letter-spacing: 0.4px; white-space: nowrap; }
+        .m2-kpi-val { font-size: 0.82rem; font-weight: 800; color: var(--navy); white-space: nowrap; }
+
+        /* Table */
+        .m2-table { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
+        .m2-table thead th {
+            font-size: 0.52rem; font-weight: 700; color: var(--gray2);
+            text-transform: uppercase; letter-spacing: 0.4px;
+            padding: 0 4px 6px; border-bottom: 1px solid var(--border);
+            text-align: right;
+        }
+        .m2-table thead th:first-child { text-align: left; }
+        .m2-table tbody td {
+            font-size: 0.68rem; color: var(--navy);
+            padding: 5px 4px; text-align: right;
+        }
+        .m2-table tbody td:first-child { text-align: left; font-weight: 500; }
+        .m2-table tbody tr:not(:last-child) td { border-bottom: 1px solid #f1f5f9; }
+        .m2-table tfoot td {
+            font-size: 0.68rem; font-weight: 800; color: #15803d;
+            padding: 6px 4px 0; border-top: 1px solid var(--border);
+            text-align: right;
+        }
+        .m2-table tfoot td:first-child { text-align: left; }
+
+        /* Stacked bar */
+        .m2-bar-wrap { margin-bottom: 8px; }
+        .m2-bar {
+            height: 10px; border-radius: 999px; overflow: hidden;
+            display: flex; background: #e2e8f0; margin-bottom: 6px;
+        }
+        .m2-bar-casas { height: 100%; background: #3b5bdb; transition: width 1s ease; }
+        .m2-bar-urb   { height: 100%; background: #60a5fa; transition: width 1s ease; }
+        .m2-bar-labels { display: flex; justify-content: space-between; }
+        .m2-bar-lbl {
+            font-size: 0.6rem; font-weight: 700; color: var(--gray2);
+            display: flex; align-items: center; gap: 4px;
+        }
+        .m2-bar-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+        .m2-bar-dot--casas { background: #3b5bdb; }
+        .m2-bar-dot--urb   { background: #60a5fa; }
+
+        /* Badge */
+        .m2-badge {
+            display: inline-flex; align-items: center; gap: 5px;
+            font-size: 0.62rem; font-weight: 700;
+            padding: 4px 10px; border-radius: 6px;
+            margin-top: 10px; align-self: flex-start;
+        }
+        .m2-badge--costoso   { background: #fee2e2; color: #dc2626; }
+        .m2-badge--eficiente { background: #d1fae5; color: #059669; }
+        .m2-badge--equilibrado { background: #ede9fe; color: #7c3aed; }
+        .m2-badge--casas-alto  { background: #dbeafe; color: #1d4ed8; }
+        .m2-badge--urb-alto    { background: #fef3c7; color: #b45309; }
+
+        /* Loading state */
+        .m2-loading {
+            grid-column: 1/-1;
+            display: flex; align-items: center; justify-content: center;
+            min-height: 260px; color: var(--gray2);
+            font-size: 0.9rem; font-weight: 600;
         }
     </style>
 </head>
@@ -88,7 +196,7 @@
             </a>
             <a href="index.html" class="brand-link">
                 <div class="topbar-brand">Costos&<span>Presupuestos</span></div>
-                <div class="topbar-sub">Análisis — Casas</div>
+                <div class="topbar-sub">Costos por M² — Casas</div>
             </a>
         </div>
         <div class="topbar-right">
@@ -98,6 +206,248 @@
             </button>
         </div>
     </div>
-    <div class="page-content">Página en construcción</div>
+
+    <div class="page-header">
+        <div class="page-title">Costos por M²</div>
+        <div class="page-subtitle">Proyectos Casas — análisis por metro cuadrado construido</div>
+    </div>
+
+    <div class="m2-grid" id="m2Grid">
+        <div class="m2-loading">Cargando datos...</div>
+    </div>
+
+<script>
+const { createClient } = supabase;
+const client = createClient(
+    'https://iipgrojliqeyycvgnkrc.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlpcGdyb2psaXFleXljdmdua3JjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NzA1NzYsImV4cCI6MjA5MTM0NjU3Nn0.Y6FQ-1qWd7HPMvTnK4alpKxM-YLJ5CsKmkorAZKMJrg'
+);
+
+client.auth.getSession().then(({ data: { session } }) => {
+    if (!session) window.location.href = 'login.html';
+});
+
+document.getElementById('btn-logout').addEventListener('click', () => {
+    client.auth.signOut().then(() => window.location.href = 'login.html');
+});
+
+const PROJECTS = [
+    { id: 'bosquesdejalapa',    key: 'bdj', name: 'Bosques de Jalapa' },
+    { id: 'bosquesdepinula',    key: 'bdp', name: 'Bosques de Pinula' },
+    { id: 'bosquessantaelena',  key: 'bse', name: 'Bosques de Santa Elena' },
+    { id: 'condadosantaelena',  key: 'cse', name: 'Condado Santa Elena' },
+    { id: 'haciendalaquerencia',key: 'hlq', name: 'Hacienda La Querencia' },
+    { id: 'reservadelbosque',   key: 'rdb', name: 'Reserva del Bosque' },
+];
+
+const PROJECT_M2 = {
+    bdj: { casas: 16566.48, urbanizacion: 36248.76, total: 52815.24 },
+    bdp: { casas: 30715.06, urbanizacion: 23331.69, total: 54046.75 },
+    bse: { casas: 41272.94, urbanizacion: 27442.78, total: 68715.72 },
+    cse: { casas: 42630.21, urbanizacion: 19427.66, total: 62057.87 },
+    hlq: { casas: 10388.90, urbanizacion: 7282.77,  total: 17671.67 },
+    rdb: { casas: 29940.56, urbanizacion: 33784.09, total: 63724.65 },
+};
+
+const fmt  = (v) => `Q ${Number(v).toLocaleString('es-GT', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+const fmtM = (v) => Number(v).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+const fmtD = (v) => `$${Number(v).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+const RATE  = 7.8;
+
+function setSapAreasFromRows(project, rows) {
+    if (!Array.isArray(rows) || rows.length === 0) return;
+    const getRow = (kw) => rows.find(r => {
+        const k = Object.keys(r).find(k => k.toLowerCase().includes('area'));
+        return k && typeof r[k] === 'string' && r[k].toLowerCase().includes(kw);
+    });
+    const cRow = getRow('construcc');
+    const uRow = getRow('urbaniz');
+    project.areas = {
+        construccion: Number(cRow?.['[PresupuestoErequester]']) || 0,
+        urbanizacion:  Number(uRow?.['[PresupuestoErequester]']) || 0,
+    };
+    project.areas.total = project.areas.construccion + project.areas.urbanizacion;
+}
+
+async function loadData() {
+    // Load M2 from Supabase
+    try {
+        const { data } = await client.from('project_m2').select('project_key, m2_casas, m2_urbanizacion, m2_total');
+        if (Array.isArray(data)) data.forEach(r => {
+            if (PROJECT_M2[r.project_key]) PROJECT_M2[r.project_key] = {
+                casas:        Number(r.m2_casas)        || PROJECT_M2[r.project_key].casas,
+                urbanizacion: Number(r.m2_urbanizacion) || PROJECT_M2[r.project_key].urbanizacion,
+                total:        Number(r.m2_total)        || PROJECT_M2[r.project_key].total,
+            };
+        });
+    } catch (_) {}
+
+    // Load areas from v_project_sap_summary
+    try {
+        const { data } = await client
+            .from('v_project_sap_summary')
+            .select('project_key, por_area')
+            .in('project_key', PROJECTS.map(p => p.key));
+        if (Array.isArray(data)) data.forEach(row => {
+            const p = PROJECTS.find(p => p.key === row.project_key);
+            if (p && Array.isArray(row.por_area) && row.por_area.length) setSapAreasFromRows(p, row.por_area);
+        });
+    } catch (_) {}
+
+    // Fallback: load areas from local JSON
+    await Promise.all(PROJECTS.filter(p => !p.areas).map(async p => {
+        try {
+            const res = await fetch(`data/powerbi/${p.key}/porArea.json`, { cache: 'no-store' });
+            if (res.ok) setSapAreasFromRows(p, (await res.json())?.rows);
+        } catch (_) {}
+    }));
+}
+
+function getBadge(p, allProjects) {
+    if (!p.areas || p.areas.total === 0) return null;
+    const m2 = PROJECT_M2[p.key];
+    const costM2 = m2.total > 0 ? p.areas.total / m2.total : 0;
+
+    const costs = allProjects.filter(x => x.areas && PROJECT_M2[x.key]?.total > 0)
+        .map(x => x.areas.total / PROJECT_M2[x.key].total);
+    const maxCost = Math.max(...costs);
+    const minCost = Math.min(...costs);
+
+    if (Math.abs(costM2 - maxCost) < 1) return { text: 'Más costoso', icon: '⚠️', cls: 'costoso' };
+    if (Math.abs(costM2 - minCost) < 1) return { text: 'Proyecto más eficiente', icon: '🏆', cls: 'eficiente' };
+
+    const casasPct = p.areas.construccion / p.areas.total;
+    if (Math.abs(casasPct - 0.5) < 0.06) return { text: 'Costo equilibrado', icon: '✅', cls: 'equilibrado' };
+    if (casasPct > 0.70) return { text: 'Fuerte componente de casas', icon: '🏠', cls: 'casas-alto' };
+    if (casasPct > 0.60) return { text: 'Mayor peso de casas', icon: '📈', cls: 'casas-alto' };
+    if ((1 - casasPct) > 0.60) return { text: 'Urbanización dominante', icon: '🏗️', cls: 'urb-alto' };
+    return null;
+}
+
+function renderCard(p, idx, allProjects) {
+    const m2     = PROJECT_M2[p.key];
+    const areas  = p.areas || { construccion: 0, urbanizacion: 0, total: 0 };
+    const noData = areas.total === 0;
+
+    const qm2Casa = m2.casas > 0        ? areas.construccion / m2.casas : 0;
+    const qm2Urb  = m2.urbanizacion > 0 ? areas.urbanizacion / m2.urbanizacion : 0;
+    const qm2Tot  = m2.total > 0        ? areas.total / m2.total : 0;
+
+    const casasPct = areas.total > 0 ? (areas.construccion / areas.total * 100) : 50;
+    const urbPct   = 100 - casasPct;
+
+    const badge = getBadge(p, allProjects);
+    const isCostoso   = badge?.cls === 'costoso';
+    const isEficiente = badge?.cls === 'eficiente';
+
+    const cardCls = isCostoso ? 'm2-card m2-card--costoso' : isEficiente ? 'm2-card m2-card--eficiente' : 'm2-card';
+
+    return `
+    <div class="${cardCls}">
+        <div class="m2-card-header">
+            <div class="m2-card-left">
+                <div class="m2-num">${idx + 1}</div>
+                <div class="m2-name">${p.name}</div>
+            </div>
+            <div style="text-align:right">
+                <div class="m2-total-label">Total con IVA</div>
+                <div class="m2-total-val">${noData ? '—' : fmt(areas.total)}</div>
+            </div>
+        </div>
+
+        <div class="m2-kpis">
+            <div class="m2-kpi">
+                <span class="m2-kpi-icon">📐</span>
+                <div class="m2-kpi-body">
+                    <span class="m2-kpi-lbl">M² construidos</span>
+                    <span class="m2-kpi-val">${fmtM(m2.total)}</span>
+                </div>
+            </div>
+            <div class="m2-kpi">
+                <span class="m2-kpi-icon">💰</span>
+                <div class="m2-kpi-body">
+                    <span class="m2-kpi-lbl">Costo x m²</span>
+                    <span class="m2-kpi-val">${noData ? '—' : `Q ${fmtM(qm2Tot)}`}</span>
+                </div>
+            </div>
+            <div class="m2-kpi">
+                <span class="m2-kpi-icon">💵</span>
+                <div class="m2-kpi-body">
+                    <span class="m2-kpi-lbl">Costo x m² $</span>
+                    <span class="m2-kpi-val">${noData ? '—' : fmtD(qm2Tot / RATE)}</span>
+                </div>
+            </div>
+        </div>
+
+        <table class="m2-table">
+            <thead>
+                <tr>
+                    <th>Concepto</th>
+                    <th>Costos</th>
+                    <th>M² constr.</th>
+                    <th>Costo x m²</th>
+                    <th>Costo x m² $</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Casas</td>
+                    <td>${fmt(areas.construccion)}</td>
+                    <td>${fmtM(m2.casas)}</td>
+                    <td>${qm2Casa > 0 ? `Q ${fmtM(qm2Casa)}` : '—'}</td>
+                    <td>${qm2Casa > 0 ? fmtD(qm2Casa / RATE) : '—'}</td>
+                </tr>
+                <tr>
+                    <td>Urbanización</td>
+                    <td>${fmt(areas.urbanizacion)}</td>
+                    <td>${fmtM(m2.urbanizacion)}</td>
+                    <td>${qm2Urb > 0 ? `Q ${fmtM(qm2Urb)}` : '—'}</td>
+                    <td>${qm2Urb > 0 ? fmtD(qm2Urb / RATE) : '—'}</td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td>Total con IVA</td>
+                    <td>${fmt(areas.total)}</td>
+                    <td>${fmtM(m2.total)}</td>
+                    <td>${qm2Tot > 0 ? `Q ${fmtM(qm2Tot)}` : '—'}</td>
+                    <td>${qm2Tot > 0 ? fmtD(qm2Tot / RATE) : '—'}</td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <div class="m2-bar-wrap">
+            <div class="m2-bar">
+                <div class="m2-bar-casas" style="width:${casasPct.toFixed(1)}%"></div>
+                <div class="m2-bar-urb"   style="width:${urbPct.toFixed(1)}%"></div>
+            </div>
+            <div class="m2-bar-labels">
+                <span class="m2-bar-lbl">
+                    <span class="m2-bar-dot m2-bar-dot--casas"></span>
+                    Casas (${casasPct.toFixed(1)}%)
+                </span>
+                <span class="m2-bar-lbl">
+                    <span class="m2-bar-dot m2-bar-dot--urb"></span>
+                    Urbanización (${urbPct.toFixed(1)}%)
+                </span>
+            </div>
+        </div>
+
+        ${badge ? `<div class="m2-badge m2-badge--${badge.cls}">${badge.icon} ${badge.text}</div>` : ''}
+    </div>`;
+}
+
+async function init() {
+    await loadData();
+    const grid = document.getElementById('m2Grid');
+    if (PROJECTS.every(p => !p.areas)) {
+        grid.innerHTML = '<div class="m2-loading">No se pudieron cargar los datos de áreas.</div>';
+        return;
+    }
+    grid.innerHTML = PROJECTS.map((p, i) => renderCard(p, i, PROJECTS)).join('');
+}
+
+init();
+</script>
 </body>
 </html>
