@@ -166,41 +166,38 @@
 
         /* ── TIPOLOGÍA SECTION ── */
         .tipo-section { padding: 0 48px 32px; }
+        .tipo-layout { display: flex; gap: 20px; align-items: flex-start; }
         .tipo-card {
             background: var(--surface); border-radius: 18px;
             border: 1.5px solid var(--border); border-top: 3px solid var(--ng);
             box-shadow: 0 2px 12px rgba(15,23,42,0.07);
-            overflow: hidden;
+            overflow: hidden; flex: 1; min-width: 0;
         }
         .tipo-card-header {
             display: flex; align-items: center; justify-content: space-between;
-            padding: 24px 32px 20px;
+            padding: 22px 28px 18px;
         }
         .tipo-card-title { font-size: 1rem; font-weight: 800; color: var(--navy); }
-        .tipo-card-sub { font-size: 0.72rem; color: var(--gray2); font-weight: 500; margin-top: 3px; }
+        .tipo-card-sub { font-size: 0.7rem; color: var(--gray2); font-weight: 500; margin-top: 3px; }
         .tipo-table-wrap { overflow-x: auto; }
         .tipo-table { width: 100%; border-collapse: collapse; }
         .tipo-table thead tr { background: #f8fafc; }
         .tipo-table thead th {
-            font-size: 0.58rem; font-weight: 700; color: var(--gray2);
-            text-transform: uppercase; letter-spacing: 0.8px;
-            padding: 14px 20px; text-align: center;
+            font-size: 0.68rem; font-weight: 700; color: var(--gray2);
+            text-transform: uppercase; letter-spacing: 0.6px;
+            padding: 13px 18px; text-align: center;
             border-bottom: 1.5px solid var(--border);
             white-space: nowrap;
         }
-        .tipo-table thead th:first-child { text-align: center; }
         .tipo-table thead th.th-highlight { color: var(--ng); }
-        .tipo-table thead th.th-ibc { color: var(--gray2); }
         .tipo-table tbody tr { transition: background .15s; }
         .tipo-table tbody tr:nth-child(even) { background: #f8fafc; }
         .tipo-table tbody tr:hover { background: #f0f4f8; }
         .tipo-table tbody tr:not(:last-child) td { border-bottom: 1px solid #f1f5f9; }
         .tipo-table tbody td {
-            padding: 15px 20px; font-size: 0.76rem; color: var(--navy);
+            padding: 13px 18px; font-size: 0.75rem; color: var(--navy);
             text-align: center; white-space: nowrap;
         }
-        .tipo-table tbody td.td-highlight { background: inherit; }
-        .tipo-table tbody td.td-ibc { background: inherit; }
         .tipo-badge {
             display: inline-flex; align-items: center;
             font-size: 0.63rem; font-weight: 700; padding: 4px 12px;
@@ -208,16 +205,56 @@
         }
         .tipo-badge--duplex     { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
         .tipo-badge--individual { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
-        .tipo-metros { font-size: 0.88rem; font-weight: 800; color: var(--navy); }
-        .tipo-cost { font-weight: 800; color: #15803d; font-size: 0.82rem; }
+        .tipo-metros { font-size: 0.86rem; font-weight: 800; color: var(--navy); }
+        .tipo-cost { font-weight: 800; color: #15803d; font-size: 0.8rem; }
         .tipo-proj-val { font-weight: 600; color: #334155; }
         .tipo-dash { color: #cbd5e1; }
         .tipo-ibc-val {
-            font-size: 0.75rem; font-weight: 800; color: var(--navy);
+            font-size: 0.74rem; font-weight: 800; color: var(--navy);
             background: #f1f5f9; border-radius: 6px;
-            padding: 3px 10px; display: inline-block;
+            padding: 3px 9px; display: inline-block;
         }
         .tipo-loading { padding: 48px; text-align: center; color: var(--gray2); font-size: 0.85rem; font-weight: 600; }
+
+        /* ── INSIGHT CARDS ── */
+        .tipo-insights {
+            display: flex; flex-direction: column; gap: 16px;
+            width: 240px; flex-shrink: 0;
+        }
+        .insight-card {
+            background: var(--surface); border-radius: 16px;
+            border: 1.5px solid var(--border);
+            box-shadow: 0 2px 12px rgba(15,23,42,0.07);
+            padding: 20px 20px 18px;
+            display: flex; flex-direction: column; gap: 14px;
+        }
+        .insight-card--best  { border-top: 3px solid #10b981; }
+        .insight-card--worst { border-top: 3px solid #f59e0b; }
+        .insight-tag {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 0.58rem; font-weight: 800; text-transform: uppercase;
+            letter-spacing: 0.7px; padding: 4px 10px; border-radius: 20px;
+            align-self: flex-start;
+        }
+        .insight-tag--best  { background: #d1fae5; color: #065f46; }
+        .insight-tag--worst { background: #fef3c7; color: #92400e; }
+        .insight-name {
+            font-size: 1.1rem; font-weight: 900; color: var(--navy);
+            line-height: 1.1;
+        }
+        .insight-sub {
+            font-size: 0.68rem; color: var(--gray2); font-weight: 500; margin-top: 2px;
+        }
+        .insight-stats { display: flex; flex-direction: column; gap: 8px; }
+        .insight-stat {
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 0.7rem;
+        }
+        .insight-stat-lbl { color: var(--gray2); font-weight: 600; }
+        .insight-stat-val { font-weight: 800; color: var(--navy); }
+        .insight-stat-val--best  { color: #059669; }
+        .insight-stat-val--warn  { color: #d97706; }
+        .insight-divider { height: 1px; background: var(--border); }
 
         /* ── CHART SECTION ── */
         .chart-section {
@@ -289,19 +326,22 @@
     </div>
 
     <div class="tipo-section" id="tipoSection" style="display:none">
-        <div class="tipo-card">
-            <div class="tipo-card-header">
-                <div>
-                    <div class="tipo-card-title">Costo de M² por Tipología</div>
-                    <div class="tipo-card-sub">Comparativo de costos por tipología de casas</div>
+        <div class="tipo-layout">
+            <div class="tipo-card">
+                <div class="tipo-card-header">
+                    <div>
+                        <div class="tipo-card-title">Costo de M² por Tipología</div>
+                        <div class="tipo-card-sub">Comparativo de costos por tipología de casas</div>
+                    </div>
+                </div>
+                <div class="tipo-table-wrap">
+                    <table class="tipo-table" id="tipoTable">
+                        <thead id="tipoThead"></thead>
+                        <tbody id="tipoTbody"><tr><td colspan="10" class="tipo-loading">Cargando datos...</td></tr></tbody>
+                    </table>
                 </div>
             </div>
-            <div class="tipo-table-wrap">
-                <table class="tipo-table" id="tipoTable">
-                    <thead id="tipoThead"></thead>
-                    <tbody id="tipoTbody"><tr><td colspan="10" class="tipo-loading">Cargando datos...</td></tr></tbody>
-                </table>
-            </div>
+            <div class="tipo-insights" id="tipoInsights"></div>
         </div>
     </div>
 
@@ -692,6 +732,43 @@ async function loadTipologia() {
                 <td class="td-ibc"><span class="tipo-ibc-val">${r.ibc.toFixed(2)}%</span></td>
             </tr>`;
         }).join('');
+
+        // Insight cards — mejor y peor por IBC
+        const best  = rows.reduce((a, b) => b.ibc > a.ibc ? b : a);
+        const worst = rows.reduce((a, b) => b.ibc < a.ibc ? b : a);
+
+        const insightCard = (row, type) => {
+            const isBest = type === 'best';
+            const badgeCls = row.tipologia.toLowerCase() === 'duplex' ? 'duplex' : 'individual';
+            return `
+            <div class="insight-card insight-card--${type}">
+                <div>
+                    <span class="insight-tag insight-tag--${type}">${isBest ? '✦ Más conveniente' : '⚠ Menos conveniente'}</span>
+                </div>
+                <div>
+                    <div class="insight-name">${fmtM(row.m2)} mts</div>
+                    <div class="insight-sub"><span class="tipo-badge tipo-badge--${badgeCls}" style="font-size:0.6rem;padding:3px 9px">${row.tipologia}</span></div>
+                </div>
+                <div class="insight-divider"></div>
+                <div class="insight-stats">
+                    <div class="insight-stat">
+                        <span class="insight-stat-lbl">Prom. Costo / M²</span>
+                        <span class="insight-stat-val">Q ${fmtM(row.avgCost)}</span>
+                    </div>
+                    <div class="insight-stat">
+                        <span class="insight-stat-lbl">IBC M²</span>
+                        <span class="insight-stat-val insight-stat-val--${isBest ? 'best' : 'warn'}">${row.ibc.toFixed(2)}%</span>
+                    </div>
+                    <div class="insight-stat">
+                        <span class="insight-stat-lbl">Proyectos</span>
+                        <span class="insight-stat-val">${Object.keys(row.costs).map(k => PROJECT_NAMES[k] || k.toUpperCase()).join(', ')}</span>
+                    </div>
+                </div>
+            </div>`;
+        };
+
+        document.getElementById('tipoInsights').innerHTML =
+            insightCard(best, 'best') + insightCard(worst, 'worst');
 
         document.getElementById('tipoSection').style.display = '';
     } catch (_) {}
