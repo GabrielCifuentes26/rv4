@@ -164,6 +164,57 @@
         .m2-bar-dot--casas { background: #3b5bdb; }
         .m2-bar-dot--urb   { background: #93c5fd; }
 
+        /* ── TIPOLOGÍA SECTION ── */
+        .tipo-section { padding: 0 48px 32px; }
+        .tipo-card {
+            background: var(--surface); border-radius: 18px;
+            border: 1.5px solid var(--border); border-top: 3px solid var(--ng);
+            box-shadow: 0 2px 12px rgba(15,23,42,0.07);
+            overflow: hidden;
+        }
+        .tipo-card-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 24px 28px 20px; border-bottom: 1px solid var(--border);
+        }
+        .tipo-card-title { font-size: 1rem; font-weight: 800; color: var(--navy); }
+        .tipo-card-sub { font-size: 0.72rem; color: var(--gray2); font-weight: 500; margin-top: 2px; }
+        .tipo-table-wrap { overflow-x: auto; }
+        .tipo-table { width: 100%; border-collapse: collapse; }
+        .tipo-table thead th {
+            font-size: 0.6rem; font-weight: 700; color: var(--gray2);
+            text-transform: uppercase; letter-spacing: 0.5px;
+            padding: 10px 16px; text-align: right;
+            background: #f8fafc; border-bottom: 1.5px solid var(--border);
+            white-space: nowrap;
+        }
+        .tipo-table thead th:first-child { text-align: left; }
+        .tipo-table thead th:nth-child(2) { text-align: left; }
+        .tipo-table tbody tr { transition: background .15s; }
+        .tipo-table tbody tr:hover { background: #f8fafc; }
+        .tipo-table tbody tr:not(:last-child) td { border-bottom: 1px solid #f1f5f9; }
+        .tipo-table tbody td {
+            padding: 12px 16px; font-size: 0.75rem; color: var(--navy);
+            text-align: right; white-space: nowrap;
+        }
+        .tipo-table tbody td:first-child { text-align: left; font-weight: 700; }
+        .tipo-table tbody td:nth-child(2) { text-align: left; }
+        .tipo-badge {
+            display: inline-flex; align-items: center; gap: 5px;
+            font-size: 0.65rem; font-weight: 700; padding: 3px 9px;
+            border-radius: 6px; white-space: nowrap;
+        }
+        .tipo-badge--duplex     { background: #dbeafe; color: #1d4ed8; }
+        .tipo-badge--individual { background: #dcfce7; color: #15803d; }
+        .tipo-cost {
+            font-weight: 800; color: #15803d; font-size: 0.8rem;
+        }
+        .tipo-dash { color: var(--gray2); }
+        .tipo-ibc-wrap { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
+        .tipo-ibc-pct { font-size: 0.7rem; font-weight: 700; color: var(--navy); min-width: 38px; text-align: right; }
+        .tipo-ibc-bar-bg { width: 80px; height: 6px; background: #e2e8f0; border-radius: 999px; overflow: hidden; }
+        .tipo-ibc-bar { height: 100%; background: var(--ng); border-radius: 999px; transition: width .8s ease; }
+        .tipo-loading { padding: 40px; text-align: center; color: var(--gray2); font-size: 0.85rem; font-weight: 600; }
+
         /* ── CHART SECTION ── */
         .chart-section {
             padding: 0 48px 72px;
@@ -231,6 +282,23 @@
 
     <div class="m2-grid" id="m2Grid">
         <div class="m2-loading">Cargando datos...</div>
+    </div>
+
+    <div class="tipo-section" id="tipoSection" style="display:none">
+        <div class="tipo-card">
+            <div class="tipo-card-header">
+                <div>
+                    <div class="tipo-card-title">Costo de M² por Tipología</div>
+                    <div class="tipo-card-sub">Comparativo de costos por tipología de casas</div>
+                </div>
+            </div>
+            <div class="tipo-table-wrap">
+                <table class="tipo-table" id="tipoTable">
+                    <thead id="tipoThead"></thead>
+                    <tbody id="tipoTbody"><tr><td colspan="10" class="tipo-loading">Cargando datos...</td></tr></tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
     <div class="chart-section" id="chartSection" style="display:none">
@@ -560,6 +628,77 @@ function renderChart() {
     });
 }
 
+const PROJECT_NAMES = {
+    bdj: 'BDJ', bdp: 'BDP', bse: 'BSE', cse: 'CSE', hlq: 'HLQ', rdb: 'RDB'
+};
+
+async function loadTipologia() {
+    try {
+        const { data, error } = await client
+            .from('casas_tipologia')
+            .select('project_key, m2, tipologia, costo_m2')
+            .eq('is_current', true)
+            .order('m2', { ascending: false });
+
+        if (error || !data || data.length === 0) return;
+
+        // Proyectos presentes en los datos
+        const projects = [...new Set(data.map(r => r.project_key))].sort();
+
+        // Agrupar por (m2, tipologia)
+        const rowMap = {};
+        data.forEach(r => {
+            const key = `${r.m2}_${r.tipologia}`;
+            if (!rowMap[key]) rowMap[key] = { m2: r.m2, tipologia: r.tipologia, costs: {} };
+            rowMap[key].costs[r.project_key] = r.costo_m2;
+        });
+
+        const rows = Object.values(rowMap).sort((a, b) => b.m2 - a.m2);
+
+        // Calcular costo promedio por fila y max IBC para escalar barra
+        rows.forEach(r => {
+            const vals = Object.values(r.costs).filter(v => v > 0);
+            r.avgCost = vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : 0;
+            r.ibc     = r.avgCost > 0 ? (r.m2 / r.avgCost) * 100 : 0;
+        });
+        const maxIbc = Math.max(...rows.map(r => r.ibc));
+
+        // Thead
+        document.getElementById('tipoThead').innerHTML = `<tr>
+            <th style="text-align:left">M²</th>
+            <th style="text-align:left">Tipología</th>
+            ${projects.map(k => `<th>${PROJECT_NAMES[k] || k.toUpperCase()}</th>`).join('')}
+            <th>Costo por M²</th>
+            <th>IBC M²</th>
+        </tr>`;
+
+        // Tbody
+        document.getElementById('tipoTbody').innerHTML = rows.map(r => {
+            const badgeCls  = r.tipologia.toLowerCase() === 'duplex' ? 'duplex' : 'individual';
+            const projCols  = projects.map(k =>
+                r.costs[k]
+                    ? `<td>Q ${fmtM(r.costs[k])}</td>`
+                    : `<td><span class="tipo-dash">—</span></td>`
+            ).join('');
+            const ibcPct    = maxIbc > 0 ? (r.ibc / maxIbc * 100).toFixed(0) : 0;
+            return `<tr>
+                <td>${fmtM(r.m2)} m²</td>
+                <td><span class="tipo-badge tipo-badge--${badgeCls}">${r.tipologia}</span></td>
+                ${projCols}
+                <td class="tipo-cost">Q ${fmtM(r.avgCost)}</td>
+                <td>
+                    <div class="tipo-ibc-wrap">
+                        <span class="tipo-ibc-pct">${r.ibc.toFixed(2)}%</span>
+                        <div class="tipo-ibc-bar-bg"><div class="tipo-ibc-bar" style="width:${ibcPct}%"></div></div>
+                    </div>
+                </td>
+            </tr>`;
+        }).join('');
+
+        document.getElementById('tipoSection').style.display = '';
+    } catch (_) {}
+}
+
 async function init() {
     await loadData();
     const grid = document.getElementById('m2Grid');
@@ -568,6 +707,7 @@ async function init() {
         return;
     }
     grid.innerHTML = PROJECTS.map((p, i) => renderCard(p, i, PROJECTS)).join('');
+    await loadTipologia();
     renderChart();
 }
 
