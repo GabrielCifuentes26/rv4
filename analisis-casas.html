@@ -16,6 +16,7 @@
     })();
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
     <style>
@@ -154,6 +155,26 @@
         .m2-bar-dot--casas { background: #3b5bdb; }
         .m2-bar-dot--urb   { background: #93c5fd; }
 
+        /* ── CHART SECTION ── */
+        .chart-section {
+            padding: 0 48px 72px;
+        }
+        .chart-card {
+            background: var(--surface);
+            border-radius: 18px;
+            border: 1.5px solid var(--border);
+            border-top: 3px solid var(--ng);
+            box-shadow: 0 2px 12px rgba(15,23,42,0.07);
+            padding: 32px 36px 28px;
+        }
+        .chart-header {
+            display: flex; align-items: baseline; gap: 12px;
+            margin-bottom: 28px;
+        }
+        .chart-title { font-size: 1rem; font-weight: 800; color: var(--navy); }
+        .chart-subtitle { font-size: 0.75rem; color: var(--gray2); font-weight: 500; }
+        .chart-wrap { position: relative; height: 320px; }
+
         /* Loading state */
         .m2-loading {
             grid-column: 1/-1;
@@ -189,6 +210,18 @@
 
     <div class="m2-grid" id="m2Grid">
         <div class="m2-loading">Cargando datos...</div>
+    </div>
+
+    <div class="chart-section" id="chartSection" style="display:none">
+        <div class="chart-card">
+            <div class="chart-header">
+                <div class="chart-title">Comparación Costo por M²</div>
+                <div class="chart-subtitle">Casas vs Urbanización — Q por metro cuadrado construido</div>
+            </div>
+            <div class="chart-wrap">
+                <canvas id="m2Chart"></canvas>
+            </div>
+        </div>
     </div>
 
 <script>
@@ -382,6 +415,95 @@ function renderCard(p, idx, allProjects) {
     </div>`;
 }
 
+function renderChart() {
+    const labels = PROJECTS.map(p => p.name);
+    const dataCasas = PROJECTS.map(p => {
+        const m2 = PROJECT_M2[p.key];
+        const areas = p.areas || { construccion: 0 };
+        return m2.casas > 0 ? Math.round(areas.construccion / m2.casas) : 0;
+    });
+    const dataUrb = PROJECTS.map(p => {
+        const m2 = PROJECT_M2[p.key];
+        const areas = p.areas || { urbanizacion: 0 };
+        return m2.urbanizacion > 0 ? Math.round(areas.urbanizacion / m2.urbanizacion) : 0;
+    });
+
+    const avgCasas = Math.round(dataCasas.reduce((a, b) => a + b, 0) / dataCasas.length);
+    const avgUrb   = Math.round(dataUrb.reduce((a, b) => a + b, 0) / dataUrb.length);
+
+    document.getElementById('chartSection').style.display = '';
+
+    new Chart(document.getElementById('m2Chart'), {
+        type: 'bar',
+        data: {
+            labels,
+            datasets: [
+                {
+                    label: 'Casas',
+                    data: dataCasas,
+                    backgroundColor: 'rgba(59,91,219,0.85)',
+                    borderRadius: 6,
+                    borderSkipped: false,
+                },
+                {
+                    label: 'Urbanización',
+                    data: dataUrb,
+                    backgroundColor: 'rgba(147,197,253,0.85)',
+                    borderRadius: 6,
+                    borderSkipped: false,
+                },
+            ],
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    align: 'end',
+                    labels: {
+                        font: { family: 'Inter', size: 11, weight: '600' },
+                        color: '#64748b',
+                        usePointStyle: true,
+                        pointStyle: 'circle',
+                        padding: 20,
+                    },
+                },
+                tooltip: {
+                    callbacks: {
+                        label: (ctx) => ` ${ctx.dataset.label}: Q ${ctx.raw.toLocaleString('es-GT')} / m²`,
+                    },
+                    bodyFont: { family: 'Inter', size: 12 },
+                    titleFont: { family: 'Inter', size: 12, weight: '700' },
+                    backgroundColor: '#0f172a',
+                    padding: 12,
+                    cornerRadius: 8,
+                },
+                annotation: {},
+            },
+            scales: {
+                x: {
+                    grid: { color: '#f1f5f9' },
+                    ticks: {
+                        font: { family: 'Inter', size: 11 },
+                        color: '#94a3b8',
+                        callback: (v) => `Q ${v.toLocaleString('es-GT')}`,
+                    },
+                    border: { dash: [4, 4] },
+                },
+                y: {
+                    grid: { display: false },
+                    ticks: {
+                        font: { family: 'Inter', size: 11, weight: '600' },
+                        color: '#0f172a',
+                    },
+                },
+            },
+        },
+    });
+}
+
 async function init() {
     await loadData();
     const grid = document.getElementById('m2Grid');
@@ -390,6 +512,7 @@ async function init() {
         return;
     }
     grid.innerHTML = PROJECTS.map((p, i) => renderCard(p, i, PROJECTS)).join('');
+    renderChart();
 }
 
 init();
