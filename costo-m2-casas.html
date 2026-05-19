@@ -174,62 +174,47 @@
         }
         .tipo-card-header {
             display: flex; align-items: center; justify-content: space-between;
-            padding: 26px 32px 22px; border-bottom: 1px solid var(--border);
+            padding: 24px 32px 20px;
         }
         .tipo-card-title { font-size: 1rem; font-weight: 800; color: var(--navy); }
         .tipo-card-sub { font-size: 0.72rem; color: var(--gray2); font-weight: 500; margin-top: 3px; }
         .tipo-table-wrap { overflow-x: auto; }
         .tipo-table { width: 100%; border-collapse: collapse; }
-        .tipo-table thead tr {
-            background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
-        }
+        .tipo-table thead tr { background: var(--navy); }
         .tipo-table thead th {
-            font-size: 0.58rem; font-weight: 700; color: #64748b;
-            text-transform: uppercase; letter-spacing: 0.7px;
-            padding: 13px 20px; text-align: right;
-            border-bottom: 1.5px solid var(--border);
+            font-size: 0.58rem; font-weight: 700; color: rgba(255,255,255,0.55);
+            text-transform: uppercase; letter-spacing: 0.8px;
+            padding: 14px 20px; text-align: center;
             white-space: nowrap;
         }
-        .tipo-table thead th:first-child { text-align: left; border-right: 1px solid var(--border); }
-        .tipo-table thead th:nth-child(2) { text-align: left; }
-        .tipo-table thead th.th-highlight {
-            background: rgba(201,168,76,0.07); color: var(--ng);
-        }
-        .tipo-table thead th.th-ibc {
-            background: rgba(15,23,42,0.04); color: #475569;
-        }
+        .tipo-table thead th:first-child { text-align: center; }
+        .tipo-table thead th.th-highlight { color: var(--ng); }
+        .tipo-table thead th.th-ibc { color: rgba(255,255,255,0.7); }
         .tipo-table tbody tr { transition: background .15s; }
-        .tipo-table tbody tr:hover { background: #fafbfc; }
+        .tipo-table tbody tr:nth-child(even) { background: #f8fafc; }
+        .tipo-table tbody tr:hover { background: #f0f4f8; }
         .tipo-table tbody tr:not(:last-child) td { border-bottom: 1px solid #f1f5f9; }
         .tipo-table tbody td {
-            padding: 14px 20px; font-size: 0.76rem; color: var(--navy);
-            text-align: right; white-space: nowrap;
+            padding: 15px 20px; font-size: 0.76rem; color: var(--navy);
+            text-align: center; white-space: nowrap;
         }
-        .tipo-table tbody td:first-child {
-            text-align: left; font-weight: 700; font-size: 0.85rem;
-            color: var(--navy); border-right: 1px solid #f1f5f9;
-        }
-        .tipo-table tbody td:nth-child(2) { text-align: left; }
-        .tipo-table tbody td.td-highlight {
-            background: rgba(201,168,76,0.05);
-        }
-        .tipo-table tbody td.td-ibc {
-            background: rgba(15,23,42,0.02);
-        }
+        .tipo-table tbody td.td-highlight { background: rgba(201,168,76,0.06); }
+        .tipo-table tbody td.td-ibc { background: rgba(15,23,42,0.03); }
         .tipo-badge {
-            display: inline-flex; align-items: center; gap: 5px;
-            font-size: 0.63rem; font-weight: 700; padding: 4px 10px;
-            border-radius: 20px; white-space: nowrap; letter-spacing: 0.2px;
+            display: inline-flex; align-items: center;
+            font-size: 0.63rem; font-weight: 700; padding: 4px 12px;
+            border-radius: 20px; white-space: nowrap;
         }
         .tipo-badge--duplex     { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
         .tipo-badge--individual { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+        .tipo-metros { font-size: 0.88rem; font-weight: 800; color: var(--navy); }
         .tipo-cost { font-weight: 800; color: #15803d; font-size: 0.82rem; }
         .tipo-proj-val { font-weight: 600; color: #334155; }
-        .tipo-dash { color: #cbd5e1; font-weight: 400; }
+        .tipo-dash { color: #cbd5e1; }
         .tipo-ibc-val {
-            font-size: 0.78rem; font-weight: 800; color: var(--navy);
-            background: #f8fafc; border: 1px solid var(--border);
-            border-radius: 6px; padding: 3px 8px; display: inline-block;
+            font-size: 0.75rem; font-weight: 800; color: var(--navy);
+            background: #f1f5f9; border-radius: 6px;
+            padding: 3px 10px; display: inline-block;
         }
         .tipo-loading { padding: 48px; text-align: center; color: var(--gray2); font-size: 0.85rem; font-weight: 600; }
 
@@ -699,7 +684,7 @@ async function loadTipologia() {
                     : `<td><span class="tipo-dash">—</span></td>`
             ).join('');
             return `<tr>
-                <td>${fmtM(r.m2)} m²</td>
+                <td><span class="tipo-metros">${fmtM(r.m2)} mts</span></td>
                 <td><span class="tipo-badge tipo-badge--${badgeCls}">${r.tipologia}</span></td>
                 ${projCols}
                 <td class="tipo-cost td-highlight">Q ${fmtM(r.avgCost)}</td>
