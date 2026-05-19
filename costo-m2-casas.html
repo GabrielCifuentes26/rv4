@@ -174,46 +174,64 @@
         }
         .tipo-card-header {
             display: flex; align-items: center; justify-content: space-between;
-            padding: 24px 28px 20px; border-bottom: 1px solid var(--border);
+            padding: 26px 32px 22px; border-bottom: 1px solid var(--border);
         }
         .tipo-card-title { font-size: 1rem; font-weight: 800; color: var(--navy); }
-        .tipo-card-sub { font-size: 0.72rem; color: var(--gray2); font-weight: 500; margin-top: 2px; }
+        .tipo-card-sub { font-size: 0.72rem; color: var(--gray2); font-weight: 500; margin-top: 3px; }
         .tipo-table-wrap { overflow-x: auto; }
         .tipo-table { width: 100%; border-collapse: collapse; }
+        .tipo-table thead tr {
+            background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+        }
         .tipo-table thead th {
-            font-size: 0.6rem; font-weight: 700; color: var(--gray2);
-            text-transform: uppercase; letter-spacing: 0.5px;
-            padding: 10px 16px; text-align: right;
-            background: #f8fafc; border-bottom: 1.5px solid var(--border);
+            font-size: 0.58rem; font-weight: 700; color: #64748b;
+            text-transform: uppercase; letter-spacing: 0.7px;
+            padding: 13px 20px; text-align: right;
+            border-bottom: 1.5px solid var(--border);
             white-space: nowrap;
         }
-        .tipo-table thead th:first-child { text-align: left; }
+        .tipo-table thead th:first-child { text-align: left; border-right: 1px solid var(--border); }
         .tipo-table thead th:nth-child(2) { text-align: left; }
+        .tipo-table thead th.th-highlight {
+            background: rgba(201,168,76,0.07); color: var(--ng);
+        }
+        .tipo-table thead th.th-ibc {
+            background: rgba(15,23,42,0.04); color: #475569;
+        }
         .tipo-table tbody tr { transition: background .15s; }
-        .tipo-table tbody tr:hover { background: #f8fafc; }
+        .tipo-table tbody tr:hover { background: #fafbfc; }
         .tipo-table tbody tr:not(:last-child) td { border-bottom: 1px solid #f1f5f9; }
         .tipo-table tbody td {
-            padding: 12px 16px; font-size: 0.75rem; color: var(--navy);
+            padding: 14px 20px; font-size: 0.76rem; color: var(--navy);
             text-align: right; white-space: nowrap;
         }
-        .tipo-table tbody td:first-child { text-align: left; font-weight: 700; }
+        .tipo-table tbody td:first-child {
+            text-align: left; font-weight: 700; font-size: 0.85rem;
+            color: var(--navy); border-right: 1px solid #f1f5f9;
+        }
         .tipo-table tbody td:nth-child(2) { text-align: left; }
+        .tipo-table tbody td.td-highlight {
+            background: rgba(201,168,76,0.05);
+        }
+        .tipo-table tbody td.td-ibc {
+            background: rgba(15,23,42,0.02);
+        }
         .tipo-badge {
             display: inline-flex; align-items: center; gap: 5px;
-            font-size: 0.65rem; font-weight: 700; padding: 3px 9px;
-            border-radius: 6px; white-space: nowrap;
+            font-size: 0.63rem; font-weight: 700; padding: 4px 10px;
+            border-radius: 20px; white-space: nowrap; letter-spacing: 0.2px;
         }
-        .tipo-badge--duplex     { background: #dbeafe; color: #1d4ed8; }
-        .tipo-badge--individual { background: #dcfce7; color: #15803d; }
-        .tipo-cost {
-            font-weight: 800; color: #15803d; font-size: 0.8rem;
+        .tipo-badge--duplex     { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
+        .tipo-badge--individual { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+        .tipo-cost { font-weight: 800; color: #15803d; font-size: 0.82rem; }
+        .tipo-proj-val { font-weight: 600; color: #334155; }
+        .tipo-dash { color: #cbd5e1; font-weight: 400; }
+        .tipo-ibc-val {
+            font-size: 0.78rem; font-weight: 800; color: var(--navy);
+            background: #f8fafc; border: 1px solid var(--border);
+            border-radius: 6px; padding: 3px 8px; display: inline-block;
         }
-        .tipo-dash { color: var(--gray2); }
-        .tipo-ibc-wrap { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
-        .tipo-ibc-pct { font-size: 0.7rem; font-weight: 700; color: var(--navy); min-width: 38px; text-align: right; }
-        .tipo-ibc-bar-bg { width: 80px; height: 6px; background: #e2e8f0; border-radius: 999px; overflow: hidden; }
-        .tipo-ibc-bar { height: 100%; background: var(--ng); border-radius: 999px; transition: width .8s ease; }
-        .tipo-loading { padding: 40px; text-align: center; color: var(--gray2); font-size: 0.85rem; font-weight: 600; }
+        .tipo-loading { padding: 48px; text-align: center; color: var(--gray2); font-size: 0.85rem; font-weight: 600; }
 
         /* ── CHART SECTION ── */
         .chart-section {
@@ -665,33 +683,27 @@ async function loadTipologia() {
 
         // Thead
         document.getElementById('tipoThead').innerHTML = `<tr>
-            <th style="text-align:left">M²</th>
+            <th style="text-align:left">Metros</th>
             <th style="text-align:left">Tipología</th>
             ${projects.map(k => `<th>${PROJECT_NAMES[k] || k.toUpperCase()}</th>`).join('')}
-            <th>Costo por M²</th>
-            <th>IBC M²</th>
+            <th class="th-highlight">Prom. Costo por M²</th>
+            <th class="th-ibc">IBC M²</th>
         </tr>`;
 
         // Tbody
         document.getElementById('tipoTbody').innerHTML = rows.map(r => {
-            const badgeCls  = r.tipologia.toLowerCase() === 'duplex' ? 'duplex' : 'individual';
-            const projCols  = projects.map(k =>
+            const badgeCls = r.tipologia.toLowerCase() === 'duplex' ? 'duplex' : 'individual';
+            const projCols = projects.map(k =>
                 r.costs[k]
-                    ? `<td>Q ${fmtM(r.costs[k])}</td>`
+                    ? `<td class="tipo-proj-val">Q ${fmtM(r.costs[k])}</td>`
                     : `<td><span class="tipo-dash">—</span></td>`
             ).join('');
-            const ibcPct    = maxIbc > 0 ? (r.ibc / maxIbc * 100).toFixed(0) : 0;
             return `<tr>
                 <td>${fmtM(r.m2)} m²</td>
                 <td><span class="tipo-badge tipo-badge--${badgeCls}">${r.tipologia}</span></td>
                 ${projCols}
-                <td class="tipo-cost">Q ${fmtM(r.avgCost)}</td>
-                <td>
-                    <div class="tipo-ibc-wrap">
-                        <span class="tipo-ibc-pct">${r.ibc.toFixed(2)}%</span>
-                        <div class="tipo-ibc-bar-bg"><div class="tipo-ibc-bar" style="width:${ibcPct}%"></div></div>
-                    </div>
-                </td>
+                <td class="tipo-cost td-highlight">Q ${fmtM(r.avgCost)}</td>
+                <td class="td-ibc"><span class="tipo-ibc-val">${r.ibc.toFixed(2)}%</span></td>
             </tr>`;
         }).join('');
 
