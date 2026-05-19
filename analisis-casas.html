@@ -17,6 +17,8 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
     <style>
@@ -180,7 +182,7 @@
         }
         .chart-title { font-size: 1rem; font-weight: 800; color: var(--navy); }
         .chart-subtitle { font-size: 0.75rem; color: var(--gray2); font-weight: 500; }
-        .chart-wrap { position: relative; height: 320px; }
+        .chart-wrap { position: relative; height: 400px; }
 
         /* Loading state */
         .m2-loading {
@@ -422,22 +424,30 @@ function renderCard(p, idx, allProjects) {
 }
 
 function renderChart() {
-    const labels = PROJECTS.map(p => p.name);
-    const dataCasas = PROJECTS.map(p => {
-        const m2 = PROJECT_M2[p.key];
-        const areas = p.areas || { construccion: 0 };
-        return m2.casas > 0 ? Math.round(areas.construccion / m2.casas) : 0;
+    // Calcular costos x m² por proyecto
+    const chartData = PROJECTS.map(p => {
+        const m2    = PROJECT_M2[p.key];
+        const areas = p.areas || { construccion: 0, urbanizacion: 0 };
+        return {
+            name:  p.name,
+            casas: m2.casas > 0        ? Math.round(areas.construccion / m2.casas)        : 0,
+            urb:   m2.urbanizacion > 0 ? Math.round(areas.urbanizacion / m2.urbanizacion) : 0,
+        };
     });
-    const dataUrb = PROJECTS.map(p => {
-        const m2 = PROJECT_M2[p.key];
-        const areas = p.areas || { urbanizacion: 0 };
-        return m2.urbanizacion > 0 ? Math.round(areas.urbanizacion / m2.urbanizacion) : 0;
-    });
+
+    // Ordenar por costo Casas descendente
+    chartData.sort((a, b) => b.casas - a.casas);
+
+    const labels    = chartData.map(d => d.name);
+    const dataCasas = chartData.map(d => d.casas);
+    const dataUrb   = chartData.map(d => d.urb);
 
     const avgCasas = Math.round(dataCasas.reduce((a, b) => a + b, 0) / dataCasas.length);
     const avgUrb   = Math.round(dataUrb.reduce((a, b) => a + b, 0) / dataUrb.length);
 
     document.getElementById('chartSection').style.display = '';
+
+    Chart.register(ChartDataLabels);
 
     new Chart(document.getElementById('m2Chart'), {
         type: 'bar',
@@ -447,16 +457,20 @@ function renderChart() {
                 {
                     label: 'Casas',
                     data: dataCasas,
-                    backgroundColor: 'rgba(59,91,219,0.85)',
-                    borderRadius: 6,
+                    backgroundColor: 'rgba(59,91,219,0.88)',
+                    hoverBackgroundColor: 'rgba(59,91,219,1)',
+                    borderRadius: 5,
                     borderSkipped: false,
+                    barThickness: 22,
                 },
                 {
                     label: 'Urbanización',
                     data: dataUrb,
-                    backgroundColor: 'rgba(147,197,253,0.85)',
-                    borderRadius: 6,
+                    backgroundColor: 'rgba(96,165,250,0.75)',
+                    hoverBackgroundColor: 'rgba(96,165,250,1)',
+                    borderRadius: 5,
                     borderSkipped: false,
+                    barThickness: 22,
                 },
             ],
         },
@@ -464,6 +478,7 @@ function renderChart() {
             indexAxis: 'y',
             responsive: true,
             maintainAspectRatio: false,
+            layout: { padding: { right: 80 } },
             plugins: {
                 legend: {
                     position: 'top',
@@ -473,36 +488,88 @@ function renderChart() {
                         color: '#64748b',
                         usePointStyle: true,
                         pointStyle: 'circle',
-                        padding: 20,
+                        padding: 24,
                     },
                 },
                 tooltip: {
                     callbacks: {
-                        label: (ctx) => ` ${ctx.dataset.label}: Q ${ctx.raw.toLocaleString('es-GT')} / m²`,
+                        label: (ctx) => `  ${ctx.dataset.label}: Q ${ctx.raw.toLocaleString('es-GT')} / m²`,
                     },
                     bodyFont: { family: 'Inter', size: 12 },
                     titleFont: { family: 'Inter', size: 12, weight: '700' },
                     backgroundColor: '#0f172a',
                     padding: 12,
                     cornerRadius: 8,
+                    displayColors: true,
                 },
-                annotation: {},
+                datalabels: {
+                    anchor: 'end',
+                    align: 'end',
+                    formatter: (v) => `Q ${v.toLocaleString('es-GT')}`,
+                    font: { family: 'Inter', size: 10, weight: '700' },
+                    color: '#475569',
+                    padding: { left: 6 },
+                },
+                annotation: {
+                    annotations: {
+                        avgCasas: {
+                            type: 'line',
+                            scaleID: 'x',
+                            value: avgCasas,
+                            borderColor: 'rgba(59,91,219,0.5)',
+                            borderWidth: 1.5,
+                            borderDash: [6, 4],
+                            label: {
+                                display: true,
+                                content: `Prom. Casas Q ${avgCasas.toLocaleString('es-GT')}`,
+                                position: 'start',
+                                backgroundColor: 'rgba(59,91,219,0.12)',
+                                color: '#3b5bdb',
+                                font: { family: 'Inter', size: 9, weight: '700' },
+                                padding: { x: 6, y: 3 },
+                                borderRadius: 4,
+                                yAdjust: -10,
+                            },
+                        },
+                        avgUrb: {
+                            type: 'line',
+                            scaleID: 'x',
+                            value: avgUrb,
+                            borderColor: 'rgba(96,165,250,0.6)',
+                            borderWidth: 1.5,
+                            borderDash: [6, 4],
+                            label: {
+                                display: true,
+                                content: `Prom. Urb. Q ${avgUrb.toLocaleString('es-GT')}`,
+                                position: 'start',
+                                backgroundColor: 'rgba(96,165,250,0.12)',
+                                color: '#2563eb',
+                                font: { family: 'Inter', size: 9, weight: '700' },
+                                padding: { x: 6, y: 3 },
+                                borderRadius: 4,
+                                yAdjust: 10,
+                            },
+                        },
+                    },
+                },
             },
             scales: {
                 x: {
-                    grid: { color: '#f1f5f9' },
+                    grid: { color: '#f1f5f9', lineWidth: 1 },
                     ticks: {
-                        font: { family: 'Inter', size: 11 },
+                        font: { family: 'Inter', size: 10 },
                         color: '#94a3b8',
                         callback: (v) => `Q ${v.toLocaleString('es-GT')}`,
+                        maxTicksLimit: 8,
                     },
-                    border: { dash: [4, 4] },
+                    border: { dash: [4, 4], color: 'transparent' },
                 },
                 y: {
                     grid: { display: false },
                     ticks: {
                         font: { family: 'Inter', size: 11, weight: '600' },
-                        color: '#0f172a',
+                        color: '#1e293b',
+                        padding: 8,
                     },
                 },
             },
