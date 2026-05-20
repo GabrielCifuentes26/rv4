@@ -35,7 +35,9 @@ $proyectos = @(
     @{ Script = "sync-powerbi-bdp.ps1"; Nombre = "BDP - Bosques de Pinula" },
     @{ Script = "sync-powerbi-cse.ps1"; Nombre = "CSE - Condado Santa Elena" },
     @{ Script = "sync-powerbi-rdb.ps1"; Nombre = "RDB - Residencias Del Bosque" },
-    @{ Script = "sync-powerbi-hlq.ps1"; Nombre = "HLQ - Hacienda La Querencia" }
+    @{ Script = "sync-powerbi-hlq.ps1"; Nombre = "HLQ - Hacienda La Querencia" },
+    @{ Script = "sync-powerbi-clc.ps1"; Nombre = "CLC - Condado La Ceiba" },
+    @{ Script = "sync-powerbi-hsl.ps1"; Nombre = "HSL - Hacienda San Luis" }
 )
 
 $ok = @()
@@ -43,7 +45,7 @@ $err = @()
 $i = 1
 
 foreach ($p in $proyectos) {
-    Write-Host "[$i/6] $($p.Nombre)..." -ForegroundColor Yellow
+    Write-Host "[$i/$($proyectos.Count)] $($p.Nombre)..." -ForegroundColor Yellow
     Set-Status -State "running" -Message "Sincronizando $($p.Nombre)..."
     try {
         & (Join-Path $pbiDir $p.Script) -MesA $MesA -UploadSupabase -SupabaseServiceKey $SupabaseServiceKey
