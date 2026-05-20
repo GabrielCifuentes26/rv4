@@ -367,12 +367,13 @@ Indica que deben correr el script de sincronización para que los datos estén d
       const isPortfolioMode = !activeKey
       const allContexts = isPortfolioMode
         ? rows.map(r => buildPortfolioRow(r as Record<string, unknown>)).join('\n')
-        : rows.map(r => {
-            const isActive = r.project_key === activeKey
-            return isActive
-              ? buildProjectContext(r as Record<string, unknown>)
-              : buildProjectSummary(r as Record<string, unknown>)
-          }).join('\n---\n')
+        : [
+            // Proyecto activo PRIMERO — nunca queda truncado
+            ...rows.filter((r: Record<string, unknown>) => r['project_key'] === activeKey)
+              .map((r: Record<string, unknown>) => buildProjectContext(r)),
+            ...rows.filter((r: Record<string, unknown>) => r['project_key'] !== activeKey)
+              .map((r: Record<string, unknown>) => buildProjectSummary(r)),
+          ].join('\n---\n')
 
       const lastSync = rows.reduce((latest, r) => {
         const d = String(r.mes_a ?? '')
