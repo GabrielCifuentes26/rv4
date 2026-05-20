@@ -44,61 +44,57 @@ npx supabase functions deploy ai-agent --project-ref iipgrojliqeyycvgnkrc
 
 ---
 
-## ESTADO ACTUAL DEL PROYECTO — 2026-05-14
+## ESTADO ACTUAL DEL PROYECTO — 2026-05-19
 
 ### Repositorio
 - Path local: `c:\Users\gcifuentes\OneDrive - rvcuatro.com\Documentos\12. Paginas Web\01.Pagina Web C&P`
-- GitHub: `https://github.com/GabrielCifuentes26/rv4`
+- Branch activo: `dev-work` (push a rv4-dev con `git push rv4-dev HEAD:main`)
+- GitHub producción: `https://github.com/GabrielCifuentes26/rv4` (push con `git push origin HEAD:master`)
 - Producción: `https://gabrielcifuentes26.github.io/rv4/index.html`
 - Supabase project ref: `iipgrojliqeyycvgnkrc`
+
+### Estructura de páginas (todo en producción al 2026-05-19)
+
+| Archivo | Descripción |
+|---|---|
+| `index.html` | Dashboard principal con tarjetas CASAS y LOTES |
+| `costo-m2-casas.html` | Costos por M² — 6 tarjetas + tabla tipología + gráfico comparativo |
+| `costo-m2-lotes.html` | Costos por M² Lotes — placeholder |
+| `ver-analisis-casas.html` | Ver análisis Casas — placeholder |
+| `ver-analisis-lotes.html` | Ver análisis Lotes — placeholder |
+
+### Tabla Supabase nueva: `casas_tipologia`
+- Columnas: `project_key`, `m2`, `tipologia`, `costo_m2`, `fecha`, `is_current`
+- Datos cargados: RDB y CSE (9 filas)
+- Se actualiza 2-3 veces/mes — ingresar directo en Supabase table editor
+- RLS: anon puede leer (`is_current=true`), authenticated puede escribir
 
 ### Lo que ya funciona
 
 **Dashboard individual por proyecto:**
 `dashboard-bdj.html`, `dashboard-bdp.html`, `dashboard-bse.html`, `dashboard-clc.html`, `dashboard-cse.html`, `dashboard-hlq.html`, `dashboard-hsl.html`, `dashboard-rdb.html`
 
+**Página Costos por M² — `costo-m2-casas.html`:**
+- Grid 3×2 de tarjetas por proyecto (datos desde Supabase + fallback JSON)
+- Tabla "Costo de M² por Tipología" — columnas dinámicas por proyecto, IBC M² calculado
+- Insight cards: "Más conveniente" y "Menos conveniente" (calculado automáticamente)
+- Gráfico barras horizontales: Casas vs Urbanización, ordenado por costo, opacidad por promedio
+- Chart.js + chartjs-plugin-datalabels + chartjs-plugin-annotation
+
 **Agente de IA (ai-agent) — OPERATIVO y DEPLOYADO:**
 - Edge Function en Supabase: `ai-agent`
-- Lee datos de Power BI desde `powerbi_resumen_cache`
-- Contexto incluye: totales, por área, **por segmento** (Propietario A/B en CLC/HSL — fix de hoy), por etapa, por fase, por mes, costo por m²
-- Caché semántico con pgvector (`qa_cache`): respuestas similares reutilizadas en <200ms
+- Caché semántico con pgvector (`qa_cache`)
 - Fallback de modelos: llama-3.3-70b → llama-3.1-8b → gemma2-9b
-- Guard de prompt: trunca a 12,000 chars para evitar error 413
-- Logging detallado: muestra status code exacto de Groq en los logs de Supabase
 
-**Chat widget:**
-- `assets/js/chat-widget.js` — compartido por todos los dashboards e `index.html`
-- Panel flotante dorado, esquina inferior derecha
+**Chat widget:** `assets/js/chat-widget.js` — panel flotante dorado
 
-**Sincronización Power BI:**
-- Scripts en `tools/powerbi/sync-powerbi-*.ps1`
-- Guarda en `powerbi_resumen_cache` con `is_current=true`; históricos con `is_current=false`
-
-**Integración RV4 Hub (SSO):**
-- Edge Functions: `sso`, `users`, `metricas`
-- Manual: `memory/HUB_INTEGRATION_MANUAL.md`
-
-**Sistema de memoria del proyecto:**
-- `CLAUDE.md` → apunta a `memory/SESION_INICIO.md` como primer archivo
-- `memory/SESION_INICIO.md` → estado actual + reglas (este archivo)
-- `memory/PROJECT_CONTEXT.md` → arquitectura técnica completa
-- `memory/MAP.md` → mapa de todos los archivos y carpetas
-- `memory/DAILY_LOG.md` → bitácora diaria
-
-### Commits del día (2026-05-14)
-
-| Commit | Descripción |
-|---|---|
-| `b169ece` | docs: CLAUDE.md apunta directo a SESION_INICIO como primer archivo a leer |
-| `5133a99` | docs: mapa completo del proyecto (MAP.md) + mover manual.html a docs/ |
-| `579a429` | docs: reorganizar y actualizar toda la memoria del proyecto |
-| `b1eeac5` | fix: porSegmento no se incluía en contexto → Propietario A/B visibles para el agente |
-| `c66dad1` | fix: logging detallado errores Groq + guard truncar prompt >12k chars |
+**Sincronización Power BI:** `tools/powerbi/sync-powerbi-*.ps1`
 
 ### Pendientes conocidos
 
-- **Verificar** que el agente responda correctamente a preguntas de segmento en CLC (ej. "¿cuánto tenemos disponible en Propietario B?") — fix deployado hoy, pendiente confirmar
-- **Merge dev → master** para unificar trabajo de UI: marimekko CLC, filtros interactivos CLC/HLQ/HSL
-- **Seed de qa_cache** — banco de preguntas frecuentes pre-cargadas (discutido, no implementado)
+- **`ver-analisis-casas.html`** — contenido pendiente de construir (placeholder)
+- **`ver-analisis-lotes.html`** — contenido pendiente de construir (placeholder)
+- **`costo-m2-lotes.html`** — contenido pendiente de construir (placeholder)
 - Coordenadas reales de proyectos en el mapa
+- Seed de qa_cache — banco de preguntas frecuentes
 - Integración SAP Business One (largo plazo)
