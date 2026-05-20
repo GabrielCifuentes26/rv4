@@ -37,7 +37,7 @@ $proyectos = @(
     @{ Script = "sync-powerbi-rdb.ps1"; Nombre = "RDB - Residencias Del Bosque" },
     @{ Script = "sync-powerbi-hlq.ps1"; Nombre = "HLQ - Hacienda La Querencia" },
     @{ Script = "sync-powerbi-clc.ps1"; Nombre = "CLC - Condado La Ceiba" },
-    @{ Script = "sync-powerbi-hsl.ps1"; Nombre = "HSL - Hacienda San Luis" }
+    @{ Script = "sync-powerbi-hsl.ps1"; Nombre = "HSL - Hacienda El Sol" }
 )
 
 $ok = @()
