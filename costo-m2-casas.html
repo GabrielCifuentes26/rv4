@@ -180,24 +180,27 @@
         .tipo-card-title { font-size: 1rem; font-weight: 800; color: var(--navy); }
         .tipo-card-sub { font-size: 0.7rem; color: var(--gray2); font-weight: 500; margin-top: 3px; }
         .tipo-table-wrap { overflow-x: auto; }
-        .tipo-table { width: 100%; border-collapse: collapse; }
+        .tipo-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
         .tipo-table thead tr { background: #f8fafc; }
         .tipo-table thead th {
-            font-size: 0.68rem; font-weight: 700; color: var(--gray2);
-            text-transform: uppercase; letter-spacing: 0.6px;
-            padding: 13px 18px; text-align: center;
+            font-size: 0.7rem; font-weight: 900; color: #0f172a;
+            text-transform: uppercase; letter-spacing: 0.5px;
+            padding: 13px 18px; text-align: left;
             border-bottom: 1.5px solid var(--border);
             white-space: nowrap;
         }
-        .tipo-table thead th.th-highlight { color: var(--ng); }
+        .tipo-table thead th.th-center { text-align: center; }
+        .tipo-table thead th.th-highlight { color: var(--ng); text-align: center; }
+        .tipo-table thead th.th-ibc { text-align: center; }
         .tipo-table tbody tr { transition: background .15s; }
         .tipo-table tbody tr:nth-child(even) { background: #f8fafc; }
         .tipo-table tbody tr:hover { background: #f0f4f8; }
         .tipo-table tbody tr:not(:last-child) td { border-bottom: 1px solid #f1f5f9; }
         .tipo-table tbody td {
-            padding: 13px 18px; font-size: 0.75rem; color: var(--navy);
-            text-align: center; white-space: nowrap;
+            padding: 13px 18px; font-size: 0.75rem; color: #94a3b8;
+            text-align: left; white-space: nowrap;
         }
+        .tipo-table tbody td.td-center { text-align: center; }
         .tipo-badge {
             display: inline-flex; align-items: center;
             font-size: 0.63rem; font-weight: 700; padding: 4px 12px;
@@ -205,12 +208,12 @@
         }
         .tipo-badge--duplex     { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
         .tipo-badge--individual { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
-        .tipo-metros { font-size: 0.86rem; font-weight: 800; color: var(--navy); }
+        .tipo-metros { font-size: 0.86rem; font-weight: 700; color: #94a3b8; }
         .tipo-cost { font-weight: 800; color: #15803d; font-size: 0.8rem; }
-        .tipo-proj-val { font-weight: 600; color: #334155; }
+        .tipo-proj-val { font-weight: 600; color: #94a3b8; }
         .tipo-dash { color: #cbd5e1; }
         .tipo-ibc-val {
-            font-size: 0.74rem; font-weight: 800; color: var(--navy);
+            font-size: 0.74rem; font-weight: 700; color: #94a3b8;
             background: #f1f5f9; border-radius: 6px;
             padding: 3px 9px; display: inline-block;
         }
@@ -709,9 +712,9 @@ async function loadTipologia() {
 
         // Thead
         document.getElementById('tipoThead').innerHTML = `<tr>
-            <th style="text-align:left">Metros</th>
-            <th style="text-align:left">Tipología</th>
-            ${projects.map(k => `<th>${PROJECT_NAMES[k] || k.toUpperCase()}</th>`).join('')}
+            <th>Metros</th>
+            <th>Tipología</th>
+            ${projects.map(k => `<th class="th-center">${PROJECT_NAMES[k] || k.toUpperCase()}</th>`).join('')}
             <th class="th-highlight">Prom. Costo por M²</th>
             <th class="th-ibc">IBC M²</th>
         </tr>`;
@@ -721,15 +724,15 @@ async function loadTipologia() {
             const badgeCls = r.tipologia.toLowerCase() === 'duplex' ? 'duplex' : 'individual';
             const projCols = projects.map(k =>
                 r.costs[k]
-                    ? `<td class="tipo-proj-val">Q ${fmtM(r.costs[k])}</td>`
-                    : `<td><span class="tipo-dash">—</span></td>`
+                    ? `<td class="td-center tipo-proj-val">Q ${fmtM(r.costs[k])}</td>`
+                    : `<td class="td-center"><span class="tipo-dash">—</span></td>`
             ).join('');
             return `<tr>
                 <td><span class="tipo-metros">${fmtM(r.m2)} mts</span></td>
                 <td><span class="tipo-badge tipo-badge--${badgeCls}">${r.tipologia}</span></td>
                 ${projCols}
-                <td class="tipo-cost td-highlight">Q ${fmtM(r.avgCost)}</td>
-                <td class="td-ibc"><span class="tipo-ibc-val">${r.ibc.toFixed(2)}%</span></td>
+                <td class="td-center tipo-cost">Q ${fmtM(r.avgCost)}</td>
+                <td class="td-center"><span class="tipo-ibc-val">${r.ibc.toFixed(2)}%</span></td>
             </tr>`;
         }).join('');
 
