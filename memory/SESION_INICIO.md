@@ -44,7 +44,7 @@ npx supabase functions deploy ai-agent --project-ref iipgrojliqeyycvgnkrc
 
 ---
 
-## ESTADO ACTUAL DEL PROYECTO — 2026-05-19
+## ESTADO ACTUAL DEL PROYECTO — 2026-05-20
 
 ### Repositorio
 - Path local: `c:\Users\gcifuentes\OneDrive - rvcuatro.com\Documentos\12. Paginas Web\01.Pagina Web C&P`
@@ -92,6 +92,7 @@ npx supabase functions deploy ai-agent --project-ref iipgrojliqeyycvgnkrc
 
 ### Pendientes conocidos
 
+- **Agente IA — mejora real pendiente:** reemplazar el fix de "proyecto activo primero" por la solución correcta: si se detecta `activeKey`, hacer SELECT solo de ese proyecto (no los 8). Elimina el problema de truncado de raíz.
 - **`ver-analisis-casas.html`** — contenido pendiente de construir (placeholder)
 - **`ver-analisis-lotes.html`** — contenido pendiente de construir (placeholder)
 - **`costo-m2-lotes.html`** — contenido pendiente de construir (placeholder)

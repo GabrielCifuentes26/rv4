@@ -4,6 +4,35 @@ Entrada más reciente arriba.
 
 ---
 
+### 2026-05-20
+
+Resumen:
+- Diagnóstico raíz del agente IA: HLQ y RDB no respondían porque caían después del límite de 12,000 chars (orden alfabético los ponía al final del prompt)
+- Fix temporal deployado: proyecto activo se pone PRIMERO en el prompt, los demás como resumen
+- Identificado que la solución definitiva es: si `activeKey` detectado → SELECT solo ese proyecto de Supabase (pendiente implementar)
+- Admin panel Power BI: agregada tarjeta HSL — Hacienda El Sol (faltaba completamente)
+- Admin panel Power BI: query Supabase actualizado para incluir `'hsl'` en el `.in()`
+- SINCRONIZAR-TODOS.ps1: agregados CLC y HSL al batch (solo tenía 6 de 8 proyectos)
+- SINCRONIZAR-TODOS.ps1: mes default cambiado de `"abr 26"` a `"may 26"`
+- Corregido nombre HSL en todos los archivos: siempre "Hacienda El Sol", nunca "Hacienda San Luis"
+- Sync de mayo ejecutado y confirmado para todos los proyectos incluyendo CLC y HSL
+
+Archivos modificados:
+- `supabase/functions/ai-agent/index.ts`
+- `admin.html`
+- `tools/sync/SINCRONIZAR-TODOS.ps1`
+- `memory/SESION_INICIO.md`
+
+Commits del día:
+- `9ca99ad` fix: ai-agent — proyecto activo primero en prompt, corrige truncado en HLQ y RDB
+- `02fd4ce` feat: admin panel — agregar tarjeta HSL en sección Power BI sync
+- `36423fd` fix: SINCRONIZAR-TODOS — agregar CLC y HSL al batch de sync
+- `11bc5dc` fix: SINCRONIZAR-TODOS — mes default actualizado a may 26
+- `fcea48a` fix: admin panel — HSL es Hacienda El Sol, no San Luis
+- `8d24ee3` fix: HSL siempre es Hacienda El Sol
+
+---
+
 ### 2026-05-14
 
 Resumen:
