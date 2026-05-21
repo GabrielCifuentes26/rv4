@@ -338,7 +338,7 @@
         .chart-kpi-body { display: flex; flex-direction: column; gap: 1px; }
         .chart-kpi-lbl { font-size: 0.65rem; font-weight: 700; color: var(--gray2); text-transform: uppercase; letter-spacing: 0.5px; }
         .chart-kpi-val { font-size: 0.82rem; font-weight: 800; color: var(--navy); }
-        .chart-wrap { position: relative; height: 380px; }
+        .chart-wrap { position: relative; height: 460px; }
 
         /* Loading state */
         .m2-loading {
@@ -692,7 +692,7 @@ function renderChart() {
             indexAxis: 'y',
             responsive: true,
             maintainAspectRatio: false,
-            layout: { padding: { right: 72 } },
+            layout: { padding: { right: 90 } },
             plugins: {
                 legend: { display: false },
                 tooltip: {
@@ -724,23 +724,11 @@ function renderChart() {
                     annotations: {
                         lineCasas: {
                             type: 'line', scaleID: 'x', value: avgCasas,
-                            borderColor: 'rgba(201,168,76,0.7)', borderWidth: 1.5, borderDash: [5, 4],
-                            label: {
-                                display: true, content: `Q ${avgCasas.toLocaleString('es-GT')} prom.`,
-                                position: 'start', backgroundColor: 'rgba(201,168,76,0.12)', color: '#A8832A',
-                                font: { family: 'Inter', size: 9, weight: '700' },
-                                padding: { x: 6, y: 3 }, borderRadius: 4, yAdjust: -14,
-                            }
+                            borderColor: 'rgba(201,168,76,0.55)', borderWidth: 1.5, borderDash: [5, 4],
                         },
                         lineUrb: {
                             type: 'line', scaleID: 'x', value: avgUrb,
-                            borderColor: 'rgba(59,130,246,0.6)', borderWidth: 1.5, borderDash: [5, 4],
-                            label: {
-                                display: true, content: `Q ${avgUrb.toLocaleString('es-GT')} prom.`,
-                                position: 'start', backgroundColor: 'rgba(59,130,246,0.10)', color: '#2563eb',
-                                font: { family: 'Inter', size: 9, weight: '700' },
-                                padding: { x: 6, y: 3 }, borderRadius: 4, yAdjust: 14,
-                            }
+                            borderColor: 'rgba(59,130,246,0.45)', borderWidth: 1.5, borderDash: [5, 4],
                         }
                     }
                 },
