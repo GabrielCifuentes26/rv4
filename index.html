@@ -254,7 +254,7 @@
         .section { padding: 90px 50px; }
         .section-tag {
             display: inline-block;
-            color: var(--ng); font-size: 0.7rem; font-weight: 700;
+            color: var(--blue); font-size: 0.7rem; font-weight: 700;
             text-transform: uppercase; letter-spacing: 2.5px; margin-bottom: 10px;
         }
         .section-heading {
@@ -401,8 +401,8 @@
         }
         .prop-card:hover {
             transform: translateY(-7px);
-            box-shadow: 0 20px 48px rgba(201,168,76,0.18), 0 0 0 2px rgba(201,168,76,0.35);
-            border-color: var(--ng);
+            box-shadow: 0 20px 48px rgba(43,88,71,0.18), 0 0 0 2px rgba(43,88,71,0.30);
+            border-color: #2b5847;
         }
         .prop-card--wip {
             opacity: 0.48; filter: grayscale(80%); pointer-events: none; position: relative; cursor: default;
@@ -446,7 +446,7 @@
         .prop-budget-col:last-child { padding-right: 0; }
         .prop-budget-col--pct .prop-budget-val { color: #059669; font-size: 1.05rem; font-weight: 900; }
         .prop-budget-lbl {
-            font-size: 0.72rem; color: #64748b; font-weight: 700;
+            font-size: 0.58rem; color: #64748b; font-weight: 700;
             text-transform: uppercase; letter-spacing: 0.8px; white-space: nowrap;
             margin-bottom: 3px;
         }
@@ -457,8 +457,8 @@
         /* Barra de avance */
         .prop-budget-track-wrap { margin-top: 11px; }
         .prop-budget-track-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
-        .prop-budget-track-lbl { font-size: 0.72rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; }
-        .prop-budget-track-pct { font-size: 0.82rem; font-weight: 900; color: #059669; }
+        .prop-budget-track-lbl { font-size: 0.58rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; }
+        .prop-budget-track-pct { font-size: 0.75rem; font-weight: 900; color: #059669; }
         .prop-budget-track {
             height: 6px; border-radius: 999px; background: #e2e8f0; overflow: hidden;
         }
@@ -506,7 +506,7 @@
             display: flex; align-items: center; gap: 16px; flex-shrink: 0;
         }
         .summary-total-label {
-            font-size: 0.68rem; font-weight: 700; letter-spacing: 1.2px;
+            font-size: 0.6rem; font-weight: 700; letter-spacing: 1.2px;
             text-transform: uppercase; color: var(--gray2); white-space: nowrap;
         }
         .summary-divider-v {
@@ -523,7 +523,7 @@
             border-left: 1px solid var(--border);
         }
         .summary-metric-lbl {
-            font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
+            font-size: 0.55rem; font-weight: 700; text-transform: uppercase;
             letter-spacing: 0.8px; color: var(--gray2); white-space: nowrap;
         }
         .summary-metric-val {
@@ -601,40 +601,18 @@
         }
         .prop-details-left { display: flex; gap: 10px; }
         .prop-cta {
-            font-size: 0.67rem; font-weight: 800; color: var(--ng2);
+            font-size: 0.67rem; font-weight: 800; color: #2b5847;
             display: inline-flex; align-items: center; gap: 4px;
-            background: rgba(201,168,76,0.12); border-radius: 6px;
+            background: rgba(43,88,71,0.10); border-radius: 6px;
             padding: 4px 10px; letter-spacing: 0.2px;
             transition: background .18s, color .18s, box-shadow .18s;
             white-space: nowrap;
         }
         .prop-card:hover .prop-cta {
-            background: var(--ng); color: var(--nn);
-            box-shadow: 0 0 14px rgba(201,168,76,0.50);
+            background: #2b5847; color: #fff;
+            box-shadow: 0 0 14px rgba(43,88,71,0.50);
         }
 
-
-        /* ── LOTES GRID — 2 tarjetas centradas ── */
-        #lotesGrid {
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        }
-
-        /* ── SUMMARY BAR — PORTAFOLIO (nivel superior) ── */
-        .summary-bar--portafolio {
-            background: var(--navy);
-            border-color: rgba(201,168,76,0.22);
-            box-shadow: 0 4px 24px rgba(15,23,42,0.18);
-        }
-        .summary-bar--portafolio .summary-title { color: #fff; }
-        .summary-bar--portafolio .summary-total-label { color: rgba(255,255,255,0.42); }
-        .summary-bar--portafolio .summary-divider-v { background: rgba(255,255,255,0.10); }
-        .summary-bar--portafolio .summary-metric-lbl { color: rgba(255,255,255,0.42); }
-        .summary-bar--portafolio .summary-metric-val { color: #fff; }
-        .summary-bar--portafolio .summary-metric--pct .summary-metric-val { color: var(--ng); }
-        .summary-bar--portafolio .proj-count-badge {
-            background: rgba(201,168,76,0.22) !important;
-            color: var(--ng) !important;
-        }
 
         /* ── EMPTY STATE ── */
         .empty-state {
@@ -681,16 +659,16 @@
         .analisis-ver-btn {
             display: inline-flex; align-items: center; gap: 4px;
             font-size: 0.7rem; font-weight: 700; letter-spacing: 0.2px;
-            color: var(--ng2);
-            background: rgba(201,168,76,0.09); border: 1px solid rgba(201,168,76,0.35);
+            color: var(--navy);
+            background: #f1f5f9; border: 1px solid var(--border);
             border-radius: 8px; padding: 6px 14px;
             text-decoration: none; cursor: pointer;
             transition: background .18s, color .18s, border-color .18s, box-shadow .18s;
             white-space: nowrap;
         }
         .analisis-ver-btn:hover {
-            background: var(--ng); color: var(--nn); border-color: var(--ng);
-            box-shadow: 0 0 14px rgba(201,168,76,0.45);
+            background: #C9A84C; color: #fff; border-color: #C9A84C;
+            box-shadow: 0 0 14px rgba(201,168,76,0.40);
         }
         .analisis-m2-btn {
             display: inline-flex; align-items: center; gap: 4px;
@@ -719,7 +697,7 @@
         }
         .analisis-metric { display: flex; flex-direction: column; gap: 3px; }
         .analisis-metric-lbl {
-            font-size: 0.72rem; font-weight: 700; letter-spacing: 1px;
+            font-size: 0.62rem; font-weight: 700; letter-spacing: 1px;
             text-transform: uppercase; color: var(--gray2);
         }
         .analisis-metric-val { font-size: 1rem; font-weight: 800; color: var(--navy); }
@@ -753,7 +731,7 @@
         }
         .analisis-stack-legend-item {
             display: flex; align-items: center; gap: 5px;
-            font-size: 0.68rem; font-weight: 600; color: var(--gray2);
+            font-size: 0.62rem; font-weight: 600; color: var(--gray2);
             letter-spacing: 0.5px; text-transform: uppercase;
         }
         .analisis-stack-dot {
@@ -884,10 +862,9 @@
     </div>
     <div class="cat-grid-wrapper">
         <div class="cat-row-active">
-            <div class="cat-card active" data-cat="todos" style="--cat-c:#C9A84C" onclick="selectCategory(this, 'todos')">
+            <div class="cat-card active" data-cat="todos" style="--cat-c:#6366f1" onclick="selectCategory(this, 'todos')">
                 <div class="cat-icon">📊</div>
                 <div class="cat-name">Análisis</div>
-                <div class="cat-count"></div>
             </div>
             <div class="cat-card" data-cat="casas" style="--cat-c:#0ea5e9" onclick="selectCategory(this, 'casas')">
                 <div class="cat-icon">🏠</div>
@@ -918,11 +895,11 @@
 
 <!-- ANÁLISIS GENERAL -->
 <section class="analisis-section" id="seccionAnalisis">
-    <div class="summary-bar summary-bar--portafolio" style="margin-top:0; margin-bottom:0;">
+    <div class="summary-bar" style="margin-top:0; margin-bottom:0;">
         <div class="summary-bar-left">
             <div class="summary-title-wrap">
                 <span class="summary-title">Análisis General de Proyectos</span>
-                <span class="proj-count-badge">8</span>
+                <span class="proj-count-badge" style="background:#6366f1">8</span>
             </div>
         </div>
         <div class="summary-bar-right">
