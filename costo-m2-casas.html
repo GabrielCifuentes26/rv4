@@ -83,12 +83,42 @@
         .btn-logout svg { width: 13px; height: 13px; fill: currentColor; }
 
 
+        /* ── PAGE HERO ── */
+        .page-hero {
+            background: var(--surface);
+            border-bottom: 1.5px solid var(--border);
+            padding: 32px 48px 28px;
+        }
+        .page-hero-inner {
+            display: flex; align-items: flex-end; justify-content: space-between; gap: 24px;
+        }
+        .page-hero-eyebrow {
+            font-size: 0.68rem; font-weight: 700; color: var(--ng);
+            text-transform: uppercase; letter-spacing: 2.2px; margin-bottom: 8px;
+        }
+        .page-hero-title {
+            font-size: 2rem; font-weight: 900; color: var(--navy);
+            letter-spacing: -0.8px; line-height: 1; margin-bottom: 8px;
+        }
+        .page-hero-title span { color: var(--ng); }
+        .page-hero-desc {
+            font-size: 0.85rem; color: var(--gray); line-height: 1.55; max-width: 480px;
+        }
+        .page-hero-meta {
+            display: flex; flex-direction: column; align-items: flex-end; gap: 3px; flex-shrink: 0;
+        }
+        .meta-lbl {
+            font-size: 0.62rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 1.2px; color: var(--gray2);
+        }
+        .meta-val { font-size: 0.82rem; font-weight: 700; color: var(--navy); }
+
         /* ── GRID ── */
         .m2-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 24px;
-            padding: 32px 48px 72px;
+            padding: 28px 48px 40px;
         }
 
         /* ── CARD ── */
@@ -113,13 +143,9 @@
             margin-bottom: 20px; gap: 12px;
         }
         .m2-card-left { display: flex; flex-direction: column; gap: 2px; }
-        .m2-card-category {
-            font-size: 0.58rem; font-weight: 700; color: var(--ng);
-            text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2px;
-        }
         .m2-name { font-size: 1.05rem; font-weight: 800; color: var(--navy); line-height: 1.2; }
         .m2-total-wrap { text-align: right; flex-shrink: 0; }
-        .m2-total-label { font-size: 0.56rem; font-weight: 700; color: var(--gray2); text-transform: uppercase; letter-spacing: 0.6px; }
+        .m2-total-label { font-size: 0.68rem; font-weight: 700; color: var(--gray2); text-transform: uppercase; letter-spacing: 0.6px; }
         .m2-total-val { font-size: 1rem; font-weight: 900; color: var(--green); white-space: nowrap; }
 
         /* Divider */
@@ -128,7 +154,7 @@
         /* Table */
         .m2-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
         .m2-table thead th {
-            font-size: 0.58rem; font-weight: 700; color: var(--gray2);
+            font-size: 0.68rem; font-weight: 700; color: var(--gray2);
             text-transform: uppercase; letter-spacing: 0.5px;
             padding: 0 6px 8px; border-bottom: 1.5px solid var(--border);
             text-align: right;
@@ -153,16 +179,16 @@
             height: 8px; border-radius: 999px; overflow: hidden;
             display: flex; background: #e2e8f0; margin-bottom: 8px;
         }
-        .m2-bar-casas { height: 100%; background: #3b5bdb; transition: width 1s ease; }
-        .m2-bar-urb   { height: 100%; background: #93c5fd; transition: width 1s ease; }
+        .m2-bar-casas { height: 100%; background: var(--ng); transition: width 1s ease; }
+        .m2-bar-urb   { height: 100%; background: #3b82f6; transition: width 1s ease; }
         .m2-bar-labels { display: flex; justify-content: space-between; }
         .m2-bar-lbl {
-            font-size: 0.62rem; font-weight: 600; color: var(--gray2);
+            font-size: 0.72rem; font-weight: 600; color: var(--gray2);
             display: flex; align-items: center; gap: 5px;
         }
         .m2-bar-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-        .m2-bar-dot--casas { background: #3b5bdb; }
-        .m2-bar-dot--urb   { background: #93c5fd; }
+        .m2-bar-dot--casas { background: var(--ng); }
+        .m2-bar-dot--urb   { background: #3b82f6; }
 
         /* ── TIPOLOGÍA SECTION ── */
         .tipo-section { padding: 0 48px 32px; }
@@ -210,7 +236,7 @@
         .tipo-badge--individual { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
         .tipo-metros { font-size: 0.86rem; font-weight: 700; color: #94a3b8; }
         .tipo-cost { font-weight: 800; color: #15803d; font-size: 0.8rem; }
-        .tipo-proj-val { font-weight: 600; color: #94a3b8; }
+        .tipo-proj-val { font-weight: 700; color: var(--navy); }
         .tipo-dash { color: #cbd5e1; }
         .tipo-ibc-val {
             font-size: 0.74rem; font-weight: 700; color: #94a3b8;
@@ -235,7 +261,7 @@
         .insight-card--worst { border-top: 3px solid #f59e0b; }
         .insight-tag {
             display: inline-flex; align-items: center; gap: 6px;
-            font-size: 0.58rem; font-weight: 800; text-transform: uppercase;
+            font-size: 0.65rem; font-weight: 800; text-transform: uppercase;
             letter-spacing: 0.7px; padding: 4px 10px; border-radius: 20px;
             align-self: flex-start;
         }
@@ -288,7 +314,7 @@
         .chart-kpi-dot--casas { background: #C9A84C; }
         .chart-kpi-dot--urb   { background: #3b82f6; }
         .chart-kpi-body { display: flex; flex-direction: column; gap: 1px; }
-        .chart-kpi-lbl { font-size: 0.56rem; font-weight: 700; color: var(--gray2); text-transform: uppercase; letter-spacing: 0.5px; }
+        .chart-kpi-lbl { font-size: 0.65rem; font-weight: 700; color: var(--gray2); text-transform: uppercase; letter-spacing: 0.5px; }
         .chart-kpi-val { font-size: 0.82rem; font-weight: 800; color: var(--navy); }
         .chart-wrap { position: relative; height: 380px; }
 
@@ -309,7 +335,6 @@
             </a>
             <a href="index.html" class="brand-link">
                 <div class="topbar-brand">Costos&<span>Presupuestos</span></div>
-                <div class="topbar-sub">Costos por M² — Casas</div>
             </a>
         </div>
         <div class="topbar-center">
@@ -321,6 +346,20 @@
                 <svg viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5-5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
                 Salir
             </button>
+        </div>
+    </div>
+
+    <div class="page-hero">
+        <div class="page-hero-inner">
+            <div>
+                <div class="page-hero-eyebrow">Análisis de costos · Proyectos Casas</div>
+                <h1 class="page-hero-title">Costo por <span>M²</span></h1>
+                <p class="page-hero-desc">Desglose de construcción y urbanización por metro cuadrado construido. 6 proyectos activos.</p>
+            </div>
+            <div class="page-hero-meta">
+                <span class="meta-lbl">Actualizado</span>
+                <span class="meta-val" id="lastUpdatedVal">—</span>
+            </div>
         </div>
     </div>
 
@@ -433,12 +472,19 @@ async function loadData() {
     try {
         const { data } = await client
             .from('v_project_sap_summary')
-            .select('project_key, por_area')
+            .select('project_key, por_area, updated_at')
             .in('project_key', PROJECTS.map(p => p.key));
-        if (Array.isArray(data)) data.forEach(row => {
-            const p = PROJECTS.find(p => p.key === row.project_key);
-            if (p && Array.isArray(row.por_area) && row.por_area.length) setSapAreasFromRows(p, row.por_area);
-        });
+        if (Array.isArray(data)) {
+            data.forEach(row => {
+                const p = PROJECTS.find(p => p.key === row.project_key);
+                if (p && Array.isArray(row.por_area) && row.por_area.length) setSapAreasFromRows(p, row.por_area);
+            });
+            const dates = data.map(r => r.updated_at).filter(Boolean).sort().reverse();
+            if (dates.length) {
+                const el = document.getElementById('lastUpdatedVal');
+                if (el) el.textContent = new Date(dates[0]).toLocaleDateString('es-GT', { day: '2-digit', month: 'short', year: 'numeric' });
+            }
+        }
     } catch (_) {}
 
     // Fallback: load areas from local JSON
@@ -487,7 +533,6 @@ function renderCard(p, idx, allProjects) {
     <div class="m2-card">
         <div class="m2-card-header">
             <div class="m2-card-left">
-                <div class="m2-card-category">Proyecto Casas</div>
                 <div class="m2-name">${p.name}</div>
             </div>
             <div class="m2-total-wrap">
@@ -649,6 +694,30 @@ function renderChart() {
                     font: { family: 'Inter', size: 10, weight: '700' },
                     color: '#475569',
                     padding: { left: 4 },
+                },
+                annotation: {
+                    annotations: {
+                        lineCasas: {
+                            type: 'line', scaleID: 'x', value: avgCasas,
+                            borderColor: 'rgba(201,168,76,0.7)', borderWidth: 1.5, borderDash: [5, 4],
+                            label: {
+                                display: true, content: `Q ${avgCasas.toLocaleString('es-GT')} prom.`,
+                                position: 'start', backgroundColor: 'rgba(201,168,76,0.12)', color: '#A8832A',
+                                font: { family: 'Inter', size: 9, weight: '700' },
+                                padding: { x: 6, y: 3 }, borderRadius: 4, yAdjust: -14,
+                            }
+                        },
+                        lineUrb: {
+                            type: 'line', scaleID: 'x', value: avgUrb,
+                            borderColor: 'rgba(59,130,246,0.6)', borderWidth: 1.5, borderDash: [5, 4],
+                            label: {
+                                display: true, content: `Q ${avgUrb.toLocaleString('es-GT')} prom.`,
+                                position: 'start', backgroundColor: 'rgba(59,130,246,0.10)', color: '#2563eb',
+                                font: { family: 'Inter', size: 9, weight: '700' },
+                                padding: { x: 6, y: 3 }, borderRadius: 4, yAdjust: 14,
+                            }
+                        }
+                    }
                 },
             },
             scales: {
