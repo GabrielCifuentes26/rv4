@@ -536,8 +536,8 @@ function renderCard(p, idx, allProjects) {
                 <div class="m2-name">${p.name}</div>
             </div>
             <div class="m2-total-wrap">
-                <div class="m2-total-label">Total con IVA</div>
-                <div class="m2-total-val">${noData ? '—' : fmt(areas.total)}</div>
+                <div class="m2-total-label">Costo por M²</div>
+                <div class="m2-total-val">${qm2Tot > 0 ? `Q ${fmtM(qm2Tot)}` : '—'}</div>
             </div>
         </div>
         <div class="m2-divider"></div>
