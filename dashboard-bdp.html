@@ -2729,7 +2729,14 @@
         } catch(e) {
             console.warn('[BDP] Error en binding de controles:', e);
         }
-        document.getElementById('filter-clear')?.click();
+        powerBIState.filters = { areas: [], segmentos: [], etapas: [], fases: [], meses: [] };
+        powerBIState.options = { areas: [], segmentos: [], etapas: [], fases: [], meses: [] };
+        const _inp = document.getElementById('filter-search');
+        if (_inp) _inp.value = '';
+        searchQuery = '';
+        document.getElementById('filter-search-suggestions')?.classList.remove('visible');
+        populateFilterControls();
+        renderPowerBIView();
     }
 
     async function loadPowerBIResumenFromSupabase() {
