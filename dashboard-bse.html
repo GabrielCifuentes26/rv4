@@ -2762,6 +2762,7 @@
                 .from('powerbi_resumen_cache')
                 .select('payload, mes_a, generated_at, updated_at')
                 .eq('project_key', POWERBI_PROJECT_KEY)
+                .eq('is_current', true)
                 .single();
 
             if (error || !data?.payload) return false;
