@@ -157,6 +157,44 @@
         }
         .btn-admin:hover { background: var(--ng); color: #fff; }
         nav.scrolled .btn-admin { color: var(--ng); background: rgba(201,168,76,0.12); border-color: var(--ng); }
+        /* ── Tour button ── */
+        .btn-tour {
+            width: 30px; height: 30px; border-radius: 50%;
+            background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25);
+            color: #fff; font-weight: 700; font-size: 14px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s;
+        }
+        .btn-tour:hover { background: var(--ac, #b8972e); }
+
+        /* ── Tour overlay ── */
+        #tour-overlay { position: fixed; inset: 0; z-index: 9000; pointer-events: none; }
+        #tour-spotlight {
+            position: fixed; border-radius: 10px; pointer-events: none;
+            outline: 9999px solid rgba(0,0,0,0.6);
+            transition: all 0.35s cubic-bezier(.4,0,.2,1);
+            z-index: 9001;
+        }
+        #tour-tooltip {
+            position: fixed; width: 300px;
+            background: #fff; border-radius: 14px;
+            padding: 22px 22px 16px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.28);
+            z-index: 9002; pointer-events: all;
+            transition: top 0.35s cubic-bezier(.4,0,.2,1), left 0.35s cubic-bezier(.4,0,.2,1);
+        }
+        .tour-step-label { font-size: 11px; font-weight: 600; color: #b8972e; letter-spacing: .05em; text-transform: uppercase; margin-bottom: 6px; }
+        #tour-title { margin: 0 0 8px; font-size: 15px; font-weight: 700; color: #1e293b; }
+        #tour-body { margin: 0 0 16px; font-size: 13px; color: #475569; line-height: 1.5; }
+        .tour-actions { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+        .tour-btn-skip { background: none; border: none; color: #94a3b8; font-size: 12px; cursor: pointer; padding: 0; }
+        .tour-btn-skip:hover { color: #64748b; }
+        .tour-nav { display: flex; gap: 8px; }
+        .tour-btn-nav { background: #f1f5f9; border: none; color: #475569; font-size: 12px; font-weight: 600; padding: 7px 12px; border-radius: 8px; cursor: pointer; }
+        .tour-btn-nav:hover { background: #e2e8f0; }
+        .tour-btn-next { background: #b8972e; border: none; color: #fff; font-size: 12px; font-weight: 700; padding: 7px 14px; border-radius: 8px; cursor: pointer; }
+        .tour-btn-next:hover { background: #a07d24; }
+
         .btn-logout {
             padding: 8px 20px; border-radius: 8px;
             font-size: 0.85rem; font-weight: 700; letter-spacing: .5px;
@@ -832,9 +870,27 @@
 
     <div class="nav-actions">
         <a href="admin.html" class="btn-admin" id="btnAdmin" style="display:none">Admin</a>
+        <button id="btn-tour" class="btn-tour" title="Tour guiado">?</button>
         <button onclick="doLogout()" class="btn-logout">Cerrar sesión</button>
     </div>
 </nav>
+
+<!-- ── TOUR GUIADO ── -->
+<div id="tour-overlay" style="display:none" aria-modal="true" role="dialog">
+    <div id="tour-spotlight"></div>
+    <div id="tour-tooltip">
+        <div class="tour-step-label" id="tour-step-label">Paso 1 de 5</div>
+        <h3 id="tour-title"></h3>
+        <p id="tour-body"></p>
+        <div class="tour-actions">
+            <button id="tour-skip" class="tour-btn-skip">Saltar tour</button>
+            <div class="tour-nav">
+                <button id="tour-prev" class="tour-btn-nav">← Anterior</button>
+                <button id="tour-next" class="tour-btn-next">Siguiente →</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- HERO SLIDER -->
 <section class="hero-slider">
@@ -1661,5 +1717,105 @@
 
 <!-- ── CHAT WIDGET ── -->
 <script src="assets/js/chat-widget.js"></script>
+
+<!-- ── TOUR GUIADO ── -->
+<script>
+(function () {
+    const TOUR_KEY = 'rv4_tour_v1';
+    const STEPS = [
+        {
+            sel: '.hero-slider',
+            title: 'Slider de proyectos',
+            body: 'Explora renders de cada desarrollo. Las imágenes rotan automáticamente — puedes navegar con los puntos de abajo.'
+        },
+        {
+            sel: '.cat-row-active',
+            title: 'Categorías',
+            body: 'Filtra por tipo: <b>Análisis</b> muestra vista consolidada, <b>Casas</b> y <b>Lotes</b> muestran solo ese tipo de proyecto.'
+        },
+        {
+            sel: '#seccionAnalisis',
+            title: 'Análisis general',
+            body: 'Métricas consolidadas de presupuesto y ejecución para todos los proyectos activos.'
+        },
+        {
+            sel: '.projects-section',
+            title: 'Proyectos de Casas',
+            body: 'Cada tarjeta abre el dashboard individual con tablas, gráficos y agente IA para consultar datos.'
+        },
+        {
+            sel: '#seccionLotes',
+            title: 'Proyectos de Lotes',
+            body: 'Proyectos de urbanización. Accede al dashboard de lotes desde cada tarjeta para ver detalle presupuestario.'
+        }
+    ];
+
+    let current = 0;
+    const overlay   = document.getElementById('tour-overlay');
+    const spotlight = document.getElementById('tour-spotlight');
+    const titleEl   = document.getElementById('tour-title');
+    const bodyEl    = document.getElementById('tour-body');
+    const labelEl   = document.getElementById('tour-step-label');
+    const prevBtn   = document.getElementById('tour-prev');
+    const nextBtn   = document.getElementById('tour-next');
+
+    function positionTooltip(rect) {
+        const tt = document.getElementById('tour-tooltip');
+        const TW = 300, TH = tt.offsetHeight || 190, PAD = 12;
+        const spaceBelow = window.innerHeight - rect.bottom - 8;
+        const spaceAbove = rect.top - 8;
+        let top = spaceBelow >= TH + PAD || spaceBelow >= spaceAbove
+            ? rect.bottom + PAD
+            : rect.top - TH - PAD;
+        let left = rect.left + rect.width / 2 - TW / 2;
+        top  = Math.max(80, Math.min(top,  window.innerHeight - TH - 16));
+        left = Math.max(16, Math.min(left, window.innerWidth  - TW - 16));
+        tt.style.top  = top  + 'px';
+        tt.style.left = left + 'px';
+    }
+
+    function showStep(idx) {
+        current = idx;
+        const step   = STEPS[idx];
+        const target = document.querySelector(step.sel);
+        if (!target) { idx < STEPS.length - 1 ? showStep(idx + 1) : endTour(); return; }
+
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        setTimeout(() => {
+            const rect = target.getBoundingClientRect();
+            const P = 8;
+            spotlight.style.cssText = `position:fixed;left:${rect.left-P}px;top:${rect.top-P}px;width:${rect.width+P*2}px;height:${rect.height+P*2}px;border-radius:10px;outline:9999px solid rgba(0,0,0,0.6);pointer-events:none;z-index:9001;transition:all .35s cubic-bezier(.4,0,.2,1)`;
+
+            titleEl.textContent = step.title;
+            bodyEl.innerHTML    = step.body;
+            labelEl.textContent = `Paso ${idx + 1} de ${STEPS.length}`;
+            prevBtn.style.display = idx === 0 ? 'none' : '';
+            nextBtn.textContent   = idx === STEPS.length - 1 ? 'Finalizar ✓' : 'Siguiente →';
+
+            positionTooltip(rect);
+        }, 380);
+    }
+
+    function startTour() {
+        overlay.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+        showStep(0);
+    }
+
+    function endTour() {
+        overlay.style.display = 'none';
+        document.body.style.overflow = '';
+        localStorage.setItem(TOUR_KEY, '1');
+    }
+
+    nextBtn.addEventListener('click', () => current >= STEPS.length - 1 ? endTour() : showStep(current + 1));
+    prevBtn.addEventListener('click', () => current > 0 && showStep(current - 1));
+    document.getElementById('tour-skip').addEventListener('click', endTour);
+    document.getElementById('btn-tour').addEventListener('click', startTour);
+
+    if (!localStorage.getItem(TOUR_KEY)) setTimeout(startTour, 1400);
+})();
+</script>
 </body>
 </html>
