@@ -125,8 +125,13 @@ function Resolve-PowerBIReportByName {
     $reportMatches = @($reports | Where-Object { $_.name -eq $ReportName })
 
     if ($reportMatches.Count -eq 0) {
-        $available = ($reports | Select-Object -ExpandProperty name) -join ", "
-        throw "No se encontro el reporte '$ReportName' en el workspace. Reportes disponibles: $available"
+        # Fallback: búsqueda case-insensitive parcial
+        $reportMatches = @($reports | Where-Object { $_.name -ilike "*$ReportName*" })
+        if ($reportMatches.Count -eq 0) {
+            $available = ($reports | Select-Object -ExpandProperty name) -join ", "
+            throw "No se encontro el reporte '$ReportName' en el workspace. Reportes disponibles: $available"
+        }
+        Write-Warning "Match exacto no encontrado. Usando coincidencia parcial: '$($reportMatches[0].name)'"
     }
 
     if ($reportMatches.Count -gt 1) {
@@ -206,10 +211,18 @@ if ($pbiConnected) {
 $env:PBI_SESSION_ACTIVE = "1"
 
 if (-not [string]::IsNullOrWhiteSpace($ReportName)) {
-    $resolvedReport = Resolve-PowerBIReportByName -WorkspaceId $WorkspaceId -ReportName $ReportName
-    $ReportId = $resolvedReport.id
-    if ([string]::IsNullOrWhiteSpace($DatasetId)) {
-        $DatasetId = $resolvedReport.datasetId
+    try {
+        $resolvedReport = Resolve-PowerBIReportByName -WorkspaceId $WorkspaceId -ReportName $ReportName
+        $ReportId = $resolvedReport.id
+        if ([string]::IsNullOrWhiteSpace($DatasetId)) {
+            $DatasetId = $resolvedReport.datasetId
+        }
+    } catch {
+        if ([string]::IsNullOrWhiteSpace($DatasetId)) {
+            throw
+        }
+        Write-Warning "No se encontro el reporte '$ReportName' en PBI Service. Continuando con DatasetId=$DatasetId"
+        if ([string]::IsNullOrWhiteSpace($ReportId)) { $ReportId = "unknown" }
     }
 }
 
