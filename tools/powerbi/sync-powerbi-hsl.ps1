@@ -29,10 +29,12 @@ Write-Info "Buscando reporte para dataset $DatasetId..."
 $reports = @(((Invoke-PowerBIRestMethod -Url "groups/$WorkspaceId/reports" -Method Get) | ConvertFrom-Json).value)
 $match   = @($reports | Where-Object { $_.datasetId -eq $DatasetId })
 if ($match.Count -eq 0) {
-    throw "No se encontro ningun reporte para el dataset $DatasetId en el workspace $WorkspaceId."
+    Write-Warning "No se encontro reporte para el dataset $DatasetId. Continuando solo con DatasetId."
+    $ReportId = "unknown"
+} else {
+    $ReportId = $match[0].id
+    Write-Info "Reporte encontrado: $($match[0].name) (id: $ReportId)"
 }
-$ReportId = $match[0].id
-Write-Info "Reporte encontrado: $($match[0].name) (id: $ReportId)"
 
 $syncScript = Join-Path $PSScriptRoot "sync-powerbi-resumen.ps1"
 $syncArgs = @{

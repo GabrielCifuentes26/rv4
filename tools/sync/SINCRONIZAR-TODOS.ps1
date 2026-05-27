@@ -52,8 +52,11 @@ foreach ($p in $proyectos) {
         $ok += $p.Nombre
         Write-Host "      OK" -ForegroundColor Green
     } catch {
-        $err += "$($p.Nombre): $($_.Exception.Message)"
-        Write-Host "      ERROR: $($_.Exception.Message)" -ForegroundColor Red
+        $msg = $_.Exception.Message
+        $inner = $_.Exception.InnerException
+        while ($inner) { $msg += " | " + $inner.Message; $inner = $inner.InnerException }
+        $err += "$($p.Nombre): $msg"
+        Write-Host "      ERROR: $msg" -ForegroundColor Red
     }
     $i++
     Write-Host ""
