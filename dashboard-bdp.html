@@ -1383,6 +1383,8 @@
     const FLOW_METRIC_NAMES = ['EjecutadoErequester', 'ComprometidoErequester', 'AsignadoErequester'];
     const BUDGET_KEY_DIMENSIONS = ['Rubros[Area]', 'Rubros[Segmento]', 'Rubros[Etapa]', 'Rubros[Fase]'];
     const MONTH_ORDER = { ene: 0, feb: 1, mar: 2, abr: 3, may: 4, jun: 5, jul: 6, ago: 7, sep: 8, oct: 9, nov: 10, dic: 11 };
+    const BDP_DEFAULT_AREAS = ['Construcción', 'Urbanización'];
+
     const powerBIState = {
         data: null,
         filters: { areas: [], segmentos: [], etapas: [], fases: [], meses: [] },
@@ -1601,7 +1603,7 @@
             btn.addEventListener('click', event => {
                 event.stopPropagation();
                 const key = btn.dataset.clearFilter;
-                powerBIState.filters[key] = [];
+                powerBIState.filters[key] = key === 'areas' ? [...BDP_DEFAULT_AREAS] : [];
                 populateFilterControls(key);
                 renderPowerBIView();
             });
@@ -1609,7 +1611,7 @@
 
         // Botón "Limpiar filtros" global → resetea todos a "Todas"
         document.getElementById('filter-clear')?.addEventListener('click', () => {
-            powerBIState.filters = { areas: [], segmentos: [], etapas: [], fases: [], meses: [] };
+            powerBIState.filters = { areas: [...BDP_DEFAULT_AREAS], segmentos: [], etapas: [], fases: [], meses: [] };
             powerBIState.options = { areas: [], segmentos: [], etapas: [], fases: [], meses: [] };
             const inp = document.getElementById('filter-search');
             if (inp) inp.value = '';
@@ -2729,7 +2731,7 @@
         } catch(e) {
             console.warn('[BDP] Error en binding de controles:', e);
         }
-        powerBIState.filters = { areas: [], segmentos: [], etapas: [], fases: [], meses: [] };
+        powerBIState.filters = { areas: [...BDP_DEFAULT_AREAS], segmentos: [], etapas: [], fases: [], meses: [] };
         powerBIState.options = { areas: [], segmentos: [], etapas: [], fases: [], meses: [] };
         const _inp = document.getElementById('filter-search');
         if (_inp) _inp.value = '';
