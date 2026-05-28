@@ -156,10 +156,19 @@
 
         /* card header */
         .pcard-head {
-            padding:18px 20px 14px;
-            display:flex; align-items:center; justify-content:space-between; gap:8px;
+            position:relative; overflow:hidden;
+            background:var(--navy);
+            height:90px;
+            display:flex; align-items:center; justify-content:center;
         }
-        .pcard-name { font-size:.95rem; font-weight:800; color:var(--navy); line-height:1.25; }
+        .pcard-head img {
+            height:72px; width:auto; object-fit:contain;
+            filter:brightness(1.05);
+        }
+        .pct-badge-wrap {
+            position:absolute; top:10px; right:12px;
+        }
+        .pcard-name { display:none; }
         .pct-badge {
             font-size:.72rem; font-weight:800; flex-shrink:0;
             padding:3px 10px; border-radius:999px; border:1.5px solid;
@@ -366,12 +375,12 @@ document.getElementById('btn-logout').addEventListener('click',()=>
 );
 
 const PROJECTS=[
-    {key:'bdj',name:'Bosques de Jalapa',     json:'data/powerbi/bdj/resumen-powerbi.json'},
-    {key:'bdp',name:'Bosques de Pinula',      json:'data/powerbi/bdp/resumen-powerbi.json'},
-    {key:'bse',name:'Bosques de Santa Elena', json:'data/powerbi/bse/resumen-powerbi.json'},
-    {key:'cse',name:'Condado Santa Elena',    json:'data/powerbi/cse/resumen-powerbi.json'},
-    {key:'hlq',name:'Hacienda La Querencia',  json:'data/powerbi/hlq/resumen-powerbi.json'},
-    {key:'rdb',name:'Reserva del Bosque',     json:'data/powerbi/rdb/resumen-powerbi.json'},
+    {key:'bdj',name:'Bosques de Jalapa',     logo:'imagenes de proyectos/Logos Casas/BOSQUES DE JALAPA RENDER.png',     json:'data/powerbi/bdj/resumen-powerbi.json'},
+    {key:'bdp',name:'Bosques de Pinula',     logo:'imagenes de proyectos/Logos Casas/BOSQUES DE PINULA RENDER.png',     json:'data/powerbi/bdp/resumen-powerbi.json'},
+    {key:'bse',name:'Bosques de Santa Elena',logo:'imagenes de proyectos/Logos Casas/BOSQUES DE SANTA ELENA RENDER.png',json:'data/powerbi/bse/resumen-powerbi.json'},
+    {key:'cse',name:'Condado Santa Elena',   logo:'imagenes de proyectos/Logos Casas/CONDADO SANTA ELENA RENDER.png',   json:'data/powerbi/cse/resumen-powerbi.json'},
+    {key:'hlq',name:'Hacienda La Querencia', logo:'imagenes de proyectos/Logos Casas/HACIENDA LA QUERENCIA RENDER.png', json:'data/powerbi/hlq/resumen-powerbi.json'},
+    {key:'rdb',name:'Reserva del Bosque',    logo:'imagenes de proyectos/Logos Casas/RESERVA DEL BOSQUE RENDER.png',    json:'data/powerbi/rdb/resumen-powerbi.json'},
 ];
 
 function fmt(v){
@@ -409,8 +418,9 @@ function buildCard(proj,areas){
     card.className='pcard';
     card.innerHTML=`
         <div class="pcard-head">
-            <div class="pcard-name">${proj.name}</div>
-            <div class="pct-badge ${cls}">${fmtPct(pctTotal)}</div>
+            <img src="${proj.logo}" alt="${proj.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+            <span style="display:none;color:#fff;font-weight:800;font-size:.9rem">${proj.name}</span>
+            <div class="pct-badge-wrap"><div class="pct-badge ${cls}">${fmtPct(pctTotal)}</div></div>
         </div>
         <div class="pcard-divider"></div>
         <div class="pcard-table-wrap">
