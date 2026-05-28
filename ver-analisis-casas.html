@@ -484,9 +484,12 @@ async function init(){
 
             const ds=payload.datasets||payload;
 
-            // KPI strip: sum ALL areas
+            // KPI strip: solo Construcción + Urbanización (igual que las tarjetas)
             const allAreas=Array.isArray(ds.porArea)?ds.porArea:[];
-            allAreas.forEach(row=>{
+            allAreas.filter(row=>{
+                const n=getAreaName(row).toLowerCase();
+                return n.includes('construcc')||n.includes('urbaniz');
+            }).forEach(row=>{
                 tSap  +=(row['[PresupuestoErequester]']??row['[RdiTotal]']??0);
                 tEjec +=(row['[EjecutadoErequester]']??0);
                 tComp +=(row['[ComprometidoErequester]']??0);
