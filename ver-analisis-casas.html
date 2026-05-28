@@ -127,7 +127,7 @@
         .cards-grid {
             max-width:1320px; margin:0 auto;
             padding:0 24px 56px;
-            display:grid; grid-template-columns:repeat(3,1fr); gap:18px;
+            display:grid; grid-template-columns:repeat(2,1fr); gap:18px;
         }
 
         /* PROJECT CARD */
@@ -220,11 +220,11 @@
         @keyframes pulse { 0%,100%{opacity:.45} 50%{opacity:.9} }
 
         /* responsive */
-        @media(max-width:1100px){ .cards-grid{grid-template-columns:repeat(2,1fr);} }
+        @media(max-width:900px){ .cards-grid{grid-template-columns:1fr;} }
         @media(max-width:680px){
             .kpi-strip-inner { flex-wrap:wrap; }
             .kpi-item { flex:1 1 calc(50% - 1px); border-bottom:1px solid var(--border); }
-            .cards-grid { grid-template-columns:1fr; padding:0 16px 40px; }
+            .cards-grid { padding:0 16px 40px; }
         }
     </style>
 </head>
@@ -387,19 +387,22 @@ function fmtPct(p){
 
 function buildCard(proj,areas){
     const sapTotal =areas.reduce((s,a)=>s+(a.sap||0),0);
+    const ejecTotal=areas.reduce((s,a)=>s+(a.ejec||0),0);
+    const compTotal=areas.reduce((s,a)=>s+(a.comp||0),0);
     const asigTotal=areas.reduce((s,a)=>s+(a.asig||0),0);
+    const dispTotal=areas.reduce((s,a)=>s+(a.disp||0),0);
     const pctTotal =sapTotal>0?(asigTotal/sapTotal*100):null;
     const cls=pctCls(pctTotal);
     const fillW=Math.min(pctTotal||0,100).toFixed(1);
 
-    const areaRows=areas.map(a=>{
-        const p=a.sap>0?(a.asig/a.sap*100):null;
-        return `<tr>
-            <td>${a.name}</td>
-            <td>${fmt(a.sap)}</td>
-            <td>${fmt(a.asig)}</td>
-        </tr>`;
-    }).join('');
+    const areaRows=areas.map(a=>`<tr>
+        <td>${a.name}</td>
+        <td>${fmt(a.sap)}</td>
+        <td>${fmt(a.ejec)}</td>
+        <td>${fmt(a.comp)}</td>
+        <td>${fmt(a.asig)}</td>
+        <td>${fmt(a.disp)}</td>
+    </tr>`).join('');
 
     const card=document.createElement('div');
     card.className='pcard';
@@ -413,8 +416,11 @@ function buildCard(proj,areas){
             <thead>
                 <tr>
                     <th>Área</th>
-                    <th>Ppto. SAP</th>
+                    <th>Presupuesto</th>
+                    <th>Ejecutado</th>
+                    <th>Comprometido</th>
                     <th>Asignado</th>
+                    <th>Disponible</th>
                 </tr>
             </thead>
             <tbody>${areaRows}</tbody>
@@ -422,7 +428,10 @@ function buildCard(proj,areas){
                 <tr>
                     <td>Total</td>
                     <td>${fmt(sapTotal)}</td>
+                    <td>${fmt(ejecTotal)}</td>
+                    <td>${fmt(compTotal)}</td>
                     <td>${fmt(asigTotal)}</td>
+                    <td>${fmt(dispTotal)}</td>
                 </tr>
             </tfoot>
         </table>
@@ -500,8 +509,11 @@ async function init(){
             const areas=['Construcción','Urbanización'].map(name=>{
                 const d=getArea(ds,name);
                 const sap  = d?.['[PresupuestoErequester]'] ?? d?.['[RdiTotal]'] ?? 0;
-                const asig = d?.['[AsignadoErequester]'] ?? 0;
-                return{name,sap,asig};
+                const ejec = d?.['[EjecutadoErequester]']   ?? 0;
+                const comp = d?.['[ComprometidoErequester]'] ?? 0;
+                const asig = d?.['[AsignadoErequester]']    ?? 0;
+                const disp = d?.['[DisponibleErequester]']  ?? 0;
+                return{name,sap,ejec,comp,asig,disp};
             });
             grid.appendChild(buildCard(proj,areas));
         }
