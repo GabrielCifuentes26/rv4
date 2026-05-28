@@ -82,33 +82,57 @@
         /* ── PAGE HERO ───────────────────────────── */
         .page-hero {
             background:var(--surface); border-bottom:1.5px solid var(--border);
-            padding:24px 28px 20px;
+            padding:20px 28px 18px;
         }
         .page-hero-inner {
             max-width:1320px; margin:0 auto;
-            display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:16px;
+            display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;
         }
         .page-hero-eyebrow {
             font-size:.68rem; font-weight:700; color:var(--ng);
-            text-transform:uppercase; letter-spacing:1px; margin-bottom:5px;
+            text-transform:uppercase; letter-spacing:1px; margin-bottom:4px;
         }
-        .page-hero-title { font-size:1.5rem; font-weight:900; color:var(--navy); line-height:1.2; }
+        .page-hero-title { font-size:1.4rem; font-weight:900; color:var(--navy); line-height:1.2; }
         .page-hero-title span { color:var(--ng); }
-        .page-hero-sub { font-size:.85rem; color:var(--gray); margin-top:5px; line-height:1.5; }
-        .hero-kpis { display:flex; gap:12px; flex-wrap:wrap; align-items:flex-start; }
-        .hero-kpi {
-            padding:12px 20px; border-radius:14px;
-            border:1.5px solid; min-width:155px;
+        .page-hero-sub { font-size:.82rem; color:var(--gray); margin-top:4px; line-height:1.5; }
+
+        /* ── KPI STRIP ───────────────────────────── */
+        .kpi-strip {
+            background:var(--surface);
+            border-bottom:2px solid var(--border);
+            padding:0 28px;
         }
-        .hero-kpi--sap   { background:rgba(201,168,76,.07);  border-color:rgba(201,168,76,.28); }
-        .hero-kpi--asig  { background:rgba(59,130,246,.06);  border-color:rgba(59,130,246,.22); }
-        .hero-kpi--pct   { background:rgba(21,128,61,.06);   border-color:rgba(21,128,61,.22); }
-        .hero-kpi-label  { font-size:.6rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--gray2); margin-bottom:2px; }
-        .hero-kpi-val    { font-size:1.1rem; font-weight:900; font-variant-numeric:tabular-nums; }
-        .hero-kpi--sap  .hero-kpi-val { color:#A8832A; }
-        .hero-kpi--asig .hero-kpi-val { color:#2563eb; }
-        .hero-kpi--pct  .hero-kpi-val { color:var(--green); }
-        .hero-kpi-sub    { font-size:.6rem; font-weight:600; color:var(--gray2); margin-top:3px; }
+        .kpi-strip-inner {
+            max-width:1320px; margin:0 auto;
+            display:flex; align-items:stretch;
+        }
+        .kpi-item {
+            flex:1; min-width:0;
+            display:flex; align-items:center; gap:13px;
+            padding:14px 18px;
+            border-right:1px solid var(--border);
+        }
+        .kpi-item:last-child { border-right:none; }
+        .kpi-icon {
+            width:36px; height:36px; border-radius:10px;
+            display:flex; align-items:center; justify-content:center; flex-shrink:0;
+        }
+        .kpi-icon svg { width:17px; height:17px; fill:currentColor; }
+        .kpi-body {}
+        .kpi-label { font-size:.58rem; font-weight:700; text-transform:uppercase; letter-spacing:.8px; color:var(--gray2); margin-bottom:2px; white-space:nowrap; }
+        .kpi-val   { font-size:.95rem; font-weight:900; font-variant-numeric:tabular-nums; }
+        .kpi-icon--sap  { background:rgba(201,168,76,.12); color:#A8832A; }
+        .kpi-icon--ejec { background:rgba(59,130,246,.10); color:#2563eb; }
+        .kpi-icon--comp { background:rgba(245,158,11,.12); color:#d97706; }
+        .kpi-icon--asig { background:rgba(21,128,61,.10);  color:#15803d; }
+        .kpi-icon--disp { background:rgba(100,116,139,.10);color:#475569; }
+        .kpi-icon--pct  { background:rgba(99,102,241,.10); color:#4f46e5; }
+        .kpi-val--sap  { color:#A8832A; }
+        .kpi-val--ejec { color:#2563eb; }
+        .kpi-val--comp { color:#d97706; }
+        .kpi-val--asig { color:#15803d; }
+        .kpi-val--disp { color:#475569; }
+        .kpi-val--pct  { color:#4f46e5; }
 
         /* ── MAIN ────────────────────────────────── */
         .main { max-width:1320px; margin:0 auto; padding:28px 28px 56px; }
@@ -300,21 +324,68 @@
             <div class="page-hero-title">Presupuesto SAP <span>vs</span> Asignado</div>
             <div class="page-hero-sub">Desglose de Construcción y Urbanización por proyecto.<br><span id="date-text" style="color:var(--ng);font-weight:600">Cargando datos…</span></div>
         </div>
-        <div class="hero-kpis">
-            <div class="hero-kpi hero-kpi--sap">
-                <div class="hero-kpi-label">Total Ppto. SAP</div>
-                <div class="hero-kpi-val" id="kpi-sap">—</div>
-                <div class="hero-kpi-sub">6 proyectos</div>
+        <div class="date-pill" id="date-pill-hero" style="margin-top:4px">
+            <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>
+            Cargando…
+        </div>
+    </div>
+</div>
+
+<!-- KPI STRIP -->
+<div class="kpi-strip">
+    <div class="kpi-strip-inner">
+        <div class="kpi-item">
+            <div class="kpi-icon kpi-icon--sap">
+                <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 7V3.5L18.5 9H13zM8 16h8v2H8zm0-4h8v2H8zm0-4h5v2H8z"/></svg>
             </div>
-            <div class="hero-kpi hero-kpi--asig">
-                <div class="hero-kpi-label">Total Asignado</div>
-                <div class="hero-kpi-val" id="kpi-asig">—</div>
-                <div class="hero-kpi-sub">Const. + Urb.</div>
+            <div class="kpi-body">
+                <div class="kpi-label">Presupuesto SAP</div>
+                <div class="kpi-val kpi-val--sap" id="ks-sap">—</div>
             </div>
-            <div class="hero-kpi hero-kpi--pct">
-                <div class="hero-kpi-label">% Asignado Global</div>
-                <div class="hero-kpi-val" id="kpi-pct">—</div>
-                <div class="hero-kpi-sub">Asignado / SAP</div>
+        </div>
+        <div class="kpi-item">
+            <div class="kpi-icon kpi-icon--ejec">
+                <svg viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6h-6z"/></svg>
+            </div>
+            <div class="kpi-body">
+                <div class="kpi-label">Ejecutado</div>
+                <div class="kpi-val kpi-val--ejec" id="ks-ejec">—</div>
+            </div>
+        </div>
+        <div class="kpi-item">
+            <div class="kpi-icon kpi-icon--comp">
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+            </div>
+            <div class="kpi-body">
+                <div class="kpi-label">Comprometido</div>
+                <div class="kpi-val kpi-val--comp" id="ks-comp">—</div>
+            </div>
+        </div>
+        <div class="kpi-item">
+            <div class="kpi-icon kpi-icon--asig">
+                <svg viewBox="0 0 24 24"><path d="M11 2v20c-5.07-.5-9-4.79-9-10s3.93-9.5 9-10zm2.03 0v8.99H22c-.47-4.74-4.24-8.52-8.97-8.99zm0 11.01V22c4.74-.47 8.5-4.25 8.97-8.99h-8.97z"/></svg>
+            </div>
+            <div class="kpi-body">
+                <div class="kpi-label">Asignado</div>
+                <div class="kpi-val kpi-val--asig" id="ks-asig">—</div>
+            </div>
+        </div>
+        <div class="kpi-item">
+            <div class="kpi-icon kpi-icon--disp">
+                <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg>
+            </div>
+            <div class="kpi-body">
+                <div class="kpi-label">Disponible</div>
+                <div class="kpi-val kpi-val--disp" id="ks-disp">—</div>
+            </div>
+        </div>
+        <div class="kpi-item">
+            <div class="kpi-icon kpi-icon--pct">
+                <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+            </div>
+            <div class="kpi-body">
+                <div class="kpi-label">% Asignado</div>
+                <div class="kpi-val kpi-val--pct" id="ks-pct">—</div>
             </div>
         </div>
     </div>
@@ -323,11 +394,7 @@
 <!-- MAIN -->
 <div class="main">
     <div class="main-top">
-        <div class="main-label">Detalle por Proyecto</div>
-        <div class="date-pill" id="date-pill">
-            <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>
-            Cargando…
-        </div>
+        <div class="main-label">Detalle por Proyecto — Construcción + Urbanización</div>
     </div>
 
     <div class="cards-grid" id="cards-grid">
@@ -531,6 +598,7 @@ async function init(){
         const grid=document.getElementById('cards-grid');
         grid.innerHTML='';
         let gSap=0,gAsig=0,mes='';
+        let tSap=0,tEjec=0,tComp=0,tAsig=0,tDisp=0;
 
         for(const proj of PROJECTS){
             let payload=null,mesA='';
@@ -547,6 +615,18 @@ async function init(){
             if(mesA&&!mes)mes=mesA;
 
             const ds=payload.datasets||payload;
+
+            // accumulate totales for KPI strip
+            const tot=Array.isArray(ds.totales)?ds.totales[0]:(ds.totales||null);
+            if(tot){
+                tSap  +=(tot['[PresupuestoErequester]']??tot['[RdiTotal]']??0);
+                tEjec +=(tot['[EjecutadoErequester]']??0);
+                tComp +=(tot['[ComprometidoErequester]']??0);
+                tAsig +=(tot['[AsignadoErequester]']??0);
+                tDisp +=(tot['[DisponibleErequester]']??0);
+            }
+
+            // accumulate Construcción + Urbanización for cards
             const areas=['Construcción','Urbanización'].map(name=>{
                 const d=getArea(ds,name);
                 const sap  = d?.['[PresupuestoErequester]'] ?? d?.['[RdiTotal]'] ?? 0;
@@ -559,21 +639,21 @@ async function init(){
 
         grid.appendChild(buildTotalCard(gSap,gAsig));
 
-        const gp=gSap>0?(gAsig/gSap*100):null;
-        document.getElementById('kpi-sap').textContent=fmt(gSap);
-        document.getElementById('kpi-asig').textContent=fmt(gAsig);
-        const pEl=document.getElementById('kpi-pct');
-        pEl.textContent=fmtPct(gp);
-        const pcls=pctCls(gp);
-        if(pcls==='ok')pEl.style.color='#15803d';
-        else if(pcls==='warn')pEl.style.color='#d97706';
-        else if(pcls==='danger')pEl.style.color='#dc2626';
+        // populate KPI strip
+        const gp=tSap>0?(tAsig/tSap*100):null;
+        document.getElementById('ks-sap').textContent =fmt(tSap);
+        document.getElementById('ks-ejec').textContent=fmt(tEjec);
+        document.getElementById('ks-comp').textContent=fmt(tComp);
+        document.getElementById('ks-asig').textContent=fmt(tAsig);
+        document.getElementById('ks-disp').textContent=fmt(tDisp);
+        document.getElementById('ks-pct').textContent =fmtPct(gp);
 
-        const ds=mes?mes.toUpperCase():'—';
-        document.getElementById('date-text').textContent='Datos al '+ds+' · 6 proyectos activos.';
-        document.getElementById('date-pill').innerHTML=`
+        const dateStr=mes?mes.toUpperCase():'—';
+        document.getElementById('date-text').textContent='Datos al '+dateStr+' · 6 proyectos activos.';
+        const heroDatePill=document.getElementById('date-pill-hero');
+        heroDatePill.innerHTML=`
             <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>
-            Datos al ${ds}`;
+            Datos al ${dateStr}`;
 
         requestAnimationFrame(()=>setTimeout(animateBars,150));
 
