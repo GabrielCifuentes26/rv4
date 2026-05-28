@@ -356,8 +356,9 @@ function buildCard(proj,areas){
 function getAreaName(row){
     return row['Rubros[Area]']||row['dimSegmentación[Area]']||row['dimSegmentacion[Area]']||'';
 }
+function norm(s){ return s.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase(); }
 function getArea(ds,name){
-    return(ds?.porArea||[]).find(r=>getAreaName(r).toLowerCase()===name.toLowerCase())||null;
+    return(ds?.porArea||[]).find(r=>norm(getAreaName(r))===norm(name))||null;
 }
 
 async function loadSB(){
@@ -381,7 +382,7 @@ async function init(){
         let mes='';
         let tSap=0,tEjec=0,tComp=0,tAsig=0,tDisp=0;
 
-        for(const proj of PROJECTS){
+        const results=await Promise.all(PROJECTS.map(async proj=>{
             let payload=null,mesA='';
             if(sbMap?.[proj.key]){
                 const row=sbMap[proj.key];
@@ -392,6 +393,10 @@ async function init(){
                 const j=await loadJSON(proj).catch(()=>null);
                 if(j){payload=j;mesA=j.metadata?.filters?.mesA||'';}
             }
+            return{proj,payload,mesA};
+        }));
+
+        for(const{proj,payload,mesA}of results){
             if(!payload)continue;
             if(mesA&&!mes)mes=mesA;
 
