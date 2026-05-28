@@ -1736,11 +1736,11 @@
         document.body.classList.toggle('dark', isDark);
         document.getElementById('btn-theme').textContent = isDark ? '☀️' : '🌙';
         localStorage.setItem('rv4-theme', isDark ? 'dark' : 'light');
+        const savedIdx = current;
         slides = isDark ? slidesNight : slidesDay;
         clearInterval(timer);
-        current = 0;
         buildDots();
-        showSlide(0);
+        showSlide(savedIdx);
         timer = setInterval(() => showSlide((current + 1) % slides.length), 7000);
     };
 
