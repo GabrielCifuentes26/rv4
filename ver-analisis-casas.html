@@ -21,86 +21,71 @@
     <style>
         *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
         :root {
-            --bg:      #f0f4f8;
-            --surface: #ffffff;
-            --navy:    #0f172a;
-            --navy2:   #1e293b;
-            --gray:    #64748b;
-            --gray2:   #94a3b8;
-            --border:  #e2e8f0;
-            --ng:      #C9A84C;
-            --blue:    #3b82f6;
-            --green:   #15803d;
-            --shadow:  0 4px 24px rgba(15,23,42,0.10);
+            --bg:     #f8fafc;
+            --surface:#ffffff;
+            --navy:   #0f172a;
+            --slate:  #334155;
+            --gray:   #64748b;
+            --muted:  #94a3b8;
+            --border: #e2e8f0;
+            --gold:   #C9A84C;
+            --gold-d: #A8832A;
+            --ok:     #16a34a;
+            --warn:   #d97706;
+            --danger: #dc2626;
+            --shadow: 0 1px 8px rgba(15,23,42,0.07);
         }
         body { font-family:'Inter','Segoe UI',sans-serif; background:var(--bg); color:var(--navy); min-height:100vh; }
 
-        /* ── TOPBAR ──────────────────────────────── */
+        /* ── TOPBAR ─────────────────────────────── */
         .topbar {
             position:sticky; top:0; z-index:300;
-            background:#0f172a; border-bottom:1px solid rgba(255,255,255,0.07);
-            padding:0 22px; height:56px;
+            background:var(--navy); border-bottom:1px solid rgba(255,255,255,0.06);
+            padding:0 24px; height:56px;
             display:flex; align-items:center; justify-content:space-between;
-            box-shadow:0 2px 16px rgba(15,23,42,0.25);
+            box-shadow:0 2px 12px rgba(15,23,42,0.22);
         }
         .topbar::before {
             content:''; position:absolute; top:0; left:0; right:0; height:2px;
-            background:linear-gradient(90deg,transparent 0%,#C9A84C 35%,#C9A84C 65%,transparent 100%);
+            background:linear-gradient(90deg,transparent,var(--gold) 30%,var(--gold) 70%,transparent);
         }
-        .topbar-left { display:flex; align-items:center; }
+        .topbar-left { display:flex; align-items:center; gap:14px; }
         .home-link {
             display:flex; align-items:center; justify-content:center;
-            width:36px; height:36px; border-radius:8px;
-            background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.12);
-            color:rgba(255,255,255,0.6); text-decoration:none;
-            transition:background .18s,color .18s; flex-shrink:0; margin-right:14px;
+            width:34px; height:34px; border-radius:8px;
+            background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.10);
+            color:rgba(255,255,255,0.55); text-decoration:none;
+            transition:background .15s,color .15s; flex-shrink:0;
         }
-        .home-link:hover { background:#C9A84C; color:#fff; border-color:#C9A84C; }
+        .home-link:hover { background:var(--gold); color:#fff; border-color:var(--gold); }
         .home-link svg { width:15px; height:15px; fill:currentColor; }
+        .brand-link { text-decoration:none; }
+        .topbar-brand { font-size:.85rem; font-weight:900; color:#fff; letter-spacing:-.2px; }
+        .topbar-brand span { color:var(--gold); }
+        .topbar-sub { font-size:.56rem; color:rgba(255,255,255,.35); margin-top:1px; letter-spacing:.3px; }
         .topbar-center {
             position:absolute; left:50%; transform:translateX(-50%);
             text-align:center; pointer-events:none;
         }
-        .topbar-page-title { font-size:1.05rem; font-weight:900; color:#fff; letter-spacing:-.2px; }
-        .topbar-page-title span { color:#C9A84C; }
-        .topbar-page-sub { font-size:0.62rem; color:rgba(255,255,255,0.45); margin-top:2px; }
-        .brand-link { text-decoration:none; }
-        .topbar-brand { font-size:.88rem; font-weight:900; color:#fff; }
-        .topbar-brand span { color:#C9A84C; }
-        .topbar-sub-brand { font-size:.58rem; color:rgba(255,255,255,.38); margin-top:1px; }
-        .topbar-right { display:flex; align-items:center; gap:10px; }
+        .topbar-title { font-size:1rem; font-weight:800; color:#fff; letter-spacing:-.2px; }
+        .topbar-title span { color:var(--gold); }
+        .topbar-subtitle { font-size:.58rem; color:rgba(255,255,255,.40); margin-top:2px; }
+        .topbar-right { display:flex; align-items:center; }
         .btn-logout {
-            display:flex; align-items:center; gap:6px;
-            background:rgba(239,68,68,.10); border:1px solid rgba(239,68,68,.30);
-            color:#f87171; padding:5px 14px; border-radius:7px;
-            font-size:.72rem; font-weight:700; cursor:pointer; font-family:inherit;
-            transition:background .18s,border-color .18s,color .18s;
+            display:flex; align-items:center; gap:5px;
+            background:rgba(239,68,68,.09); border:1px solid rgba(239,68,68,.25);
+            color:#f87171; padding:5px 13px; border-radius:7px;
+            font-size:.70rem; font-weight:700; cursor:pointer; font-family:inherit;
+            transition:background .15s,color .15s;
         }
-        .btn-logout:hover { background:rgba(239,68,68,.22); border-color:rgba(239,68,68,.55); color:#fca5a5; }
-        .btn-logout svg { width:13px; height:13px; fill:currentColor; }
+        .btn-logout:hover { background:rgba(239,68,68,.20); color:#fca5a5; }
+        .btn-logout svg { width:12px; height:12px; fill:currentColor; }
 
-        /* ── PAGE HERO ───────────────────────────── */
-        .page-hero {
-            background:var(--surface); border-bottom:1.5px solid var(--border);
-            padding:20px 28px 18px;
-        }
-        .page-hero-inner {
-            max-width:1320px; margin:0 auto;
-            display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;
-        }
-        .page-hero-eyebrow {
-            font-size:.68rem; font-weight:700; color:var(--ng);
-            text-transform:uppercase; letter-spacing:1px; margin-bottom:4px;
-        }
-        .page-hero-title { font-size:1.4rem; font-weight:900; color:var(--navy); line-height:1.2; }
-        .page-hero-title span { color:var(--ng); }
-        .page-hero-sub { font-size:.82rem; color:var(--gray); margin-top:4px; line-height:1.5; }
-
-        /* ── KPI STRIP ───────────────────────────── */
+        /* ── KPI STRIP ──────────────────────────── */
         .kpi-strip {
             background:var(--surface);
-            border-bottom:2px solid var(--border);
-            padding:0 28px;
+            border-bottom:1px solid var(--border);
+            padding:0 24px;
         }
         .kpi-strip-inner {
             max-width:1320px; margin:0 auto;
@@ -108,186 +93,138 @@
         }
         .kpi-item {
             flex:1; min-width:0;
-            display:flex; align-items:center; gap:13px;
-            padding:14px 18px;
+            display:flex; align-items:center; gap:12px;
+            padding:16px 20px;
             border-right:1px solid var(--border);
         }
         .kpi-item:last-child { border-right:none; }
         .kpi-icon {
-            width:36px; height:36px; border-radius:10px;
-            display:flex; align-items:center; justify-content:center; flex-shrink:0;
+            width:34px; height:34px; border-radius:9px; flex-shrink:0;
+            background:#f1f5f9;
+            display:flex; align-items:center; justify-content:center;
+            color:var(--slate);
         }
-        .kpi-icon svg { width:17px; height:17px; fill:currentColor; }
-        .kpi-body {}
-        .kpi-label { font-size:.58rem; font-weight:700; text-transform:uppercase; letter-spacing:.8px; color:var(--gray2); margin-bottom:2px; white-space:nowrap; }
-        .kpi-val   { font-size:.95rem; font-weight:900; font-variant-numeric:tabular-nums; }
-        .kpi-icon--sap  { background:rgba(201,168,76,.12); color:#A8832A; }
-        .kpi-icon--ejec { background:rgba(59,130,246,.10); color:#2563eb; }
-        .kpi-icon--comp { background:rgba(245,158,11,.12); color:#d97706; }
-        .kpi-icon--asig { background:rgba(21,128,61,.10);  color:#15803d; }
-        .kpi-icon--disp { background:rgba(100,116,139,.10);color:#475569; }
-        .kpi-icon--pct  { background:rgba(99,102,241,.10); color:#4f46e5; }
-        .kpi-val--sap  { color:#A8832A; }
-        .kpi-val--ejec { color:#2563eb; }
-        .kpi-val--comp { color:#d97706; }
-        .kpi-val--asig { color:#15803d; }
-        .kpi-val--disp { color:#475569; }
-        .kpi-val--pct  { color:#4f46e5; }
+        .kpi-icon svg { width:16px; height:16px; fill:currentColor; }
+        .kpi-label { font-size:.57rem; font-weight:700; text-transform:uppercase; letter-spacing:.7px; color:var(--muted); margin-bottom:3px; white-space:nowrap; }
+        .kpi-val   { font-size:.9rem; font-weight:800; color:var(--navy); font-variant-numeric:tabular-nums; }
 
-        /* ── MAIN ────────────────────────────────── */
-        .main { max-width:1320px; margin:0 auto; padding:28px 28px 56px; }
-        .main-top {
+        /* ── SECTION HEADER ─────────────────────── */
+        .section-header {
+            max-width:1320px; margin:0 auto;
+            padding:24px 24px 16px;
             display:flex; align-items:center; justify-content:space-between;
-            margin-bottom:20px;
         }
-        .main-label { font-size:.68rem; font-weight:700; color:var(--gray2); text-transform:uppercase; letter-spacing:1px; }
-        .date-pill {
+        .section-label { font-size:.65rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:1px; }
+        .date-chip {
             display:inline-flex; align-items:center; gap:5px;
-            background:rgba(201,168,76,.08); border:1px solid rgba(201,168,76,.2);
-            color:#A8832A; padding:5px 13px; border-radius:20px;
-            font-size:.63rem; font-weight:700;
+            background:rgba(201,168,76,.07); border:1px solid rgba(201,168,76,.18);
+            color:var(--gold-d); padding:4px 11px; border-radius:20px;
+            font-size:.6rem; font-weight:700;
         }
-        .date-pill svg { width:10px; height:10px; fill:currentColor; }
+        .date-chip svg { width:10px; height:10px; fill:currentColor; }
 
-        /* ── CARDS GRID ──────────────────────────── */
+        /* ── CARDS GRID ─────────────────────────── */
         .cards-grid {
-            display:grid;
-            grid-template-columns:repeat(3,1fr);
-            gap:20px;
+            max-width:1320px; margin:0 auto;
+            padding:0 24px 56px;
+            display:grid; grid-template-columns:repeat(3,1fr); gap:18px;
         }
 
         /* PROJECT CARD */
         .pcard {
             background:var(--surface);
-            border-radius:18px;
-            border:1.5px solid var(--border);
-            border-top:3px solid var(--ng);
+            border-radius:14px;
+            border:1px solid var(--border);
+            border-left:3px solid var(--gold);
             box-shadow:var(--shadow);
-            overflow:hidden;
             display:flex; flex-direction:column;
-            transition:transform .2s ease, box-shadow .2s ease;
-            animation:fadeUp .45s ease both;
+            overflow:hidden;
+            animation:fadeUp .4s ease both;
+            transition:box-shadow .2s, transform .2s;
         }
         .pcard:hover {
-            transform:translateY(-3px);
-            box-shadow:0 10px 36px rgba(15,23,42,0.14);
+            box-shadow:0 6px 28px rgba(15,23,42,0.11);
+            transform:translateY(-2px);
         }
         @keyframes fadeUp {
-            from{opacity:0;transform:translateY(14px)}
+            from{opacity:0;transform:translateY(12px)}
             to{opacity:1;transform:translateY(0)}
         }
         .pcard:nth-child(1){animation-delay:.04s}
-        .pcard:nth-child(2){animation-delay:.10s}
-        .pcard:nth-child(3){animation-delay:.16s}
-        .pcard:nth-child(4){animation-delay:.22s}
-        .pcard:nth-child(5){animation-delay:.28s}
-        .pcard:nth-child(6){animation-delay:.34s}
+        .pcard:nth-child(2){animation-delay:.09s}
+        .pcard:nth-child(3){animation-delay:.14s}
+        .pcard:nth-child(4){animation-delay:.19s}
+        .pcard:nth-child(5){animation-delay:.24s}
+        .pcard:nth-child(6){animation-delay:.29s}
 
         /* card header */
-        .pcard-head { padding:18px 22px 14px; }
-        .pcard-head-top {
-            display:flex; align-items:flex-start; justify-content:space-between; gap:8px;
+        .pcard-head {
+            padding:18px 20px 14px;
+            display:flex; align-items:center; justify-content:space-between; gap:8px;
         }
-        .pcard-name { font-size:1.05rem; font-weight:800; color:var(--navy); line-height:1.2; }
-        .pcard-pct-group { text-align:right; flex-shrink:0; }
-        .pcard-pct-label { font-size:.65rem; font-weight:700; color:var(--gray2); text-transform:uppercase; letter-spacing:.6px; }
-        .pcard-pct-val { font-size:1.05rem; font-weight:900; font-variant-numeric:tabular-nums; }
-        .pcard-pct-val.ok     { color:#15803d; }
-        .pcard-pct-val.warn   { color:#d97706; }
-        .pcard-pct-val.danger { color:#dc2626; }
+        .pcard-name { font-size:.95rem; font-weight:800; color:var(--navy); line-height:1.25; }
+        .pct-badge {
+            font-size:.72rem; font-weight:800; flex-shrink:0;
+            padding:3px 10px; border-radius:999px; border:1.5px solid;
+            font-variant-numeric:tabular-nums;
+        }
+        .pct-badge.ok     { color:var(--ok);     background:rgba(22,163,74,.05);  border-color:rgba(22,163,74,.22); }
+        .pct-badge.warn   { color:var(--warn);   background:rgba(217,119,6,.05);  border-color:rgba(217,119,6,.22); }
+        .pct-badge.danger { color:var(--danger); background:rgba(220,38,38,.05);  border-color:rgba(220,38,38,.22); }
 
         /* divider */
-        .pcard-divider { height:1px; background:var(--border); margin:0 22px 16px; }
+        .pcard-divider { height:1px; background:var(--border); margin:0 20px 0; }
 
-        /* area table */
-        .pcard-table { width:100%; border-collapse:collapse; margin:0 0 16px; }
+        /* table */
+        .pcard-table { width:100%; border-collapse:collapse; }
         .pcard-table thead th {
-            font-size:.63rem; font-weight:700; color:var(--gray2);
-            text-transform:uppercase; letter-spacing:.7px;
-            padding:0 22px 8px; text-align:right; border-bottom:1.5px solid var(--border);
+            font-size:.58rem; font-weight:700; color:var(--muted);
+            text-transform:uppercase; letter-spacing:.6px;
+            padding:10px 20px 8px; text-align:right;
         }
         .pcard-table thead th:first-child { text-align:left; }
         .pcard-table tbody td {
-            font-size:.74rem; color:var(--navy);
-            padding:9px 22px; text-align:right; font-variant-numeric:tabular-nums;
+            font-size:.76rem; color:var(--navy);
+            padding:9px 20px; text-align:right;
+            font-variant-numeric:tabular-nums;
+            border-top:1px solid #f1f5f9;
         }
-        .pcard-table tbody td:first-child { text-align:left; font-weight:600; color:var(--gray); }
-        .pcard-table tbody tr:not(:last-child) td { border-bottom:1px solid #f1f5f9; }
-
-        /* total row */
+        .pcard-table tbody td:first-child { text-align:left; color:var(--gray); font-weight:500; }
         .pcard-table tfoot td {
-            font-size:.74rem; font-weight:800;
-            padding:9px 22px; text-align:right;
-            border-top:1.5px solid var(--border);
+            font-size:.76rem; font-weight:700;
+            padding:10px 20px; text-align:right;
+            border-top:1px solid var(--border);
+            color:var(--slate);
             font-variant-numeric:tabular-nums;
         }
-        .pcard-table tfoot td:first-child { text-align:left; color:var(--gray); }
-        .pcard-table tfoot td.td-sap   { color:var(--navy2); }
-        .pcard-table tfoot td.td-asig  { color:#1d4ed8; }
-        .pcard-table tfoot td.td-pct   { }
-        .pcard-table tfoot td.td-pct.ok     { color:#15803d; }
-        .pcard-table tfoot td.td-pct.warn   { color:#d97706; }
-        .pcard-table tfoot td.td-pct.danger { color:#dc2626; }
+        .pcard-table tfoot td:first-child { text-align:left; font-weight:600; }
 
-        .td-area-dot {
-            display:inline-flex; align-items:center; gap:6px;
+        /* progress bar */
+        .pcard-prog { padding:12px 20px 18px; }
+        .prog-labels {
+            display:flex; justify-content:space-between;
+            margin-bottom:6px;
         }
-        .area-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; display:inline-block; }
-        .area-dot--constr { background:var(--ng); }
-        .area-dot--urban  { background:var(--blue); }
-
-        /* stacked bar */
-        .pcard-bar-wrap { padding:0 22px 18px; }
-        .pcard-bar-track {
-            height:8px; border-radius:999px; overflow:hidden;
-            display:flex; background:#e2e8f0; margin-bottom:8px;
+        .prog-label-text { font-size:.6rem; font-weight:600; color:var(--muted); }
+        .prog-label-pct  { font-size:.6rem; font-weight:700; color:var(--slate); }
+        .prog-track {
+            height:5px; background:#e9eef5; border-radius:999px; overflow:hidden;
         }
-        .pcard-bar-constr { height:100%; background:var(--ng); transition:width 1s ease; }
-        .pcard-bar-urban  { height:100%; background:var(--blue); transition:width 1s ease; }
-        .pcard-bar-legend { display:flex; justify-content:space-between; }
-        .pcard-bar-leg-item { display:flex; align-items:center; gap:5px; font-size:.7rem; font-weight:600; color:var(--gray2); }
-
-        /* ── TOTAL CARD ─────────────────────────── */
-        .total-card {
-            grid-column:1/-1;
-            background:var(--surface);
-            border-radius:18px;
-            border:1.5px solid var(--border);
-            border-top:3px solid var(--ng);
-            box-shadow:var(--shadow);
-            padding:22px 28px;
-            display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:20px;
+        .prog-fill {
+            height:100%; background:var(--gold); border-radius:999px;
+            transition:width 1s cubic-bezier(.4,0,.2,1);
         }
-        .total-left-label { font-size:.68rem; font-weight:700; color:var(--ng); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; }
-        .total-left-title { font-size:1rem; font-weight:900; color:var(--navy); }
-        .total-left-sub { font-size:.72rem; color:var(--gray2); margin-top:2px; }
-        .total-kpis { display:flex; align-items:center; gap:0; flex-wrap:wrap; }
-        .total-kpi  { padding:0 28px; text-align:center; }
-        .total-kpi:first-child { padding-left:0; }
-        .total-kpi-label { font-size:.58rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--gray2); margin-bottom:5px; }
-        .total-kpi-val { font-size:1.4rem; font-weight:900; font-variant-numeric:tabular-nums; }
-        .total-kpi-val.t-sap  { color:#A8832A; }
-        .total-kpi-val.t-asig { color:#2563eb; }
-        .total-kpi-val.t-pct.ok     { color:#15803d; }
-        .total-kpi-val.t-pct.warn   { color:#d97706; }
-        .total-kpi-val.t-pct.danger { color:#dc2626; }
-        .total-sep { width:1px; height:44px; background:var(--border); }
 
         /* skeleton */
-        .skel { background:#e2e8f0; border-radius:6px; animation:pulse 1.4s ease-in-out infinite; }
-        @keyframes pulse { 0%,100%{opacity:.5} 50%{opacity:1} }
+        .skel { background:#e9eef5; border-radius:6px; animation:pulse 1.4s ease-in-out infinite; }
+        @keyframes pulse { 0%,100%{opacity:.45} 50%{opacity:.9} }
 
         /* responsive */
         @media(max-width:1100px){ .cards-grid{grid-template-columns:repeat(2,1fr);} }
         @media(max-width:680px){
-            .page-hero{padding:18px;}
-            .main{padding:18px 16px 40px;}
-            .cards-grid{grid-template-columns:1fr;}
-            .page-hero-title{font-size:1.2rem;}
-            .total-card{padding:18px;}
-            .total-kpis{gap:16px;}
-            .total-kpi{padding:0;}
-            .total-sep{display:none;}
+            .kpi-strip-inner { flex-wrap:wrap; }
+            .kpi-item { flex:1 1 calc(50% - 1px); border-bottom:1px solid var(--border); }
+            .cards-grid { grid-template-columns:1fr; padding:0 16px 40px; }
         }
     </style>
 </head>
@@ -301,12 +238,12 @@
         </a>
         <a href="index.html" class="brand-link">
             <div class="topbar-brand">Costos&<span>Presupuestos</span></div>
-            <div class="topbar-sub-brand">Análisis Comparativo · Casas</div>
+            <div class="topbar-sub">Análisis Comparativo · Casas</div>
         </a>
     </div>
     <div class="topbar-center">
-        <div class="topbar-page-title">Análisis de <span>Casas</span></div>
-        <div class="topbar-page-sub">Presupuesto SAP vs Asignado · 6 Proyectos</div>
+        <div class="topbar-title">Análisis de <span>Casas</span></div>
+        <div class="topbar-subtitle">Presupuesto SAP vs Asignado · 6 Proyectos</div>
     </div>
     <div class="topbar-right">
         <button class="btn-logout" id="btn-logout">
@@ -320,96 +257,98 @@
 <div class="kpi-strip">
     <div class="kpi-strip-inner">
         <div class="kpi-item">
-            <div class="kpi-icon kpi-icon--sap">
+            <div class="kpi-icon">
                 <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 7V3.5L18.5 9H13zM8 16h8v2H8zm0-4h8v2H8zm0-4h5v2H8z"/></svg>
             </div>
-            <div class="kpi-body">
+            <div>
                 <div class="kpi-label">Presupuesto SAP</div>
-                <div class="kpi-val kpi-val--sap" id="ks-sap">—</div>
+                <div class="kpi-val" id="ks-sap">—</div>
             </div>
         </div>
         <div class="kpi-item">
-            <div class="kpi-icon kpi-icon--ejec">
+            <div class="kpi-icon">
                 <svg viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6h-6z"/></svg>
             </div>
-            <div class="kpi-body">
+            <div>
                 <div class="kpi-label">Ejecutado</div>
-                <div class="kpi-val kpi-val--ejec" id="ks-ejec">—</div>
+                <div class="kpi-val" id="ks-ejec">—</div>
             </div>
         </div>
         <div class="kpi-item">
-            <div class="kpi-icon kpi-icon--comp">
+            <div class="kpi-icon">
                 <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
             </div>
-            <div class="kpi-body">
+            <div>
                 <div class="kpi-label">Comprometido</div>
-                <div class="kpi-val kpi-val--comp" id="ks-comp">—</div>
+                <div class="kpi-val" id="ks-comp">—</div>
             </div>
         </div>
         <div class="kpi-item">
-            <div class="kpi-icon kpi-icon--asig">
+            <div class="kpi-icon">
                 <svg viewBox="0 0 24 24"><path d="M11 2v20c-5.07-.5-9-4.79-9-10s3.93-9.5 9-10zm2.03 0v8.99H22c-.47-4.74-4.24-8.52-8.97-8.99zm0 11.01V22c4.74-.47 8.5-4.25 8.97-8.99h-8.97z"/></svg>
             </div>
-            <div class="kpi-body">
+            <div>
                 <div class="kpi-label">Asignado</div>
-                <div class="kpi-val kpi-val--asig" id="ks-asig">—</div>
+                <div class="kpi-val" id="ks-asig">—</div>
             </div>
         </div>
         <div class="kpi-item">
-            <div class="kpi-icon kpi-icon--disp">
-                <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg>
+            <div class="kpi-icon">
+                <svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h14c1.1 0 2 .9 2 2v1h-9a2 2 0 00-2 2v8a2 2 0 002 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
             </div>
-            <div class="kpi-body">
+            <div>
                 <div class="kpi-label">Disponible</div>
-                <div class="kpi-val kpi-val--disp" id="ks-disp">—</div>
+                <div class="kpi-val" id="ks-disp">—</div>
             </div>
         </div>
         <div class="kpi-item">
-            <div class="kpi-icon kpi-icon--pct">
+            <div class="kpi-icon">
                 <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
             </div>
-            <div class="kpi-body">
+            <div>
                 <div class="kpi-label">% Asignado</div>
-                <div class="kpi-val kpi-val--pct" id="ks-pct">—</div>
+                <div class="kpi-val" id="ks-pct">—</div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- MAIN -->
-<div class="main">
-    <div class="main-top">
-        <div class="main-label">Detalle por Proyecto — Construcción + Urbanización</div>
+<!-- SECTION HEADER -->
+<div class="section-header">
+    <div class="section-label">Construcción + Urbanización · 6 Proyectos</div>
+    <div class="date-chip" id="date-chip">
+        <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>
+        Cargando…
     </div>
+</div>
 
-    <div class="cards-grid" id="cards-grid">
-        <!-- skeletons -->
-        <div class="pcard" style="min-height:320px">
-            <div style="padding:20px;display:flex;flex-direction:column;gap:14px">
-                <div class="skel" style="height:18px;width:60%"></div>
-                <div class="skel" style="height:14px;width:90%"></div>
-                <div class="skel" style="height:14px;width:90%"></div>
-                <div class="skel" style="height:14px;width:90%"></div>
-                <div class="skel" style="height:10px;width:100%;border-radius:999px"></div>
-            </div>
+<!-- CARDS GRID -->
+<div class="cards-grid" id="cards-grid">
+    <div class="pcard" style="min-height:300px">
+        <div style="padding:20px;display:flex;flex-direction:column;gap:14px">
+            <div class="skel" style="height:16px;width:55%"></div>
+            <div class="skel" style="height:13px;width:90%"></div>
+            <div class="skel" style="height:13px;width:85%"></div>
+            <div class="skel" style="height:13px;width:90%"></div>
+            <div class="skel" style="height:5px;width:100%;border-radius:999px;margin-top:4px"></div>
         </div>
-        <div class="pcard" style="min-height:320px">
-            <div style="padding:20px;display:flex;flex-direction:column;gap:14px">
-                <div class="skel" style="height:18px;width:55%"></div>
-                <div class="skel" style="height:14px;width:90%"></div>
-                <div class="skel" style="height:14px;width:90%"></div>
-                <div class="skel" style="height:14px;width:90%"></div>
-                <div class="skel" style="height:10px;width:100%;border-radius:999px"></div>
-            </div>
+    </div>
+    <div class="pcard" style="min-height:300px">
+        <div style="padding:20px;display:flex;flex-direction:column;gap:14px">
+            <div class="skel" style="height:16px;width:60%"></div>
+            <div class="skel" style="height:13px;width:90%"></div>
+            <div class="skel" style="height:13px;width:80%"></div>
+            <div class="skel" style="height:13px;width:90%"></div>
+            <div class="skel" style="height:5px;width:100%;border-radius:999px;margin-top:4px"></div>
         </div>
-        <div class="pcard" style="min-height:320px">
-            <div style="padding:20px;display:flex;flex-direction:column;gap:14px">
-                <div class="skel" style="height:18px;width:65%"></div>
-                <div class="skel" style="height:14px;width:90%"></div>
-                <div class="skel" style="height:14px;width:90%"></div>
-                <div class="skel" style="height:14px;width:90%"></div>
-                <div class="skel" style="height:10px;width:100%;border-radius:999px"></div>
-            </div>
+    </div>
+    <div class="pcard" style="min-height:300px">
+        <div style="padding:20px;display:flex;flex-direction:column;gap:14px">
+            <div class="skel" style="height:16px;width:50%"></div>
+            <div class="skel" style="height:13px;width:90%"></div>
+            <div class="skel" style="height:13px;width:88%"></div>
+            <div class="skel" style="height:13px;width:90%"></div>
+            <div class="skel" style="height:5px;width:100%;border-radius:999px;margin-top:4px"></div>
         </div>
     </div>
 </div>
@@ -440,7 +379,7 @@ function fmt(v){
     return'Q '+(v/1e6).toLocaleString('es-GT',{minimumFractionDigits:2,maximumFractionDigits:2})+'M';
 }
 function pctCls(p){
-    if(p==null)return'';
+    if(p==null)return'ok';
     return p>=100?'danger':p>=90?'warn':'ok';
 }
 function fmtPct(p){
@@ -452,21 +391,14 @@ function buildCard(proj,areas){
     const asigTotal=areas.reduce((s,a)=>s+(a.asig||0),0);
     const pctTotal =sapTotal>0?(asigTotal/sapTotal*100):null;
     const cls=pctCls(pctTotal);
+    const fillW=Math.min(pctTotal||0,100).toFixed(1);
 
-    // stacked bar widths by SAP proportion
-    const totalSapForBar=areas.reduce((s,a)=>s+(a.sap||0),0)||1;
-    const constrPct=((areas[0]?.sap||0)/totalSapForBar*100).toFixed(1);
-    const urbPct  =((areas[1]?.sap||0)/totalSapForBar*100).toFixed(1);
-
-    const areaRows=areas.map((a,i)=>{
+    const areaRows=areas.map(a=>{
         const p=a.sap>0?(a.asig/a.sap*100):null;
-        const dotCls=i===0?'area-dot--constr':'area-dot--urban';
-        const tdPctCls=pctCls(p);
         return `<tr>
-            <td><span class="td-area-dot"><span class="area-dot ${dotCls}"></span>${a.name}</span></td>
+            <td>${a.name}</td>
             <td>${fmt(a.sap)}</td>
             <td>${fmt(a.asig)}</td>
-            <td class="${tdPctCls}" style="font-weight:700">${fmtPct(p)}</td>
         </tr>`;
     }).join('');
 
@@ -474,13 +406,8 @@ function buildCard(proj,areas){
     card.className='pcard';
     card.innerHTML=`
         <div class="pcard-head">
-            <div class="pcard-head-top">
-                <div class="pcard-name">${proj.name}</div>
-                <div class="pcard-pct-group">
-                    <div class="pcard-pct-label">% Asignado</div>
-                    <div class="pcard-pct-val ${cls}">${fmtPct(pctTotal)}</div>
-                </div>
-            </div>
+            <div class="pcard-name">${proj.name}</div>
+            <div class="pct-badge ${cls}">${fmtPct(pctTotal)}</div>
         </div>
         <div class="pcard-divider"></div>
         <table class="pcard-table">
@@ -489,72 +416,28 @@ function buildCard(proj,areas){
                     <th>Área</th>
                     <th>Ppto. SAP</th>
                     <th>Asignado</th>
-                    <th>% Asig.</th>
                 </tr>
             </thead>
             <tbody>${areaRows}</tbody>
             <tfoot>
                 <tr>
-                    <td>Total</td>
-                    <td class="td-sap">${fmt(sapTotal)}</td>
-                    <td class="td-asig">${fmt(asigTotal)}</td>
-                    <td class="td-pct ${cls}">${fmtPct(pctTotal)}</td>
+                    <td>Total C+U</td>
+                    <td>${fmt(sapTotal)}</td>
+                    <td>${fmt(asigTotal)}</td>
                 </tr>
             </tfoot>
         </table>
-        <div class="pcard-bar-wrap">
-            <div class="pcard-bar-track">
-                <div class="pcard-bar-constr" data-w="${constrPct}" style="width:0"></div>
-                <div class="pcard-bar-urban"  data-w="${urbPct}"   style="width:0"></div>
+        <div class="pcard-prog">
+            <div class="prog-labels">
+                <span class="prog-label-text">Ejecución del presupuesto</span>
+                <span class="prog-label-pct">${fmtPct(pctTotal)}</span>
             </div>
-            <div class="pcard-bar-legend">
-                <div class="pcard-bar-leg-item">
-                    <span class="area-dot area-dot--constr"></span>Construcción (${constrPct}%)
-                </div>
-                <div class="pcard-bar-leg-item">
-                    <span class="area-dot area-dot--urban"></span>Urbanización (${urbPct}%)
-                </div>
+            <div class="prog-track">
+                <div class="prog-fill" data-w="${fillW}" style="width:0"></div>
             </div>
         </div>
     `;
     return card;
-}
-
-function buildTotalCard(sap,asig){
-    const pct=sap>0?(asig/sap*100):null;
-    const cls=pctCls(pct);
-    const card=document.createElement('div');
-    card.className='total-card';
-    card.innerHTML=`
-        <div>
-            <div class="total-left-label">Consolidado · 6 Proyectos</div>
-            <div class="total-left-title">Total General</div>
-            <div class="total-left-sub">Construcción + Urbanización</div>
-        </div>
-        <div class="total-kpis">
-            <div class="total-kpi">
-                <div class="total-kpi-label">Ppto. SAP</div>
-                <div class="total-kpi-val t-sap">${fmt(sap)}</div>
-            </div>
-            <div class="total-sep"></div>
-            <div class="total-kpi">
-                <div class="total-kpi-label">Asignado</div>
-                <div class="total-kpi-val t-asig">${fmt(asig)}</div>
-            </div>
-            <div class="total-sep"></div>
-            <div class="total-kpi">
-                <div class="total-kpi-label">% Asignado</div>
-                <div class="total-kpi-val t-pct ${cls}">${fmtPct(pct)}</div>
-            </div>
-        </div>
-    `;
-    return card;
-}
-
-function animateBars(){
-    document.querySelectorAll('.pcard-bar-constr,.pcard-bar-urban').forEach(el=>{
-        el.style.width=(el.dataset.w||0)+'%';
-    });
 }
 
 function getAreaName(row){
@@ -582,7 +465,7 @@ async function init(){
         const sbMap=await loadSB();
         const grid=document.getElementById('cards-grid');
         grid.innerHTML='';
-        let gSap=0,gAsig=0,mes='';
+        let mes='';
         let tSap=0,tEjec=0,tComp=0,tAsig=0,tDisp=0;
 
         for(const proj of PROJECTS){
@@ -601,7 +484,7 @@ async function init(){
 
             const ds=payload.datasets||payload;
 
-            // accumulate ALL areas from porArea for KPI strip (full project total)
+            // KPI strip: sum ALL areas
             const allAreas=Array.isArray(ds.porArea)?ds.porArea:[];
             allAreas.forEach(row=>{
                 tSap  +=(row['[PresupuestoErequester]']??row['[RdiTotal]']??0);
@@ -611,36 +494,44 @@ async function init(){
                 tDisp +=(row['[DisponibleErequester]']??0);
             });
 
-            // accumulate Construcción + Urbanización for cards
+            // Cards: only Construcción + Urbanización
             const areas=['Construcción','Urbanización'].map(name=>{
                 const d=getArea(ds,name);
                 const sap  = d?.['[PresupuestoErequester]'] ?? d?.['[RdiTotal]'] ?? 0;
                 const asig = d?.['[AsignadoErequester]'] ?? 0;
                 return{name,sap,asig};
             });
-            areas.forEach(a=>{gSap+=a.sap;gAsig+=a.asig;});
             grid.appendChild(buildCard(proj,areas));
         }
 
-        grid.appendChild(buildTotalCard(gSap,gAsig));
-
-        // populate KPI strip
+        // KPI strip values
         const gp=tSap>0?(tAsig/tSap*100):null;
         document.getElementById('ks-sap').textContent =fmt(tSap);
         document.getElementById('ks-ejec').textContent=fmt(tEjec);
         document.getElementById('ks-comp').textContent=fmt(tComp);
         document.getElementById('ks-asig').textContent=fmt(tAsig);
         document.getElementById('ks-disp').textContent=fmt(tDisp);
-        document.getElementById('ks-pct').textContent =fmtPct(gp);
+        const pctEl=document.getElementById('ks-pct');
+        pctEl.textContent=fmtPct(gp);
+        if(gp!=null){
+            pctEl.style.color=gp>=100?'var(--danger)':gp>=90?'var(--warn)':'var(--ok)';
+        }
 
         const dateStr=mes?mes.toUpperCase():'—';
+        document.getElementById('date-chip').innerHTML=`
+            <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>
+            Datos al ${dateStr}`;
 
-        requestAnimationFrame(()=>setTimeout(animateBars,150));
+        requestAnimationFrame(()=>setTimeout(()=>{
+            document.querySelectorAll('.prog-fill').forEach(el=>{
+                el.style.width=(el.dataset.w||0)+'%';
+            });
+        },150));
 
     }catch(e){
         console.error(e);
         document.getElementById('cards-grid').innerHTML=
-            `<div style="color:#dc2626;padding:48px;grid-column:1/-1;text-align:center;font-size:.85rem">Error: ${e.message}</div>`;
+            `<div style="color:var(--danger);padding:48px;text-align:center;font-size:.85rem;grid-column:1/-1">Error al cargar datos.</div>`;
     }
 }
 document.addEventListener('DOMContentLoaded',init);
