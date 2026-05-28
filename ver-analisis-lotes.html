@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ver Análisis Lotes — Costos&Presupuestos</title>
+    <title>Análisis Lotes — Costos&Presupuestos</title>
     <style>html{visibility:hidden}</style>
     <script>
     (function(){
@@ -16,84 +16,438 @@
     })();
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
-        const { createClient } = supabase;
-        const client = createClient(
-            'https://iipgrojliqeyycvgnkrc.supabase.co',
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlpcGdyb2psaXFleXljdmdua3JjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NzA1NzYsImV4cCI6MjA5MTM0NjU3Nn0.Y6FQ-1qWd7HPMvTnK4alpKxM-YLJ5CsKmkorAZKMJrg'
-        );
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('btn-logout').addEventListener('click', () => {
-                client.auth.signOut().then(() => window.location.href = 'login.html');
-            });
-        });
-    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
     <style>
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', 'Segoe UI', sans-serif; background: #f0f4f8; color: #0f172a; min-height: 100vh; }
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+        :root {
+            --bg:     #f8fafc;
+            --surface:#ffffff;
+            --navy:   #0f172a;
+            --slate:  #334155;
+            --gray:   #64748b;
+            --muted:  #94a3b8;
+            --border: #e2e8f0;
+            --gold:   #C9A84C;
+            --gold-d: #A8832A;
+            --ok:     #16a34a;
+            --warn:   #d97706;
+            --danger: #dc2626;
+            --shadow: 0 1px 8px rgba(15,23,42,0.07);
+        }
+        body { font-family:'Inter','Segoe UI',sans-serif; background:var(--bg); color:var(--navy); min-height:100vh; }
+
+        /* ── TOPBAR ─────────────────────────────── */
         .topbar {
-            position: sticky; top: 0; z-index: 300;
-            background: #0f172a; border-bottom: 1px solid rgba(255,255,255,0.07);
-            padding: 0 22px; height: 56px;
-            display: flex; align-items: center; justify-content: space-between;
-            box-shadow: 0 2px 16px rgba(15,23,42,0.25);
+            position:sticky; top:0; z-index:300;
+            background:var(--navy); border-bottom:1px solid rgba(255,255,255,0.06);
+            padding:0 24px; height:56px;
+            display:flex; align-items:center; justify-content:space-between;
+            box-shadow:0 2px 12px rgba(15,23,42,0.22);
         }
         .topbar::before {
-            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-            background: linear-gradient(90deg, transparent 0%, #C9A84C 35%, #C9A84C 65%, transparent 100%);
+            content:''; position:absolute; top:0; left:0; right:0; height:2px;
+            background:linear-gradient(90deg,transparent,var(--gold) 30%,var(--gold) 70%,transparent);
         }
-        .topbar-left { display: flex; align-items: center; }
+        .topbar-left { display:flex; align-items:center; gap:14px; }
         .home-link {
-            display: flex; align-items: center; justify-content: center;
-            width: 36px; height: 36px; border-radius: 8px;
-            background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
-            color: rgba(255,255,255,0.6); text-decoration: none;
-            transition: background .18s, color .18s; flex-shrink: 0; margin-right: 14px;
+            display:flex; align-items:center; justify-content:center;
+            width:34px; height:34px; border-radius:8px;
+            background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.10);
+            color:rgba(255,255,255,0.55); text-decoration:none;
+            transition:background .15s,color .15s; flex-shrink:0;
         }
-        .home-link:hover { background: #C9A84C; color: #fff; border-color: #C9A84C; }
-        .home-link svg { width: 15px; height: 15px; fill: currentColor; }
-        .brand-link { text-decoration: none; color: inherit; }
-        .brand-link:hover .topbar-brand { color: #C9A84C; transition: color .18s; }
-        .topbar-brand { font-size: 0.95rem; font-weight: 900; color: #fff; letter-spacing: 0.5px; }
-        .topbar-brand span { color: #C9A84C; }
-        .topbar-sub { font-size: 0.62rem; color: rgba(255,255,255,0.38); margin-top: 1px; letter-spacing: 0.2px; }
-        .topbar-right { display: flex; align-items: center; gap: 10px; }
+        .home-link:hover { background:var(--gold); color:#fff; border-color:var(--gold); }
+        .home-link svg { width:15px; height:15px; fill:currentColor; }
+        .brand-link { text-decoration:none; }
+        .topbar-brand { font-size:.85rem; font-weight:900; color:#fff; letter-spacing:-.2px; }
+        .topbar-brand span { color:var(--gold); }
+        .topbar-sub { font-size:.56rem; color:rgba(255,255,255,.35); margin-top:1px; letter-spacing:.3px; }
+        .topbar-center {
+            position:absolute; left:50%; transform:translateX(-50%);
+            text-align:center; pointer-events:none;
+        }
+        .topbar-title { font-size:1rem; font-weight:800; color:#fff; letter-spacing:-.2px; }
+        .topbar-title span { color:var(--gold); }
+        .topbar-right { display:flex; align-items:center; }
         .btn-logout {
-            display: flex; align-items: center; gap: 6px;
-            background: rgba(239,68,68,0.10); border: 1px solid rgba(239,68,68,0.30);
-            color: #f87171; padding: 5px 14px; border-radius: 7px;
-            font-size: 0.72rem; font-weight: 700; cursor: pointer;
-            font-family: inherit; transition: background .18s, border-color .18s, color .18s;
+            display:flex; align-items:center; gap:5px;
+            background:rgba(239,68,68,.09); border:1px solid rgba(239,68,68,.25);
+            color:#f87171; padding:5px 13px; border-radius:7px;
+            font-size:.70rem; font-weight:700; cursor:pointer; font-family:inherit;
+            transition:background .15s,color .15s;
         }
-        .btn-logout:hover { background: rgba(239,68,68,0.22); border-color: rgba(239,68,68,0.55); color: #fca5a5; }
-        .btn-logout svg { width: 13px; height: 13px; fill: currentColor; }
-        .page-content {
-            display: flex; align-items: center; justify-content: center;
-            min-height: calc(100vh - 56px);
-            color: #94a3b8; font-size: 0.9rem; font-weight: 600;
+        .btn-logout:hover { background:rgba(239,68,68,.20); color:#fca5a5; }
+        .btn-logout svg { width:12px; height:12px; fill:currentColor; }
+
+        /* ── KPI STRIP ──────────────────────────── */
+        .kpi-strip { background:var(--surface); border-bottom:1px solid var(--border); padding:0 24px; }
+        .kpi-strip-inner { display:flex; align-items:stretch; }
+        .kpi-item {
+            flex:1; min-width:0;
+            display:flex; align-items:center; gap:12px;
+            padding:16px 20px; border-right:1px solid var(--border);
+        }
+        .kpi-item:last-child { border-right:none; }
+        .kpi-icon {
+            width:34px; height:34px; border-radius:9px; flex-shrink:0;
+            background:#f1f5f9; display:flex; align-items:center; justify-content:center; color:var(--slate);
+        }
+        .kpi-icon svg { width:16px; height:16px; fill:currentColor; }
+        .kpi-label { font-size:.57rem; font-weight:700; text-transform:uppercase; letter-spacing:.7px; color:var(--muted); margin-bottom:3px; white-space:nowrap; }
+        .kpi-val   { font-size:.9rem; font-weight:800; color:var(--navy); font-variant-numeric:tabular-nums; }
+
+        /* ── SECTION HEADER ─────────────────────── */
+        .section-header { padding:24px 28px 16px; display:flex; align-items:center; justify-content:flex-end; }
+        .date-chip {
+            display:inline-flex; align-items:center; gap:5px;
+            background:rgba(201,168,76,.07); border:1px solid rgba(201,168,76,.18);
+            color:var(--gold-d); padding:4px 11px; border-radius:20px;
+            font-size:.6rem; font-weight:700;
+        }
+        .date-chip svg { width:10px; height:10px; fill:currentColor; }
+
+        /* ── CARDS GRID ─────────────────────────── */
+        .cards-grid {
+            padding:0 28px 56px;
+            display:grid; grid-template-columns:repeat(2,1fr); gap:18px;
+        }
+
+        /* PROJECT CARD */
+        .pcard {
+            background:var(--surface); border-radius:14px;
+            border:1px solid var(--border); border-left:3px solid var(--gold);
+            box-shadow:var(--shadow); display:flex; flex-direction:column; overflow:hidden;
+            animation:fadeUp .4s ease both; transition:box-shadow .2s, transform .2s;
+        }
+        .pcard:hover { box-shadow:0 6px 28px rgba(15,23,42,0.11); transform:translateY(-2px); }
+        @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+        .pcard:nth-child(1){animation-delay:.04s}
+        .pcard:nth-child(2){animation-delay:.09s}
+
+        /* card header */
+        .pcard-head {
+            background:var(--surface); padding:10px 16px 8px;
+            display:flex; align-items:center; gap:12px;
+        }
+        .pcard-head img { height:110px; width:auto; max-width:180px; object-fit:contain; flex-shrink:0; }
+        .pcard-head-info { flex:1; min-width:0; }
+        .pcard-name { font-size:.95rem; font-weight:800; color:var(--navy); line-height:1.25; }
+        .pct-badge-wrap { flex-shrink:0; }
+        .pct-badge {
+            font-size:.72rem; font-weight:800;
+            padding:3px 10px; border-radius:999px; border:1.5px solid; font-variant-numeric:tabular-nums;
+        }
+        .pct-badge.ok     { color:var(--ok);     background:rgba(22,163,74,.05);  border-color:rgba(22,163,74,.22); }
+        .pct-badge.warn   { color:var(--warn);   background:rgba(217,119,6,.05);  border-color:rgba(217,119,6,.22); }
+        .pct-badge.danger { color:var(--danger); background:rgba(220,38,38,.05);  border-color:rgba(220,38,38,.22); }
+
+        .pcard-divider { height:1px; background:var(--border); margin:0; }
+
+        /* table */
+        .pcard-table-wrap { overflow-x:auto; }
+        .pcard-table { width:100%; border-collapse:collapse; }
+        .pcard-table thead th {
+            font-size:.58rem; font-weight:700; color:var(--muted);
+            text-transform:uppercase; letter-spacing:.5px;
+            padding:10px 14px 8px; text-align:right;
+            border-bottom:1px solid var(--border); white-space:nowrap;
+        }
+        .pcard-table thead th:first-child { text-align:left; padding-left:20px; }
+        .pcard-table thead th:last-child  { padding-right:20px; }
+        .pcard-table tbody td {
+            font-size:.73rem; color:var(--navy);
+            padding:8px 14px; text-align:right;
+            font-variant-numeric:tabular-nums; border-top:1px solid #f1f5f9;
+        }
+        .pcard-table tbody td:first-child { text-align:left; color:var(--gray); font-weight:600; padding-left:20px; }
+        .pcard-table tbody td:last-child  { padding-right:20px; }
+        .pcard-table tfoot td {
+            font-size:.73rem; font-weight:700; color:var(--slate);
+            padding:9px 14px; text-align:right;
+            border-top:1.5px solid var(--border);
+            font-variant-numeric:tabular-nums; background:#fafbfc;
+        }
+        .pcard-table tfoot td:first-child { text-align:left; padding-left:20px; font-weight:800; }
+        .pcard-table tfoot td:last-child  { padding-right:20px; }
+
+        /* progress bar */
+        .pcard-prog { padding:12px 20px 18px; }
+        .prog-labels { display:flex; justify-content:space-between; margin-bottom:6px; }
+        .prog-label-text { font-size:.6rem; font-weight:600; color:var(--muted); }
+        .prog-label-pct  { font-size:.6rem; font-weight:700; color:var(--slate); }
+        .prog-track { height:5px; background:#e9eef5; border-radius:999px; overflow:hidden; }
+        .prog-fill  { height:100%; background:var(--gold); border-radius:999px; transition:width 1s cubic-bezier(.4,0,.2,1); }
+
+        .skel { background:#e9eef5; border-radius:6px; animation:pulse 1.4s ease-in-out infinite; }
+        @keyframes pulse { 0%,100%{opacity:.45} 50%{opacity:.9} }
+
+        @media(max-width:900px){ .cards-grid{grid-template-columns:1fr;} }
+        @media(max-width:680px){
+            .kpi-strip-inner { flex-wrap:wrap; }
+            .kpi-item { flex:1 1 calc(50% - 1px); border-bottom:1px solid var(--border); }
+            .cards-grid { padding:0 16px 40px; }
         }
     </style>
 </head>
 <body>
-    <div class="topbar">
-        <div class="topbar-left">
-            <a href="index.html" class="home-link">
-                <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-            </a>
-            <a href="index.html" class="brand-link">
-                <div class="topbar-brand">Costos&<span>Presupuestos</span></div>
-                <div class="topbar-sub">Análisis — Lotes</div>
-            </a>
+
+<!-- TOPBAR -->
+<div class="topbar">
+    <div class="topbar-left">
+        <a href="index.html" class="home-link">
+            <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        </a>
+        <a href="index.html" class="brand-link">
+            <div class="topbar-brand">Costos&<span>Presupuestos</span></div>
+            <div class="topbar-sub">Análisis Comparativo · Lotes</div>
+        </a>
+    </div>
+    <div class="topbar-center">
+        <div class="topbar-title">Análisis de <span>Lotes</span></div>
+    </div>
+    <div class="topbar-right">
+        <button class="btn-logout" id="btn-logout">
+            <svg viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5-5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
+            Salir
+        </button>
+    </div>
+</div>
+
+<!-- KPI STRIP -->
+<div class="kpi-strip">
+    <div class="kpi-strip-inner">
+        <div class="kpi-item">
+            <div class="kpi-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 7V3.5L18.5 9H13zM8 16h8v2H8zm0-4h8v2H8zm0-4h5v2H8z"/></svg></div>
+            <div><div class="kpi-label">Presupuesto SAP</div><div class="kpi-val" id="ks-sap">—</div></div>
         </div>
-        <div class="topbar-right">
-            <button class="btn-logout" id="btn-logout">
-                <svg viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5-5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
-                Salir
-            </button>
+        <div class="kpi-item">
+            <div class="kpi-icon"><svg viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6h-6z"/></svg></div>
+            <div><div class="kpi-label">Ejecutado</div><div class="kpi-val" id="ks-ejec">—</div></div>
+        </div>
+        <div class="kpi-item">
+            <div class="kpi-icon"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div>
+            <div><div class="kpi-label">Comprometido</div><div class="kpi-val" id="ks-comp">—</div></div>
+        </div>
+        <div class="kpi-item">
+            <div class="kpi-icon"><svg viewBox="0 0 24 24"><path d="M11 2v20c-5.07-.5-9-4.79-9-10s3.93-9.5 9-10zm2.03 0v8.99H22c-.47-4.74-4.24-8.52-8.97-8.99zm0 11.01V22c4.74-.47 8.5-4.25 8.97-8.99h-8.97z"/></svg></div>
+            <div><div class="kpi-label">Asignado</div><div class="kpi-val" id="ks-asig">—</div></div>
+        </div>
+        <div class="kpi-item">
+            <div class="kpi-icon"><svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h14c1.1 0 2 .9 2 2v1h-9a2 2 0 00-2 2v8a2 2 0 002 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg></div>
+            <div><div class="kpi-label">Disponible</div><div class="kpi-val" id="ks-disp">—</div></div>
+        </div>
+        <div class="kpi-item">
+            <div class="kpi-icon"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg></div>
+            <div><div class="kpi-label">% Asignado</div><div class="kpi-val" id="ks-pct">—</div></div>
         </div>
     </div>
-    <div class="page-content">Página en construcción</div>
+</div>
+
+<!-- SECTION HEADER -->
+<div class="section-header">
+    <div class="date-chip" id="date-chip">
+        <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>
+        Cargando…
+    </div>
+</div>
+
+<!-- CARDS GRID -->
+<div class="cards-grid" id="cards-grid">
+    <div class="pcard" style="min-height:300px">
+        <div style="padding:20px;display:flex;flex-direction:column;gap:14px">
+            <div class="skel" style="height:16px;width:55%"></div>
+            <div class="skel" style="height:13px;width:90%"></div>
+            <div class="skel" style="height:13px;width:85%"></div>
+            <div class="skel" style="height:5px;width:100%;border-radius:999px;margin-top:4px"></div>
+        </div>
+    </div>
+    <div class="pcard" style="min-height:300px">
+        <div style="padding:20px;display:flex;flex-direction:column;gap:14px">
+            <div class="skel" style="height:16px;width:60%"></div>
+            <div class="skel" style="height:13px;width:90%"></div>
+            <div class="skel" style="height:13px;width:80%"></div>
+            <div class="skel" style="height:5px;width:100%;border-radius:999px;margin-top:4px"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+const{createClient}=supabase;
+const sb=createClient(
+    'https://iipgrojliqeyycvgnkrc.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlpcGdyb2psaXFleXljdmdua3JjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NzA1NzYsImV4cCI6MjA5MTM0NjU3Nn0.Y6FQ-1qWd7HPMvTnK4alpKxM-YLJ5CsKmkorAZKMJrg'
+);
+document.getElementById('btn-logout').addEventListener('click',()=>
+    sb.auth.signOut().then(()=>window.location.href='login.html')
+);
+
+const PROJECTS=[
+    {key:'clc',name:'Condado La Ceiba', logo:'imagenes de proyectos/Logos Lotes/Logo CLC.png', json:'data/powerbi/clc/resumen-powerbi.json'},
+    {key:'hsl',name:'Hacienda El Sol',  logo:'imagenes de proyectos/Logos Lotes/Logo HSL.png', json:'data/powerbi/hsl/resumen-powerbi.json'},
+];
+
+function fmt(v){
+    if(!v||isNaN(v))return'—';
+    return'Q '+(v/1e6).toLocaleString('es-GT',{minimumFractionDigits:2,maximumFractionDigits:2})+'M';
+}
+function pctCls(p){
+    if(p==null)return'ok';
+    return p>=100?'danger':p>=90?'warn':'ok';
+}
+function fmtPct(p){ return p!=null?p.toFixed(1)+'%':'—'; }
+
+function buildCard(proj,areas){
+    const sapTotal =areas.reduce((s,a)=>s+(a.sap||0),0);
+    const ejecTotal=areas.reduce((s,a)=>s+(a.ejec||0),0);
+    const compTotal=areas.reduce((s,a)=>s+(a.comp||0),0);
+    const asigTotal=areas.reduce((s,a)=>s+(a.asig||0),0);
+    const dispTotal=areas.reduce((s,a)=>s+(a.disp||0),0);
+    const pctTotal =sapTotal>0?(asigTotal/sapTotal*100):null;
+    const cls=pctCls(pctTotal);
+    const fillW=Math.min(pctTotal||0,100).toFixed(1);
+
+    const areaRows=areas.map(a=>`<tr>
+        <td>${a.name}</td>
+        <td>${fmt(a.sap)}</td>
+        <td>${fmt(a.ejec)}</td>
+        <td>${fmt(a.comp)}</td>
+        <td>${fmt(a.asig)}</td>
+        <td>${fmt(a.disp)}</td>
+    </tr>`).join('');
+
+    const card=document.createElement('div');
+    card.className='pcard';
+    card.innerHTML=`
+        <div class="pcard-head">
+            <img src="${proj.logo}" alt="${proj.name}">
+            <div class="pcard-head-info">
+                <div class="pcard-name">${proj.name}</div>
+            </div>
+            <div class="pct-badge-wrap"><div class="pct-badge ${cls}">${fmtPct(pctTotal)}</div></div>
+        </div>
+        <div class="pcard-divider"></div>
+        <div class="pcard-table-wrap">
+        <table class="pcard-table">
+            <thead><tr>
+                <th>Área</th><th>Presupuesto</th><th>Ejecutado</th>
+                <th>Comprometido</th><th>Asignado</th><th>Disponible</th>
+            </tr></thead>
+            <tbody>${areaRows}</tbody>
+            <tfoot><tr>
+                <td>Total</td>
+                <td>${fmt(sapTotal)}</td><td>${fmt(ejecTotal)}</td>
+                <td>${fmt(compTotal)}</td><td>${fmt(asigTotal)}</td><td>${fmt(dispTotal)}</td>
+            </tr></tfoot>
+        </table>
+        </div>
+        <div class="pcard-prog">
+            <div class="prog-labels">
+                <span class="prog-label-text">% Asignado</span>
+                <span class="prog-label-pct">${fmtPct(pctTotal)}</span>
+            </div>
+            <div class="prog-track"><div class="prog-fill" data-w="${fillW}" style="width:0"></div></div>
+        </div>`;
+    return card;
+}
+
+function getAreaName(row){
+    return row['Rubros[Area]']||row['dimSegmentación[Area]']||row['dimSegmentacion[Area]']||'';
+}
+function getArea(ds,name){
+    return(ds?.porArea||[]).find(r=>getAreaName(r).toLowerCase()===name.toLowerCase())||null;
+}
+
+async function loadSB(){
+    const{data,error}=await sb.from('powerbi_resumen_cache')
+        .select('project_key,payload,mes_a')
+        .in('project_key',PROJECTS.map(p=>p.key))
+        .eq('is_current',true);
+    if(error||!data?.length)return null;
+    const map={};data.forEach(r=>{map[r.project_key]=r;});return map;
+}
+async function loadJSON(proj){
+    const r=await fetch(proj.json+'?_='+Date.now());
+    return r.ok?r.json():null;
+}
+
+async function init(){
+    try{
+        const sbMap=await loadSB();
+        const grid=document.getElementById('cards-grid');
+        grid.innerHTML='';
+        let mes='';
+        let tSap=0,tEjec=0,tComp=0,tAsig=0,tDisp=0;
+
+        for(const proj of PROJECTS){
+            let payload=null,mesA='';
+            if(sbMap?.[proj.key]){
+                const row=sbMap[proj.key];
+                try{payload=typeof row.payload==='string'?JSON.parse(row.payload):row.payload;}catch{}
+                mesA=row.mes_a||'';
+            }
+            if(!payload){
+                const j=await loadJSON(proj).catch(()=>null);
+                if(j){payload=j;mesA=j.metadata?.filters?.mesA||'';}
+            }
+            if(!payload)continue;
+            if(mesA&&!mes)mes=mesA;
+
+            const ds=payload.datasets||payload;
+
+            const allAreas=Array.isArray(ds.porArea)?ds.porArea:[];
+            allAreas.filter(row=>{
+                const n=getAreaName(row).toLowerCase();
+                return n.includes('construcc')||n.includes('urbaniz');
+            }).forEach(row=>{
+                tSap  +=(row['[PresupuestoErequester]']??row['[RdiTotal]']??0);
+                tEjec +=(row['[EjecutadoErequester]']??0);
+                tComp +=(row['[ComprometidoErequester]']??0);
+                tAsig +=(row['[AsignadoErequester]']??0);
+                tDisp +=(row['[DisponibleErequester]']??0);
+            });
+
+            const areas=['Construcción','Urbanización'].map(name=>{
+                const d=getArea(ds,name);
+                const sap  = d?.['[PresupuestoErequester]'] ?? d?.['[RdiTotal]'] ?? 0;
+                const ejec = d?.['[EjecutadoErequester]']   ?? 0;
+                const comp = d?.['[ComprometidoErequester]'] ?? 0;
+                const asig = d?.['[AsignadoErequester]']    ?? 0;
+                const disp = d?.['[DisponibleErequester]']  ?? 0;
+                return{name,sap,ejec,comp,asig,disp};
+            });
+            grid.appendChild(buildCard(proj,areas));
+        }
+
+        const gp=tSap>0?(tAsig/tSap*100):null;
+        document.getElementById('ks-sap').textContent =fmt(tSap);
+        document.getElementById('ks-ejec').textContent=fmt(tEjec);
+        document.getElementById('ks-comp').textContent=fmt(tComp);
+        document.getElementById('ks-asig').textContent=fmt(tAsig);
+        document.getElementById('ks-disp').textContent=fmt(tDisp);
+        const pctEl=document.getElementById('ks-pct');
+        pctEl.textContent=fmtPct(gp);
+        if(gp!=null) pctEl.style.color=gp>=100?'var(--danger)':gp>=90?'var(--warn)':'var(--ok)';
+
+        const dateStr=mes?mes.toUpperCase():'—';
+        document.getElementById('date-chip').innerHTML=`
+            <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>
+            Datos al ${dateStr}`;
+
+        requestAnimationFrame(()=>setTimeout(()=>{
+            document.querySelectorAll('.prog-fill').forEach(el=>{ el.style.width=(el.dataset.w||0)+'%'; });
+        },150));
+
+    }catch(e){
+        console.error(e);
+        document.getElementById('cards-grid').innerHTML=
+            `<div style="color:var(--danger);padding:48px;text-align:center;font-size:.85rem;grid-column:1/-1">Error al cargar datos.</div>`;
+    }
+}
+document.addEventListener('DOMContentLoaded',init);
+})();
+</script>
 </body>
 </html>
