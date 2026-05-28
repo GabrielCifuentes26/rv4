@@ -175,32 +175,33 @@
         /* divider */
         .pcard-divider { height:1px; background:var(--border); margin:0 20px 0; }
 
-        /* area sections */
-        .area-block { padding:12px 20px; }
-        .area-block + .area-block { border-top:1px solid var(--border); }
-        .area-block-label {
-            font-size:.58rem; font-weight:700; text-transform:uppercase;
-            letter-spacing:.8px; color:var(--gold-d); margin-bottom:10px;
+        /* table */
+        .pcard-table-wrap { overflow-x:auto; }
+        .pcard-table { width:100%; border-collapse:collapse; min-width:420px; }
+        .pcard-table thead th {
+            font-size:.58rem; font-weight:700; color:var(--muted);
+            text-transform:uppercase; letter-spacing:.5px;
+            padding:10px 14px 8px; text-align:right;
+            border-bottom:1px solid var(--border); white-space:nowrap;
         }
-        .metric-row {
-            display:flex; justify-content:space-between; align-items:center;
-            padding:4px 0;
+        .pcard-table thead th:first-child { text-align:left; padding-left:20px; }
+        .pcard-table thead th:last-child  { padding-right:20px; }
+        .pcard-table tbody td {
+            font-size:.73rem; color:var(--navy);
+            padding:8px 14px; text-align:right;
+            font-variant-numeric:tabular-nums;
+            border-top:1px solid #f1f5f9;
         }
-        .metric-row + .metric-row { border-top:1px solid #f1f5f9; }
-        .metric-name { font-size:.72rem; color:var(--gray); }
-        .metric-val  { font-size:.72rem; font-weight:700; color:var(--navy); font-variant-numeric:tabular-nums; }
-
-        /* total row */
-        .pcard-total {
-            display:flex; justify-content:space-between; align-items:center;
-            padding:10px 20px; border-top:1px solid var(--border);
-            background:#fafbfc;
+        .pcard-table tbody td:first-child { text-align:left; color:var(--gray); font-weight:600; padding-left:20px; }
+        .pcard-table tbody td:last-child  { padding-right:20px; }
+        .pcard-table tfoot td {
+            font-size:.73rem; font-weight:700; color:var(--slate);
+            padding:9px 14px; text-align:right;
+            border-top:1.5px solid var(--border);
+            font-variant-numeric:tabular-nums; background:#fafbfc;
         }
-        .pcard-total-label { font-size:.68rem; font-weight:700; color:var(--slate); }
-        .pcard-total-vals  { display:flex; gap:16px; }
-        .pcard-total-item  { text-align:right; }
-        .pcard-total-item-label { font-size:.55rem; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--muted); margin-bottom:1px; }
-        .pcard-total-item-val   { font-size:.76rem; font-weight:800; color:var(--navy); font-variant-numeric:tabular-nums; }
+        .pcard-table tfoot td:first-child { text-align:left; padding-left:20px; font-weight:800; }
+        .pcard-table tfoot td:last-child  { padding-right:20px; }
 
         /* progress bar */
         .pcard-prog { padding:12px 20px 18px; }
@@ -398,15 +399,14 @@ function buildCard(proj,areas){
     const cls=pctCls(pctTotal);
     const fillW=Math.min(pctTotal||0,100).toFixed(1);
 
-    const areaBlocks=areas.map(a=>`
-        <div class="area-block">
-            <div class="area-block-label">${a.name}</div>
-            <div class="metric-row"><span class="metric-name">Presupuesto SAP</span><span class="metric-val">${fmt(a.sap)}</span></div>
-            <div class="metric-row"><span class="metric-name">Ejecutado</span><span class="metric-val">${fmt(a.ejec)}</span></div>
-            <div class="metric-row"><span class="metric-name">Comprometido</span><span class="metric-val">${fmt(a.comp)}</span></div>
-            <div class="metric-row"><span class="metric-name">Asignado</span><span class="metric-val">${fmt(a.asig)}</span></div>
-            <div class="metric-row"><span class="metric-name">Disponible</span><span class="metric-val">${fmt(a.disp)}</span></div>
-        </div>`).join('');
+    const areaRows=areas.map(a=>`<tr>
+        <td>${a.name}</td>
+        <td>${fmt(a.sap)}</td>
+        <td>${fmt(a.ejec)}</td>
+        <td>${fmt(a.comp)}</td>
+        <td>${fmt(a.asig)}</td>
+        <td>${fmt(a.disp)}</td>
+    </tr>`).join('');
 
     const card=document.createElement('div');
     card.className='pcard';
@@ -416,31 +416,30 @@ function buildCard(proj,areas){
             <div class="pct-badge ${cls}">${fmtPct(pctTotal)}</div>
         </div>
         <div class="pcard-divider"></div>
-        ${areaBlocks}
-        <div class="pcard-total">
-            <span class="pcard-total-label">Total</span>
-            <div class="pcard-total-vals">
-                <div class="pcard-total-item">
-                    <div class="pcard-total-item-label">Presupuesto</div>
-                    <div class="pcard-total-item-val">${fmt(sapTotal)}</div>
-                </div>
-                <div class="pcard-total-item">
-                    <div class="pcard-total-item-label">Ejecutado</div>
-                    <div class="pcard-total-item-val">${fmt(ejecTotal)}</div>
-                </div>
-                <div class="pcard-total-item">
-                    <div class="pcard-total-item-label">Comprometido</div>
-                    <div class="pcard-total-item-val">${fmt(compTotal)}</div>
-                </div>
-                <div class="pcard-total-item">
-                    <div class="pcard-total-item-label">Asignado</div>
-                    <div class="pcard-total-item-val">${fmt(asigTotal)}</div>
-                </div>
-                <div class="pcard-total-item">
-                    <div class="pcard-total-item-label">Disponible</div>
-                    <div class="pcard-total-item-val">${fmt(dispTotal)}</div>
-                </div>
-            </div>
+        <div class="pcard-table-wrap">
+        <table class="pcard-table">
+            <thead>
+                <tr>
+                    <th>Área</th>
+                    <th>Presupuesto</th>
+                    <th>Ejecutado</th>
+                    <th>Comprometido</th>
+                    <th>Asignado</th>
+                    <th>Disponible</th>
+                </tr>
+            </thead>
+            <tbody>${areaRows}</tbody>
+            <tfoot>
+                <tr>
+                    <td>Total</td>
+                    <td>${fmt(sapTotal)}</td>
+                    <td>${fmt(ejecTotal)}</td>
+                    <td>${fmt(compTotal)}</td>
+                    <td>${fmt(asigTotal)}</td>
+                    <td>${fmt(dispTotal)}</td>
+                </tr>
+            </tfoot>
+        </table>
         </div>
         <div class="pcard-prog">
             <div class="prog-labels">
