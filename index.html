@@ -729,9 +729,15 @@
             font-size: 2.4rem; font-weight: 900; color: var(--navy); line-height: 1;
         }
         .analisis-cat-sub { font-size: 0.78rem; color: var(--gray2); margin-bottom: 4px; }
+        .analisis-cat-top {
+            display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
+            margin-bottom: 20px; padding-bottom: 18px; border-bottom: 1px solid var(--border);
+        }
+        .analisis-cat-topleft { display: flex; flex-direction: column; }
         .analisis-metrics-row {
-            display: flex; gap: 24px; flex-wrap: wrap;
-            margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--border);
+            display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start;
+            border: 1px solid var(--border); border-radius: 12px; padding: 14px 18px;
+            background: var(--bg); flex-shrink: 0;
         }
         .analisis-metric { display: flex; flex-direction: column; gap: 3px; }
         .analisis-metric-lbl {
@@ -742,7 +748,7 @@
         .analisis-metric-val--pct { color: var(--green); }
 
         /* ── ANALISIS STACK BAR ── */
-        .analisis-stack-wrap { margin-top: 20px; }
+        .analisis-stack-wrap { margin-top: 0; }
         .analisis-stack-labels {
             display: flex; justify-content: space-between;
             margin-bottom: 5px;
@@ -979,21 +985,25 @@
     </div>
     <div class="analisis-cat-grid">
         <div class="analisis-cat-card analisis-cat-card--casas">
-            <div class="analisis-cat-header">🏠 Casas</div>
-            <div class="analisis-cat-count">6</div>
-            <div class="analisis-cat-sub">Proyectos en ejecución</div>
-            <div class="analisis-metrics-row">
-                <div class="analisis-metric">
-                    <div class="analisis-metric-lbl">Presupuesto</div>
-                    <div class="analisis-metric-val" id="analisisCasasPpto">—</div>
+            <div class="analisis-cat-top">
+                <div class="analisis-cat-topleft">
+                    <div class="analisis-cat-header">🏠 Casas</div>
+                    <div class="analisis-cat-count">6</div>
+                    <div class="analisis-cat-sub">Proyectos en ejecución</div>
                 </div>
-                <div class="analisis-metric">
-                    <div class="analisis-metric-lbl">Asignado</div>
-                    <div class="analisis-metric-val" id="analisisCasasAsig">—</div>
-                </div>
-                <div class="analisis-metric">
-                    <div class="analisis-metric-lbl">% Asignado</div>
-                    <div class="analisis-metric-val analisis-metric-val--pct" id="analisisCasasPct">—</div>
+                <div class="analisis-metrics-row">
+                    <div class="analisis-metric">
+                        <div class="analisis-metric-lbl">Presupuesto</div>
+                        <div class="analisis-metric-val" id="analisisCasasPpto">—</div>
+                    </div>
+                    <div class="analisis-metric">
+                        <div class="analisis-metric-lbl">Asignado</div>
+                        <div class="analisis-metric-val" id="analisisCasasAsig">—</div>
+                    </div>
+                    <div class="analisis-metric">
+                        <div class="analisis-metric-lbl">% Asignado</div>
+                        <div class="analisis-metric-val analisis-metric-val--pct" id="analisisCasasPct">—</div>
+                    </div>
                 </div>
             </div>
             <div class="analisis-stack-wrap">
@@ -1019,21 +1029,25 @@
             </div>
         </div>
         <div class="analisis-cat-card analisis-cat-card--lotes">
-            <div class="analisis-cat-header">🌿 Lotes</div>
-            <div class="analisis-cat-count">2</div>
-            <div class="analisis-cat-sub">Proyectos en ejecución</div>
-            <div class="analisis-metrics-row">
-                <div class="analisis-metric">
-                    <div class="analisis-metric-lbl">Presupuesto</div>
-                    <div class="analisis-metric-val" id="analisisLotesPpto">—</div>
+            <div class="analisis-cat-top">
+                <div class="analisis-cat-topleft">
+                    <div class="analisis-cat-header">🌿 Lotes</div>
+                    <div class="analisis-cat-count">2</div>
+                    <div class="analisis-cat-sub">Proyectos en ejecución</div>
                 </div>
-                <div class="analisis-metric">
-                    <div class="analisis-metric-lbl">Asignado</div>
-                    <div class="analisis-metric-val" id="analisisLotesAsig">—</div>
-                </div>
-                <div class="analisis-metric">
-                    <div class="analisis-metric-lbl">% Asignado</div>
-                    <div class="analisis-metric-val analisis-metric-val--pct" id="analisisLotesPct">—</div>
+                <div class="analisis-metrics-row">
+                    <div class="analisis-metric">
+                        <div class="analisis-metric-lbl">Presupuesto</div>
+                        <div class="analisis-metric-val" id="analisisLotesPpto">—</div>
+                    </div>
+                    <div class="analisis-metric">
+                        <div class="analisis-metric-lbl">Asignado</div>
+                        <div class="analisis-metric-val" id="analisisLotesAsig">—</div>
+                    </div>
+                    <div class="analisis-metric">
+                        <div class="analisis-metric-lbl">% Asignado</div>
+                        <div class="analisis-metric-val analisis-metric-val--pct" id="analisisLotesPct">—</div>
+                    </div>
                 </div>
             </div>
             <div class="analisis-stack-wrap">
