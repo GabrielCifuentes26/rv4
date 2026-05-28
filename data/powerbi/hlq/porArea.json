@@ -1,0 +1,56 @@
+{
+    "name":  "porArea",
+    "rows":  [
+                 {
+                     "dimSegmentación[Area]":  "CONSTRUCCIÓN",
+                     "[RdiTotal]":  18763687.220423985,
+                     "[PresupuestoErequester]":  18763687.220423985,
+                     "[EjecutadoErequester]":  7043101.60736568,
+                     "[ComprometidoErequester]":  2402321.5426343032,
+                     "[AsignadoErequester]":  9445423.15,
+                     "[DisponibleErequester]":  9318264.0704239849,
+                     "[PorcentajeAsignado]":  0.50338843528146227,
+                     "[PorcentajeDisponible]":  0.49661156471853773
+                 },
+                 {
+                     "dimSegmentación[Area]":  "FUERA DE PROYECTO",
+                     "[RdiTotal]":  849349.65000000014,
+                     "[PresupuestoErequester]":  849349.65000000014,
+                     "[EjecutadoErequester]":  233313.10466149997,
+                     "[ComprometidoErequester]":  79229.7853385,
+                     "[AsignadoErequester]":  312542.89,
+                     "[DisponibleErequester]":  536806.76000000013,
+                     "[PorcentajeAsignado]":  0.36797906492337984,
+                     "[PorcentajeDisponible]":  0.63202093507662016
+                 },
+                 {
+                     "dimSegmentación[Area]":  "URBANIZACIÓN",
+                     "[RdiTotal]":  34804336.227019422,
+                     "[PresupuestoErequester]":  34804336.227019422,
+                     "[EjecutadoErequester]":  9626574.0164895263,
+                     "[ComprometidoErequester]":  1321338.4635104723,
+                     "[AsignadoErequester]":  10947912.48,
+                     "[DisponibleErequester]":  23856423.747019421,
+                     "[PorcentajeAsignado]":  0.31455599120148942,
+                     "[PorcentajeDisponible]":  0.68544400879851064
+                 }
+             ],
+    "metadata":  {
+                     "generatedAt":  "2026-05-27T16:19:35.7776625Z",
+                     "workspaceId":  "d111fc11-b7f3-4976-b74b-99f47f06bd22",
+                     "reportId":  "6730fdd5-86c6-4bac-9dd4-7443c877377a",
+                     "datasetId":  "40fefec2-d0df-4146-bce3-1a4b6bffeaeb",
+                     "projectKey":  "hlq",
+                     "projectName":  "Hacienda La Querencia",
+                     "modelProfile":  "hlq",
+                     "filters":  {
+                                     "areas":  [
+                                                   "CONSTRUCCIÓN",
+                                                   "FUERA DE PROYECTO",
+                                                   "URBANIZACIÓN"
+                                               ],
+                                     "mesA":  "may 26"
+                                 },
+                     "source":  "Power BI Service"
+                 }
+}

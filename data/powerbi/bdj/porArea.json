@@ -1,0 +1,44 @@
+{
+    "name":  "porArea",
+    "rows":  [
+                 {
+                     "dimSegmentación[Area]":  "CONSTRUCCIÓN",
+                     "[RdiTotal]":  50491134.439810209,
+                     "[PresupuestoErequester]":  50491134.439810209,
+                     "[EjecutadoErequester]":  14751592.536599949,
+                     "[ComprometidoErequester]":  3518277.9334000964,
+                     "[AsignadoErequester]":  18269870.47,
+                     "[DisponibleErequester]":  32221263.96981021,
+                     "[PorcentajeAsignado]":  0.36184313687344977,
+                     "[PorcentajeDisponible]":  0.63815686312655029
+                 },
+                 {
+                     "dimSegmentación[Area]":  "URBANIZACIÓN",
+                     "[RdiTotal]":  50299662.660120629,
+                     "[PresupuestoErequester]":  50299662.660120629,
+                     "[EjecutadoErequester]":  17832579.514516484,
+                     "[ComprometidoErequester]":  4477697.9054834973,
+                     "[AsignadoErequester]":  22310277.42,
+                     "[DisponibleErequester]":  27989385.240120627,
+                     "[PorcentajeAsignado]":  0.44354725737929029,
+                     "[PorcentajeDisponible]":  0.55645274262070976
+                 }
+             ],
+    "metadata":  {
+                     "generatedAt":  "2026-05-27T16:18:36.4209000Z",
+                     "workspaceId":  "d111fc11-b7f3-4976-b74b-99f47f06bd22",
+                     "reportId":  "464d198e-76eb-47c7-90ca-7d6117f42fba",
+                     "datasetId":  "55c99fdf-ea52-4217-8493-fd85b0ff4742",
+                     "projectKey":  "bdj",
+                     "projectName":  "Bosques de Jalapa",
+                     "modelProfile":  "hlq",
+                     "filters":  {
+                                     "areas":  [
+                                                   "CONSTRUCCIÓN",
+                                                   "URBANIZACIÓN"
+                                               ],
+                                     "mesA":  "may 26"
+                                 },
+                     "source":  "Power BI Service"
+                 }
+}

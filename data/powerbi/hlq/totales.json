@@ -1,0 +1,33 @@
+{
+    "name":  "totales",
+    "rows":  [
+                 {
+                     "[RdiTotal]":  54417373.097443417,
+                     "[PresupuestoErequester]":  54417373.097443417,
+                     "[EjecutadoErequester]":  16902988.72851672,
+                     "[ComprometidoErequester]":  3802889.7914832733,
+                     "[AsignadoErequester]":  20705878.52,
+                     "[DisponibleErequester]":  33711494.577443421,
+                     "[PorcentajeAsignado]":  0.38050125063778173,
+                     "[PorcentajeDisponible]":  0.61949874936221827
+                 }
+             ],
+    "metadata":  {
+                     "generatedAt":  "2026-05-27T16:19:35.7776625Z",
+                     "workspaceId":  "d111fc11-b7f3-4976-b74b-99f47f06bd22",
+                     "reportId":  "6730fdd5-86c6-4bac-9dd4-7443c877377a",
+                     "datasetId":  "40fefec2-d0df-4146-bce3-1a4b6bffeaeb",
+                     "projectKey":  "hlq",
+                     "projectName":  "Hacienda La Querencia",
+                     "modelProfile":  "hlq",
+                     "filters":  {
+                                     "areas":  [
+                                                   "CONSTRUCCIÓN",
+                                                   "FUERA DE PROYECTO",
+                                                   "URBANIZACIÓN"
+                                               ],
+                                     "mesA":  "may 26"
+                                 },
+                     "source":  "Power BI Service"
+                 }
+}

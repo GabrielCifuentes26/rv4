@@ -1,0 +1,44 @@
+{
+    "name":  "porArea",
+    "rows":  [
+                 {
+                     "dimSegmentación[Area]":  "CONSTRUCCIÓN",
+                     "[RdiTotal]":  65190603.597581312,
+                     "[PresupuestoErequester]":  65190603.597581312,
+                     "[EjecutadoErequester]":  18393117.394564424,
+                     "[ComprometidoErequester]":  4381262.705435819,
+                     "[AsignadoErequester]":  22774380.1,
+                     "[DisponibleErequester]":  42416223.497581311,
+                     "[PorcentajeAsignado]":  0.34935065551141747,
+                     "[PorcentajeDisponible]":  0.65064934448858258
+                 },
+                 {
+                     "dimSegmentación[Area]":  "URBANIZACIÓN",
+                     "[RdiTotal]":  41780439.085119233,
+                     "[PresupuestoErequester]":  41780439.085119233,
+                     "[EjecutadoErequester]":  23221245.502812594,
+                     "[ComprometidoErequester]":  4084431.3271873691,
+                     "[AsignadoErequester]":  27305676.83,
+                     "[DisponibleErequester]":  14474762.255119234,
+                     "[PorcentajeAsignado]":  0.65355169615068376,
+                     "[PorcentajeDisponible]":  0.34644830384931619
+                 }
+             ],
+    "metadata":  {
+                     "generatedAt":  "2026-05-27T16:19:22.6467414Z",
+                     "workspaceId":  "d111fc11-b7f3-4976-b74b-99f47f06bd22",
+                     "reportId":  "f3fdef8d-947a-4e1a-9188-c774420fde9c",
+                     "datasetId":  "c794678f-11ea-40eb-ad76-bdf4603191be",
+                     "projectKey":  "rdb",
+                     "projectName":  "Reserva del Bosque",
+                     "modelProfile":  "hlq",
+                     "filters":  {
+                                     "areas":  [
+                                                   "CONSTRUCCIÓN",
+                                                   "URBANIZACIÓN"
+                                               ],
+                                     "mesA":  "may 26"
+                                 },
+                     "source":  "Power BI Service"
+                 }
+}

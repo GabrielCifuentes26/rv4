@@ -1,0 +1,68 @@
+{
+    "name":  "porArea",
+    "rows":  [
+                 {
+                     "Rubros[Area]":  "Construcción",
+                     "[RdiTotal]":  75844560.095931038,
+                     "[PresupuestoErequester]":  82645822.898000062,
+                     "[EjecutadoErequester]":  76804236.654000163,
+                     "[ComprometidoErequester]":  4785907.1139999963,
+                     "[AsignadoErequester]":  81590143.768000066,
+                     "[DisponibleErequester]":  1055679.1300000008,
+                     "[PorcentajeAsignado]":  0.98722646719480434,
+                     "[PorcentajeDisponible]":  0.012773532805195737
+                 },
+                 {
+                     "Rubros[Area]":  "Costo Indirecto",
+                     "[RdiTotal]":  null,
+                     "[PresupuestoErequester]":  31952401.097999997,
+                     "[EjecutadoErequester]":  26941635.089999996,
+                     "[ComprometidoErequester]":  2483514.9440000006,
+                     "[AsignadoErequester]":  29425150.033999998,
+                     "[DisponibleErequester]":  2527251.0639999993,
+                     "[PorcentajeAsignado]":  0.920905754273403,
+                     "[PorcentajeDisponible]":  0.079094245726597
+                 },
+                 {
+                     "Rubros[Area]":  "Preliminar",
+                     "[RdiTotal]":  null,
+                     "[PresupuestoErequester]":  2744417.9399999995,
+                     "[EjecutadoErequester]":  2744417.9399999995,
+                     "[ComprometidoErequester]":  0.0,
+                     "[AsignadoErequester]":  2744417.9399999995,
+                     "[DisponibleErequester]":  0.0,
+                     "[PorcentajeAsignado]":  1.0,
+                     "[PorcentajeDisponible]":  0.0
+                 },
+                 {
+                     "Rubros[Area]":  "Urbanización",
+                     "[RdiTotal]":  39277448.665999994,
+                     "[PresupuestoErequester]":  41211540.148000017,
+                     "[EjecutadoErequester]":  38691122.609999985,
+                     "[ComprometidoErequester]":  2389547.648000001,
+                     "[AsignadoErequester]":  41080670.258000009,
+                     "[DisponibleErequester]":  130869.89000000006,
+                     "[PorcentajeAsignado]":  0.99682443583690339,
+                     "[PorcentajeDisponible]":  0.0031755641630964652
+                 }
+             ],
+    "metadata":  {
+                     "generatedAt":  "2026-05-27T16:18:50.3725371Z",
+                     "workspaceId":  "d111fc11-b7f3-4976-b74b-99f47f06bd22",
+                     "reportId":  "f3fdef8d-947a-4e1a-9188-c774420fde9c",
+                     "datasetId":  "245c5962-1238-43bb-88ba-5dce10fbbfab",
+                     "projectKey":  "bdp",
+                     "projectName":  "Bosques de Pinula",
+                     "modelProfile":  "bse",
+                     "filters":  {
+                                     "areas":  [
+                                                   "CONSTRUCCIÓN",
+                                                   "URBANIZACIÓN",
+                                                   "COSTO INDIRECTO",
+                                                   "PRELIMINAR"
+                                               ],
+                                     "mesA":  "may 26"
+                                 },
+                     "source":  "Power BI Service"
+                 }
+}

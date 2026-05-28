@@ -1,0 +1,33 @@
+{
+    "name":  "porArea",
+    "rows":  [
+                 {
+                     "dimSegmentacion[Area]":  "URBANIZACION",
+                     "[RdiTotal]":  14989329.93,
+                     "[PresupuestoErequester]":  14989329.93,
+                     "[EjecutadoErequester]":  631285.48,
+                     "[ComprometidoErequester]":  0.0,
+                     "[AsignadoErequester]":  631285.48,
+                     "[DisponibleErequester]":  14358044.45,
+                     "[PorcentajeAsignado]":  0.042115657133981035,
+                     "[PorcentajeDisponible]":  0.957884342866019
+                 }
+             ],
+    "metadata":  {
+                     "generatedAt":  "2026-05-27T16:20:01.5787871Z",
+                     "workspaceId":  "d111fc11-b7f3-4976-b74b-99f47f06bd22",
+                     "reportId":  "3555a16c-076c-4264-aaf1-8e81ff6d5acb",
+                     "datasetId":  "cf18b9bd-c7a3-451c-844e-84227382e471",
+                     "projectKey":  "hsl",
+                     "projectName":  "Hacienda El Sol",
+                     "modelProfile":  "hsl",
+                     "filters":  {
+                                     "areas":  [
+                                                   "CONSTRUCCION",
+                                                   "URBANIZACION"
+                                               ],
+                                     "mesA":  "may 26"
+                                 },
+                     "source":  "Power BI Service"
+                 }
+}

@@ -1,0 +1,44 @@
+{
+    "name":  "porArea",
+    "rows":  [
+                 {
+                     "Rubros[Area]":  "Construcción",
+                     "[RdiTotal]":  126877474.2141269,
+                     "[PresupuestoErequester]":  122731953.04600006,
+                     "[EjecutadoErequester]":  101892922.694,
+                     "[ComprometidoErequester]":  14289115.431999996,
+                     "[AsignadoErequester]":  116182038.12599999,
+                     "[DisponibleErequester]":  6549914.9199999943,
+                     "[PorcentajeAsignado]":  0.946632358098749,
+                     "[PorcentajeDisponible]":  0.053367641901250276
+                 },
+                 {
+                     "Rubros[Area]":  "Urbanización",
+                     "[RdiTotal]":  35199841.673567764,
+                     "[PresupuestoErequester]":  39661338.906000026,
+                     "[EjecutadoErequester]":  33635731.037999995,
+                     "[ComprometidoErequester]":  2927716.678,
+                     "[AsignadoErequester]":  36563447.716,
+                     "[DisponibleErequester]":  3097891.1900000004,
+                     "[PorcentajeAsignado]":  0.921891411751322,
+                     "[PorcentajeDisponible]":  0.07810858824867728
+                 }
+             ],
+    "metadata":  {
+                     "generatedAt":  "2026-05-27T16:18:27.4290461Z",
+                     "workspaceId":  "d111fc11-b7f3-4976-b74b-99f47f06bd22",
+                     "reportId":  "f3fdef8d-947a-4e1a-9188-c774420fde9c",
+                     "datasetId":  "68161d1e-2ef3-4916-a65c-3e86d4abb2bc",
+                     "projectKey":  "bse",
+                     "projectName":  "Bosques de Santa Elena",
+                     "modelProfile":  "bse",
+                     "filters":  {
+                                     "areas":  [
+                                                   "CONSTRUCCIÓN",
+                                                   "URBANIZACIÓN"
+                                               ],
+                                     "mesA":  "may 26"
+                                 },
+                     "source":  "Power BI Service"
+                 }
+}

@@ -1,0 +1,44 @@
+{
+    "name":  "porArea",
+    "rows":  [
+                 {
+                     "dimSegmentacion[Area]":  "CONSTRUCCION",
+                     "[RdiTotal]":  295776.58,
+                     "[PresupuestoErequester]":  295776.58,
+                     "[EjecutadoErequester]":  100827.44,
+                     "[ComprometidoErequester]":  5590.0,
+                     "[AsignadoErequester]":  106417.44,
+                     "[DisponibleErequester]":  189359.14,
+                     "[PorcentajeAsignado]":  0.35978994685786142,
+                     "[PorcentajeDisponible]":  0.64021005314213864
+                 },
+                 {
+                     "dimSegmentacion[Area]":  "URBANIZACION",
+                     "[RdiTotal]":  14120846.42,
+                     "[PresupuestoErequester]":  14120846.42,
+                     "[EjecutadoErequester]":  6423312.1558000008,
+                     "[ComprometidoErequester]":  86654.554200000013,
+                     "[AsignadoErequester]":  6509966.71,
+                     "[DisponibleErequester]":  7610879.71,
+                     "[PorcentajeAsignado]":  0.46101816536858842,
+                     "[PorcentajeDisponible]":  0.53898183463141158
+                 }
+             ],
+    "metadata":  {
+                     "generatedAt":  "2026-05-27T16:19:48.7675203Z",
+                     "workspaceId":  "d111fc11-b7f3-4976-b74b-99f47f06bd22",
+                     "reportId":  "c20539a5-2ec3-401b-a9cc-d1552cb31bc9",
+                     "datasetId":  "c6f440f9-0bef-4c32-b6d0-d0b1ffe992de",
+                     "projectKey":  "clc",
+                     "projectName":  "Condado La Ceiba",
+                     "modelProfile":  "hsl",
+                     "filters":  {
+                                     "areas":  [
+                                                   "CONSTRUCCION",
+                                                   "URBANIZACION"
+                                               ],
+                                     "mesA":  "may 26"
+                                 },
+                     "source":  "Power BI Service"
+                 }
+}
