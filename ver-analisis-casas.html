@@ -17,6 +17,8 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="dark.css">
+    <script src="theme.js"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
     <style>
         *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
@@ -71,6 +73,14 @@
         .topbar-title span { color:var(--gold); }
         .topbar-subtitle { font-size:.58rem; color:rgba(255,255,255,.40); margin-top:2px; }
         .topbar-right { display:flex; align-items:center; }
+        .btn-theme {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: rgba(255,255,255,0.10); border: 1px solid rgba(255,255,255,0.18);
+            color: #fff; font-size: 15px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background .2s, transform .3s; flex-shrink: 0;
+        }
+        .btn-theme:hover { background: rgba(201,168,76,0.35); transform: rotate(20deg); }
         .btn-logout {
             display:flex; align-items:center; gap:5px;
             background:rgba(239,68,68,.09); border:1px solid rgba(239,68,68,.25);
@@ -254,6 +264,7 @@
         <div class="topbar-title">Análisis de <span>Casas</span></div>
     </div>
     <div class="topbar-right">
+        <button id="btn-theme" class="btn-theme" title="Cambiar tema" onclick="toggleTheme()">🌙</button>
         <button class="btn-logout" id="btn-logout">
             <svg viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5-5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
             Salir
