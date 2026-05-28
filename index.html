@@ -778,6 +778,9 @@
             font-size: 0.62rem; font-weight: 600; color: var(--gray2);
             letter-spacing: 0.5px; text-transform: uppercase;
         }
+        .legend-val {
+            font-size: 0.72rem; font-weight: 700; color: var(--navy); letter-spacing: 0; text-transform: none; margin-left: 2px;
+        }
         .analisis-stack-dot {
             width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
         }
@@ -1007,17 +1010,13 @@
                 </div>
             </div>
             <div class="analisis-stack-wrap">
-                <div class="analisis-stack-labels">
-                    <div class="analisis-stack-lbl" id="analisisCasasBarAsigLbl">—<span>Asignado</span></div>
-                    <div class="analisis-stack-lbl" id="analisisCasasBarDispLbl">—<span>Disponible</span></div>
-                </div>
                 <div class="analisis-stack-bar">
                     <div class="analisis-stack-seg analisis-stack-seg--asig" id="analisisCasasBarAsig" style="width:0%"></div>
                     <div class="analisis-stack-seg analisis-stack-seg--disp" id="analisisCasasBarDisp" style="width:100%"></div>
                 </div>
                 <div class="analisis-stack-legend">
-                    <div class="analisis-stack-legend-item"><span class="analisis-stack-dot analisis-stack-dot--asig"></span>Asignado</div>
-                    <div class="analisis-stack-legend-item"><span class="analisis-stack-dot analisis-stack-dot--disp"></span>Disponible</div>
+                    <div class="analisis-stack-legend-item" id="analisisCasasBarAsigLbl"><span class="analisis-stack-dot analisis-stack-dot--asig"></span>Asignado <span class="legend-val">—</span></div>
+                    <div class="analisis-stack-legend-item" id="analisisCasasBarDispLbl"><span class="analisis-stack-dot analisis-stack-dot--disp"></span>Disponible <span class="legend-val">—</span></div>
                 </div>
             </div>
             <div class="analisis-cat-footer">
@@ -1051,17 +1050,13 @@
                 </div>
             </div>
             <div class="analisis-stack-wrap">
-                <div class="analisis-stack-labels">
-                    <div class="analisis-stack-lbl" id="analisisLotesBarAsigLbl">—<span>Asignado</span></div>
-                    <div class="analisis-stack-lbl" id="analisisLotesBarDispLbl">—<span>Disponible</span></div>
-                </div>
                 <div class="analisis-stack-bar">
                     <div class="analisis-stack-seg analisis-stack-seg--asig" id="analisisLotesBarAsig" style="width:0%"></div>
                     <div class="analisis-stack-seg analisis-stack-seg--disp" id="analisisLotesBarDisp" style="width:100%"></div>
                 </div>
                 <div class="analisis-stack-legend">
-                    <div class="analisis-stack-legend-item"><span class="analisis-stack-dot analisis-stack-dot--asig"></span>Asignado</div>
-                    <div class="analisis-stack-legend-item"><span class="analisis-stack-dot analisis-stack-dot--disp"></span>Disponible</div>
+                    <div class="analisis-stack-legend-item" id="analisisLotesBarAsigLbl"><span class="analisis-stack-dot analisis-stack-dot--asig"></span>Asignado <span class="legend-val">—</span></div>
+                    <div class="analisis-stack-legend-item" id="analisisLotesBarDispLbl"><span class="analisis-stack-dot analisis-stack-dot--disp"></span>Disponible <span class="legend-val">—</span></div>
                 </div>
             </div>
             <div class="analisis-cat-footer">
@@ -1500,8 +1495,8 @@
             const elDispLbl = document.getElementById(prefix + 'BarDispLbl');
             if (elAsig) elAsig.style.width = (pct * 100).toFixed(1) + '%';
             if (elDisp) elDisp.style.width = ((1 - pct) * 100).toFixed(1) + '%';
-            if (elAsigLbl) elAsigLbl.innerHTML = formatCompactMoney(asig) + '<span>Asignado</span>';
-            if (elDispLbl) elDispLbl.innerHTML = formatCompactMoney(disp) + '<span>Disponible</span>';
+            if (elAsigLbl) { const v=elAsigLbl.querySelector('.legend-val'); if(v) v.textContent=formatCompactMoney(asig); }
+            if (elDispLbl) { const v=elDispLbl.querySelector('.legend-val'); if(v) v.textContent=formatCompactMoney(disp); }
         };
         setBar('analisisCasas', casasAsig, casasPpto);
         setBar('analisisLotes', lotesAsig, lotesPpto);
