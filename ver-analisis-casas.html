@@ -20,206 +20,226 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', 'Segoe UI', sans-serif; background: #f0f4f8; color: #0f172a; min-height: 100vh; }
+        body { font-family: 'Inter', 'Segoe UI', sans-serif; background: #0c1117; color: #0f172a; min-height: 100vh; }
 
         /* ── TOPBAR ─────────────────────────────────────────────── */
         .topbar {
             position: sticky; top: 0; z-index: 300;
-            background: #0f172a; border-bottom: 1px solid rgba(255,255,255,0.07);
-            padding: 0 22px; height: 56px;
+            background: #080c12; border-bottom: 1px solid rgba(255,255,255,0.06);
+            padding: 0 28px; height: 56px;
             display: flex; align-items: center; justify-content: space-between;
-            box-shadow: 0 2px 16px rgba(15,23,42,0.25);
+            box-shadow: 0 1px 0 rgba(201,168,76,0.15);
         }
         .topbar::before {
             content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-            background: linear-gradient(90deg, transparent 0%, #C9A84C 35%, #C9A84C 65%, transparent 100%);
+            background: linear-gradient(90deg, transparent 0%, #C9A84C 30%, #E8C96A 50%, #C9A84C 70%, transparent 100%);
         }
-        .topbar-left { display: flex; align-items: center; }
+        .topbar-left { display: flex; align-items: center; gap: 14px; }
         .home-link {
             display: flex; align-items: center; justify-content: center;
-            width: 36px; height: 36px; border-radius: 8px;
-            background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
-            color: rgba(255,255,255,0.6); text-decoration: none;
-            transition: background .18s, color .18s; flex-shrink: 0; margin-right: 14px;
+            width: 34px; height: 34px; border-radius: 8px;
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.5); text-decoration: none;
+            transition: all .2s;
         }
         .home-link:hover { background: #C9A84C; color: #fff; border-color: #C9A84C; }
-        .home-link svg { width: 15px; height: 15px; fill: currentColor; }
-        .brand-link { text-decoration: none; color: inherit; }
-        .brand-link:hover .topbar-brand { color: #C9A84C; transition: color .18s; }
-        .topbar-brand { font-size: 0.95rem; font-weight: 900; color: #fff; letter-spacing: 0.5px; }
+        .home-link svg { width: 14px; height: 14px; fill: currentColor; }
+        .brand-link { text-decoration: none; }
+        .topbar-brand { font-size: 0.88rem; font-weight: 900; color: #fff; letter-spacing: 0.3px; }
         .topbar-brand span { color: #C9A84C; }
-        .topbar-sub { font-size: 0.62rem; color: rgba(255,255,255,0.38); margin-top: 1px; letter-spacing: 0.2px; }
+        .topbar-sub { font-size: 0.6rem; color: rgba(255,255,255,0.3); margin-top: 1px; }
         .topbar-right { display: flex; align-items: center; gap: 10px; }
         .btn-logout {
             display: flex; align-items: center; gap: 6px;
-            background: rgba(239,68,68,0.10); border: 1px solid rgba(239,68,68,0.30);
-            color: #f87171; padding: 5px 14px; border-radius: 7px;
-            font-size: 0.72rem; font-weight: 700; cursor: pointer;
-            font-family: inherit; transition: background .18s, border-color .18s, color .18s;
+            background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25);
+            color: #f87171; padding: 5px 13px; border-radius: 7px;
+            font-size: 0.7rem; font-weight: 700; cursor: pointer; font-family: inherit;
+            transition: all .18s;
         }
-        .btn-logout:hover { background: rgba(239,68,68,0.22); border-color: rgba(239,68,68,0.55); color: #fca5a5; }
-        .btn-logout svg { width: 13px; height: 13px; fill: currentColor; }
+        .btn-logout:hover { background: rgba(239,68,68,0.18); }
+        .btn-logout svg { width: 12px; height: 12px; fill: currentColor; }
 
-        /* ── PAGE HEADER ───────────────────────────────────────── */
-        .page-header {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            padding: 32px 32px 28px;
-            border-bottom: 1px solid rgba(201,168,76,0.2);
+        /* ── HERO ───────────────────────────────────────────────── */
+        .hero {
+            background: #080c12;
+            padding: 36px 32px 0;
+            position: relative; overflow: hidden;
         }
-        .page-header-top { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-        .page-title-group {}
-        .page-eyebrow {
-            font-size: 0.62rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
-            color: #C9A84C; margin-bottom: 6px;
+        .hero::after {
+            content: '';
+            position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(201,168,76,0.3), transparent);
         }
-        .page-title { font-size: 1.5rem; font-weight: 900; color: #fff; line-height: 1.2; }
-        .page-title span { color: #C9A84C; }
-        .page-subtitle { font-size: 0.78rem; color: rgba(255,255,255,0.45); margin-top: 5px; }
-        .date-pill {
+        .hero-inner { max-width: 1280px; margin: 0 auto; }
+        .hero-tag {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(201,168,76,0.1); border: 1px solid rgba(201,168,76,0.2);
+            color: #C9A84C; font-size: 0.62rem; font-weight: 700; letter-spacing: 1.2px;
+            text-transform: uppercase; padding: 4px 12px; border-radius: 20px; margin-bottom: 14px;
+        }
+        .hero-title {
+            font-size: 2rem; font-weight: 900; color: #fff; line-height: 1.15; margin-bottom: 6px;
+        }
+        .hero-title span { color: #C9A84C; }
+        .hero-sub { font-size: 0.8rem; color: rgba(255,255,255,0.4); margin-bottom: 32px; }
+
+        /* KPI STRIP */
+        .kpi-strip {
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            gap: 1px; background: rgba(255,255,255,0.04);
+            border-top: 1px solid rgba(255,255,255,0.05);
+            margin: 0 -32px;
+        }
+        .kpi-cell {
+            padding: 18px 24px; background: #080c12;
+            display: flex; flex-direction: column; gap: 3px;
+        }
+        .kpi-cell-label {
+            font-size: 0.58rem; font-weight: 700; letter-spacing: 1.2px;
+            text-transform: uppercase; color: rgba(255,255,255,0.3);
+        }
+        .kpi-cell-val {
+            font-size: 1.3rem; font-weight: 900; color: #fff;
+            font-variant-numeric: tabular-nums;
+        }
+        .kpi-cell-val.gold   { color: #C9A84C; }
+        .kpi-cell-val.green  { color: #4ade80; }
+        .kpi-cell-val.amber  { color: #fbbf24; }
+        .kpi-cell-val.red    { color: #f87171; }
+        .kpi-cell-note { font-size: 0.6rem; color: rgba(255,255,255,0.25); }
+
+        /* ── GRID SECTION ───────────────────────────────────────── */
+        .section {
+            max-width: 1280px; margin: 0 auto;
+            padding: 32px 32px 48px;
+        }
+        .section-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .section-title { font-size: 0.72rem; font-weight: 800; color: rgba(255,255,255,0.5); letter-spacing: 1px; text-transform: uppercase; }
+        .date-badge {
+            display: flex; align-items: center; gap: 5px;
+            background: rgba(201,168,76,0.08); border: 1px solid rgba(201,168,76,0.18);
+            color: rgba(201,168,76,0.8); padding: 4px 12px; border-radius: 20px;
+            font-size: 0.64rem; font-weight: 700;
+        }
+        .date-badge svg { width: 10px; height: 10px; fill: currentColor; }
+
+        /* PROJECT CARDS GRID */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .proj-card {
+            background: #13181f; border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.06);
+            overflow: hidden; display: flex; flex-direction: column;
+            transition: transform .2s, box-shadow .2s;
+        }
+        .proj-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        }
+
+        /* Card top stripe */
+        .card-stripe { height: 4px; width: 100%; }
+
+        /* Card header */
+        .card-head {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 16px 18px 12px;
+        }
+        .card-proj-name { font-size: 0.88rem; font-weight: 800; color: #fff; }
+        .card-proj-key {
+            font-size: 0.62rem; font-weight: 800; letter-spacing: 1px;
+            padding: 3px 9px; border-radius: 6px; color: #fff;
+            opacity: 0.9;
+        }
+
+        /* Gauge */
+        .card-gauge-wrap {
+            display: flex; flex-direction: column; align-items: center;
+            padding: 4px 18px 16px; position: relative;
+        }
+        .gauge-svg { width: 130px; height: 130px; }
+        .gauge-center {
+            position: absolute;
+            top: 50%; left: 50%; transform: translate(-50%, -36%);
+            text-align: center; pointer-events: none;
+        }
+        .gauge-pct { font-size: 1.55rem; font-weight: 900; color: #fff; line-height: 1; }
+        .gauge-pct-label { font-size: 0.58rem; font-weight: 600; color: rgba(255,255,255,0.4); margin-top: 2px; letter-spacing: 0.5px; }
+
+        /* Card numbers */
+        .card-nums {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 1px; background: rgba(255,255,255,0.04);
+            border-top: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .card-num-cell { padding: 12px 18px; background: #13181f; }
+        .card-num-label { font-size: 0.58rem; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 4px; }
+        .card-num-val { font-size: 0.92rem; font-weight: 800; color: #fff; font-variant-numeric: tabular-nums; }
+        .card-num-val.val-asig { color: #60a5fa; }
+
+        /* Area breakdown */
+        .card-areas { padding: 14px 18px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+        .area-row {}
+        .area-row-top {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        .area-name {
             display: flex; align-items: center; gap: 6px;
-            background: rgba(201,168,76,0.12); border: 1px solid rgba(201,168,76,0.25);
-            color: #C9A84C; padding: 6px 14px; border-radius: 20px;
-            font-size: 0.72rem; font-weight: 700; white-space: nowrap; align-self: flex-start;
+            font-size: 0.7rem; font-weight: 600; color: rgba(255,255,255,0.6);
         }
-        .date-pill svg { width: 12px; height: 12px; fill: currentColor; }
+        .area-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+        .area-pct { font-size: 0.72rem; font-weight: 800; }
+        .area-bar-bg { height: 5px; border-radius: 4px; background: rgba(255,255,255,0.07); overflow: hidden; }
+        .area-bar-fill { height: 100%; border-radius: 4px; transition: width .5s ease; }
+        .area-amount { font-size: 0.65rem; color: rgba(255,255,255,0.28); margin-top: 3px; font-variant-numeric: tabular-nums; }
 
-        /* ── KPI SUMMARY BAR ─────────────────────────────────── */
-        .kpi-bar {
-            display: flex; gap: 1px;
-            background: rgba(201,168,76,0.12);
-            border-top: 1px solid rgba(201,168,76,0.15);
+        /* Total card */
+        .total-card {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #1a1f2e 0%, #111827 100%);
+            border-radius: 16px; border: 1px solid rgba(201,168,76,0.2);
+            padding: 24px 28px;
+            display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px;
         }
-        .kpi-item {
-            flex: 1; padding: 14px 20px; background: rgba(15,23,42,0.6);
-            display: flex; flex-direction: column; gap: 2px;
-        }
-        .kpi-item:first-child { border-radius: 0; }
-        .kpi-label { font-size: 0.6rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.38); }
-        .kpi-value { font-size: 1.15rem; font-weight: 800; color: #fff; }
-        .kpi-value.accent { color: #C9A84C; }
-        .kpi-value.green { color: #34d399; }
-        .kpi-value.warn { color: #fbbf24; }
-        .kpi-value.danger { color: #f87171; }
-        .kpi-note { font-size: 0.6rem; color: rgba(255,255,255,0.3); margin-top: 1px; }
-
-        /* ── MAIN CONTENT ─────────────────────────────────────── */
-        .main { padding: 28px 32px 48px; max-width: 1200px; margin: 0 auto; }
-
-        /* ── TABLE ────────────────────────────────────────────── */
-        .table-card {
-            background: #fff; border-radius: 14px;
-            box-shadow: 0 2px 20px rgba(15,23,42,0.08);
-            overflow: hidden;
-        }
-        .table-card-header {
-            padding: 16px 22px; border-bottom: 1px solid #e2e8f0;
-            display: flex; align-items: center; justify-content: space-between; gap: 12px;
-        }
-        .table-card-title { font-size: 0.82rem; font-weight: 800; color: #0f172a; letter-spacing: 0.3px; }
-        .table-card-badge {
-            font-size: 0.64rem; font-weight: 700; background: #f1f5f9; color: #64748b;
-            padding: 3px 10px; border-radius: 20px; border: 1px solid #e2e8f0;
-        }
-        .table-wrap { overflow-x: auto; }
-        table {
-            width: 100%; border-collapse: collapse; font-size: 0.82rem;
-        }
-        thead th {
-            background: #0f172a; color: rgba(255,255,255,0.7);
-            font-size: 0.64rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
-            padding: 11px 16px; text-align: right; white-space: nowrap;
-        }
-        thead th:first-child, thead th:nth-child(2) { text-align: left; }
-        thead th:first-child { border-radius: 0; }
-
-        /* project group rows */
-        .row-area td {
-            padding: 10px 16px; border-bottom: 1px solid #f1f5f9;
-            text-align: right; vertical-align: middle;
-        }
-        .row-area td:nth-child(2) { text-align: left; }
-        .row-area:hover td { background: #f8fafc; }
-
-        /* project name cell with left border color */
-        .td-project {
-            text-align: left !important; vertical-align: middle;
-            font-weight: 700; font-size: 0.8rem; color: #0f172a;
-            padding-left: 18px !important;
-            border-left: 3px solid transparent;
-            white-space: nowrap;
-        }
-        .td-area {
-            color: #475569; font-size: 0.76rem; font-weight: 500;
-        }
-        .td-area .area-dot {
-            display: inline-block; width: 7px; height: 7px; border-radius: 50%;
-            margin-right: 7px; vertical-align: middle;
-        }
-        .area-dot.constr { background: #3b82f6; }
-        .area-dot.urban  { background: #10b981; }
-
-        /* subtotal row */
-        .row-subtotal td {
-            padding: 9px 16px; background: #f8fafc;
-            border-bottom: 2px solid #e2e8f0;
-            text-align: right; vertical-align: middle;
-            font-size: 0.75rem; color: #64748b;
-        }
-        .row-subtotal td:nth-child(2) { text-align: left; font-weight: 600; color: #475569; }
-        .row-subtotal .td-project { color: transparent; font-size: 0; padding: 0 !important; border: none; }
-
-        /* grand total row */
-        .row-total td {
-            padding: 13px 16px; background: #0f172a;
-            text-align: right; color: #fff; font-weight: 700; font-size: 0.82rem;
-        }
-        .row-total td:first-child, .row-total td:nth-child(2) { text-align: left; }
-        .row-total td:first-child { border-radius: 0; }
-
-        /* number cells */
-        .num { font-variant-numeric: tabular-nums; white-space: nowrap; }
-        .num-sap { color: #0f172a; font-weight: 600; }
-        .num-asig { color: #1d4ed8; font-weight: 700; }
-        .num-pct { font-weight: 800; }
-
-        /* progress bar cell */
-        .td-pct { min-width: 130px; }
-        .pct-wrap { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
-        .pct-bar-bg {
-            width: 64px; height: 6px; border-radius: 4px; background: #e2e8f0;
-            flex-shrink: 0; overflow: hidden;
-        }
-        .pct-bar-fill { height: 100%; border-radius: 4px; transition: width .4s ease; }
-        .pct-fill-ok     { background: #22c55e; }
-        .pct-fill-warn   { background: #f59e0b; }
-        .pct-fill-danger { background: #ef4444; }
-        .pct-text { font-size: 0.78rem; font-weight: 800; min-width: 44px; text-align: right; }
-        .pct-ok     { color: #16a34a; }
-        .pct-warn   { color: #d97706; }
-        .pct-danger { color: #dc2626; }
+        .total-left {}
+        .total-label { font-size: 0.62rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #C9A84C; margin-bottom: 4px; }
+        .total-title { font-size: 1.1rem; font-weight: 900; color: #fff; }
+        .total-sub { font-size: 0.72rem; color: rgba(255,255,255,0.35); margin-top: 2px; }
+        .total-kpis { display: flex; gap: 32px; flex-wrap: wrap; }
+        .total-kpi { text-align: center; }
+        .total-kpi-label { font-size: 0.58rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 4px; }
+        .total-kpi-val { font-size: 1.4rem; font-weight: 900; font-variant-numeric: tabular-nums; }
+        .total-kpi-val.gold { color: #C9A84C; }
+        .total-kpi-val.blue { color: #60a5fa; }
+        .total-kpi-val.green { color: #4ade80; }
+        .total-kpi-val.amber { color: #fbbf24; }
+        .total-kpi-val.red   { color: #f87171; }
+        .total-divider { width: 1px; background: rgba(255,255,255,0.08); align-self: stretch; }
 
         /* skeleton */
-        .skeleton td { padding: 12px 16px; }
-        .skel-block {
-            height: 14px; border-radius: 6px; background: #e2e8f0;
-            animation: skel 1.4s ease-in-out infinite;
-        }
-        @keyframes skel { 0%,100%{opacity:.5} 50%{opacity:1} }
-
-        /* empty / error */
-        .state-msg { padding: 48px; text-align: center; color: #94a3b8; font-size: 0.85rem; }
-        .state-msg strong { display: block; font-size: 1rem; color: #64748b; margin-bottom: 6px; }
+        .skel { background: rgba(255,255,255,0.06); border-radius: 6px; animation: pulse 1.5s ease-in-out infinite; }
+        @keyframes pulse { 0%,100%{opacity:.4} 50%{opacity:.9} }
 
         /* responsive */
-        @media(max-width:768px){
-            .page-header { padding: 20px 16px; }
-            .kpi-bar { flex-wrap: wrap; }
-            .kpi-item { flex: 1 1 45%; }
-            .main { padding: 16px; }
-            thead th { font-size: 0.58rem; padding: 9px 10px; }
-            .row-area td, .row-subtotal td, .row-total td { padding: 8px 10px; }
-            .td-pct { min-width: 90px; }
-            .pct-bar-bg { width: 36px; }
+        @media(max-width:1024px){
+            .cards-grid { grid-template-columns: repeat(2,1fr); }
+            .kpi-strip { grid-template-columns: repeat(2,1fr); }
+        }
+        @media(max-width:640px){
+            .hero { padding: 24px 16px 0; }
+            .kpi-strip { margin: 0 -16px; grid-template-columns: repeat(2,1fr); }
+            .section { padding: 20px 16px 40px; }
+            .cards-grid { grid-template-columns: 1fr; }
+            .hero-title { font-size: 1.4rem; }
         }
     </style>
 </head>
@@ -233,7 +253,7 @@
         </a>
         <a href="index.html" class="brand-link">
             <div class="topbar-brand">Costos&<span>Presupuestos</span></div>
-            <div class="topbar-sub">Análisis — Casas</div>
+            <div class="topbar-sub">Análisis Comparativo · Casas</div>
         </a>
     </div>
     <div class="topbar-right">
@@ -244,71 +264,83 @@
     </div>
 </div>
 
-<!-- PAGE HEADER -->
-<div class="page-header">
-    <div class="page-header-top">
-        <div class="page-title-group">
-            <div class="page-eyebrow">Resumen Comparativo</div>
-            <div class="page-title">Presupuesto SAP vs <span>Asignado</span></div>
-            <div class="page-subtitle">6 proyectos de casas · Áreas: Construcción y Urbanización</div>
+<!-- HERO -->
+<div class="hero">
+    <div class="hero-inner">
+        <div class="hero-tag">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg>
+            Resumen Comparativo · Proyectos de Casas
         </div>
-        <div class="date-pill" id="date-pill">
-            <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>
-            <span id="date-label">Cargando…</span>
-        </div>
+        <div class="hero-title">Presupuesto SAP <span>vs</span> Asignado</div>
+        <div class="hero-sub">6 proyectos · Construcción y Urbanización · <span id="date-text" style="color:rgba(201,168,76,0.7)">Cargando…</span></div>
     </div>
-    <div class="kpi-bar" id="kpi-bar">
-        <div class="kpi-item">
-            <div class="kpi-label">Total Ppto. SAP</div>
-            <div class="kpi-value" id="kpi-sap">—</div>
-            <div class="kpi-note">Suma 6 proyectos</div>
+    <div class="kpi-strip">
+        <div class="kpi-cell">
+            <div class="kpi-cell-label">Total Ppto. SAP</div>
+            <div class="kpi-cell-val gold" id="kpi-sap">—</div>
+            <div class="kpi-cell-note">6 proyectos combinados</div>
         </div>
-        <div class="kpi-item">
-            <div class="kpi-label">Total Asignado</div>
-            <div class="kpi-value accent" id="kpi-asig">—</div>
-            <div class="kpi-note">Construcción + Urbanización</div>
+        <div class="kpi-cell">
+            <div class="kpi-cell-label">Total Asignado</div>
+            <div class="kpi-cell-val" id="kpi-asig">—</div>
+            <div class="kpi-cell-note">Const. + Urbanización</div>
         </div>
-        <div class="kpi-item">
-            <div class="kpi-label">% Asignado Global</div>
-            <div class="kpi-value" id="kpi-pct">—</div>
-            <div class="kpi-note">Asignado / SAP</div>
+        <div class="kpi-cell">
+            <div class="kpi-cell-label">% Asignado Global</div>
+            <div class="kpi-cell-val" id="kpi-pct">—</div>
+            <div class="kpi-cell-note">Sobre presupuesto SAP</div>
         </div>
-        <div class="kpi-item">
-            <div class="kpi-label">Proyectos</div>
-            <div class="kpi-value">6</div>
-            <div class="kpi-note">Casas en ejecución</div>
+        <div class="kpi-cell">
+            <div class="kpi-cell-label">Proyectos</div>
+            <div class="kpi-cell-val" style="color:#fff" id="kpi-count">—</div>
+            <div class="kpi-cell-note">Con datos actuales</div>
         </div>
     </div>
 </div>
 
-<!-- MAIN -->
-<div class="main">
-    <div class="table-card">
-        <div class="table-card-header">
-            <div class="table-card-title">Detalle por Proyecto y Área</div>
-            <div class="table-card-badge" id="table-badge">Cargando…</div>
+<!-- GRID -->
+<div class="section">
+    <div class="section-header">
+        <div class="section-title">Detalle por Proyecto</div>
+        <div class="date-badge" id="date-badge">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+            Cargando datos…
         </div>
-        <div class="table-wrap">
-            <table id="main-table">
-                <thead>
-                    <tr>
-                        <th style="width:200px">Proyecto</th>
-                        <th style="width:150px">Área</th>
-                        <th>Ppto. SAP</th>
-                        <th>Asignado</th>
-                        <th class="td-pct">% Asignado</th>
-                    </tr>
-                </thead>
-                <tbody id="table-body">
-                    <!-- skeleton -->
-                    <tr class="skeleton"><td><div class="skel-block" style="width:120px"></div></td><td><div class="skel-block" style="width:90px"></div></td><td><div class="skel-block" style="width:80px"></div></td><td><div class="skel-block" style="width:80px"></div></td><td><div class="skel-block" style="width:100px"></div></td></tr>
-                    <tr class="skeleton"><td></td><td><div class="skel-block" style="width:90px"></div></td><td><div class="skel-block" style="width:80px"></div></td><td><div class="skel-block" style="width:80px"></div></td><td><div class="skel-block" style="width:100px"></div></td></tr>
-                    <tr class="skeleton"><td><div class="skel-block" style="width:130px"></div></td><td><div class="skel-block" style="width:90px"></div></td><td><div class="skel-block" style="width:80px"></div></td><td><div class="skel-block" style="width:80px"></div></td><td><div class="skel-block" style="width:100px"></div></td></tr>
-                    <tr class="skeleton"><td></td><td><div class="skel-block" style="width:90px"></div></td><td><div class="skel-block" style="width:80px"></div></td><td><div class="skel-block" style="width:80px"></div></td><td><div class="skel-block" style="width:100px"></div></td></tr>
-                    <tr class="skeleton"><td><div class="skel-block" style="width:110px"></div></td><td><div class="skel-block" style="width:90px"></div></td><td><div class="skel-block" style="width:80px"></div></td><td><div class="skel-block" style="width:80px"></div></td><td><div class="skel-block" style="width:100px"></div></td></tr>
-                    <tr class="skeleton"><td></td><td><div class="skel-block" style="width:90px"></div></td><td><div class="skel-block" style="width:80px"></div></td><td><div class="skel-block" style="width:80px"></div></td><td><div class="skel-block" style="width:100px"></div></td></tr>
-                </tbody>
-            </table>
+    </div>
+    <div class="cards-grid" id="cards-grid">
+        <!-- skeleton cards -->
+        <div class="proj-card" style="min-height:380px">
+            <div class="card-stripe skel" style="height:4px"></div>
+            <div style="padding:18px;display:flex;flex-direction:column;gap:14px">
+                <div class="skel" style="height:18px;width:60%;border-radius:6px"></div>
+                <div class="skel" style="height:120px;width:120px;border-radius:50%;margin:0 auto"></div>
+                <div class="skel" style="height:14px;width:80%;border-radius:6px"></div>
+                <div class="skel" style="height:14px;width:70%;border-radius:6px"></div>
+                <div class="skel" style="height:8px;width:100%;border-radius:4px"></div>
+                <div class="skel" style="height:8px;width:100%;border-radius:4px"></div>
+            </div>
+        </div>
+        <div class="proj-card" style="min-height:380px">
+            <div class="card-stripe skel" style="height:4px"></div>
+            <div style="padding:18px;display:flex;flex-direction:column;gap:14px">
+                <div class="skel" style="height:18px;width:55%;border-radius:6px"></div>
+                <div class="skel" style="height:120px;width:120px;border-radius:50%;margin:0 auto"></div>
+                <div class="skel" style="height:14px;width:75%;border-radius:6px"></div>
+                <div class="skel" style="height:14px;width:65%;border-radius:6px"></div>
+                <div class="skel" style="height:8px;width:100%;border-radius:4px"></div>
+                <div class="skel" style="height:8px;width:100%;border-radius:4px"></div>
+            </div>
+        </div>
+        <div class="proj-card" style="min-height:380px">
+            <div class="card-stripe skel" style="height:4px"></div>
+            <div style="padding:18px;display:flex;flex-direction:column;gap:14px">
+                <div class="skel" style="height:18px;width:65%;border-radius:6px"></div>
+                <div class="skel" style="height:120px;width:120px;border-radius:50%;margin:0 auto"></div>
+                <div class="skel" style="height:14px;width:80%;border-radius:6px"></div>
+                <div class="skel" style="height:14px;width:60%;border-radius:6px"></div>
+                <div class="skel" style="height:8px;width:100%;border-radius:4px"></div>
+                <div class="skel" style="height:8px;width:100%;border-radius:4px"></div>
+            </div>
         </div>
     </div>
 </div>
@@ -318,244 +350,236 @@
     'use strict';
 
     const { createClient } = supabase;
-    const client = createClient(
+    const sb = createClient(
         'https://iipgrojliqeyycvgnkrc.supabase.co',
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlpcGdyb2psaXFleXljdmdua3JjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NzA1NzYsImV4cCI6MjA5MTM0NjU3Nn0.Y6FQ-1qWd7HPMvTnK4alpKxM-YLJ5CsKmkorAZKMJrg'
     );
 
-    document.getElementById('btn-logout').addEventListener('click', () => {
-        client.auth.signOut().then(() => window.location.href = 'login.html');
-    });
+    document.getElementById('btn-logout').addEventListener('click', () =>
+        sb.auth.signOut().then(() => window.location.href = 'login.html')
+    );
 
     const PROJECTS = [
-        { key: 'bdj', name: 'Bosques de Jalapa',      color: '#7c3aed', json: 'data/powerbi/bdj/resumen-powerbi.json' },
-        { key: 'bdp', name: 'Bosques de Pinula',       color: '#2563eb', json: 'data/powerbi/bdp/resumen-powerbi.json' },
-        { key: 'bse', name: 'Bosques de Santa Elena',  color: '#16a34a', json: 'data/powerbi/bse/resumen-powerbi.json' },
-        { key: 'cse', name: 'Condado Santa Elena',     color: '#d97706', json: 'data/powerbi/cse/resumen-powerbi.json' },
-        { key: 'hlq', name: 'Hacienda La Querencia',   color: '#dc2626', json: 'data/powerbi/hlq/resumen-powerbi.json' },
-        { key: 'rdb', name: 'Reserva del Bosque',      color: '#0d9488', json: 'data/powerbi/rdb/resumen-powerbi.json' },
+        { key:'bdj', name:'Bosques de Jalapa',      abbr:'BDJ', color:'#8b5cf6', json:'data/powerbi/bdj/resumen-powerbi.json' },
+        { key:'bdp', name:'Bosques de Pinula',       abbr:'BDP', color:'#3b82f6', json:'data/powerbi/bdp/resumen-powerbi.json' },
+        { key:'bse', name:'Bosques de Santa Elena',  abbr:'BSE', color:'#10b981', json:'data/powerbi/bse/resumen-powerbi.json' },
+        { key:'cse', name:'Condado Santa Elena',     abbr:'CSE', color:'#f59e0b', json:'data/powerbi/cse/resumen-powerbi.json' },
+        { key:'hlq', name:'Hacienda La Querencia',   abbr:'HLQ', color:'#ef4444', json:'data/powerbi/hlq/resumen-powerbi.json' },
+        { key:'rdb', name:'Reserva del Bosque',      abbr:'RDB', color:'#14b8a6', json:'data/powerbi/rdb/resumen-powerbi.json' },
     ];
 
-    const AREAS = ['Construcción', 'Urbanización'];
+    const AREA_NAMES = ['Construcción', 'Urbanización'];
+    const AREA_COLORS = ['#60a5fa', '#34d399'];
 
-    function fmtM(val) {
-        if (val == null || isNaN(val)) return '—';
-        const m = val / 1e6;
+    function fmt(v) {
+        if (v == null || isNaN(v) || v === 0) return '—';
+        const m = v / 1e6;
         return 'Q ' + m.toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + 'M';
     }
 
-    function pctClass(p) {
-        if (p >= 100) return 'danger';
-        if (p >= 90)  return 'warn';
-        return 'ok';
+    function pctColor(p) {
+        if (p == null) return '#94a3b8';
+        if (p >= 100)  return '#f87171';
+        if (p >= 90)   return '#fbbf24';
+        return '#4ade80';
     }
 
-    function renderPct(pct) {
-        if (pct == null || isNaN(pct)) return '<span class="pct-text" style="color:#94a3b8">—</span>';
-        const cls = pctClass(pct);
-        const capped = Math.min(pct, 100);
-        return `<div class="pct-wrap">
-            <div class="pct-bar-bg"><div class="pct-bar-fill pct-fill-${cls}" style="width:${capped}%"></div></div>
-            <span class="pct-text pct-${cls}">${pct.toFixed(1)}%</span>
-        </div>`;
+    function pctCls(p) {
+        if (p == null) return '';
+        if (p >= 100)  return 'red';
+        if (p >= 90)   return 'amber';
+        return 'green';
     }
 
-    function parsePayload(payload) {
-        if (!payload) return null;
-        try {
-            const d = (typeof payload === 'string') ? JSON.parse(payload) : payload;
-            return d;
-        } catch { return null; }
+    function buildGaugeSVG(pct, color) {
+        const r = 44, cx = 55, cy = 55;
+        const circ = 2 * Math.PI * r; // ≈ 276.46
+        const capped = Math.min(pct || 0, 100);
+        const fill = (capped / 100) * circ;
+        const gc = pctColor(pct);
+        return `<svg class="gauge-svg" viewBox="0 0 110 110" style="overflow:visible">
+            <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="9"/>
+            <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${gc}" stroke-width="9"
+                stroke-dasharray="${fill} ${circ}" stroke-dashoffset="0"
+                stroke-linecap="round"
+                transform="rotate(-90 ${cx} ${cy})"
+                style="transition:stroke-dasharray .8s ease"/>
+            <circle cx="${cx}" cy="${cy}" r="35" fill="rgba(255,255,255,0.03)"/>
+        </svg>`;
+    }
+
+    function buildCard(proj, areas) {
+        const sapTotal  = areas.reduce((s, a) => s + (a.sap  || 0), 0);
+        const asigTotal = areas.reduce((s, a) => s + (a.asig || 0), 0);
+        const pctTotal  = sapTotal > 0 ? (asigTotal / sapTotal * 100) : null;
+        const gc = pctColor(pctTotal);
+
+        const card = document.createElement('div');
+        card.className = 'proj-card';
+
+        const areaRows = areas.map((a, i) => {
+            const p = a.sap > 0 ? (a.asig / a.sap * 100) : null;
+            const barW = Math.min(p || 0, 100);
+            const ac = AREA_COLORS[i];
+            const pc = pctColor(p);
+            return `<div class="area-row">
+                <div class="area-row-top">
+                    <div class="area-name">
+                        <div class="area-dot" style="background:${ac}"></div>
+                        ${a.name}
+                    </div>
+                    <span class="area-pct" style="color:${pc}">${p != null ? p.toFixed(1)+'%' : '—'}</span>
+                </div>
+                <div class="area-bar-bg">
+                    <div class="area-bar-fill" style="width:${barW}%;background:${pc}"></div>
+                </div>
+                <div class="area-amount">SAP ${fmt(a.sap)} &nbsp;·&nbsp; Asig. ${fmt(a.asig)}</div>
+            </div>`;
+        }).join('');
+
+        card.innerHTML = `
+            <div class="card-stripe" style="background:${proj.color}"></div>
+            <div class="card-head">
+                <div class="card-proj-name">${proj.name}</div>
+                <div class="card-proj-key" style="background:${proj.color}22;color:${proj.color}">${proj.abbr}</div>
+            </div>
+            <div class="card-gauge-wrap">
+                ${buildGaugeSVG(pctTotal, proj.color)}
+                <div class="gauge-center">
+                    <div class="gauge-pct" style="color:${gc}">${pctTotal != null ? pctTotal.toFixed(1)+'%' : '—'}</div>
+                    <div class="gauge-pct-label">% ASIGNADO</div>
+                </div>
+            </div>
+            <div class="card-nums">
+                <div class="card-num-cell">
+                    <div class="card-num-label">Ppto. SAP</div>
+                    <div class="card-num-val">${fmt(sapTotal)}</div>
+                </div>
+                <div class="card-num-cell" style="border-left:1px solid rgba(255,255,255,0.04)">
+                    <div class="card-num-label">Asignado</div>
+                    <div class="card-num-val val-asig">${fmt(asigTotal)}</div>
+                </div>
+            </div>
+            <div class="card-areas">${areaRows}</div>
+        `;
+        return card;
+    }
+
+    function buildTotalCard(grandSap, grandAsig) {
+        const pct = grandSap > 0 ? (grandAsig / grandSap * 100) : null;
+        const cls = pctCls(pct);
+        const card = document.createElement('div');
+        card.className = 'total-card';
+        card.innerHTML = `
+            <div class="total-left">
+                <div class="total-label">Consolidado · 6 Proyectos</div>
+                <div class="total-title">Total General</div>
+                <div class="total-sub">Construcción + Urbanización</div>
+            </div>
+            <div class="total-kpis">
+                <div class="total-kpi">
+                    <div class="total-kpi-label">Ppto. SAP</div>
+                    <div class="total-kpi-val gold">${fmt(grandSap)}</div>
+                </div>
+                <div class="total-divider"></div>
+                <div class="total-kpi">
+                    <div class="total-kpi-label">Asignado</div>
+                    <div class="total-kpi-val blue">${fmt(grandAsig)}</div>
+                </div>
+                <div class="total-divider"></div>
+                <div class="total-kpi">
+                    <div class="total-kpi-label">% Asignado</div>
+                    <div class="total-kpi-val ${cls}">${pct != null ? pct.toFixed(1)+'%' : '—'}</div>
+                </div>
+            </div>
+        `;
+        return card;
     }
 
     function getAreaData(datasets, areaName) {
-        if (!datasets?.porArea) return null;
-        return datasets.porArea.find(r =>
+        return (datasets?.porArea || []).find(r =>
             (r['Rubros[Area]'] || '').toLowerCase() === areaName.toLowerCase()
         ) || null;
     }
 
-    async function loadFromSupabase() {
-        const { data, error } = await client
+    async function loadSupabase() {
+        const { data, error } = await sb
             .from('powerbi_resumen_cache')
             .select('project_key, payload, mes_a')
             .in('project_key', PROJECTS.map(p => p.key))
             .eq('is_current', true);
         if (error || !data?.length) return null;
         const map = {};
-        data.forEach(row => { map[row.project_key] = row; });
+        data.forEach(r => { map[r.project_key] = r; });
         return map;
     }
 
-    async function loadFromJson(proj) {
+    async function loadJson(proj) {
         const r = await fetch(proj.json + '?_=' + Date.now());
         if (!r.ok) return null;
         return r.json();
     }
 
-    function buildRows(projectResults) {
-        const tbody = document.getElementById('table-body');
-        tbody.innerHTML = '';
-
-        let grandSap = 0, grandAsig = 0;
-        let mesLabel = '';
-        let loadedCount = 0;
-
-        const rows = [];
-
-        projectResults.forEach(({ proj, payload, mesA }) => {
-            if (!payload) return;
-            loadedCount++;
-            if (mesA && !mesLabel) mesLabel = mesA;
-
-            const datasets = payload.datasets || payload;
-            let projSap = 0, projAsig = 0;
-            const areaRows = [];
-
-            AREAS.forEach(area => {
-                const d = getAreaData(datasets, area);
-                const sap  = d ? (d['[RdiTotal]'] ?? null) : null;
-                const asig = d ? (d['[AsignadoErequester]'] ?? null) : null;
-                const pct  = (sap > 0 && asig != null) ? (asig / sap * 100) : null;
-
-                if (sap != null) projSap  += sap;
-                if (asig != null) projAsig += asig;
-
-                areaRows.push({ area, sap, asig, pct });
-            });
-
-            grandSap  += projSap;
-            grandAsig += projAsig;
-
-            const projPct = projSap > 0 ? (projAsig / projSap * 100) : null;
-
-            rows.push({ proj, areaRows, projSap, projAsig, projPct });
-        });
-
-        if (!rows.length) {
-            tbody.innerHTML = '<tr><td colspan="5" class="state-msg"><strong>Sin datos</strong>No se encontró información para los proyectos.</td></tr>';
-            return;
-        }
-
-        rows.forEach(({ proj, areaRows, projSap, projAsig, projPct }) => {
-            const rowspan = AREAS.length + 1;
-
-            areaRows.forEach((ar, i) => {
-                const tr = document.createElement('tr');
-                tr.className = 'row-area';
-
-                const isConstr = ar.area === 'Construcción';
-                const dotCls   = isConstr ? 'constr' : 'urban';
-
-                if (i === 0) {
-                    const tdProj = document.createElement('td');
-                    tdProj.className = 'td-project';
-                    tdProj.rowSpan = rowspan;
-                    tdProj.style.borderLeftColor = proj.color;
-                    tdProj.textContent = proj.name;
-                    tr.appendChild(tdProj);
-                }
-
-                const tdArea = document.createElement('td');
-                tdArea.className = 'td-area';
-                tdArea.innerHTML = `<span class="area-dot ${dotCls}"></span>${ar.area}`;
-                tr.appendChild(tdArea);
-
-                const tdSap = document.createElement('td');
-                tdSap.className = 'num num-sap';
-                tdSap.textContent = fmtM(ar.sap);
-                tr.appendChild(tdSap);
-
-                const tdAsig = document.createElement('td');
-                tdAsig.className = 'num num-asig';
-                tdAsig.textContent = fmtM(ar.asig);
-                tr.appendChild(tdAsig);
-
-                const tdPct = document.createElement('td');
-                tdPct.className = 'td-pct';
-                tdPct.innerHTML = renderPct(ar.pct);
-                tr.appendChild(tdPct);
-
-                tbody.appendChild(tr);
-            });
-
-            // subtotal row
-            const trSub = document.createElement('tr');
-            trSub.className = 'row-subtotal';
-            trSub.innerHTML = `
-                <td></td>
-                <td><strong>Subtotal</strong></td>
-                <td class="num">${fmtM(projSap)}</td>
-                <td class="num" style="color:#1d4ed8;font-weight:700">${fmtM(projAsig)}</td>
-                <td class="td-pct">${renderPct(projPct)}</td>
-            `;
-            tbody.appendChild(trSub);
-        });
-
-        // grand total
-        const grandPct = grandSap > 0 ? (grandAsig / grandSap * 100) : null;
-        const trTotal = document.createElement('tr');
-        trTotal.className = 'row-total';
-        const gpCls = grandPct ? pctClass(grandPct) : 'ok';
-        const gpColor = gpCls === 'danger' ? '#f87171' : gpCls === 'warn' ? '#fbbf24' : '#34d399';
-        trTotal.innerHTML = `
-            <td colspan="2" style="font-weight:800;font-size:0.82rem">TOTAL GENERAL</td>
-            <td class="num">${fmtM(grandSap)}</td>
-            <td class="num" style="color:#93c5fd;font-weight:800">${fmtM(grandAsig)}</td>
-            <td class="td-pct"><div class="pct-wrap"><span class="pct-text" style="color:${gpColor};font-size:0.9rem">${grandPct ? grandPct.toFixed(1)+'%' : '—'}</span></div></td>
-        `;
-        tbody.appendChild(trTotal);
-
-        // update KPIs
-        const pctEl = document.getElementById('kpi-pct');
-        document.getElementById('kpi-sap').textContent  = fmtM(grandSap);
-        document.getElementById('kpi-asig').textContent = fmtM(grandAsig);
-        pctEl.textContent = grandPct ? grandPct.toFixed(1) + '%' : '—';
-        pctEl.className = 'kpi-value ' + (grandPct ? (pctClass(grandPct) === 'ok' ? 'green' : pctClass(grandPct) === 'warn' ? 'warn' : 'danger') : '');
-
-        // date label
-        if (mesLabel) {
-            document.getElementById('date-label').textContent = 'Datos al: ' + mesLabel.toUpperCase();
-        } else {
-            document.getElementById('date-label').textContent = 'may 26';
-        }
-
-        document.getElementById('table-badge').textContent = loadedCount + ' proyectos cargados';
-    }
-
     async function init() {
         try {
-            const sbMap = await loadFromSupabase();
-            const results = [];
+            const sbMap = await loadSupabase();
+            const grid = document.getElementById('cards-grid');
+            grid.innerHTML = '';
+
+            let grandSap = 0, grandAsig = 0, mesLabel = '', count = 0;
 
             for (const proj of PROJECTS) {
-                let payload = null;
-                let mesA    = '';
+                let payload = null, mesA = '';
 
-                if (sbMap && sbMap[proj.key]) {
+                if (sbMap?.[proj.key]) {
                     const row = sbMap[proj.key];
-                    payload = parsePayload(row.payload);
-                    mesA    = row.mes_a || '';
+                    try { payload = typeof row.payload === 'string' ? JSON.parse(row.payload) : row.payload; } catch {}
+                    mesA = row.mes_a || '';
                 }
-
                 if (!payload) {
-                    const json = await loadFromJson(proj).catch(() => null);
-                    if (json) {
-                        payload = json;
-                        mesA    = json.metadata?.filters?.mesA || '';
-                    }
+                    const json = await loadJson(proj).catch(() => null);
+                    if (json) { payload = json; mesA = json.metadata?.filters?.mesA || ''; }
                 }
+                if (!payload) continue;
 
-                results.push({ proj, payload, mesA });
+                count++;
+                if (mesA && !mesLabel) mesLabel = mesA;
+
+                const datasets = payload.datasets || payload;
+                const areas = AREA_NAMES.map(name => {
+                    const d = getAreaData(datasets, name);
+                    return {
+                        name,
+                        sap:  d?.['[RdiTotal]']          ?? 0,
+                        asig: d?.['[AsignadoErequester]'] ?? 0,
+                    };
+                });
+
+                areas.forEach(a => { grandSap += a.sap; grandAsig += a.asig; });
+                grid.appendChild(buildCard(proj, areas));
             }
 
-            buildRows(results);
+            grid.appendChild(buildTotalCard(grandSap, grandAsig));
+
+            // Update hero KPIs
+            const globalPct = grandSap > 0 ? (grandAsig / grandSap * 100) : null;
+            document.getElementById('kpi-sap').textContent   = fmt(grandSap);
+            document.getElementById('kpi-asig').textContent  = fmt(grandAsig);
+            const kpiPctEl = document.getElementById('kpi-pct');
+            kpiPctEl.textContent = globalPct ? globalPct.toFixed(1) + '%' : '—';
+            kpiPctEl.className = 'kpi-cell-val ' + pctCls(globalPct);
+            document.getElementById('kpi-count').textContent = count;
+
+            const dateStr = mesLabel ? mesLabel.toUpperCase() : '—';
+            document.getElementById('date-text').textContent = dateStr;
+            document.getElementById('date-badge').innerHTML = `
+                <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>
+                Datos al ${dateStr}`;
 
         } catch (e) {
             console.error(e);
-            document.getElementById('table-body').innerHTML =
-                '<tr><td colspan="5" class="state-msg"><strong>Error al cargar datos</strong>' + e.message + '</td></tr>';
-            document.getElementById('table-badge').textContent = 'Error';
+            document.getElementById('cards-grid').innerHTML =
+                `<div style="color:#f87171;padding:40px;grid-column:1/-1;text-align:center;font-size:.85rem">Error al cargar: ${e.message}</div>`;
         }
     }
 
