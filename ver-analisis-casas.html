@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ver Análisis Casas — Costos&Presupuestos</title>
+    <title>Análisis Casas — Costos&Presupuestos</title>
     <style>html{visibility:hidden}</style>
     <script>
     (function(){
@@ -16,23 +16,13 @@
     })();
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
-        const { createClient } = supabase;
-        const client = createClient(
-            'https://iipgrojliqeyycvgnkrc.supabase.co',
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlpcGdyb2psaXFleXljdmdua3JjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NzA1NzYsImV4cCI6MjA5MTM0NjU3Nn0.Y6FQ-1qWd7HPMvTnK4alpKxM-YLJ5CsKmkorAZKMJrg'
-        );
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('btn-logout').addEventListener('click', () => {
-                client.auth.signOut().then(() => window.location.href = 'login.html');
-            });
-        });
-    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', 'Segoe UI', sans-serif; background: #f0f4f8; color: #0f172a; min-height: 100vh; }
+
+        /* ── TOPBAR ─────────────────────────────────────────────── */
         .topbar {
             position: sticky; top: 0; z-index: 300;
             background: #0f172a; border-bottom: 1px solid rgba(255,255,255,0.07);
@@ -69,31 +59,508 @@
         }
         .btn-logout:hover { background: rgba(239,68,68,0.22); border-color: rgba(239,68,68,0.55); color: #fca5a5; }
         .btn-logout svg { width: 13px; height: 13px; fill: currentColor; }
-        .page-content {
-            display: flex; align-items: center; justify-content: center;
-            min-height: calc(100vh - 56px);
-            color: #94a3b8; font-size: 0.9rem; font-weight: 600;
+
+        /* ── PAGE HEADER ───────────────────────────────────────── */
+        .page-header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            padding: 32px 32px 28px;
+            border-bottom: 1px solid rgba(201,168,76,0.2);
+        }
+        .page-header-top { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+        .page-title-group {}
+        .page-eyebrow {
+            font-size: 0.62rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+            color: #C9A84C; margin-bottom: 6px;
+        }
+        .page-title { font-size: 1.5rem; font-weight: 900; color: #fff; line-height: 1.2; }
+        .page-title span { color: #C9A84C; }
+        .page-subtitle { font-size: 0.78rem; color: rgba(255,255,255,0.45); margin-top: 5px; }
+        .date-pill {
+            display: flex; align-items: center; gap: 6px;
+            background: rgba(201,168,76,0.12); border: 1px solid rgba(201,168,76,0.25);
+            color: #C9A84C; padding: 6px 14px; border-radius: 20px;
+            font-size: 0.72rem; font-weight: 700; white-space: nowrap; align-self: flex-start;
+        }
+        .date-pill svg { width: 12px; height: 12px; fill: currentColor; }
+
+        /* ── KPI SUMMARY BAR ─────────────────────────────────── */
+        .kpi-bar {
+            display: flex; gap: 1px;
+            background: rgba(201,168,76,0.12);
+            border-top: 1px solid rgba(201,168,76,0.15);
+        }
+        .kpi-item {
+            flex: 1; padding: 14px 20px; background: rgba(15,23,42,0.6);
+            display: flex; flex-direction: column; gap: 2px;
+        }
+        .kpi-item:first-child { border-radius: 0; }
+        .kpi-label { font-size: 0.6rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.38); }
+        .kpi-value { font-size: 1.15rem; font-weight: 800; color: #fff; }
+        .kpi-value.accent { color: #C9A84C; }
+        .kpi-value.green { color: #34d399; }
+        .kpi-value.warn { color: #fbbf24; }
+        .kpi-value.danger { color: #f87171; }
+        .kpi-note { font-size: 0.6rem; color: rgba(255,255,255,0.3); margin-top: 1px; }
+
+        /* ── MAIN CONTENT ─────────────────────────────────────── */
+        .main { padding: 28px 32px 48px; max-width: 1200px; margin: 0 auto; }
+
+        /* ── TABLE ────────────────────────────────────────────── */
+        .table-card {
+            background: #fff; border-radius: 14px;
+            box-shadow: 0 2px 20px rgba(15,23,42,0.08);
+            overflow: hidden;
+        }
+        .table-card-header {
+            padding: 16px 22px; border-bottom: 1px solid #e2e8f0;
+            display: flex; align-items: center; justify-content: space-between; gap: 12px;
+        }
+        .table-card-title { font-size: 0.82rem; font-weight: 800; color: #0f172a; letter-spacing: 0.3px; }
+        .table-card-badge {
+            font-size: 0.64rem; font-weight: 700; background: #f1f5f9; color: #64748b;
+            padding: 3px 10px; border-radius: 20px; border: 1px solid #e2e8f0;
+        }
+        .table-wrap { overflow-x: auto; }
+        table {
+            width: 100%; border-collapse: collapse; font-size: 0.82rem;
+        }
+        thead th {
+            background: #0f172a; color: rgba(255,255,255,0.7);
+            font-size: 0.64rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+            padding: 11px 16px; text-align: right; white-space: nowrap;
+        }
+        thead th:first-child, thead th:nth-child(2) { text-align: left; }
+        thead th:first-child { border-radius: 0; }
+
+        /* project group rows */
+        .row-area td {
+            padding: 10px 16px; border-bottom: 1px solid #f1f5f9;
+            text-align: right; vertical-align: middle;
+        }
+        .row-area td:nth-child(2) { text-align: left; }
+        .row-area:hover td { background: #f8fafc; }
+
+        /* project name cell with left border color */
+        .td-project {
+            text-align: left !important; vertical-align: middle;
+            font-weight: 700; font-size: 0.8rem; color: #0f172a;
+            padding-left: 18px !important;
+            border-left: 3px solid transparent;
+            white-space: nowrap;
+        }
+        .td-area {
+            color: #475569; font-size: 0.76rem; font-weight: 500;
+        }
+        .td-area .area-dot {
+            display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+            margin-right: 7px; vertical-align: middle;
+        }
+        .area-dot.constr { background: #3b82f6; }
+        .area-dot.urban  { background: #10b981; }
+
+        /* subtotal row */
+        .row-subtotal td {
+            padding: 9px 16px; background: #f8fafc;
+            border-bottom: 2px solid #e2e8f0;
+            text-align: right; vertical-align: middle;
+            font-size: 0.75rem; color: #64748b;
+        }
+        .row-subtotal td:nth-child(2) { text-align: left; font-weight: 600; color: #475569; }
+        .row-subtotal .td-project { color: transparent; font-size: 0; padding: 0 !important; border: none; }
+
+        /* grand total row */
+        .row-total td {
+            padding: 13px 16px; background: #0f172a;
+            text-align: right; color: #fff; font-weight: 700; font-size: 0.82rem;
+        }
+        .row-total td:first-child, .row-total td:nth-child(2) { text-align: left; }
+        .row-total td:first-child { border-radius: 0; }
+
+        /* number cells */
+        .num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .num-sap { color: #0f172a; font-weight: 600; }
+        .num-asig { color: #1d4ed8; font-weight: 700; }
+        .num-pct { font-weight: 800; }
+
+        /* progress bar cell */
+        .td-pct { min-width: 130px; }
+        .pct-wrap { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
+        .pct-bar-bg {
+            width: 64px; height: 6px; border-radius: 4px; background: #e2e8f0;
+            flex-shrink: 0; overflow: hidden;
+        }
+        .pct-bar-fill { height: 100%; border-radius: 4px; transition: width .4s ease; }
+        .pct-fill-ok     { background: #22c55e; }
+        .pct-fill-warn   { background: #f59e0b; }
+        .pct-fill-danger { background: #ef4444; }
+        .pct-text { font-size: 0.78rem; font-weight: 800; min-width: 44px; text-align: right; }
+        .pct-ok     { color: #16a34a; }
+        .pct-warn   { color: #d97706; }
+        .pct-danger { color: #dc2626; }
+
+        /* skeleton */
+        .skeleton td { padding: 12px 16px; }
+        .skel-block {
+            height: 14px; border-radius: 6px; background: #e2e8f0;
+            animation: skel 1.4s ease-in-out infinite;
+        }
+        @keyframes skel { 0%,100%{opacity:.5} 50%{opacity:1} }
+
+        /* empty / error */
+        .state-msg { padding: 48px; text-align: center; color: #94a3b8; font-size: 0.85rem; }
+        .state-msg strong { display: block; font-size: 1rem; color: #64748b; margin-bottom: 6px; }
+
+        /* responsive */
+        @media(max-width:768px){
+            .page-header { padding: 20px 16px; }
+            .kpi-bar { flex-wrap: wrap; }
+            .kpi-item { flex: 1 1 45%; }
+            .main { padding: 16px; }
+            thead th { font-size: 0.58rem; padding: 9px 10px; }
+            .row-area td, .row-subtotal td, .row-total td { padding: 8px 10px; }
+            .td-pct { min-width: 90px; }
+            .pct-bar-bg { width: 36px; }
         }
     </style>
 </head>
 <body>
-    <div class="topbar">
-        <div class="topbar-left">
-            <a href="index.html" class="home-link">
-                <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-            </a>
-            <a href="index.html" class="brand-link">
-                <div class="topbar-brand">Costos&<span>Presupuestos</span></div>
-                <div class="topbar-sub">Análisis — Casas</div>
-            </a>
+
+<!-- TOPBAR -->
+<div class="topbar">
+    <div class="topbar-left">
+        <a href="index.html" class="home-link">
+            <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        </a>
+        <a href="index.html" class="brand-link">
+            <div class="topbar-brand">Costos&<span>Presupuestos</span></div>
+            <div class="topbar-sub">Análisis — Casas</div>
+        </a>
+    </div>
+    <div class="topbar-right">
+        <button class="btn-logout" id="btn-logout">
+            <svg viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5-5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
+            Salir
+        </button>
+    </div>
+</div>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+    <div class="page-header-top">
+        <div class="page-title-group">
+            <div class="page-eyebrow">Resumen Comparativo</div>
+            <div class="page-title">Presupuesto SAP vs <span>Asignado</span></div>
+            <div class="page-subtitle">6 proyectos de casas · Áreas: Construcción y Urbanización</div>
         </div>
-        <div class="topbar-right">
-            <button class="btn-logout" id="btn-logout">
-                <svg viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5-5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
-                Salir
-            </button>
+        <div class="date-pill" id="date-pill">
+            <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>
+            <span id="date-label">Cargando…</span>
         </div>
     </div>
-    <div class="page-content">Página en construcción</div>
+    <div class="kpi-bar" id="kpi-bar">
+        <div class="kpi-item">
+            <div class="kpi-label">Total Ppto. SAP</div>
+            <div class="kpi-value" id="kpi-sap">—</div>
+            <div class="kpi-note">Suma 6 proyectos</div>
+        </div>
+        <div class="kpi-item">
+            <div class="kpi-label">Total Asignado</div>
+            <div class="kpi-value accent" id="kpi-asig">—</div>
+            <div class="kpi-note">Construcción + Urbanización</div>
+        </div>
+        <div class="kpi-item">
+            <div class="kpi-label">% Asignado Global</div>
+            <div class="kpi-value" id="kpi-pct">—</div>
+            <div class="kpi-note">Asignado / SAP</div>
+        </div>
+        <div class="kpi-item">
+            <div class="kpi-label">Proyectos</div>
+            <div class="kpi-value">6</div>
+            <div class="kpi-note">Casas en ejecución</div>
+        </div>
+    </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+    <div class="table-card">
+        <div class="table-card-header">
+            <div class="table-card-title">Detalle por Proyecto y Área</div>
+            <div class="table-card-badge" id="table-badge">Cargando…</div>
+        </div>
+        <div class="table-wrap">
+            <table id="main-table">
+                <thead>
+                    <tr>
+                        <th style="width:200px">Proyecto</th>
+                        <th style="width:150px">Área</th>
+                        <th>Ppto. SAP</th>
+                        <th>Asignado</th>
+                        <th class="td-pct">% Asignado</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                    <!-- skeleton -->
+                    <tr class="skeleton"><td><div class="skel-block" style="width:120px"></div></td><td><div class="skel-block" style="width:90px"></div></td><td><div class="skel-block" style="width:80px"></div></td><td><div class="skel-block" style="width:80px"></div></td><td><div class="skel-block" style="width:100px"></div></td></tr>
+                    <tr class="skeleton"><td></td><td><div class="skel-block" style="width:90px"></div></td><td><div class="skel-block" style="width:80px"></div></td><td><div class="skel-block" style="width:80px"></div></td><td><div class="skel-block" style="width:100px"></div></td></tr>
+                    <tr class="skeleton"><td><div class="skel-block" style="width:130px"></div></td><td><div class="skel-block" style="width:90px"></div></td><td><div class="skel-block" style="width:80px"></div></td><td><div class="skel-block" style="width:80px"></div></td><td><div class="skel-block" style="width:100px"></div></td></tr>
+                    <tr class="skeleton"><td></td><td><div class="skel-block" style="width:90px"></div></td><td><div class="skel-block" style="width:80px"></div></td><td><div class="skel-block" style="width:80px"></div></td><td><div class="skel-block" style="width:100px"></div></td></tr>
+                    <tr class="skeleton"><td><div class="skel-block" style="width:110px"></div></td><td><div class="skel-block" style="width:90px"></div></td><td><div class="skel-block" style="width:80px"></div></td><td><div class="skel-block" style="width:80px"></div></td><td><div class="skel-block" style="width:100px"></div></td></tr>
+                    <tr class="skeleton"><td></td><td><div class="skel-block" style="width:90px"></div></td><td><div class="skel-block" style="width:80px"></div></td><td><div class="skel-block" style="width:80px"></div></td><td><div class="skel-block" style="width:100px"></div></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    'use strict';
+
+    const { createClient } = supabase;
+    const client = createClient(
+        'https://iipgrojliqeyycvgnkrc.supabase.co',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlpcGdyb2psaXFleXljdmdua3JjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NzA1NzYsImV4cCI6MjA5MTM0NjU3Nn0.Y6FQ-1qWd7HPMvTnK4alpKxM-YLJ5CsKmkorAZKMJrg'
+    );
+
+    document.getElementById('btn-logout').addEventListener('click', () => {
+        client.auth.signOut().then(() => window.location.href = 'login.html');
+    });
+
+    const PROJECTS = [
+        { key: 'bdj', name: 'Bosques de Jalapa',      color: '#7c3aed', json: 'data/powerbi/bdj/resumen-powerbi.json' },
+        { key: 'bdp', name: 'Bosques de Pinula',       color: '#2563eb', json: 'data/powerbi/bdp/resumen-powerbi.json' },
+        { key: 'bse', name: 'Bosques de Santa Elena',  color: '#16a34a', json: 'data/powerbi/bse/resumen-powerbi.json' },
+        { key: 'cse', name: 'Condado Santa Elena',     color: '#d97706', json: 'data/powerbi/cse/resumen-powerbi.json' },
+        { key: 'hlq', name: 'Hacienda La Querencia',   color: '#dc2626', json: 'data/powerbi/hlq/resumen-powerbi.json' },
+        { key: 'rdb', name: 'Reserva del Bosque',      color: '#0d9488', json: 'data/powerbi/rdb/resumen-powerbi.json' },
+    ];
+
+    const AREAS = ['Construcción', 'Urbanización'];
+
+    function fmtM(val) {
+        if (val == null || isNaN(val)) return '—';
+        const m = val / 1e6;
+        return 'Q ' + m.toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + 'M';
+    }
+
+    function pctClass(p) {
+        if (p >= 100) return 'danger';
+        if (p >= 90)  return 'warn';
+        return 'ok';
+    }
+
+    function renderPct(pct) {
+        if (pct == null || isNaN(pct)) return '<span class="pct-text" style="color:#94a3b8">—</span>';
+        const cls = pctClass(pct);
+        const capped = Math.min(pct, 100);
+        return `<div class="pct-wrap">
+            <div class="pct-bar-bg"><div class="pct-bar-fill pct-fill-${cls}" style="width:${capped}%"></div></div>
+            <span class="pct-text pct-${cls}">${pct.toFixed(1)}%</span>
+        </div>`;
+    }
+
+    function parsePayload(payload) {
+        if (!payload) return null;
+        try {
+            const d = (typeof payload === 'string') ? JSON.parse(payload) : payload;
+            return d;
+        } catch { return null; }
+    }
+
+    function getAreaData(datasets, areaName) {
+        if (!datasets?.porArea) return null;
+        return datasets.porArea.find(r =>
+            (r['Rubros[Area]'] || '').toLowerCase() === areaName.toLowerCase()
+        ) || null;
+    }
+
+    async function loadFromSupabase() {
+        const { data, error } = await client
+            .from('powerbi_resumen_cache')
+            .select('project_key, payload, mes_a')
+            .in('project_key', PROJECTS.map(p => p.key))
+            .eq('is_current', true);
+        if (error || !data?.length) return null;
+        const map = {};
+        data.forEach(row => { map[row.project_key] = row; });
+        return map;
+    }
+
+    async function loadFromJson(proj) {
+        const r = await fetch(proj.json + '?_=' + Date.now());
+        if (!r.ok) return null;
+        return r.json();
+    }
+
+    function buildRows(projectResults) {
+        const tbody = document.getElementById('table-body');
+        tbody.innerHTML = '';
+
+        let grandSap = 0, grandAsig = 0;
+        let mesLabel = '';
+        let loadedCount = 0;
+
+        const rows = [];
+
+        projectResults.forEach(({ proj, payload, mesA }) => {
+            if (!payload) return;
+            loadedCount++;
+            if (mesA && !mesLabel) mesLabel = mesA;
+
+            const datasets = payload.datasets || payload;
+            let projSap = 0, projAsig = 0;
+            const areaRows = [];
+
+            AREAS.forEach(area => {
+                const d = getAreaData(datasets, area);
+                const sap  = d ? (d['[RdiTotal]'] ?? null) : null;
+                const asig = d ? (d['[AsignadoErequester]'] ?? null) : null;
+                const pct  = (sap > 0 && asig != null) ? (asig / sap * 100) : null;
+
+                if (sap != null) projSap  += sap;
+                if (asig != null) projAsig += asig;
+
+                areaRows.push({ area, sap, asig, pct });
+            });
+
+            grandSap  += projSap;
+            grandAsig += projAsig;
+
+            const projPct = projSap > 0 ? (projAsig / projSap * 100) : null;
+
+            rows.push({ proj, areaRows, projSap, projAsig, projPct });
+        });
+
+        if (!rows.length) {
+            tbody.innerHTML = '<tr><td colspan="5" class="state-msg"><strong>Sin datos</strong>No se encontró información para los proyectos.</td></tr>';
+            return;
+        }
+
+        rows.forEach(({ proj, areaRows, projSap, projAsig, projPct }) => {
+            const rowspan = AREAS.length + 1;
+
+            areaRows.forEach((ar, i) => {
+                const tr = document.createElement('tr');
+                tr.className = 'row-area';
+
+                const isConstr = ar.area === 'Construcción';
+                const dotCls   = isConstr ? 'constr' : 'urban';
+
+                if (i === 0) {
+                    const tdProj = document.createElement('td');
+                    tdProj.className = 'td-project';
+                    tdProj.rowSpan = rowspan;
+                    tdProj.style.borderLeftColor = proj.color;
+                    tdProj.textContent = proj.name;
+                    tr.appendChild(tdProj);
+                }
+
+                const tdArea = document.createElement('td');
+                tdArea.className = 'td-area';
+                tdArea.innerHTML = `<span class="area-dot ${dotCls}"></span>${ar.area}`;
+                tr.appendChild(tdArea);
+
+                const tdSap = document.createElement('td');
+                tdSap.className = 'num num-sap';
+                tdSap.textContent = fmtM(ar.sap);
+                tr.appendChild(tdSap);
+
+                const tdAsig = document.createElement('td');
+                tdAsig.className = 'num num-asig';
+                tdAsig.textContent = fmtM(ar.asig);
+                tr.appendChild(tdAsig);
+
+                const tdPct = document.createElement('td');
+                tdPct.className = 'td-pct';
+                tdPct.innerHTML = renderPct(ar.pct);
+                tr.appendChild(tdPct);
+
+                tbody.appendChild(tr);
+            });
+
+            // subtotal row
+            const trSub = document.createElement('tr');
+            trSub.className = 'row-subtotal';
+            trSub.innerHTML = `
+                <td></td>
+                <td><strong>Subtotal</strong></td>
+                <td class="num">${fmtM(projSap)}</td>
+                <td class="num" style="color:#1d4ed8;font-weight:700">${fmtM(projAsig)}</td>
+                <td class="td-pct">${renderPct(projPct)}</td>
+            `;
+            tbody.appendChild(trSub);
+        });
+
+        // grand total
+        const grandPct = grandSap > 0 ? (grandAsig / grandSap * 100) : null;
+        const trTotal = document.createElement('tr');
+        trTotal.className = 'row-total';
+        const gpCls = grandPct ? pctClass(grandPct) : 'ok';
+        const gpColor = gpCls === 'danger' ? '#f87171' : gpCls === 'warn' ? '#fbbf24' : '#34d399';
+        trTotal.innerHTML = `
+            <td colspan="2" style="font-weight:800;font-size:0.82rem">TOTAL GENERAL</td>
+            <td class="num">${fmtM(grandSap)}</td>
+            <td class="num" style="color:#93c5fd;font-weight:800">${fmtM(grandAsig)}</td>
+            <td class="td-pct"><div class="pct-wrap"><span class="pct-text" style="color:${gpColor};font-size:0.9rem">${grandPct ? grandPct.toFixed(1)+'%' : '—'}</span></div></td>
+        `;
+        tbody.appendChild(trTotal);
+
+        // update KPIs
+        const pctEl = document.getElementById('kpi-pct');
+        document.getElementById('kpi-sap').textContent  = fmtM(grandSap);
+        document.getElementById('kpi-asig').textContent = fmtM(grandAsig);
+        pctEl.textContent = grandPct ? grandPct.toFixed(1) + '%' : '—';
+        pctEl.className = 'kpi-value ' + (grandPct ? (pctClass(grandPct) === 'ok' ? 'green' : pctClass(grandPct) === 'warn' ? 'warn' : 'danger') : '');
+
+        // date label
+        if (mesLabel) {
+            document.getElementById('date-label').textContent = 'Datos al: ' + mesLabel.toUpperCase();
+        } else {
+            document.getElementById('date-label').textContent = 'may 26';
+        }
+
+        document.getElementById('table-badge').textContent = loadedCount + ' proyectos cargados';
+    }
+
+    async function init() {
+        try {
+            const sbMap = await loadFromSupabase();
+            const results = [];
+
+            for (const proj of PROJECTS) {
+                let payload = null;
+                let mesA    = '';
+
+                if (sbMap && sbMap[proj.key]) {
+                    const row = sbMap[proj.key];
+                    payload = parsePayload(row.payload);
+                    mesA    = row.mes_a || '';
+                }
+
+                if (!payload) {
+                    const json = await loadFromJson(proj).catch(() => null);
+                    if (json) {
+                        payload = json;
+                        mesA    = json.metadata?.filters?.mesA || '';
+                    }
+                }
+
+                results.push({ proj, payload, mesA });
+            }
+
+            buildRows(results);
+
+        } catch (e) {
+            console.error(e);
+            document.getElementById('table-body').innerHTML =
+                '<tr><td colspan="5" class="state-msg"><strong>Error al cargar datos</strong>' + e.message + '</td></tr>';
+            document.getElementById('table-badge').textContent = 'Error';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+})();
+</script>
 </body>
 </html>
