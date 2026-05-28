@@ -157,6 +157,51 @@
         }
         .btn-admin:hover { background: var(--ng); color: #fff; }
         nav.scrolled .btn-admin { color: var(--ng); background: rgba(201,168,76,0.12); border-color: var(--ng); }
+        /* ── Dark mode variables ── */
+        body.dark {
+            --bg:      #0f172a;
+            --surface: #1e293b;
+            --navy:    #f1f5f9;
+            --navy2:   #e2e8f0;
+            --gray:    #94a3b8;
+            --gray2:   #64748b;
+            --border:  #334155;
+            --shadow:  0 4px 24px rgba(0,0,0,0.40);
+            --shadow-lg: 0 12px 40px rgba(0,0,0,0.50);
+        }
+        body { transition: background .25s, color .25s; }
+        body.dark { background: var(--bg); color: var(--navy); }
+        body.dark .summary-bar,
+        body.dark .analisis-cat-card,
+        body.dark .prop-card,
+        body.dark .analisis-section,
+        body.dark .projects-section,
+        body.dark .lotes-section { background: var(--surface) !important; }
+        body.dark .analisis-metrics-row { background: #273549 !important; border-color: #334155 !important; }
+        body.dark .analisis-metric-val,
+        body.dark .analisis-cat-count,
+        body.dark .summary-metric-val,
+        body.dark .summary-title,
+        body.dark .prop-name { color: var(--navy) !important; }
+        body.dark .analisis-metric-lbl,
+        body.dark .analisis-cat-sub,
+        body.dark .summary-metric-lbl { color: var(--gray) !important; }
+        body.dark .analisis-stack-bar { background: #334155 !important; }
+        body.dark .analisis-cat-footer,
+        body.dark .analisis-cat-top { border-color: #334155 !important; }
+        body.dark .prop-card { border-color: #334155 !important; }
+
+        /* ── Theme toggle button ── */
+        .btn-theme {
+            width: 34px; height: 34px; border-radius: 50%;
+            background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.20);
+            color: #fff; font-size: 16px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background .2s, transform .3s;
+            flex-shrink: 0;
+        }
+        .btn-theme:hover { background: rgba(201,168,76,0.35); transform: rotate(20deg); }
+
         /* ── Tour button ── */
         .btn-tour {
             width: 30px; height: 30px; border-radius: 50%;
@@ -879,6 +924,7 @@
 
     <div class="nav-actions">
         <a href="admin.html" class="btn-admin" id="btnAdmin" style="display:none">Admin</a>
+        <button id="btn-theme" class="btn-theme" title="Cambiar tema" onclick="toggleTheme()">🌙</button>
         <button id="btn-tour" class="btn-tour" title="Tour guiado">?</button>
         <button onclick="doLogout()" class="btn-logout">Cerrar sesión</button>
     </div>
@@ -1697,6 +1743,20 @@
         await client.auth.signOut();
         window.location.href = 'login.html';
     }
+
+    // ── THEME TOGGLE ──────────────────────────────────────────────────────────
+    function toggleTheme() {
+        const isDark = document.body.classList.toggle('dark');
+        document.getElementById('btn-theme').textContent = isDark ? '☀️' : '🌙';
+        localStorage.setItem('rv4-theme', isDark ? 'dark' : 'light');
+    }
+    (function initTheme() {
+        if (localStorage.getItem('rv4-theme') === 'dark') {
+            document.body.classList.add('dark');
+            const btn = document.getElementById('btn-theme');
+            if (btn) btn.textContent = '☀️';
+        }
+    })();
 
     // ── DROPDOWN ──────────────────────────────────────────────────────────────
     function toggleDrop(id) {
