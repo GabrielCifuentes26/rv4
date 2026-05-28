@@ -616,15 +616,15 @@ async function init(){
 
             const ds=payload.datasets||payload;
 
-            // accumulate totales for KPI strip
-            const tot=Array.isArray(ds.totales)?ds.totales[0]:(ds.totales||null);
-            if(tot){
-                tSap  +=(tot['[PresupuestoErequester]']??tot['[RdiTotal]']??0);
-                tEjec +=(tot['[EjecutadoErequester]']??0);
-                tComp +=(tot['[ComprometidoErequester]']??0);
-                tAsig +=(tot['[AsignadoErequester]']??0);
-                tDisp +=(tot['[DisponibleErequester]']??0);
-            }
+            // accumulate ALL areas from porArea for KPI strip (full project total)
+            const allAreas=Array.isArray(ds.porArea)?ds.porArea:[];
+            allAreas.forEach(row=>{
+                tSap  +=(row['[PresupuestoErequester]']??row['[RdiTotal]']??0);
+                tEjec +=(row['[EjecutadoErequester]']??0);
+                tComp +=(row['[ComprometidoErequester]']??0);
+                tAsig +=(row['[AsignadoErequester]']??0);
+                tDisp +=(row['[DisponibleErequester]']??0);
+            });
 
             // accumulate Construcción + Urbanización for cards
             const areas=['Construcción','Urbanización'].map(name=>{
