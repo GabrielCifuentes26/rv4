@@ -414,15 +414,17 @@ async function init(){
                 tDisp +=(row['[DisponibleErequester]']??0);
             });
 
-            const areas=['Construcción','Urbanización'].map(name=>{
-                const d=getArea(ds,name);
-                const sap  = d?.['[PresupuestoErequester]'] ?? d?.['[RdiTotal]'] ?? 0;
-                const ejec = d?.['[EjecutadoErequester]']   ?? 0;
-                const comp = d?.['[ComprometidoErequester]'] ?? 0;
-                const asig = d?.['[AsignadoErequester]']    ?? 0;
-                const disp = d?.['[DisponibleErequester]']  ?? 0;
-                return{name,sap,ejec,comp,asig,disp};
-            });
+            const areas=allAreas
+                .filter(row=>{ const n=getAreaName(row).toLowerCase(); return n.includes('construcc')||n.includes('urbaniz'); })
+                .map(row=>{
+                    const name=getAreaName(row);
+                    const sap  = row['[PresupuestoErequester]'] ?? row['[RdiTotal]'] ?? 0;
+                    const ejec = row['[EjecutadoErequester]']   ?? 0;
+                    const comp = row['[ComprometidoErequester]'] ?? 0;
+                    const asig = row['[AsignadoErequester]']    ?? 0;
+                    const disp = row['[DisponibleErequester]']  ?? 0;
+                    return{name,sap,ejec,comp,asig,disp};
+                });
             grid.appendChild(buildCard(proj,areas));
         }
 
