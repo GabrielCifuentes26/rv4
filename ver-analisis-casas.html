@@ -496,9 +496,13 @@
         return card;
     }
 
+    function getAreaName(row) {
+        return row['Rubros[Area]'] || row['dimSegmentación[Area]'] || row['dimSegmentacion[Area]'] || '';
+    }
+
     function getAreaData(datasets, areaName) {
         return (datasets?.porArea || []).find(r =>
-            (r['Rubros[Area]'] || '').toLowerCase() === areaName.toLowerCase()
+            getAreaName(r).toLowerCase() === areaName.toLowerCase()
         ) || null;
     }
 
