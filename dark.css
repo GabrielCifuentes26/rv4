@@ -1,0 +1,225 @@
+/* ══════════════════════════════════════════════════════
+   DARK MODE — rv4 / Costos & Presupuestos
+   Aplica a todas las páginas del sitio
+══════════════════════════════════════════════════════ */
+
+/* Pre-apply class to avoid flash before DOMContentLoaded */
+.dark-pre body { background: #0f172a !important; }
+
+/* ── Variables globales ─────────────────────────────── */
+body.dark {
+    --bg:        #0f172a;
+    --surface:   #1e293b;
+    --navy:      #f1f5f9;
+    --navy2:     #e2e8f0;
+    --gray:      #94a3b8;
+    --gray2:     #64748b;
+    --border:    #334155;
+    --shadow:    0 4px 24px rgba(0,0,0,0.45);
+    --shadow-lg: 0 12px 40px rgba(0,0,0,0.55);
+    --blue:      #38bdf8;
+    --blue-dark: #0ea5e9;
+    --green:     #34d399;
+    background: var(--bg);
+    color: var(--navy);
+}
+
+/* ── Transiciones suaves ────────────────────────────── */
+body { transition: background-color .25s, color .25s; }
+body *:not(.slide):not(.slide *):not(nav):not(nav *) {
+    transition: background-color .25s, color .2s, border-color .25s, box-shadow .25s;
+}
+
+/* ══════════════════════════════════════════════════════
+   INDEX — Secciones y tarjetas
+══════════════════════════════════════════════════════ */
+
+/* Secciones principales */
+body.dark .projects-section,
+body.dark .analisis-section,
+body.dark .lotes-section  { background: var(--bg) !important; }
+
+/* Summary bars */
+body.dark .summary-bar    { background: var(--surface) !important; border-color: var(--border) !important; box-shadow: var(--shadow) !important; }
+body.dark .summary-title  { color: var(--navy) !important; }
+body.dark .summary-metric-lbl { color: var(--gray) !important; }
+body.dark .summary-metric-val { color: var(--navy) !important; }
+body.dark .summary-metric--pct .summary-metric-val { color: #34d399 !important; }
+body.dark .summary-total-label { color: var(--gray) !important; }
+
+/* Cat cards (Casas / Lotes / Edificios) */
+body.dark .cat-card        { background: var(--surface) !important; border-color: var(--border) !important; }
+body.dark .cat-card.active { background: #334155 !important; border-color: #475569 !important; }
+body.dark .cat-icon        { background: #273549 !important; }
+body.dark .cat-name        { color: var(--navy) !important; }
+body.dark .cat-count       { color: var(--gray) !important; }
+body.dark .cat-card--wip   { background: #1a2535 !important; }
+body.dark .cat-card--wip .cat-icon  { background: #253040 !important; }
+body.dark .cat-card--wip .cat-name  { color: #475569 !important; }
+body.dark .wip-badge       { background: #253040 !important; border-color: #334155 !important; color: #475569 !important; }
+
+/* Prop cards */
+body.dark .prop-card       { background: var(--surface) !important; border-color: var(--border) !important; }
+body.dark .prop-img        { background: #253040 !important; }
+body.dark .prop-name       { color: var(--navy) !important; }
+body.dark .prop-cta        { background: rgba(52,211,153,0.12) !important; color: #34d399 !important; }
+body.dark .prop-card:hover .prop-cta { background: #34d399 !important; color: #0f172a !important; }
+body.dark .prop-budget-lbl { color: var(--gray) !important; }
+body.dark .prop-budget-val { color: var(--navy) !important; }
+body.dark .prop-budget-col--pct .prop-budget-val { color: #34d399 !important; }
+body.dark .prop-budget-track { background: #334155 !important; }
+body.dark .prop-budget-loading { color: var(--gray) !important; }
+
+/* Análisis cards */
+body.dark .analisis-cat-card      { background: var(--surface) !important; box-shadow: var(--shadow) !important; }
+body.dark .analisis-cat-header    { color: var(--gray) !important; }
+body.dark .analisis-cat-count     { color: var(--navy) !important; }
+body.dark .analisis-cat-sub       { color: var(--gray) !important; }
+body.dark .analisis-cat-top       { border-color: var(--border) !important; }
+body.dark .analisis-cat-footer    { border-color: var(--border) !important; }
+body.dark .analisis-cat-footer-name { color: var(--navy) !important; }
+body.dark .analisis-metrics-row   { background: #273549 !important; border-color: var(--border) !important; }
+body.dark .analisis-metric-lbl    { color: var(--gray) !important; }
+body.dark .analisis-metric-val    { color: var(--navy) !important; }
+body.dark .analisis-metric-val--pct { color: #34d399 !important; }
+body.dark .analisis-stack-bar     { background: #334155 !important; }
+body.dark .analisis-stack-seg--disp { background: #3d5068 !important; }
+body.dark .analisis-stack-dot--disp { background: #3d5068 !important; }
+body.dark .analisis-stack-legend-item { color: var(--gray) !important; }
+body.dark .legend-val             { color: var(--navy) !important; }
+
+/* Botones de análisis */
+body.dark .analisis-ver-btn,
+body.dark .analisis-m2-btn {
+    background: #273549 !important;
+    color: var(--navy) !important;
+    border-color: var(--border) !important;
+}
+body.dark .analisis-ver-btn:hover,
+body.dark .analisis-m2-btn:hover {
+    background: #C9A84C !important;
+    color: #0f172a !important;
+    border-color: #C9A84C !important;
+}
+
+/* Dev dropdown */
+body.dark .dev-dropdown-trigger   { background: var(--surface) !important; border-color: var(--border) !important; color: var(--navy) !important; }
+body.dark .dev-dropdown-panel     { background: var(--surface) !important; border-color: var(--border) !important; box-shadow: var(--shadow) !important; }
+body.dark .dev-option             { color: var(--navy) !important; }
+body.dark .dev-option:hover       { background: #334155 !important; color: #38bdf8 !important; }
+body.dark .dev-option--active     { background: #1e3a4a !important; color: #38bdf8 !important; }
+body.dark .dev-option--disabled   { color: #475569 !important; }
+body.dark .dev-option-soon        { background: #273549 !important; border-color: #334155 !important; color: #475569 !important; }
+
+/* Nav dropdown (drop-panel) */
+body.dark .drop-panel             { background: rgba(30,41,59,0.97) !important; border-color: rgba(51,65,85,0.8) !important; }
+body.dark .drop-item              { color: #e2e8f0 !important; }
+body.dark .drop-item:hover        { background: rgba(201,168,76,0.15) !important; }
+
+/* Footer */
+body.dark footer                  { background: #0a1120 !important; }
+
+/* Logout button */
+body.dark .btn-logout             { background: rgba(239,68,68,.12) !important; border-color: rgba(239,68,68,.25) !important; color: #f87171 !important; }
+
+/* ══════════════════════════════════════════════════════
+   DASHBOARDS — topbar ya es oscuro; foco en el contenido
+══════════════════════════════════════════════════════ */
+
+/* Tarjetas KPI del dashboard */
+body.dark .kpi-card,
+body.dark .kpi-block,
+body.dark .metric-card,
+body.dark .stat-card,
+body.dark [class*="kpi-"],
+body.dark [class*="-card"]:not(.prop-card):not(.cat-card):not(.analisis-cat-card) {
+    background: var(--surface) !important;
+    border-color: var(--border) !important;
+    color: var(--navy) !important;
+}
+
+/* Tablas */
+body.dark table                   { color: var(--navy) !important; }
+body.dark th                      { background: #273549 !important; color: var(--gray) !important; border-color: var(--border) !important; }
+body.dark td                      { border-color: var(--border) !important; color: var(--navy) !important; }
+body.dark tr:hover td             { background: #253040 !important; }
+body.dark tbody tr:nth-child(even) td { background: #1a2738 !important; }
+
+/* Selects y inputs en topbar de dashboard */
+body.dark .period-select,
+body.dark select                  { background: rgba(255,255,255,0.07) !important; border-color: rgba(255,255,255,0.15) !important; color: #fff !important; }
+
+/* Contenedor principal del dashboard */
+body.dark .dash-main,
+body.dark .main-content,
+body.dark .page-body,
+body.dark .content-wrap           { background: var(--bg) !important; }
+
+/* Secciones y paneles del dashboard */
+body.dark .section,
+body.dark .panel,
+body.dark .chart-container,
+body.dark .chart-wrap,
+body.dark .chart-card,
+body.dark [class*="section"]:not(.projects-section):not(.analisis-section):not(.lotes-section),
+body.dark [class*="panel"],
+body.dark [class*="chart"]        { background: var(--surface) !important; border-color: var(--border) !important; }
+
+/* Títulos y labels dentro del dashboard */
+body.dark .section-title,
+body.dark .panel-title,
+body.dark .chart-title,
+body.dark [class*="-title"],
+body.dark [class*="-label"],
+body.dark [class*="-lbl"]        { color: var(--navy) !important; }
+
+body.dark [class*="-sub"],
+body.dark [class*="-desc"],
+body.dark [class*="-meta"]       { color: var(--gray) !important; }
+
+/* ══════════════════════════════════════════════════════
+   VER-ANALISIS — pcard (tarjetas de proyecto)
+══════════════════════════════════════════════════════ */
+
+body.dark .pcard                  { background: var(--surface) !important; border-color: var(--border) !important; box-shadow: var(--shadow) !important; }
+body.dark .pcard-head             { background: var(--surface) !important; border-color: var(--border) !important; }
+body.dark .pcard-name             { color: var(--navy) !important; }
+body.dark .pcard-divider          { background: var(--border) !important; }
+body.dark .pcard-table-wrap       { background: var(--surface) !important; }
+body.dark .pcard-table th         { background: #273549 !important; color: var(--gray) !important; border-color: var(--border) !important; }
+body.dark .pcard-table td         { color: var(--navy) !important; border-color: var(--border) !important; }
+body.dark .pcard-table tfoot td   { background: #273549 !important; color: var(--navy) !important; }
+body.dark .pcard-prog             { background: var(--surface) !important; }
+body.dark .prog-track             { background: #334155 !important; }
+body.dark .prog-label-text        { color: var(--gray) !important; }
+body.dark .prog-label-pct         { color: var(--navy) !important; }
+
+/* KPI strip en ver-analisis */
+body.dark .kpi-strip,
+body.dark .kpi-bar                { background: var(--surface) !important; border-color: var(--border) !important; }
+body.dark .kpi-item               { border-color: var(--border) !important; }
+body.dark .kpi-label              { color: var(--gray) !important; }
+body.dark .kpi-val                { color: var(--navy) !important; }
+
+/* Topbar (dashboards y ver-analisis) */
+body.dark .topbar                 { background: #0a1120 !important; border-color: rgba(255,255,255,0.05) !important; }
+body.dark .topbar-brand           { color: #fff !important; }
+body.dark .topbar-sub             { color: rgba(255,255,255,.30) !important; }
+body.dark .topbar-title           { color: #fff !important; }
+body.dark .topbar-subtitle        { color: rgba(255,255,255,.30) !important; }
+body.dark .home-link              { background: rgba(255,255,255,0.05) !important; border-color: rgba(255,255,255,0.08) !important; }
+
+/* Pct badges */
+body.dark .pct-badge.ok           { background: rgba(52,211,153,0.15) !important; color: #34d399 !important; border-color: rgba(52,211,153,0.30) !important; }
+body.dark .pct-badge.warn         { background: rgba(251,191,36,0.15) !important; color: #fbbf24 !important; border-color: rgba(251,191,36,0.30) !important; }
+body.dark .pct-badge.danger       { background: rgba(248,113,113,0.15) !important; color: #f87171 !important; border-color: rgba(248,113,113,0.30) !important; }
+
+/* Date chip */
+body.dark .date-chip              { background: #273549 !important; color: var(--gray) !important; border-color: var(--border) !important; }
+
+/* ══════════════════════════════════════════════════════
+   SCROLLBAR
+══════════════════════════════════════════════════════ */
+body.dark ::-webkit-scrollbar-track  { background: #1e293b; }
+body.dark ::-webkit-scrollbar-thumb  { background: #334155; }
+body.dark ::-webkit-scrollbar-thumb:hover { background: #475569; }
