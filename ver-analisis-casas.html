@@ -549,7 +549,9 @@ async function init(){
             const ds=payload.datasets||payload;
             const areas=['Construcción','Urbanización'].map(name=>{
                 const d=getArea(ds,name);
-                return{name,sap:d?.['[RdiTotal]']??0,asig:d?.['[AsignadoErequester]']??0};
+                const sap  = d?.['[PresupuestoErequester]'] ?? d?.['[RdiTotal]'] ?? 0;
+                const asig = d?.['[AsignadoErequester]'] ?? 0;
+                return{name,sap,asig};
             });
             areas.forEach(a=>{gSap+=a.sap;gAsig+=a.asig;});
             grid.appendChild(buildCard(proj,areas));
