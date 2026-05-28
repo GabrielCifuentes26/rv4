@@ -21,150 +21,136 @@
     <style>
         *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
         :root {
-            --bg:       #080d14;
-            --surface:  #0e1520;
-            --surface2: #131d2b;
-            --border:   rgba(255,255,255,0.07);
-            --gold:     #C9A84C;
-            --text:     #f1f5f9;
-            --muted:    rgba(255,255,255,0.38);
-            --faint:    rgba(255,255,255,0.12);
+            --bg:      #f0f4f8;
+            --surface: #ffffff;
+            --navy:    #0f172a;
+            --navy2:   #1e293b;
+            --gray:    #64748b;
+            --gray2:   #94a3b8;
+            --border:  #e2e8f0;
+            --ng:      #C9A84C;
+            --blue:    #3b82f6;
+            --green:   #15803d;
+            --shadow:  0 4px 24px rgba(15,23,42,0.10);
         }
-        body {
-            font-family:'Inter','Segoe UI',sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            min-height:100vh;
-        }
+        body { font-family:'Inter','Segoe UI',sans-serif; background:var(--bg); color:var(--navy); min-height:100vh; }
 
-        /* ── TOPBAR ──────────────────────────────────────── */
+        /* ── TOPBAR ──────────────────────────────── */
         .topbar {
             position:sticky; top:0; z-index:300;
-            height:56px; padding:0 28px;
-            background: var(--bg);
-            border-bottom: 1px solid var(--border);
+            background:#0f172a; border-bottom:1px solid rgba(255,255,255,0.07);
+            padding:0 22px; height:56px;
             display:flex; align-items:center; justify-content:space-between;
+            box-shadow:0 2px 16px rgba(15,23,42,0.25);
         }
         .topbar::before {
             content:''; position:absolute; top:0; left:0; right:0; height:2px;
-            background:linear-gradient(90deg,transparent,var(--gold) 30%,#e8c96a 50%,var(--gold) 70%,transparent);
+            background:linear-gradient(90deg,transparent 0%,#C9A84C 35%,#C9A84C 65%,transparent 100%);
         }
-        .topbar-left { display:flex; align-items:center; gap:14px; }
+        .topbar-left { display:flex; align-items:center; }
         .home-link {
-            width:34px; height:34px; border-radius:8px; flex-shrink:0;
             display:flex; align-items:center; justify-content:center;
-            background:var(--faint); border:1px solid var(--border);
-            color:var(--muted); text-decoration:none; transition:all .18s;
+            width:36px; height:36px; border-radius:8px;
+            background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.12);
+            color:rgba(255,255,255,0.6); text-decoration:none;
+            transition:background .18s,color .18s; flex-shrink:0; margin-right:14px;
         }
-        .home-link:hover { background:var(--gold); color:#fff; border-color:var(--gold); }
-        .home-link svg { width:14px; height:14px; fill:currentColor; }
+        .home-link:hover { background:#C9A84C; color:#fff; border-color:#C9A84C; }
+        .home-link svg { width:15px; height:15px; fill:currentColor; }
+        .topbar-center {
+            position:absolute; left:50%; transform:translateX(-50%);
+            text-align:center; pointer-events:none;
+        }
+        .topbar-page-title { font-size:1.05rem; font-weight:900; color:#fff; letter-spacing:-.2px; }
+        .topbar-page-title span { color:#C9A84C; }
+        .topbar-page-sub { font-size:0.62rem; color:rgba(255,255,255,0.45); margin-top:2px; }
         .brand-link { text-decoration:none; }
         .topbar-brand { font-size:.88rem; font-weight:900; color:#fff; }
-        .topbar-brand span { color:var(--gold); }
-        .topbar-sub { font-size:.58rem; color:var(--muted); margin-top:1px; }
+        .topbar-brand span { color:#C9A84C; }
+        .topbar-sub-brand { font-size:.58rem; color:rgba(255,255,255,.38); margin-top:1px; }
+        .topbar-right { display:flex; align-items:center; gap:10px; }
         .btn-logout {
             display:flex; align-items:center; gap:6px;
-            background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.22);
+            background:rgba(239,68,68,.10); border:1px solid rgba(239,68,68,.30);
             color:#f87171; padding:5px 14px; border-radius:7px;
-            font-size:.7rem; font-weight:700; cursor:pointer; font-family:inherit; transition:all .18s;
+            font-size:.72rem; font-weight:700; cursor:pointer; font-family:inherit;
+            transition:background .18s,border-color .18s,color .18s;
         }
-        .btn-logout:hover { background:rgba(239,68,68,.18); }
+        .btn-logout:hover { background:rgba(239,68,68,.22); border-color:rgba(239,68,68,.55); color:#fca5a5; }
         .btn-logout svg { width:13px; height:13px; fill:currentColor; }
 
-        /* ── HERO ────────────────────────────────────────── */
-        .hero {
-            background: var(--bg);
-            padding: 44px 40px 0;
-            position:relative; overflow:hidden;
+        /* ── PAGE HERO ───────────────────────────── */
+        .page-hero {
+            background:var(--surface); border-bottom:1.5px solid var(--border);
+            padding:24px 28px 20px;
         }
-        .hero-glow {
-            position:absolute; top:-80px; left:50%; transform:translateX(-50%);
-            width:600px; height:300px; border-radius:50%;
-            background:radial-gradient(ellipse,rgba(201,168,76,.07) 0%,transparent 70%);
-            pointer-events:none;
+        .page-hero-inner {
+            max-width:1320px; margin:0 auto;
+            display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:16px;
         }
-        .hero-inner { max-width:1320px; margin:0 auto; position:relative; }
-        .hero-eyebrow {
-            display:inline-flex; align-items:center; gap:7px;
-            background:rgba(201,168,76,.08); border:1px solid rgba(201,168,76,.18);
-            color:var(--gold); font-size:.6rem; font-weight:700; letter-spacing:1.5px;
-            text-transform:uppercase; padding:5px 14px; border-radius:20px; margin-bottom:16px;
+        .page-hero-eyebrow {
+            font-size:.68rem; font-weight:700; color:var(--ng);
+            text-transform:uppercase; letter-spacing:1px; margin-bottom:5px;
         }
-        .hero-eyebrow svg { width:10px; height:10px; fill:currentColor; }
-        .hero-title {
-            font-size:2.2rem; font-weight:900; color:#fff; line-height:1.12; margin-bottom:8px;
-            letter-spacing:-.5px;
+        .page-hero-title { font-size:1.5rem; font-weight:900; color:var(--navy); line-height:1.2; }
+        .page-hero-title span { color:var(--ng); }
+        .page-hero-sub { font-size:.85rem; color:var(--gray); margin-top:5px; line-height:1.5; }
+        .hero-kpis { display:flex; gap:12px; flex-wrap:wrap; align-items:flex-start; }
+        .hero-kpi {
+            padding:12px 20px; border-radius:14px;
+            border:1.5px solid; min-width:155px;
         }
-        .hero-title em { color:var(--gold); font-style:normal; }
-        .hero-desc { font-size:.8rem; color:var(--muted); margin-bottom:36px; line-height:1.5; }
-        .hero-desc strong { color:rgba(201,168,76,.8); font-weight:600; }
+        .hero-kpi--sap   { background:rgba(201,168,76,.07);  border-color:rgba(201,168,76,.28); }
+        .hero-kpi--asig  { background:rgba(59,130,246,.06);  border-color:rgba(59,130,246,.22); }
+        .hero-kpi--pct   { background:rgba(21,128,61,.06);   border-color:rgba(21,128,61,.22); }
+        .hero-kpi-label  { font-size:.6rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--gray2); margin-bottom:2px; }
+        .hero-kpi-val    { font-size:1.1rem; font-weight:900; font-variant-numeric:tabular-nums; }
+        .hero-kpi--sap  .hero-kpi-val { color:#A8832A; }
+        .hero-kpi--asig .hero-kpi-val { color:#2563eb; }
+        .hero-kpi--pct  .hero-kpi-val { color:var(--green); }
+        .hero-kpi-sub    { font-size:.6rem; font-weight:600; color:var(--gray2); margin-top:3px; }
 
-        /* KPI STRIP */
-        .kpi-strip {
-            display:grid; grid-template-columns:repeat(4,1fr);
-            background:var(--faint); gap:1px;
-            border-top:1px solid var(--border);
-            margin:0 -40px;
-        }
-        .kpi-cell { background:var(--bg); padding:20px 28px; }
-        .kpi-cell-eyebrow {
-            font-size:.56rem; font-weight:700; letter-spacing:1.3px; text-transform:uppercase;
-            color:var(--muted); margin-bottom:6px;
-        }
-        .kpi-cell-value {
-            font-size:1.45rem; font-weight:900; color:#fff;
-            font-variant-numeric:tabular-nums; line-height:1;
-        }
-        .kpi-cell-value.c-gold  { color:var(--gold); }
-        .kpi-cell-value.c-blue  { color:#60a5fa; }
-        .kpi-cell-value.c-green { color:#4ade80; }
-        .kpi-cell-value.c-amber { color:#fbbf24; }
-        .kpi-cell-value.c-red   { color:#f87171; }
-        .kpi-cell-sub { font-size:.58rem; color:rgba(255,255,255,.22); margin-top:5px; }
-
-        /* ── SECTION ─────────────────────────────────────── */
-        .section { max-width:1320px; margin:0 auto; padding:36px 40px 60px; }
-        .section-top {
+        /* ── MAIN ────────────────────────────────── */
+        .main { max-width:1320px; margin:0 auto; padding:28px 28px 56px; }
+        .main-top {
             display:flex; align-items:center; justify-content:space-between;
-            margin-bottom:24px;
+            margin-bottom:20px;
         }
-        .section-label {
-            font-size:.65rem; font-weight:700; letter-spacing:1.5px; text-transform:uppercase;
-            color:var(--muted);
-        }
-        .pill-date {
+        .main-label { font-size:.68rem; font-weight:700; color:var(--gray2); text-transform:uppercase; letter-spacing:1px; }
+        .date-pill {
             display:inline-flex; align-items:center; gap:5px;
-            background:rgba(201,168,76,.07); border:1px solid rgba(201,168,76,.15);
-            color:rgba(201,168,76,.7); padding:5px 13px; border-radius:20px;
-            font-size:.62rem; font-weight:700;
+            background:rgba(201,168,76,.08); border:1px solid rgba(201,168,76,.2);
+            color:#A8832A; padding:5px 13px; border-radius:20px;
+            font-size:.63rem; font-weight:700;
         }
-        .pill-date svg { width:10px; height:10px; fill:currentColor; }
+        .date-pill svg { width:10px; height:10px; fill:currentColor; }
 
-        /* ── CARDS GRID ──────────────────────────────────── */
+        /* ── CARDS GRID ──────────────────────────── */
         .cards-grid {
             display:grid;
             grid-template-columns:repeat(3,1fr);
-            gap:18px;
+            gap:20px;
         }
 
         /* PROJECT CARD */
         .pcard {
             background:var(--surface);
             border-radius:18px;
-            border:1px solid var(--border);
+            border:1.5px solid var(--border);
+            border-top:3px solid var(--ng);
+            box-shadow:var(--shadow);
             overflow:hidden;
             display:flex; flex-direction:column;
-            transition:transform .22s ease, box-shadow .22s ease, border-color .22s ease;
-            animation: cardIn .5s ease both;
+            transition:transform .2s ease, box-shadow .2s ease;
+            animation:fadeUp .45s ease both;
         }
         .pcard:hover {
             transform:translateY(-3px);
-            border-color:rgba(255,255,255,.12);
-            box-shadow:0 12px 40px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.05);
+            box-shadow:0 10px 36px rgba(15,23,42,0.14);
         }
-        @keyframes cardIn {
-            from { opacity:0; transform:translateY(16px); }
-            to   { opacity:1; transform:translateY(0); }
+        @keyframes fadeUp {
+            from{opacity:0;transform:translateY(14px)}
+            to{opacity:1;transform:translateY(0)}
         }
         .pcard:nth-child(1){animation-delay:.04s}
         .pcard:nth-child(2){animation-delay:.10s}
@@ -173,144 +159,117 @@
         .pcard:nth-child(5){animation-delay:.28s}
         .pcard:nth-child(6){animation-delay:.34s}
 
-        /* top accent bar */
-        .pcard-bar { height:5px; }
-
         /* card header */
-        .pcard-head {
-            display:flex; align-items:center; justify-content:space-between;
-            padding:18px 20px 14px;
+        .pcard-head { padding:18px 22px 14px; }
+        .pcard-head-top {
+            display:flex; align-items:flex-start; justify-content:space-between; gap:8px;
         }
-        .pcard-name { font-size:.9rem; font-weight:800; color:#fff; }
-        .pcard-badge {
-            font-size:.6rem; font-weight:800; letter-spacing:.8px;
-            padding:4px 10px; border-radius:7px;
-        }
+        .pcard-name { font-size:1.05rem; font-weight:800; color:var(--navy); line-height:1.2; }
+        .pcard-pct-group { text-align:right; flex-shrink:0; }
+        .pcard-pct-label { font-size:.65rem; font-weight:700; color:var(--gray2); text-transform:uppercase; letter-spacing:.6px; }
+        .pcard-pct-val { font-size:1.05rem; font-weight:900; font-variant-numeric:tabular-nums; }
+        .pcard-pct-val.ok     { color:#15803d; }
+        .pcard-pct-val.warn   { color:#d97706; }
+        .pcard-pct-val.danger { color:#dc2626; }
 
-        /* GAUGE */
-        .pcard-gauge-area {
-            display:flex; align-items:center; justify-content:center;
-            padding:4px 20px 20px; position:relative;
+        /* divider */
+        .pcard-divider { height:1px; background:var(--border); margin:0 22px 16px; }
+
+        /* area table */
+        .pcard-table { width:100%; border-collapse:collapse; margin:0 0 16px; }
+        .pcard-table thead th {
+            font-size:.63rem; font-weight:700; color:var(--gray2);
+            text-transform:uppercase; letter-spacing:.7px;
+            padding:0 22px 8px; text-align:right; border-bottom:1.5px solid var(--border);
         }
-        .gauge-wrap { position:relative; width:150px; height:150px; flex-shrink:0; }
-        .gauge-wrap svg { width:100%; height:100%; }
-        .gauge-center-text {
-            position:absolute; inset:0;
-            display:flex; flex-direction:column; align-items:center; justify-content:center;
-            pointer-events:none;
+        .pcard-table thead th:first-child { text-align:left; }
+        .pcard-table tbody td {
+            font-size:.74rem; color:var(--navy);
+            padding:9px 22px; text-align:right; font-variant-numeric:tabular-nums;
         }
-        .gauge-pct-num {
-            font-size:1.7rem; font-weight:900; line-height:1;
+        .pcard-table tbody td:first-child { text-align:left; font-weight:600; color:var(--gray); }
+        .pcard-table tbody tr:not(:last-child) td { border-bottom:1px solid #f1f5f9; }
+
+        /* total row */
+        .pcard-table tfoot td {
+            font-size:.74rem; font-weight:800;
+            padding:9px 22px; text-align:right;
+            border-top:1.5px solid var(--border);
             font-variant-numeric:tabular-nums;
         }
-        .gauge-pct-lbl {
-            font-size:.54rem; font-weight:700; letter-spacing:1px; text-transform:uppercase;
-            color:var(--muted); margin-top:3px;
-        }
+        .pcard-table tfoot td:first-child { text-align:left; color:var(--gray); }
+        .pcard-table tfoot td.td-sap   { color:var(--navy2); }
+        .pcard-table tfoot td.td-asig  { color:#1d4ed8; }
+        .pcard-table tfoot td.td-pct   { }
+        .pcard-table tfoot td.td-pct.ok     { color:#15803d; }
+        .pcard-table tfoot td.td-pct.warn   { color:#d97706; }
+        .pcard-table tfoot td.td-pct.danger { color:#dc2626; }
 
-        /* card stats row */
-        .pcard-stats {
-            display:grid; grid-template-columns:1fr 1fr;
-            border-top:1px solid var(--border);
+        .td-area-dot {
+            display:inline-flex; align-items:center; gap:6px;
         }
-        .pcard-stat { padding:14px 20px; }
-        .pcard-stat + .pcard-stat { border-left:1px solid var(--border); }
-        .pcard-stat-label {
-            font-size:.56rem; font-weight:700; letter-spacing:1px; text-transform:uppercase;
-            color:var(--muted); margin-bottom:5px;
-        }
-        .pcard-stat-val {
-            font-size:.95rem; font-weight:800;
-            font-variant-numeric:tabular-nums; color:#fff;
-        }
-        .pcard-stat-val.v-blue { color:#60a5fa; }
-        .pcard-stat-diff {
-            font-size:.58rem; color:var(--muted); margin-top:2px;
-            font-variant-numeric:tabular-nums;
-        }
+        .area-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; display:inline-block; }
+        .area-dot--constr { background:var(--ng); }
+        .area-dot--urban  { background:var(--blue); }
 
-        /* area breakdown */
-        .pcard-areas { padding:16px 20px; display:flex; flex-direction:column; gap:13px; flex:1; }
-        .area-item {}
-        .area-item-header {
-            display:flex; align-items:center; justify-content:space-between;
-            margin-bottom:6px;
+        /* stacked bar */
+        .pcard-bar-wrap { padding:0 22px 18px; }
+        .pcard-bar-track {
+            height:8px; border-radius:999px; overflow:hidden;
+            display:flex; background:#e2e8f0; margin-bottom:8px;
         }
-        .area-item-name {
-            display:flex; align-items:center; gap:7px;
-            font-size:.72rem; font-weight:600; color:rgba(255,255,255,.55);
-        }
-        .area-item-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
-        .area-item-pct { font-size:.76rem; font-weight:800; }
-        .area-track { height:6px; border-radius:6px; background:rgba(255,255,255,.06); overflow:hidden; }
-        .area-fill { height:100%; border-radius:6px; width:0; transition:width .9s cubic-bezier(.16,1,.3,1); }
-        .area-nums {
-            display:flex; align-items:center; justify-content:space-between;
-            margin-top:5px;
-        }
-        .area-num { font-size:.63rem; color:rgba(255,255,255,.3); font-variant-numeric:tabular-nums; }
-        .area-num strong { color:rgba(255,255,255,.5); font-weight:600; }
+        .pcard-bar-constr { height:100%; background:var(--ng); transition:width 1s ease; }
+        .pcard-bar-urban  { height:100%; background:var(--blue); transition:width 1s ease; }
+        .pcard-bar-legend { display:flex; justify-content:space-between; }
+        .pcard-bar-leg-item { display:flex; align-items:center; gap:5px; font-size:.7rem; font-weight:600; color:var(--gray2); }
 
-        /* ── TOTAL CARD ──────────────────────────────────── */
+        /* ── TOTAL CARD ─────────────────────────── */
         .total-card {
             grid-column:1/-1;
+            background:var(--surface);
             border-radius:18px;
-            border:1px solid rgba(201,168,76,.2);
-            background:linear-gradient(135deg,rgba(201,168,76,.06) 0%,rgba(201,168,76,.02) 50%,transparent 100%);
-            padding:28px 32px;
-            display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:24px;
-            position:relative; overflow:hidden;
+            border:1.5px solid var(--border);
+            border-top:3px solid var(--ng);
+            box-shadow:var(--shadow);
+            padding:22px 28px;
+            display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:20px;
         }
-        .total-card::before {
-            content:'';
-            position:absolute; top:0; left:0; right:0; height:1px;
-            background:linear-gradient(90deg,transparent,rgba(201,168,76,.4),transparent);
-        }
-        .total-card-left {}
-        .total-card-eyebrow {
-            font-size:.58rem; font-weight:700; letter-spacing:1.5px; text-transform:uppercase;
-            color:var(--gold); margin-bottom:5px;
-        }
-        .total-card-title { font-size:1.15rem; font-weight:900; color:#fff; }
-        .total-card-sub { font-size:.72rem; color:var(--muted); margin-top:3px; }
-        .total-card-kpis { display:flex; align-items:center; gap:0; }
-        .total-kpi { padding:0 28px; text-align:center; }
+        .total-left-label { font-size:.68rem; font-weight:700; color:var(--ng); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; }
+        .total-left-title { font-size:1rem; font-weight:900; color:var(--navy); }
+        .total-left-sub { font-size:.72rem; color:var(--gray2); margin-top:2px; }
+        .total-kpis { display:flex; align-items:center; gap:0; flex-wrap:wrap; }
+        .total-kpi  { padding:0 28px; text-align:center; }
         .total-kpi:first-child { padding-left:0; }
-        .total-kpi-lbl {
-            font-size:.56rem; font-weight:700; letter-spacing:1.2px; text-transform:uppercase;
-            color:var(--muted); margin-bottom:6px;
-        }
-        .total-kpi-val { font-size:1.5rem; font-weight:900; font-variant-numeric:tabular-nums; }
+        .total-kpi-label { font-size:.58rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--gray2); margin-bottom:5px; }
+        .total-kpi-val { font-size:1.4rem; font-weight:900; font-variant-numeric:tabular-nums; }
+        .total-kpi-val.t-sap  { color:#A8832A; }
+        .total-kpi-val.t-asig { color:#2563eb; }
+        .total-kpi-val.t-pct.ok     { color:#15803d; }
+        .total-kpi-val.t-pct.warn   { color:#d97706; }
+        .total-kpi-val.t-pct.danger { color:#dc2626; }
         .total-sep { width:1px; height:44px; background:var(--border); }
 
-        /* ── SKELETON ────────────────────────────────────── */
-        .skel {
-            background:rgba(255,255,255,.06); border-radius:6px;
-            animation:pulse 1.4s ease-in-out infinite;
-        }
-        @keyframes pulse { 0%,100%{opacity:.35} 50%{opacity:.75} }
+        /* skeleton */
+        .skel { background:#e2e8f0; border-radius:6px; animation:pulse 1.4s ease-in-out infinite; }
+        @keyframes pulse { 0%,100%{opacity:.5} 50%{opacity:1} }
 
-        /* ── RESPONSIVE ──────────────────────────────────── */
-        @media(max-width:1100px){
-            .cards-grid { grid-template-columns:repeat(2,1fr); }
-            .kpi-strip  { grid-template-columns:repeat(2,1fr); }
-        }
+        /* responsive */
+        @media(max-width:1100px){ .cards-grid{grid-template-columns:repeat(2,1fr);} }
         @media(max-width:680px){
-            .hero { padding:28px 18px 0; }
-            .kpi-strip { margin:0 -18px; }
-            .section { padding:24px 18px 48px; }
-            .cards-grid { grid-template-columns:1fr; }
-            .hero-title { font-size:1.5rem; }
-            .kpi-cell { padding:16px 18px; }
-            .total-card { padding:20px; }
-            .total-card-kpis { flex-wrap:wrap; gap:16px; }
-            .total-kpi { padding:0; }
-            .total-sep { display:none; }
+            .page-hero{padding:18px;}
+            .main{padding:18px 16px 40px;}
+            .cards-grid{grid-template-columns:1fr;}
+            .page-hero-title{font-size:1.2rem;}
+            .total-card{padding:18px;}
+            .total-kpis{gap:16px;}
+            .total-kpi{padding:0;}
+            .total-sep{display:none;}
         }
     </style>
 </head>
 <body>
 
+<!-- TOPBAR -->
 <div class="topbar">
     <div class="topbar-left">
         <a href="index.html" class="home-link">
@@ -318,8 +277,12 @@
         </a>
         <a href="index.html" class="brand-link">
             <div class="topbar-brand">Costos&<span>Presupuestos</span></div>
-            <div class="topbar-sub">Análisis Comparativo · Casas</div>
+            <div class="topbar-sub-brand">Análisis Comparativo · Casas</div>
         </a>
+    </div>
+    <div class="topbar-center">
+        <div class="topbar-page-title">Presupuesto SAP <span>vs</span> Asignado</div>
+        <div class="topbar-page-sub">Proyectos Casas</div>
     </div>
     <div class="topbar-right">
         <button class="btn-logout" id="btn-logout">
@@ -329,80 +292,71 @@
     </div>
 </div>
 
-<div class="hero">
-    <div class="hero-glow"></div>
-    <div class="hero-inner">
-        <div class="hero-eyebrow">
-            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
-            Resumen Comparativo · Proyectos de Casas
+<!-- PAGE HERO -->
+<div class="page-hero">
+    <div class="page-hero-inner">
+        <div>
+            <div class="page-hero-eyebrow">Resumen Comparativo · 6 Proyectos</div>
+            <div class="page-hero-title">Presupuesto SAP <span>vs</span> Asignado</div>
+            <div class="page-hero-sub">Desglose de Construcción y Urbanización por proyecto.<br><span id="date-text" style="color:var(--ng);font-weight:600">Cargando datos…</span></div>
         </div>
-        <h1 class="hero-title">Presupuesto SAP <em>vs</em> Asignado</h1>
-        <p class="hero-desc">6 proyectos en ejecución · Áreas: Construcción y Urbanización · <strong id="date-text">Cargando…</strong></p>
-    </div>
-    <div class="kpi-strip">
-        <div class="kpi-cell">
-            <div class="kpi-cell-eyebrow">Total Ppto. SAP</div>
-            <div class="kpi-cell-value c-gold" id="kpi-sap">—</div>
-            <div class="kpi-cell-sub">Suma de 6 proyectos</div>
-        </div>
-        <div class="kpi-cell">
-            <div class="kpi-cell-eyebrow">Total Asignado</div>
-            <div class="kpi-cell-value c-blue" id="kpi-asig">—</div>
-            <div class="kpi-cell-sub">Const. + Urbanización</div>
-        </div>
-        <div class="kpi-cell">
-            <div class="kpi-cell-eyebrow">% Asignado Global</div>
-            <div class="kpi-cell-value" id="kpi-pct">—</div>
-            <div class="kpi-cell-sub">Asignado / SAP</div>
-        </div>
-        <div class="kpi-cell">
-            <div class="kpi-cell-eyebrow">Proyectos Cargados</div>
-            <div class="kpi-cell-value" id="kpi-count">—</div>
-            <div class="kpi-cell-sub">Con datos actuales</div>
+        <div class="hero-kpis">
+            <div class="hero-kpi hero-kpi--sap">
+                <div class="hero-kpi-label">Total Ppto. SAP</div>
+                <div class="hero-kpi-val" id="kpi-sap">—</div>
+                <div class="hero-kpi-sub">6 proyectos</div>
+            </div>
+            <div class="hero-kpi hero-kpi--asig">
+                <div class="hero-kpi-label">Total Asignado</div>
+                <div class="hero-kpi-val" id="kpi-asig">—</div>
+                <div class="hero-kpi-sub">Const. + Urb.</div>
+            </div>
+            <div class="hero-kpi hero-kpi--pct">
+                <div class="hero-kpi-label">% Asignado Global</div>
+                <div class="hero-kpi-val" id="kpi-pct">—</div>
+                <div class="hero-kpi-sub">Asignado / SAP</div>
+            </div>
         </div>
     </div>
 </div>
 
-<div class="section">
-    <div class="section-top">
-        <div class="section-label">Detalle por Proyecto</div>
-        <div class="pill-date" id="pill-date">
+<!-- MAIN -->
+<div class="main">
+    <div class="main-top">
+        <div class="main-label">Detalle por Proyecto</div>
+        <div class="date-pill" id="date-pill">
             <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>
             Cargando…
         </div>
     </div>
+
     <div class="cards-grid" id="cards-grid">
-        <div class="pcard" style="min-height:400px">
-            <div class="pcard-bar skel"></div>
-            <div style="padding:20px;display:flex;flex-direction:column;gap:16px">
-                <div class="skel" style="height:16px;width:55%"></div>
-                <div class="skel" style="height:130px;width:130px;border-radius:50%;margin:8px auto"></div>
-                <div class="skel" style="height:13px;width:80%"></div>
-                <div class="skel" style="height:13px;width:65%"></div>
-                <div class="skel" style="height:7px;width:100%;border-radius:4px"></div>
-                <div class="skel" style="height:7px;width:100%;border-radius:4px"></div>
+        <!-- skeletons -->
+        <div class="pcard" style="min-height:320px">
+            <div style="padding:20px;display:flex;flex-direction:column;gap:14px">
+                <div class="skel" style="height:18px;width:60%"></div>
+                <div class="skel" style="height:14px;width:90%"></div>
+                <div class="skel" style="height:14px;width:90%"></div>
+                <div class="skel" style="height:14px;width:90%"></div>
+                <div class="skel" style="height:10px;width:100%;border-radius:999px"></div>
             </div>
         </div>
-        <div class="pcard" style="min-height:400px">
-            <div class="pcard-bar skel"></div>
-            <div style="padding:20px;display:flex;flex-direction:column;gap:16px">
-                <div class="skel" style="height:16px;width:60%"></div>
-                <div class="skel" style="height:130px;width:130px;border-radius:50%;margin:8px auto"></div>
-                <div class="skel" style="height:13px;width:75%"></div>
-                <div class="skel" style="height:13px;width:60%"></div>
-                <div class="skel" style="height:7px;width:100%;border-radius:4px"></div>
-                <div class="skel" style="height:7px;width:100%;border-radius:4px"></div>
+        <div class="pcard" style="min-height:320px">
+            <div style="padding:20px;display:flex;flex-direction:column;gap:14px">
+                <div class="skel" style="height:18px;width:55%"></div>
+                <div class="skel" style="height:14px;width:90%"></div>
+                <div class="skel" style="height:14px;width:90%"></div>
+                <div class="skel" style="height:14px;width:90%"></div>
+                <div class="skel" style="height:10px;width:100%;border-radius:999px"></div>
             </div>
         </div>
-        <div class="pcard" style="min-height:400px">
-            <div class="pcard-bar skel"></div>
-            <div style="padding:20px;display:flex;flex-direction:column;gap:16px">
-                <div class="skel" style="height:16px;width:50%"></div>
-                <div class="skel" style="height:130px;width:130px;border-radius:50%;margin:8px auto"></div>
-                <div class="skel" style="height:13px;width:70%"></div>
-                <div class="skel" style="height:13px;width:80%"></div>
-                <div class="skel" style="height:7px;width:100%;border-radius:4px"></div>
-                <div class="skel" style="height:7px;width:100%;border-radius:4px"></div>
+        <div class="pcard" style="min-height:320px">
+            <div style="padding:20px;display:flex;flex-direction:column;gap:14px">
+                <div class="skel" style="height:18px;width:65%"></div>
+                <div class="skel" style="height:14px;width:90%"></div>
+                <div class="skel" style="height:14px;width:90%"></div>
+                <div class="skel" style="height:14px;width:90%"></div>
+                <div class="skel" style="height:10px;width:100%;border-radius:999px"></div>
             </div>
         </div>
     </div>
@@ -411,7 +365,7 @@
 <script>
 (function(){
 'use strict';
-const {createClient}=supabase;
+const{createClient}=supabase;
 const sb=createClient(
     'https://iipgrojliqeyycvgnkrc.supabase.co',
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlpcGdyb2psaXFleXljdmdua3JjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NzA1NzYsImV4cCI6MjA5MTM0NjU3Nn0.Y6FQ-1qWd7HPMvTnK4alpKxM-YLJ5CsKmkorAZKMJrg'
@@ -421,168 +375,141 @@ document.getElementById('btn-logout').addEventListener('click',()=>
 );
 
 const PROJECTS=[
-    {key:'bdj',name:'Bosques de Jalapa',     abbr:'BDJ',color:'#8b5cf6',json:'data/powerbi/bdj/resumen-powerbi.json'},
-    {key:'bdp',name:'Bosques de Pinula',      abbr:'BDP',color:'#3b82f6',json:'data/powerbi/bdp/resumen-powerbi.json'},
-    {key:'bse',name:'Bosques de Santa Elena', abbr:'BSE',color:'#10b981',json:'data/powerbi/bse/resumen-powerbi.json'},
-    {key:'cse',name:'Condado Santa Elena',    abbr:'CSE',color:'#f59e0b',json:'data/powerbi/cse/resumen-powerbi.json'},
-    {key:'hlq',name:'Hacienda La Querencia',  abbr:'HLQ',color:'#ef4444',json:'data/powerbi/hlq/resumen-powerbi.json'},
-    {key:'rdb',name:'Reserva del Bosque',     abbr:'RDB',color:'#14b8a6',json:'data/powerbi/rdb/resumen-powerbi.json'},
+    {key:'bdj',name:'Bosques de Jalapa',     json:'data/powerbi/bdj/resumen-powerbi.json'},
+    {key:'bdp',name:'Bosques de Pinula',      json:'data/powerbi/bdp/resumen-powerbi.json'},
+    {key:'bse',name:'Bosques de Santa Elena', json:'data/powerbi/bse/resumen-powerbi.json'},
+    {key:'cse',name:'Condado Santa Elena',    json:'data/powerbi/cse/resumen-powerbi.json'},
+    {key:'hlq',name:'Hacienda La Querencia',  json:'data/powerbi/hlq/resumen-powerbi.json'},
+    {key:'rdb',name:'Reserva del Bosque',     json:'data/powerbi/rdb/resumen-powerbi.json'},
 ];
-const AREA_COLORS=['#60a5fa','#34d399'];
 
 function fmt(v){
     if(!v||isNaN(v))return'—';
     return'Q '+(v/1e6).toLocaleString('es-GT',{minimumFractionDigits:2,maximumFractionDigits:2})+'M';
 }
-function statusColor(p){
-    if(p==null)return'#64748b';
-    return p>=100?'#f87171':p>=90?'#fbbf24':'#4ade80';
-}
-function statusCls(p){
+function pctCls(p){
     if(p==null)return'';
-    return p>=100?'c-red':p>=90?'c-amber':'c-green';
+    return p>=100?'danger':p>=90?'warn':'ok';
+}
+function fmtPct(p){
+    return p!=null?p.toFixed(1)+'%':'—';
 }
 
-function buildGauge(pct, projColor, uid){
-    const R=54, cx=70, cy=70;
-    const circ=2*Math.PI*R;
-    const capped=Math.min(pct||0,100);
-    const sc=statusColor(pct);
-    return `<svg viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-            <filter id="g${uid}" x="-30%" y="-30%" width="160%" height="160%">
-                <feGaussianBlur stdDeviation="4" result="b"/>
-                <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-            </filter>
-            <radialGradient id="ig${uid}" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stop-color="${projColor}" stop-opacity=".08"/>
-                <stop offset="100%" stop-color="${projColor}" stop-opacity="0"/>
-            </radialGradient>
-        </defs>
-        <circle cx="${cx}" cy="${cy}" r="${R}" fill="url(#ig${uid})"/>
-        <circle cx="${cx}" cy="${cy}" r="${R}" stroke="rgba(255,255,255,0.06)" stroke-width="11"/>
-        <circle class="gauge-arc" cx="${cx}" cy="${cy}" r="${R}"
-            stroke="${sc}" stroke-width="11" stroke-linecap="round"
-            stroke-dasharray="0 ${circ}"
-            data-fill="${(capped/100)*circ}" data-circ="${circ}"
-            transform="rotate(-90 ${cx} ${cy})"
-            filter="url(#g${uid})"/>
-    </svg>`;
-}
-
-function buildCard(proj, areas, idx){
+function buildCard(proj,areas){
     const sapTotal =areas.reduce((s,a)=>s+(a.sap||0),0);
     const asigTotal=areas.reduce((s,a)=>s+(a.asig||0),0);
     const pctTotal =sapTotal>0?(asigTotal/sapTotal*100):null;
-    const sc=statusColor(pctTotal);
-    const uid=proj.key;
+    const cls=pctCls(pctTotal);
+
+    // stacked bar widths by SAP proportion
+    const totalSapForBar=areas.reduce((s,a)=>s+(a.sap||0),0)||1;
+    const constrPct=((areas[0]?.sap||0)/totalSapForBar*100).toFixed(1);
+    const urbPct  =((areas[1]?.sap||0)/totalSapForBar*100).toFixed(1);
 
     const areaRows=areas.map((a,i)=>{
         const p=a.sap>0?(a.asig/a.sap*100):null;
-        const ac=AREA_COLORS[i];
-        const pc=statusColor(p);
-        return `<div class="area-item">
-            <div class="area-item-header">
-                <div class="area-item-name">
-                    <div class="area-item-dot" style="background:${ac}"></div>
-                    ${a.name}
-                </div>
-                <span class="area-item-pct" style="color:${pc}">${p!=null?p.toFixed(1)+'%':'—'}</span>
-            </div>
-            <div class="area-track">
-                <div class="area-fill" style="background:${pc}" data-w="${Math.min(p||0,100)}"></div>
-            </div>
-            <div class="area-nums">
-                <span class="area-num">SAP <strong>${fmt(a.sap)}</strong></span>
-                <span class="area-num">Asig. <strong style="color:rgba(96,165,250,.7)">${fmt(a.asig)}</strong></span>
-            </div>
-        </div>`;
+        const dotCls=i===0?'area-dot--constr':'area-dot--urban';
+        const tdPctCls=pctCls(p);
+        return `<tr>
+            <td><span class="td-area-dot"><span class="area-dot ${dotCls}"></span>${a.name}</span></td>
+            <td>${fmt(a.sap)}</td>
+            <td>${fmt(a.asig)}</td>
+            <td class="${tdPctCls}" style="font-weight:700">${fmtPct(p)}</td>
+        </tr>`;
     }).join('');
-
-    const diff=sapTotal>0?(asigTotal-sapTotal):null;
-    const diffStr=diff!=null?(diff>=0?'↑ '+fmt(Math.abs(diff)):'↓ '+fmt(Math.abs(diff))):'';
-    const diffColor=diff!=null?(diff>=0?'#f87171':'#4ade80'):'';
 
     const card=document.createElement('div');
     card.className='pcard';
     card.innerHTML=`
-        <div class="pcard-bar" style="background:${proj.color}"></div>
         <div class="pcard-head">
-            <div class="pcard-name">${proj.name}</div>
-            <div class="pcard-badge" style="background:${proj.color}1a;color:${proj.color};border:1px solid ${proj.color}30">${proj.abbr}</div>
-        </div>
-        <div class="pcard-gauge-area">
-            <div class="gauge-wrap">
-                ${buildGauge(pctTotal,proj.color,uid)}
-                <div class="gauge-center-text">
-                    <div class="gauge-pct-num" style="color:${sc}">${pctTotal!=null?pctTotal.toFixed(1)+'%':'—'}</div>
-                    <div class="gauge-pct-lbl">Asignado</div>
+            <div class="pcard-head-top">
+                <div class="pcard-name">${proj.name}</div>
+                <div class="pcard-pct-group">
+                    <div class="pcard-pct-label">% Asignado</div>
+                    <div class="pcard-pct-val ${cls}">${fmtPct(pctTotal)}</div>
                 </div>
             </div>
         </div>
-        <div class="pcard-stats">
-            <div class="pcard-stat">
-                <div class="pcard-stat-label">Ppto. SAP</div>
-                <div class="pcard-stat-val">${fmt(sapTotal)}</div>
+        <div class="pcard-divider"></div>
+        <table class="pcard-table">
+            <thead>
+                <tr>
+                    <th>Área</th>
+                    <th>Ppto. SAP</th>
+                    <th>Asignado</th>
+                    <th>% Asig.</th>
+                </tr>
+            </thead>
+            <tbody>${areaRows}</tbody>
+            <tfoot>
+                <tr>
+                    <td>Total</td>
+                    <td class="td-sap">${fmt(sapTotal)}</td>
+                    <td class="td-asig">${fmt(asigTotal)}</td>
+                    <td class="td-pct ${cls}">${fmtPct(pctTotal)}</td>
+                </tr>
+            </tfoot>
+        </table>
+        <div class="pcard-bar-wrap">
+            <div class="pcard-bar-track">
+                <div class="pcard-bar-constr" data-w="${constrPct}" style="width:0"></div>
+                <div class="pcard-bar-urban"  data-w="${urbPct}"   style="width:0"></div>
             </div>
-            <div class="pcard-stat">
-                <div class="pcard-stat-label">Asignado</div>
-                <div class="pcard-stat-val v-blue">${fmt(asigTotal)}</div>
-                ${diff!=null?`<div class="pcard-stat-diff" style="color:${diffColor}">${diffStr} vs SAP</div>`:''}
+            <div class="pcard-bar-legend">
+                <div class="pcard-bar-leg-item">
+                    <span class="area-dot area-dot--constr"></span>Construcción (${constrPct}%)
+                </div>
+                <div class="pcard-bar-leg-item">
+                    <span class="area-dot area-dot--urban"></span>Urbanización (${urbPct}%)
+                </div>
             </div>
         </div>
-        <div class="pcard-areas">${areaRows}</div>
     `;
     return card;
 }
 
 function buildTotalCard(sap,asig){
     const pct=sap>0?(asig/sap*100):null;
+    const cls=pctCls(pct);
     const card=document.createElement('div');
     card.className='total-card';
     card.innerHTML=`
-        <div class="total-card-left">
-            <div class="total-card-eyebrow">Consolidado · 6 Proyectos</div>
-            <div class="total-card-title">Total General</div>
-            <div class="total-card-sub">Construcción + Urbanización</div>
+        <div>
+            <div class="total-left-label">Consolidado · 6 Proyectos</div>
+            <div class="total-left-title">Total General</div>
+            <div class="total-left-sub">Construcción + Urbanización</div>
         </div>
-        <div class="total-card-kpis">
+        <div class="total-kpis">
             <div class="total-kpi">
-                <div class="total-kpi-lbl">Ppto. SAP</div>
-                <div class="total-kpi-val c-gold">${fmt(sap)}</div>
+                <div class="total-kpi-label">Ppto. SAP</div>
+                <div class="total-kpi-val t-sap">${fmt(sap)}</div>
             </div>
             <div class="total-sep"></div>
             <div class="total-kpi">
-                <div class="total-kpi-lbl">Asignado</div>
-                <div class="total-kpi-val c-blue">${fmt(asig)}</div>
+                <div class="total-kpi-label">Asignado</div>
+                <div class="total-kpi-val t-asig">${fmt(asig)}</div>
             </div>
             <div class="total-sep"></div>
             <div class="total-kpi">
-                <div class="total-kpi-lbl">% Asignado</div>
-                <div class="total-kpi-val ${statusCls(pct)}">${pct!=null?pct.toFixed(1)+'%':'—'}</div>
+                <div class="total-kpi-label">% Asignado</div>
+                <div class="total-kpi-val t-pct ${cls}">${fmtPct(pct)}</div>
             </div>
         </div>
     `;
     return card;
 }
 
-function animateGauges(){
-    document.querySelectorAll('.gauge-arc').forEach(arc=>{
-        const fill=parseFloat(arc.dataset.fill)||0;
-        const circ=parseFloat(arc.dataset.circ)||1;
-        arc.style.transition='stroke-dasharray 1.1s cubic-bezier(.16,1,.3,1)';
-        arc.setAttribute('stroke-dasharray',`${fill} ${circ}`);
-    });
-    document.querySelectorAll('.area-fill').forEach(bar=>{
-        bar.style.width=(bar.dataset.w||0)+'%';
+function animateBars(){
+    document.querySelectorAll('.pcard-bar-constr,.pcard-bar-urban').forEach(el=>{
+        el.style.width=(el.dataset.w||0)+'%';
     });
 }
 
 function getAreaName(row){
     return row['Rubros[Area]']||row['dimSegmentación[Area]']||row['dimSegmentacion[Area]']||'';
 }
-function getArea(datasets,name){
-    return(datasets?.porArea||[]).find(r=>getAreaName(r).toLowerCase()===name.toLowerCase())||null;
+function getArea(ds,name){
+    return(ds?.porArea||[]).find(r=>getAreaName(r).toLowerCase()===name.toLowerCase())||null;
 }
 
 async function loadSB(){
@@ -603,7 +530,7 @@ async function init(){
         const sbMap=await loadSB();
         const grid=document.getElementById('cards-grid');
         grid.innerHTML='';
-        let gSap=0,gAsig=0,mes='',count=0;
+        let gSap=0,gAsig=0,mes='';
 
         for(const proj of PROJECTS){
             let payload=null,mesA='';
@@ -617,7 +544,6 @@ async function init(){
                 if(j){payload=j;mesA=j.metadata?.filters?.mesA||'';}
             }
             if(!payload)continue;
-            count++;
             if(mesA&&!mes)mes=mesA;
 
             const ds=payload.datasets||payload;
@@ -626,35 +552,35 @@ async function init(){
                 return{name,sap:d?.['[RdiTotal]']??0,asig:d?.['[AsignadoErequester]']??0};
             });
             areas.forEach(a=>{gSap+=a.sap;gAsig+=a.asig;});
-            grid.appendChild(buildCard(proj,areas,count));
+            grid.appendChild(buildCard(proj,areas));
         }
 
         grid.appendChild(buildTotalCard(gSap,gAsig));
 
-        // KPIs
         const gp=gSap>0?(gAsig/gSap*100):null;
         document.getElementById('kpi-sap').textContent=fmt(gSap);
-        const aEl=document.getElementById('kpi-asig');aEl.textContent=fmt(gAsig);
+        document.getElementById('kpi-asig').textContent=fmt(gAsig);
         const pEl=document.getElementById('kpi-pct');
-        pEl.textContent=gp?gp.toFixed(1)+'%':'—';
-        pEl.className='kpi-cell-value '+statusCls(gp);
-        document.getElementById('kpi-count').textContent=count;
+        pEl.textContent=fmtPct(gp);
+        const pcls=pctCls(gp);
+        if(pcls==='ok')pEl.style.color='#15803d';
+        else if(pcls==='warn')pEl.style.color='#d97706';
+        else if(pcls==='danger')pEl.style.color='#dc2626';
 
         const ds=mes?mes.toUpperCase():'—';
-        document.getElementById('date-text').textContent=ds;
-        document.getElementById('pill-date').innerHTML=`
+        document.getElementById('date-text').textContent='Datos al '+ds+' · 6 proyectos activos.';
+        document.getElementById('date-pill').innerHTML=`
             <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>
             Datos al ${ds}`;
 
-        requestAnimationFrame(()=>setTimeout(animateGauges,120));
+        requestAnimationFrame(()=>setTimeout(animateBars,150));
 
     }catch(e){
         console.error(e);
         document.getElementById('cards-grid').innerHTML=
-            `<div style="color:#f87171;padding:48px;grid-column:1/-1;text-align:center;font-size:.85rem;opacity:.8">Error: ${e.message}</div>`;
+            `<div style="color:#dc2626;padding:48px;grid-column:1/-1;text-align:center;font-size:.85rem">Error: ${e.message}</div>`;
     }
 }
-
 document.addEventListener('DOMContentLoaded',init);
 })();
 </script>
