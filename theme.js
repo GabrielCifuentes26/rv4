@@ -7,7 +7,7 @@
         document.body.classList.toggle('dark', dark);
         document.documentElement.classList.remove('dark-pre');
         const btn = document.getElementById('btn-theme');
-        if(btn) btn.textContent = dark ? '☀️' : '🌙';
+        if(btn) btn.textContent = dark ? '🌙' : '☀️';
     }
 
     window.toggleTheme = function(){

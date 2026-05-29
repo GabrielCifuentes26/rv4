@@ -900,7 +900,7 @@
 
     <div class="nav-actions">
         <a href="admin.html" class="btn-admin" id="btnAdmin" style="display:none">Admin</a>
-        <button id="btn-theme" class="btn-theme" title="Cambiar tema" onclick="toggleTheme()">🌙</button>
+        <button id="btn-theme" class="btn-theme" title="Cambiar tema" onclick="toggleTheme()">☀️</button>
         <button id="btn-tour" class="btn-tour" title="Tour guiado">?</button>
         <button onclick="doLogout()" class="btn-logout">Cerrar sesión</button>
     </div>
@@ -1736,7 +1736,7 @@
     window.toggleTheme = function() {
         const isDark = !document.body.classList.contains('dark');
         document.body.classList.toggle('dark', isDark);
-        document.getElementById('btn-theme').textContent = isDark ? '☀️' : '🌙';
+        document.getElementById('btn-theme').textContent = isDark ? '🌙' : '☀️';
         localStorage.setItem('rv4-theme', isDark ? 'dark' : 'light');
         const savedIdx = current;
         slides = isDark ? slidesNight : slidesDay;
