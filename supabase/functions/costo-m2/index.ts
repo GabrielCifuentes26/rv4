@@ -10,7 +10,6 @@ Deno.serve(async (req) => {
     return new Response('ok', { headers: corsHeaders })
   }
 
-  // Validar API key
   const apiKey = req.headers.get('x-api-key')
   if (!apiKey || apiKey !== Deno.env.get('HUB_API_KEY')) {
     return new Response(JSON.stringify({ error: 'No autorizado.' }), {
@@ -25,7 +24,6 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     )
 
-    // Leer datos vigentes de tipología (is_current = true)
     const { data: rows, error } = await admin
       .from('casas_tipologia')
       .select('project_key, m2, tipologia, costo_m2, fecha')
@@ -34,24 +32,32 @@ Deno.serve(async (req) => {
 
     if (error) throw error
 
+    // Recopilar todos los proyectos únicos presentes en los datos
+    const todosProyectos = Array.from(
+      new Set((rows ?? []).map(r => r.project_key.toUpperCase()))
+    ).sort()
+
     // Agrupar por (m2, tipologia)
     const grupos = new Map<string, {
       m2: number
       tipologia: string
-      proyectos: Record<string, number>
+      proyectos: Record<string, number | null>
     }>()
 
     for (const row of rows ?? []) {
       const key = `${row.m2}__${row.tipologia}`
       if (!grupos.has(key)) {
-        grupos.set(key, { m2: row.m2, tipologia: row.tipologia, proyectos: {} })
+        // Inicializar con null para TODOS los proyectos
+        const proyectosVacios: Record<string, number | null> = {}
+        for (const p of todosProyectos) proyectosVacios[p] = null
+        grupos.set(key, { m2: row.m2, tipologia: row.tipologia, proyectos: proyectosVacios })
       }
       grupos.get(key)!.proyectos[row.project_key.toUpperCase()] = Number(row.costo_m2)
     }
 
     // Calcular promedio e IBC por grupo
     const tipologias = Array.from(grupos.values()).map((g) => {
-      const costos = Object.values(g.proyectos)
+      const costos = Object.values(g.proyectos).filter(v => v !== null) as number[]
       const promedio = costos.length > 0
         ? costos.reduce((a, b) => a + b, 0) / costos.length
         : 0
@@ -60,24 +66,18 @@ Deno.serve(async (req) => {
         : 0
 
       return {
-        m2: g.m2,
+        metros: g.m2,
         tipologia: g.tipologia,
         proyectos: g.proyectos,
-        promedio: Number(promedio.toFixed(2)),
+        promedio_costo_m2: Number(promedio.toFixed(2)),
         ibc_pct,
       }
     })
 
-    // Calcular más y menos conveniente (por IBC)
     const conIbc = tipologias.filter(t => t.ibc_pct > 0)
-    const masConveniente  = conIbc.length > 0
-      ? conIbc.reduce((a, b) => a.ibc_pct > b.ibc_pct ? a : b)
-      : null
-    const menosConveniente = conIbc.length > 0
-      ? conIbc.reduce((a, b) => a.ibc_pct < b.ibc_pct ? a : b)
-      : null
+    const masConveniente   = conIbc.length > 0 ? conIbc.reduce((a, b) => a.ibc_pct > b.ibc_pct ? a : b) : null
+    const menosConveniente = conIbc.length > 0 ? conIbc.reduce((a, b) => a.ibc_pct < b.ibc_pct ? a : b) : null
 
-    // Fecha de última actualización
     const ultimaFecha = (rows ?? []).reduce((latest, r) => {
       return r.fecha && r.fecha > latest ? r.fecha : latest
     }, '')
@@ -86,12 +86,13 @@ Deno.serve(async (req) => {
       sistema: 'Costo por M² — Costos&Presupuestos',
       generadoEn: new Date().toISOString(),
       ultimaActualizacion: ultimaFecha || null,
+      proyectos: todosProyectos,
       tipologias,
       masConveniente: masConveniente
-        ? { m2: masConveniente.m2, tipologia: masConveniente.tipologia, promedio: masConveniente.promedio, ibc_pct: masConveniente.ibc_pct }
+        ? { metros: masConveniente.metros, tipologia: masConveniente.tipologia, promedio_costo_m2: masConveniente.promedio_costo_m2, ibc_pct: masConveniente.ibc_pct }
         : null,
       menosConveniente: menosConveniente
-        ? { m2: menosConveniente.m2, tipologia: menosConveniente.tipologia, promedio: menosConveniente.promedio, ibc_pct: menosConveniente.ibc_pct }
+        ? { metros: menosConveniente.metros, tipologia: menosConveniente.tipologia, promedio_costo_m2: menosConveniente.promedio_costo_m2, ibc_pct: menosConveniente.ibc_pct }
         : null,
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
