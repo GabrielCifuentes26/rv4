@@ -21,6 +21,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
+    <link rel="stylesheet" href="dark.css">
+    <script src="theme.js"></script>
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
@@ -340,6 +342,40 @@
         .chart-kpi-val { font-size: 0.82rem; font-weight: 800; color: var(--navy); }
         .chart-wrap { position: relative; height: 460px; }
 
+        /* ── DARK MODE btn-theme ── */
+        .btn-theme {
+            display: flex; align-items: center; justify-content: center;
+            width: 34px; height: 34px; border-radius: 8px;
+            background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
+            font-size: 1rem; cursor: pointer; transition: background .18s;
+        }
+        .btn-theme:hover { background: rgba(255,255,255,0.14); }
+
+        /* ── DARK MODE overrides ── */
+        body.dark .page-hero { background: var(--surface); border-color: var(--border); }
+        body.dark .m2-table tbody tr:not(:last-child) td { border-bottom-color: var(--border); }
+        body.dark .m2-table tfoot td { color: #34d399; border-top-color: var(--border); }
+        body.dark .tipo-table thead tr { background: #1e293b; }
+        body.dark .tipo-table thead th { background: #1e293b; color: var(--gray); border-bottom-color: var(--border); }
+        body.dark .tipo-table tbody tr:nth-child(even) { background: #1a2738; }
+        body.dark .tipo-table tbody tr:hover { background: #253040; }
+        body.dark .tipo-table tbody tr:not(:last-child) td { border-bottom-color: var(--border); }
+        body.dark .tipo-ibc-val { background: #273549; color: var(--gray2); }
+        body.dark .tipo-badge--duplex { background: rgba(37,99,235,0.18); color: #60a5fa; border-color: rgba(37,99,235,0.35); }
+        body.dark .tipo-badge--individual { background: rgba(22,163,74,0.15); color: #34d399; border-color: rgba(22,163,74,0.30); }
+        body.dark .tipo-proj-val { color: var(--navy); }
+        body.dark .tipo-cost { color: #34d399; }
+        body.dark .tipo-metros { color: var(--gray); }
+        body.dark .insight-tag--best { background: rgba(52,211,153,0.15); color: #34d399; }
+        body.dark .insight-tag--worst { background: rgba(251,191,36,0.15); color: #fbbf24; }
+        body.dark .insight-name { color: var(--navy); }
+        body.dark .insight-stat-val { color: var(--navy); }
+        body.dark .chart-kpi { background: #273549; border-color: var(--border); }
+        body.dark .chart-kpi-val { color: var(--navy); }
+        body.dark .m2-bar { background: #334155; }
+        body.dark .hero-kpi--casas { background: rgba(201,168,76,0.10); border-color: rgba(201,168,76,0.30); }
+        body.dark .hero-kpi--urb   { background: rgba(59,130,246,0.10); border-color: rgba(59,130,246,0.25); }
+
         /* Loading state */
         .m2-loading {
             grid-column: 1/-1;
@@ -364,6 +400,7 @@
             <div class="topbar-page-sub">Proyectos Casas</div>
         </div>
         <div class="topbar-right">
+            <button class="btn-theme" id="btn-theme" onclick="toggleTheme()" title="Cambiar modo">☀️</button>
             <button class="btn-logout" id="btn-logout">
                 <svg viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5-5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
                 Salir
@@ -612,6 +649,8 @@ function renderCard(p, idx, allProjects) {
     </div>`;
 }
 
+let m2ChartInstance = null;
+
 function renderChart() {
     const chartData = PROJECTS.map(p => {
         const m2    = PROJECT_M2[p.key];
@@ -661,7 +700,14 @@ function renderChart() {
     document.getElementById('chartSection').style.display = '';
     Chart.register(ChartDataLabels);
 
-    new Chart(document.getElementById('m2Chart'), {
+    const dark = document.body.classList.contains('dark');
+    const clrGrid   = dark ? '#1e293b' : '#f1f5f9';
+    const clrXTick  = dark ? '#94a3b8' : '#cbd5e1';
+    const clrYTick  = dark ? '#e2e8f0' : '#334155';
+    const clrLabel  = dark ? '#94a3b8' : '#475569';
+
+    if (m2ChartInstance) { m2ChartInstance.destroy(); }
+    m2ChartInstance = new Chart(document.getElementById('m2Chart'), {
         type: 'bar',
         data: {
             labels,
@@ -717,7 +763,7 @@ function renderChart() {
                     align: 'end',
                     formatter: (v) => `Q ${v.toLocaleString('es-GT')}`,
                     font: { family: 'Inter', size: 10, weight: '700' },
-                    color: '#475569',
+                    color: clrLabel,
                     padding: { left: 4 },
                 },
                 annotation: {
@@ -735,10 +781,10 @@ function renderChart() {
             },
             scales: {
                 x: {
-                    grid: { color: '#f1f5f9' },
+                    grid: { color: clrGrid },
                     ticks: {
                         font: { family: 'Inter', size: 10 },
-                        color: '#cbd5e1',
+                        color: clrXTick,
                         callback: (v) => `Q ${(v/1000).toFixed(0)}k`,
                         maxTicksLimit: 7,
                     },
@@ -748,7 +794,7 @@ function renderChart() {
                     grid: { display: false },
                     ticks: {
                         font: { family: 'Inter', size: 11, weight: '600' },
-                        color: '#334155',
+                        color: clrYTick,
                         padding: 10,
                     },
                 },
@@ -872,6 +918,13 @@ async function init() {
 }
 
 init();
+
+// Regenerar gráfico al cambiar tema
+const _baseToggle = window.toggleTheme;
+window.toggleTheme = function() {
+    _baseToggle();
+    if (document.getElementById('chartSection').style.display !== 'none') renderChart();
+};
 </script>
 </body>
 </html>
