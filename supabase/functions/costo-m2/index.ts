@@ -56,16 +56,14 @@ Deno.serve(async (req) => {
     for (const row of rows ?? []) {
       const key = `${row.m2}__${row.tipologia}`
       if (!grupos.has(key)) {
-        const init: Record<string, { costo_m2: number | null; fecha: string | null; costo_unitario_gtq: number | null }> = {}
-        for (const p of todosProyectos) init[p] = { costo_m2: null, fecha: null, costo_unitario_gtq: null }
+        const init: Record<string, { costo_m2: number | null; fecha: string | null }> = {}
+        for (const p of todosProyectos) init[p] = { costo_m2: null, fecha: null }
         grupos.set(key, { m2: row.m2, tipologia: row.tipologia, proyectos: init })
       }
       const costo = Number(row.costo_m2)
-      const m2val = Number(row.m2)
       grupos.get(key)!.proyectos[row.project_key.toUpperCase()] = {
-        costo_m2:         costo,
-        fecha:            row.fecha ?? null,
-        costo_unitario_gtq: Math.round(costo * m2val),
+        costo_m2: costo,
+        fecha:    row.fecha ?? null,
       }
     }
 
@@ -79,22 +77,20 @@ Deno.serve(async (req) => {
         ? Number(((g.m2 / promedio) * 100).toFixed(2)) : 0
 
       return {
-        metros_construccion:        g.m2,
-        tipologia:                  g.tipologia,
-        moneda:                     'GTQ',
-        promedio_costo_m2_gtq:      Number(promedio.toFixed(2)),
-        costo_unitario_promedio_gtq: Math.round(promedio * g.m2),
+        metros_construccion:   g.m2,
+        tipologia:             g.tipologia,
+        moneda:                'GTQ',
+        promedio_costo_m2_gtq: Number(promedio.toFixed(2)),
         ibc_pct,
         incluye: 'Costo directo de construcción de la unidad habitacional. No incluye urbanización, indirectos, licencias ni equipamiento.',
         proyectos: Object.fromEntries(
           Object.entries(g.proyectos).map(([codigo, v]) => [
             codigo,
             v.costo_m2 !== null ? {
-              codigo_proyecto:     codigo,
-              nombre_proyecto:     NOMBRES[codigo] ?? codigo,
-              costo_m2_gtq:        v.costo_m2,
-              costo_unitario_gtq:  v.costo_unitario_gtq,
-              fecha_vigencia:      v.fecha,
+              codigo_proyecto: codigo,
+              nombre_proyecto: NOMBRES[codigo] ?? codigo,
+              costo_m2_gtq:    v.costo_m2,
+              fecha_vigencia:  v.fecha,
             } : null,
           ])
         ),
