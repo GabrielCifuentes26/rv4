@@ -66,8 +66,7 @@ body.dark .wip-badge       { background: #253040 !important; border-color: #3341
 
 /* Prop cards */
 body.dark .prop-card       { background: var(--surface) !important; border-color: var(--border) !important; }
-body.dark .prop-img        { background: #253040 !important; position: relative; }
-body.dark .prop-img img    { filter: brightness(0.72) !important; }
+body.dark .prop-img        { filter: brightness(0.68) !important; position: relative; }
 body.dark .prop-name       { color: var(--navy) !important; }
 body.dark .prop-cta        { background: rgba(52,211,153,0.12) !important; color: #34d399 !important; }
 body.dark .prop-card:hover .prop-cta { background: #34d399 !important; color: #0f172a !important; }
