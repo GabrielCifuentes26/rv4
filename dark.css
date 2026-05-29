@@ -6,6 +6,12 @@
 /* Pre-apply class to avoid flash before DOMContentLoaded */
 .dark-pre body { background: #0f172a !important; }
 
+/* html.dark: se aplica inmediatamente desde theme.js antes de que body exista */
+html.dark body {
+    background: #0f172a !important;
+    color: #f1f5f9 !important;
+}
+
 /* ── Variables globales ─────────────────────────────── */
 body.dark {
     --bg:        #0f172a;
