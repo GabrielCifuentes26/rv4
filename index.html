@@ -1612,7 +1612,7 @@
         'imagenes de proyectos/render 2 Noche.png',
         'imagenes de proyectos/render 3 Noche.png'
     ];
-    let slides = document.body.classList.contains('dark') ? slidesNight : slidesDay;
+    let slides = localStorage.getItem('rv4-theme') === 'dark' ? slidesNight : slidesDay;
     let current = 0, timer = null;
 
     function preloadImages(urls) {
@@ -1625,7 +1625,7 @@
         // Precarga imágenes activas inmediatamente
         preloadImages(slides);
         // Precarga imágenes del otro tema en segundo plano (después de 2s para no competir)
-        setTimeout(() => preloadImages(document.body.classList.contains('dark') ? slidesDay : slidesNight), 2000);
+        setTimeout(() => preloadImages(localStorage.getItem('rv4-theme') === 'dark' ? slidesDay : slidesNight), 2000);
         timer = setInterval(() => showSlide((current + 1) % slides.length), 7000);
     }
 
