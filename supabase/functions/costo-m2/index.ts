@@ -5,6 +5,15 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-api-key',
 }
 
+const NOMBRES: Record<string, string> = {
+  BDJ: 'Bosques de Jalapa',
+  BDP: 'Bosques de Pinula',
+  BSE: 'Bosques de Santa Elena',
+  CSE: 'Condado Santa Elena',
+  HLQ: 'Hacienda La Querencia',
+  RDB: 'Reserva del Bosque',
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
@@ -32,45 +41,63 @@ Deno.serve(async (req) => {
 
     if (error) throw error
 
-    // Recopilar todos los proyectos únicos presentes en los datos
+    // Proyectos únicos presentes
     const todosProyectos = Array.from(
       new Set((rows ?? []).map(r => r.project_key.toUpperCase()))
     ).sort()
 
-    // Agrupar por (m2, tipologia)
+    // Agrupar por (m2, tipologia), guardando costo_m2 y fecha por proyecto
     const grupos = new Map<string, {
       m2: number
       tipologia: string
-      proyectos: Record<string, number | null>
+      proyectos: Record<string, { costo_m2: number | null; fecha: string | null; costo_unitario_gtq: number | null }>
     }>()
 
     for (const row of rows ?? []) {
       const key = `${row.m2}__${row.tipologia}`
       if (!grupos.has(key)) {
-        // Inicializar con null para TODOS los proyectos
-        const proyectosVacios: Record<string, number | null> = {}
-        for (const p of todosProyectos) proyectosVacios[p] = null
-        grupos.set(key, { m2: row.m2, tipologia: row.tipologia, proyectos: proyectosVacios })
+        const init: Record<string, { costo_m2: number | null; fecha: string | null; costo_unitario_gtq: number | null }> = {}
+        for (const p of todosProyectos) init[p] = { costo_m2: null, fecha: null, costo_unitario_gtq: null }
+        grupos.set(key, { m2: row.m2, tipologia: row.tipologia, proyectos: init })
       }
-      grupos.get(key)!.proyectos[row.project_key.toUpperCase()] = Number(row.costo_m2)
+      const costo = Number(row.costo_m2)
+      const m2val = Number(row.m2)
+      grupos.get(key)!.proyectos[row.project_key.toUpperCase()] = {
+        costo_m2:         costo,
+        fecha:            row.fecha ?? null,
+        costo_unitario_gtq: Math.round(costo * m2val),
+      }
     }
 
-    // Calcular promedio e IBC por grupo
+    // Calcular promedio, IBC y costo unitario promedio por grupo
     const tipologias = Array.from(grupos.values()).map((g) => {
-      const costos = Object.values(g.proyectos).filter(v => v !== null) as number[]
+      const vals = Object.values(g.proyectos).filter(v => v.costo_m2 !== null)
+      const costos = vals.map(v => v.costo_m2 as number)
       const promedio = costos.length > 0
-        ? costos.reduce((a, b) => a + b, 0) / costos.length
-        : 0
+        ? costos.reduce((a, b) => a + b, 0) / costos.length : 0
       const ibc_pct = promedio > 0
-        ? Number(((g.m2 / promedio) * 100).toFixed(2))
-        : 0
+        ? Number(((g.m2 / promedio) * 100).toFixed(2)) : 0
 
       return {
-        metros: g.m2,
-        tipologia: g.tipologia,
-        proyectos: g.proyectos,
-        promedio_costo_m2: Number(promedio.toFixed(2)),
+        metros_construccion:        g.m2,
+        tipologia:                  g.tipologia,
+        moneda:                     'GTQ',
+        promedio_costo_m2_gtq:      Number(promedio.toFixed(2)),
+        costo_unitario_promedio_gtq: Math.round(promedio * g.m2),
         ibc_pct,
+        incluye: 'Costo directo de construcción de la unidad habitacional. No incluye urbanización, indirectos, licencias ni equipamiento.',
+        proyectos: Object.fromEntries(
+          Object.entries(g.proyectos).map(([codigo, v]) => [
+            codigo,
+            v.costo_m2 !== null ? {
+              codigo_proyecto:     codigo,
+              nombre_proyecto:     NOMBRES[codigo] ?? codigo,
+              costo_m2_gtq:        v.costo_m2,
+              costo_unitario_gtq:  v.costo_unitario_gtq,
+              fecha_vigencia:      v.fecha,
+            } : null,
+          ])
+        ),
       }
     })
 
@@ -83,17 +110,15 @@ Deno.serve(async (req) => {
     }, '')
 
     return new Response(JSON.stringify({
-      sistema: 'Costo por M² — Costos&Presupuestos',
-      generadoEn: new Date().toISOString(),
-      ultimaActualizacion: ultimaFecha || null,
-      proyectos: todosProyectos,
+      sistema:              'Costo por M² por Tipología — Costos&Presupuestos',
+      generadoEn:           new Date().toISOString(),
+      moneda:               'GTQ',
+      tipo_cambio_referencia: 'GTQ/USD ≈ 7.80',
+      ultima_actualizacion: ultimaFecha || null,
+      proyectos_disponibles: todosProyectos.map(c => ({ codigo: c, nombre: NOMBRES[c] ?? c })),
       tipologias,
-      masConveniente: masConveniente
-        ? { metros: masConveniente.metros, tipologia: masConveniente.tipologia, promedio_costo_m2: masConveniente.promedio_costo_m2, ibc_pct: masConveniente.ibc_pct }
-        : null,
-      menosConveniente: menosConveniente
-        ? { metros: menosConveniente.metros, tipologia: menosConveniente.tipologia, promedio_costo_m2: menosConveniente.promedio_costo_m2, ibc_pct: menosConveniente.ibc_pct }
-        : null,
+      masConveniente:  masConveniente  ? { metros_construccion: masConveniente.metros_construccion,  tipologia: masConveniente.tipologia,  promedio_costo_m2_gtq: masConveniente.promedio_costo_m2_gtq,  costo_unitario_promedio_gtq: masConveniente.costo_unitario_promedio_gtq,  ibc_pct: masConveniente.ibc_pct  } : null,
+      menosConveniente: menosConveniente ? { metros_construccion: menosConveniente.metros_construccion, tipologia: menosConveniente.tipologia, promedio_costo_m2_gtq: menosConveniente.promedio_costo_m2_gtq, costo_unitario_promedio_gtq: menosConveniente.costo_unitario_promedio_gtq, ibc_pct: menosConveniente.ibc_pct } : null,
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
