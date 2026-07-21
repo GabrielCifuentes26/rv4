@@ -1,6 +1,6 @@
 {
     "metadata":  {
-                     "generatedAt":  "2026-07-13T17:55:50.8295356Z",
+                     "generatedAt":  "2026-07-21T17:09:07.2350115Z",
                      "workspaceId":  "d111fc11-b7f3-4976-b74b-99f47f06bd22",
                      "reportId":  "f3fdef8d-947a-4e1a-9188-c774420fde9c",
                      "datasetId":  "68161d1e-2ef3-4916-a65c-3e86d4abb2bc",
@@ -20,37 +20,37 @@
                      "totales":  [
                                      {
                                          "[RdiTotal]":  162077315.88769463,
-                                         "[PresupuestoErequester]":  162692391.9519999,
-                                         "[EjecutadoErequester]":  139748785.54199997,
-                                         "[ComprometidoErequester]":  17113336.339999992,
-                                         "[AsignadoErequester]":  156862121.88199997,
-                                         "[DisponibleErequester]":  5830270.0699999956,
-                                         "[PorcentajeAsignado]":  0.96416384318868409,
-                                         "[PorcentajeDisponible]":  0.035836156811316258
+                                         "[PresupuestoErequester]":  162692391.95199993,
+                                         "[EjecutadoErequester]":  140014366.732,
+                                         "[ComprometidoErequester]":  16451947.149999993,
+                                         "[AsignadoErequester]":  156466313.882,
+                                         "[DisponibleErequester]":  6226078.0699999975,
+                                         "[PorcentajeAsignado]":  0.96173098203733554,
+                                         "[PorcentajeDisponible]":  0.03826901796266486
                                      }
                                  ],
                      "porArea":  [
                                      {
                                          "Rubros[Area]":  "Construcción",
                                          "[RdiTotal]":  126877474.2141269,
-                                         "[PresupuestoErequester]":  124201121.19600005,
-                                         "[EjecutadoErequester]":  105566571.22400005,
-                                         "[ComprometidoErequester]":  14170749.441999977,
-                                         "[AsignadoErequester]":  119737320.66600008,
-                                         "[DisponibleErequester]":  4463800.5299999947,
-                                         "[PorcentajeAsignado]":  0.96405990149673682,
-                                         "[PorcentajeDisponible]":  0.035940098503263379
+                                         "[PresupuestoErequester]":  124397498.68600005,
+                                         "[EjecutadoErequester]":  105785512.31400004,
+                                         "[ComprometidoErequester]":  13569703.691999985,
+                                         "[AsignadoErequester]":  119355216.00600009,
+                                         "[DisponibleErequester]":  5042282.679999995,
+                                         "[PorcentajeAsignado]":  0.95946636601811808,
+                                         "[PorcentajeDisponible]":  0.040533633981882179
                                      },
                                      {
                                          "Rubros[Area]":  "Urbanización",
                                          "[RdiTotal]":  35199841.673567764,
-                                         "[PresupuestoErequester]":  38491270.756000005,
-                                         "[EjecutadoErequester]":  34182214.318000011,
-                                         "[ComprometidoErequester]":  2942586.8979999986,
-                                         "[AsignadoErequester]":  37124801.216000013,
-                                         "[DisponibleErequester]":  1366469.5400000012,
-                                         "[PorcentajeAsignado]":  0.96449923545880889,
-                                         "[PorcentajeDisponible]":  0.035500764541191367
+                                         "[PresupuestoErequester]":  38294893.26600001,
+                                         "[EjecutadoErequester]":  34228854.41800002,
+                                         "[ComprometidoErequester]":  2882243.4579999996,
+                                         "[AsignadoErequester]":  37111097.876000017,
+                                         "[DisponibleErequester]":  1183795.3900000001,
+                                         "[PorcentajeAsignado]":  0.96908738244085868,
+                                         "[PorcentajeDisponible]":  0.030912617559141466
                                      }
                                  ],
                      "porEtapa":  [
@@ -68,13 +68,13 @@
                                       {
                                           "Rubros[Etapa]":  "1.4 Fee Construcción",
                                           "[RdiTotal]":  8752161.2322826516,
-                                          "[PresupuestoErequester]":  9852161.23,
+                                          "[PresupuestoErequester]":  9934437.32,
                                           "[EjecutadoErequester]":  8604164.39,
                                           "[ComprometidoErequester]":  1247966.0,
                                           "[AsignadoErequester]":  9852130.39,
-                                          "[DisponibleErequester]":  30.839999999850988,
-                                          "[PorcentajeAsignado]":  0.99999686972236046,
-                                          "[PorcentajeDisponible]":  3.1302776395845673E-06
+                                          "[DisponibleErequester]":  82306.9299999997,
+                                          "[PorcentajeAsignado]":  0.9917149882425349,
+                                          "[PorcentajeDisponible]":  0.0082850117574650613
                                       },
                                       {
                                           "Rubros[Etapa]":  "2.01 GENERALES Y PROVISIONALES",
@@ -101,46 +101,46 @@
                                       {
                                           "Rubros[Etapa]":  "2.03 PAVIMENTACION Y BANQUETAS",
                                           "[RdiTotal]":  3386302.83,
-                                          "[PresupuestoErequester]":  3328354.864,
-                                          "[EjecutadoErequester]":  3146648.9879999994,
+                                          "[PresupuestoErequester]":  3346581.1140000005,
+                                          "[EjecutadoErequester]":  3146648.987999999,
                                           "[ComprometidoErequester]":  170435.71600000001,
-                                          "[AsignadoErequester]":  3317084.704,
-                                          "[DisponibleErequester]":  11270.160000000111,
-                                          "[PorcentajeAsignado]":  0.99661389471360162,
-                                          "[PorcentajeDisponible]":  0.003386105286398365
+                                          "[AsignadoErequester]":  3317084.7040000004,
+                                          "[DisponibleErequester]":  29496.410000000025,
+                                          "[PorcentajeAsignado]":  0.99118610635893278,
+                                          "[PorcentajeDisponible]":  0.00881389364106715
                                       },
                                       {
                                           "Rubros[Etapa]":  "2.04 RELLENOS DE ZANJAS",
                                           "[RdiTotal]":  1031947.81,
-                                          "[PresupuestoErequester]":  911870.66800000006,
+                                          "[PresupuestoErequester]":  912156.288,
                                           "[EjecutadoErequester]":  899951.394,
                                           "[ComprometidoErequester]":  12204.766,
                                           "[AsignadoErequester]":  912156.15999999992,
-                                          "[DisponibleErequester]":  -285.492000000007,
-                                          "[PorcentajeAsignado]":  1.0003130838725474,
-                                          "[PorcentajeDisponible]":  -0.00031308387254760012
+                                          "[DisponibleErequester]":  0.127999999988333,
+                                          "[PorcentajeAsignado]":  0.9999998596731704,
+                                          "[PorcentajeDisponible]":  1.4032682959297102E-07
                                       },
                                       {
                                           "Rubros[Etapa]":  "2.05 OBRA CIVIL INSTALACIONES HIDRAULICAS",
                                           "[RdiTotal]":  2096520.5,
-                                          "[PresupuestoErequester]":  1844731.346,
-                                          "[EjecutadoErequester]":  1584231.5440000002,
-                                          "[ComprometidoErequester]":  231509.79,
-                                          "[AsignadoErequester]":  1815741.3339999998,
-                                          "[DisponibleErequester]":  28990.012000000053,
-                                          "[PorcentajeAsignado]":  0.98428496807252708,
-                                          "[PorcentajeDisponible]":  0.015715031927472898
+                                          "[PresupuestoErequester]":  1860934.686,
+                                          "[EjecutadoErequester]":  1584231.544,
+                                          "[ComprometidoErequester]":  273054.8,
+                                          "[AsignadoErequester]":  1857286.3439999998,
+                                          "[DisponibleErequester]":  3648.3420000000128,
+                                          "[PorcentajeAsignado]":  0.99803951099012389,
+                                          "[PorcentajeDisponible]":  0.0019604890098759826
                                       },
                                       {
                                           "Rubros[Etapa]":  "2.06 INSTALACIONES HIDRAULICAS",
                                           "[RdiTotal]":  2786364.96,
-                                          "[PresupuestoErequester]":  2460694.582,
+                                          "[PresupuestoErequester]":  2467929.962,
                                           "[EjecutadoErequester]":  2175325.3279999997,
-                                          "[ComprometidoErequester]":  289166.676,
+                                          "[ComprometidoErequester]":  289166.67600000004,
                                           "[AsignadoErequester]":  2464492.0039999997,
-                                          "[DisponibleErequester]":  -3797.4219999999941,
-                                          "[PorcentajeAsignado]":  1.0015432317475634,
-                                          "[PorcentajeDisponible]":  -0.0015432317475635399
+                                          "[DisponibleErequester]":  3437.9580000000251,
+                                          "[PorcentajeAsignado]":  0.99860694669097738,
+                                          "[PorcentajeDisponible]":  0.0013930533090225619
                                       },
                                       {
                                           "Rubros[Etapa]":  "2.07 TANQUE ELEVADO",
@@ -167,24 +167,24 @@
                                       {
                                           "Rubros[Etapa]":  "2.09 MURO PERIMETRAL",
                                           "[RdiTotal]":  1776960.34,
-                                          "[PresupuestoErequester]":  1563204.8159999999,
-                                          "[EjecutadoErequester]":  1294802.716,
-                                          "[ComprometidoErequester]":  272513.69,
-                                          "[AsignadoErequester]":  1567316.4059999997,
-                                          "[DisponibleErequester]":  -4111.5899999999929,
-                                          "[PorcentajeAsignado]":  1.0026302311494413,
-                                          "[PorcentajeDisponible]":  -0.0026302311494413879
+                                          "[PresupuestoErequester]":  1563471.456,
+                                          "[EjecutadoErequester]":  1294802.7159999998,
+                                          "[ComprometidoErequester]":  218840.13,
+                                          "[AsignadoErequester]":  1513642.8459999997,
+                                          "[DisponibleErequester]":  49828.61,
+                                          "[PorcentajeAsignado]":  0.96812950450180757,
+                                          "[PorcentajeDisponible]":  0.031870495498192195
                                       },
                                       {
                                           "Rubros[Etapa]":  "2.11 MURO DE MAMPOSTERIA",
                                           "[RdiTotal]":  3136514.17,
-                                          "[PresupuestoErequester]":  2257175.05,
+                                          "[PresupuestoErequester]":  2021016.12,
                                           "[EjecutadoErequester]":  1740980.6500000001,
-                                          "[ComprometidoErequester]":  83918.31,
-                                          "[AsignadoErequester]":  1824898.9600000002,
-                                          "[DisponibleErequester]":  432276.09,
-                                          "[PorcentajeAsignado]":  0.80848800805236631,
-                                          "[PorcentajeDisponible]":  0.19151199194763385
+                                          "[ComprometidoErequester]":  82343.51999999999,
+                                          "[AsignadoErequester]":  1823324.1700000002,
+                                          "[DisponibleErequester]":  197691.95,
+                                          "[PorcentajeAsignado]":  0.90218190342786586,
+                                          "[PorcentajeDisponible]":  0.097818096572134222
                                       },
                                       {
                                           "Rubros[Etapa]":  "2.12 COLUMNA DE CONTADORES",
@@ -278,8 +278,8 @@
                                           "Rubros[Etapa]":  "2.20 DESVIACIONES APROBADAS",
                                           "[RdiTotal]":  0.0,
                                           "[PresupuestoErequester]":  1091426.95,
-                                          "[EjecutadoErequester]":  422540.1,
-                                          "[ComprometidoErequester]":  602786.83,
+                                          "[EjecutadoErequester]":  469180.19999999995,
+                                          "[ComprometidoErequester]":  556146.73,
                                           "[AsignadoErequester]":  1025326.9299999999,
                                           "[DisponibleErequester]":  66100.020000000019,
                                           "[PorcentajeAsignado]":  0.93943706447783792,
@@ -310,86 +310,86 @@
                                       {
                                           "Rubros[Etapa]":  "3.01 OBRA GRIS",
                                           "[RdiTotal]":  13403325.430219088,
-                                          "[PresupuestoErequester]":  13792381.110000003,
-                                          "[EjecutadoErequester]":  12305123.814000001,
-                                          "[ComprometidoErequester]":  1087125.45,
-                                          "[AsignadoErequester]":  13392249.264000004,
-                                          "[DisponibleErequester]":  400131.84600000049,
-                                          "[PorcentajeAsignado]":  0.97098892186861863,
-                                          "[PorcentajeDisponible]":  0.029011078131381506
+                                          "[PresupuestoErequester]":  13788498.270000003,
+                                          "[EjecutadoErequester]":  12392703.594,
+                                          "[ComprometidoErequester]":  999545.67,
+                                          "[AsignadoErequester]":  13392249.264,
+                                          "[DisponibleErequester]":  396249.00600000017,
+                                          "[PorcentajeAsignado]":  0.97126235227065061,
+                                          "[PorcentajeDisponible]":  0.028737647729349142
                                       },
                                       {
                                           "Rubros[Etapa]":  "3.02 ACERO",
                                           "[RdiTotal]":  14210593.245912042,
-                                          "[PresupuestoErequester]":  11818900.836000003,
+                                          "[PresupuestoErequester]":  11815017.996000003,
                                           "[EjecutadoErequester]":  11521669.870000001,
                                           "[ComprometidoErequester]":  226246.05599999998,
                                           "[AsignadoErequester]":  11747915.926,
-                                          "[DisponibleErequester]":  70984.910000000193,
-                                          "[PorcentajeAsignado]":  0.99399394994636181,
-                                          "[PorcentajeDisponible]":  0.0060060500536380148
+                                          "[DisponibleErequester]":  67102.070000000167,
+                                          "[PorcentajeAsignado]":  0.99432061212071621,
+                                          "[PorcentajeDisponible]":  0.0056793878792836122
                                       },
                                       {
                                           "Rubros[Etapa]":  "3.03 CONCRETO",
                                           "[RdiTotal]":  17578830.166521955,
-                                          "[PresupuestoErequester]":  17362146.802,
-                                          "[EjecutadoErequester]":  16881287.636000004,
-                                          "[ComprometidoErequester]":  430905.92,
-                                          "[AsignadoErequester]":  17312193.556,
-                                          "[DisponibleErequester]":  49953.245999999745,
-                                          "[PorcentajeAsignado]":  0.99712286466819611,
-                                          "[PorcentajeDisponible]":  0.0028771353318038685
+                                          "[PresupuestoErequester]":  17544259.702,
+                                          "[EjecutadoErequester]":  16881287.636,
+                                          "[ComprometidoErequester]":  569337.91999999993,
+                                          "[AsignadoErequester]":  17450625.556,
+                                          "[DisponibleErequester]":  93634.145999999892,
+                                          "[PorcentajeAsignado]":  0.99466297537824733,
+                                          "[PorcentajeDisponible]":  0.0053370246217528255
                                       },
                                       {
                                           "Rubros[Etapa]":  "3.04 AGREGADOS",
                                           "[RdiTotal]":  3164342.4846184053,
-                                          "[PresupuestoErequester]":  2805116.7060000002,
+                                          "[PresupuestoErequester]":  2801453.136,
                                           "[EjecutadoErequester]":  1924700.882,
-                                          "[ComprometidoErequester]":  526328.87,
-                                          "[AsignadoErequester]":  2451029.752,
-                                          "[DisponibleErequester]":  354086.95400000009,
-                                          "[PorcentajeAsignado]":  0.87377104373496239,
-                                          "[PorcentajeDisponible]":  0.1262289562650375
+                                          "[ComprometidoErequester]":  555328.87,
+                                          "[AsignadoErequester]":  2480029.7519999994,
+                                          "[DisponibleErequester]":  321423.38400000008,
+                                          "[PorcentajeAsignado]":  0.88526547887967222,
+                                          "[PorcentajeDisponible]":  0.11473452112032763
                                       },
                                       {
                                           "Rubros[Etapa]":  "3.05 MATERIALES VARIOS",
                                           "[RdiTotal]":  3568257.843537902,
-                                          "[PresupuestoErequester]":  3127433.696,
-                                          "[EjecutadoErequester]":  2305265.114,
-                                          "[ComprometidoErequester]":  390478.83,
-                                          "[AsignadoErequester]":  2695743.944,
-                                          "[DisponibleErequester]":  431689.752,
-                                          "[PorcentajeAsignado]":  0.86196677724866466,
-                                          "[PorcentajeDisponible]":  0.13803322275133534
+                                          "[PresupuestoErequester]":  3101848.406,
+                                          "[EjecutadoErequester]":  2321999.3140000007,
+                                          "[ComprometidoErequester]":  382194.63,
+                                          "[AsignadoErequester]":  2704193.9439999997,
+                                          "[DisponibleErequester]":  397654.46199999994,
+                                          "[PorcentajeAsignado]":  0.8718008071475043,
+                                          "[PorcentajeDisponible]":  0.12819919285249556
                                       },
                                       {
                                           "Rubros[Etapa]":  "3.06 IMPERMEABILIZACION DE LOSAS",
                                           "[RdiTotal]":  1763877.1889360766,
-                                          "[PresupuestoErequester]":  809389.5,
-                                          "[EjecutadoErequester]":  674867.0,
-                                          "[ComprometidoErequester]":  138355.0,
+                                          "[PresupuestoErequester]":  814184.5,
+                                          "[EjecutadoErequester]":  705667.0,
+                                          "[ComprometidoErequester]":  107555.0,
                                           "[AsignadoErequester]":  813222.0,
-                                          "[DisponibleErequester]":  -3832.5,
-                                          "[PorcentajeAsignado]":  1.0047350503064347,
-                                          "[PorcentajeDisponible]":  -0.0047350503064346643
+                                          "[DisponibleErequester]":  962.5,
+                                          "[PorcentajeAsignado]":  0.99881783551516889,
+                                          "[PorcentajeDisponible]":  0.0011821644848311408
                                       },
                                       {
                                           "Rubros[Etapa]":  "3.07 VARIOS MADERA (POR DUPLEX)",
                                           "[RdiTotal]":  678492.18836245,
-                                          "[PresupuestoErequester]":  542697.136,
+                                          "[PresupuestoErequester]":  534931.44600000011,
                                           "[EjecutadoErequester]":  349564.81200000003,
                                           "[ComprometidoErequester]":  41604.73,
                                           "[AsignadoErequester]":  391169.542,
-                                          "[DisponibleErequester]":  151527.594,
-                                          "[PorcentajeAsignado]":  0.72078792396649016,
-                                          "[PorcentajeDisponible]":  0.27921207603350978
+                                          "[DisponibleErequester]":  143761.904,
+                                          "[PorcentajeAsignado]":  0.73125172379565051,
+                                          "[PorcentajeDisponible]":  0.26874827620434932
                                       },
                                       {
                                           "Rubros[Etapa]":  "3.08 EQUIPO",
                                           "[RdiTotal]":  467592.758135178,
                                           "[PresupuestoErequester]":  374227.69199999992,
-                                          "[EjecutadoErequester]":  341161.62999999995,
-                                          "[ComprometidoErequester]":  21478.5,
+                                          "[EjecutadoErequester]":  343861.43,
+                                          "[ComprometidoErequester]":  18778.699999999997,
                                           "[AsignadoErequester]":  362640.12999999995,
                                           "[DisponibleErequester]":  11587.562,
                                           "[PorcentajeAsignado]":  0.96903606481371785,
@@ -398,57 +398,57 @@
                                       {
                                           "Rubros[Etapa]":  "3.09 ALQUILER DE FORMALETA",
                                           "[RdiTotal]":  1641593.3902359288,
-                                          "[PresupuestoErequester]":  1516529.3339999998,
+                                          "[PresupuestoErequester]":  1500997.9740000002,
                                           "[EjecutadoErequester]":  14946.983999999999,
                                           "[ComprometidoErequester]":  0.0,
                                           "[AsignadoErequester]":  14946.983999999999,
-                                          "[DisponibleErequester]":  1501582.3499999999,
-                                          "[PorcentajeAsignado]":  0.0098560467409989447,
-                                          "[PorcentajeDisponible]":  0.99014395325900106
+                                          "[DisponibleErequester]":  1486050.9900000002,
+                                          "[PorcentajeAsignado]":  0.0099580307628050115,
+                                          "[PorcentajeDisponible]":  0.990041969237195
                                       },
                                       {
                                           "Rubros[Etapa]":  "3.11 INSTALACIONES HIDROSANITARIAS",
                                           "[RdiTotal]":  7792146.6254235459,
                                           "[PresupuestoErequester]":  7655249.1099999985,
-                                          "[EjecutadoErequester]":  6836390.95,
-                                          "[ComprometidoErequester]":  633103.00000000012,
+                                          "[EjecutadoErequester]":  6862618.2599999988,
+                                          "[ComprometidoErequester]":  606875.69000000018,
                                           "[AsignadoErequester]":  7469493.9499999983,
-                                          "[DisponibleErequester]":  185755.15999999968,
+                                          "[DisponibleErequester]":  185755.15999999992,
                                           "[PorcentajeAsignado]":  0.975734929414988,
-                                          "[PorcentajeDisponible]":  0.024265070585011924
+                                          "[PorcentajeDisponible]":  0.024265070585011955
                                       },
                                       {
                                           "Rubros[Etapa]":  "3.12 INSTALACIONES ELECTRICAS",
                                           "[RdiTotal]":  8526613.780330155,
-                                          "[PresupuestoErequester]":  8516973.38,
+                                          "[PresupuestoErequester]":  8513303.2999999989,
                                           "[EjecutadoErequester]":  7246599.922,
                                           "[ComprometidoErequester]":  1097891.1480000003,
                                           "[AsignadoErequester]":  8344491.07,
-                                          "[DisponibleErequester]":  172482.31000000008,
-                                          "[PorcentajeAsignado]":  0.9797484032995768,
-                                          "[PorcentajeDisponible]":  0.020251596700423181
+                                          "[DisponibleErequester]":  168812.23000000007,
+                                          "[PorcentajeAsignado]":  0.98017077225476057,
+                                          "[PorcentajeDisponible]":  0.019829227745239628
                                       },
                                       {
                                           "Rubros[Etapa]":  "3.13 PISOS, AZULEJO Y FACHADA",
                                           "[RdiTotal]":  6603753.004414469,
-                                          "[PresupuestoErequester]":  6494718.44,
+                                          "[PresupuestoErequester]":  6483069.9200000009,
                                           "[EjecutadoErequester]":  5651233.6220000014,
                                           "[ComprometidoErequester]":  462763.80800000008,
                                           "[AsignadoErequester]":  6113997.4300000006,
-                                          "[DisponibleErequester]":  380721.00999999989,
-                                          "[PorcentajeAsignado]":  0.94137990530040594,
-                                          "[PorcentajeDisponible]":  0.058620094699594068
+                                          "[DisponibleErequester]":  369072.49,
+                                          "[PorcentajeAsignado]":  0.94307133895603579,
+                                          "[PorcentajeDisponible]":  0.056928661043964178
                                       },
                                       {
                                           "Rubros[Etapa]":  "3.14 ACABADOS EN MUROS Y CIELOS",
                                           "[RdiTotal]":  8468341.0196958184,
-                                          "[PresupuestoErequester]":  8446208.292,
+                                          "[PresupuestoErequester]":  8438442.612,
                                           "[EjecutadoErequester]":  6900165.5160000017,
                                           "[ComprometidoErequester]":  1381462.79,
                                           "[AsignadoErequester]":  8281628.3060000008,
-                                          "[DisponibleErequester]":  164579.98600000006,
-                                          "[PorcentajeAsignado]":  0.98051433491690188,
-                                          "[PorcentajeDisponible]":  0.01948566508309834
+                                          "[DisponibleErequester]":  156814.30600000013,
+                                          "[PorcentajeAsignado]":  0.98141667684307066,
+                                          "[PorcentajeDisponible]":  0.018583323156929486
                                       },
                                       {
                                           "Rubros[Etapa]":  "3.15 FALSAS COLUMNAS",
@@ -464,35 +464,35 @@
                                       {
                                           "Rubros[Etapa]":  "3.16 PINTURA",
                                           "[RdiTotal]":  2667064.2641815268,
-                                          "[PresupuestoErequester]":  2615908.96,
-                                          "[EjecutadoErequester]":  2472250.15,
+                                          "[PresupuestoErequester]":  2628092.67,
+                                          "[EjecutadoErequester]":  2472250.1499999994,
                                           "[ComprometidoErequester]":  128450.35,
                                           "[AsignadoErequester]":  2600700.5,
-                                          "[DisponibleErequester]":  15208.460000000057,
-                                          "[PorcentajeAsignado]":  0.99418616617300015,
-                                          "[PorcentajeDisponible]":  0.0058138338269998731
+                                          "[DisponibleErequester]":  27392.170000000049,
+                                          "[PorcentajeAsignado]":  0.98957716738352308,
+                                          "[PorcentajeDisponible]":  0.010422832616476972
                                       },
                                       {
                                           "Rubros[Etapa]":  "3.17 PUERTAS",
                                           "[RdiTotal]":  4612581.7958337963,
-                                          "[PresupuestoErequester]":  4576647.3420000011,
+                                          "[PresupuestoErequester]":  4572764.502,
                                           "[EjecutadoErequester]":  4018917.212,
                                           "[ComprometidoErequester]":  427409.11,
                                           "[AsignadoErequester]":  4446326.3220000006,
-                                          "[DisponibleErequester]":  130321.01999999997,
-                                          "[PorcentajeAsignado]":  0.97152478435381262,
-                                          "[PorcentajeDisponible]":  0.028475215646187307
+                                          "[DisponibleErequester]":  126438.17999999998,
+                                          "[PorcentajeAsignado]":  0.97234972849690837,
+                                          "[PorcentajeDisponible]":  0.027650271503091715
                                       },
                                       {
                                           "Rubros[Etapa]":  "3.18 VENTANAS",
                                           "[RdiTotal]":  4996687.873614192,
-                                          "[PresupuestoErequester]":  4626549.9200000027,
+                                          "[PresupuestoErequester]":  4618784.4900000021,
                                           "[EjecutadoErequester]":  3492792.7899999991,
-                                          "[ComprometidoErequester]":  1496427.7599999995,
-                                          "[AsignadoErequester]":  4989220.5500000007,
-                                          "[DisponibleErequester]":  -362670.63,
-                                          "[PorcentajeAsignado]":  1.0783890017985578,
-                                          "[PorcentajeDisponible]":  -0.0783890017985583
+                                          "[ComprometidoErequester]":  903140.47000000009,
+                                          "[AsignadoErequester]":  4395933.2600000007,
+                                          "[DisponibleErequester]":  222851.23,
+                                          "[PorcentajeAsignado]":  0.95175110887236891,
+                                          "[PorcentajeDisponible]":  0.048248891127630832
                                       },
                                       {
                                           "Rubros[Etapa]":  "3.19 ARTEFACTOS",
@@ -508,13 +508,13 @@
                                       {
                                           "Rubros[Etapa]":  "3.21 BARANDA DE GRADAS (FHA)",
                                           "[RdiTotal]":  3038128.6590713356,
-                                          "[PresupuestoErequester]":  2665328.972,
+                                          "[PresupuestoErequester]":  2661446.132,
                                           "[EjecutadoErequester]":  2073938.3020000001,
                                           "[ComprometidoErequester]":  378401.4,
                                           "[AsignadoErequester]":  2452339.7019999996,
-                                          "[DisponibleErequester]":  212989.26999999993,
-                                          "[PorcentajeAsignado]":  0.92008893752421927,
-                                          "[PorcentajeDisponible]":  0.079911062475780545
+                                          "[DisponibleErequester]":  209106.42999999991,
+                                          "[PorcentajeAsignado]":  0.9214312747172293,
+                                          "[PorcentajeDisponible]":  0.0785687252827704
                                       },
                                       {
                                           "Rubros[Etapa]":  "3.22 LIMPIEZA DE CASAS",
@@ -542,8 +542,8 @@
                                           "Rubros[Etapa]":  "3.24 DESVIACIONES APROBADAS",
                                           "[RdiTotal]":  0.0,
                                           "[PresupuestoErequester]":  3100917.8,
-                                          "[EjecutadoErequester]":  2444822.54,
-                                          "[ComprometidoErequester]":  440955.98,
+                                          "[EjecutadoErequester]":  2466822.54,
+                                          "[ComprometidoErequester]":  418955.98,
                                           "[AsignadoErequester]":  2885778.52,
                                           "[DisponibleErequester]":  215139.28000000006,
                                           "[PorcentajeAsignado]":  0.93062077298534007,
@@ -563,13 +563,13 @@
                                       {
                                           "Rubros[Etapa]":  "4.01 CUARTOS DE MAQUINAS",
                                           "[RdiTotal]":  98049.22,
-                                          "[PresupuestoErequester]":  83135.69,
+                                          "[PresupuestoErequester]":  83184.73000000001,
                                           "[EjecutadoErequester]":  71724.47,
                                           "[ComprometidoErequester]":  9958.19,
                                           "[AsignadoErequester]":  81682.66,
-                                          "[DisponibleErequester]":  1453.0300000000011,
-                                          "[PorcentajeAsignado]":  0.98252218752259113,
-                                          "[PorcentajeDisponible]":  0.017477812477408934
+                                          "[DisponibleErequester]":  1502.0700000000011,
+                                          "[PorcentajeAsignado]":  0.981942959963926,
+                                          "[PorcentajeDisponible]":  0.018057040036073939
                                       },
                                       {
                                           "Rubros[Etapa]":  "4.02 PTAR",
@@ -585,13 +585,13 @@
                                       {
                                           "Rubros[Etapa]":  "4.03 EQUIPO DE FILTRACION",
                                           "[RdiTotal]":  1357760.0,
-                                          "[PresupuestoErequester]":  1274195.0,
+                                          "[PresupuestoErequester]":  1275593.01,
                                           "[EjecutadoErequester]":  1267598.21,
                                           "[ComprometidoErequester]":  2918.02,
                                           "[AsignadoErequester]":  1270516.23,
-                                          "[DisponibleErequester]":  3678.7700000000186,
-                                          "[PorcentajeAsignado]":  0.99711286733977134,
-                                          "[PorcentajeDisponible]":  0.0028871326602286297
+                                          "[DisponibleErequester]":  5076.7800000000279,
+                                          "[PorcentajeAsignado]":  0.99602006285688249,
+                                          "[PorcentajeDisponible]":  0.0039799371431174808
                                       },
                                       {
                                           "Rubros[Etapa]":  "4.04 ÁREA DE PARQUE",
@@ -739,13 +739,13 @@
                                       {
                                           "Rubros[Etapa]":  "5.08 Amenidades 2",
                                           "[RdiTotal]":  null,
-                                          "[PresupuestoErequester]":  735868.17000000027,
+                                          "[PresupuestoErequester]":  731985.33000000031,
                                           "[EjecutadoErequester]":  0.0,
                                           "[ComprometidoErequester]":  10400.0,
                                           "[AsignadoErequester]":  10400.0,
-                                          "[DisponibleErequester]":  725468.17000000027,
-                                          "[PorcentajeAsignado]":  0.014132966234971131,
-                                          "[PorcentajeDisponible]":  0.98586703376502882
+                                          "[DisponibleErequester]":  721585.33000000031,
+                                          "[PorcentajeAsignado]":  0.01420793501421674,
+                                          "[PorcentajeDisponible]":  0.98579206498578331
                                       },
                                       {
                                           "Rubros[Etapa]":  "5.09 Manto Verde",
@@ -762,8 +762,8 @@
                                           "Rubros[Etapa]":  "Cocinas",
                                           "[RdiTotal]":  4688250.0,
                                           "[PresupuestoErequester]":  4688250.0,
-                                          "[EjecutadoErequester]":  3958539.6799999997,
-                                          "[ComprometidoErequester]":  690900.3,
+                                          "[EjecutadoErequester]":  3991439.6799999997,
+                                          "[ComprometidoErequester]":  658000.3,
                                           "[AsignadoErequester]":  4649439.98,
                                           "[DisponibleErequester]":  38810.020000000019,
                                           "[PorcentajeAsignado]":  0.99172185357009557,
@@ -794,13 +794,13 @@
                                       {
                                           "Rubros[Etapa]":  "PAGO DE PLANILLAS PERSONAL DE APOYO",
                                           "[RdiTotal]":  null,
-                                          "[PresupuestoErequester]":  282581.31,
+                                          "[PresupuestoErequester]":  296518.08,
                                           "[EjecutadoErequester]":  75200.0,
-                                          "[ComprometidoErequester]":  200000.0,
-                                          "[AsignadoErequester]":  275200.0,
-                                          "[DisponibleErequester]":  7381.3099999999977,
-                                          "[PorcentajeAsignado]":  0.97387898725503108,
-                                          "[PorcentajeDisponible]":  0.026121012744968863
+                                          "[ComprometidoErequester]":  235300.63,
+                                          "[AsignadoErequester]":  310500.63,
+                                          "[DisponibleErequester]":  -13982.549999999988,
+                                          "[PorcentajeAsignado]":  1.0471558091837099,
+                                          "[PorcentajeDisponible]":  -0.04715580918370977
                                       },
                                       {
                                           "Rubros[Etapa]":  "Saldos Disponibles versión 1",
@@ -818,31 +818,31 @@
                                          {
                                              "Rubros[Segmento]":  "Amenidades",
                                              "[RdiTotal]":  5089949.419999999,
-                                             "[PresupuestoErequester]":  6863524.9400000013,
-                                             "[EjecutadoErequester]":  5704295.879999998,
+                                             "[PresupuestoErequester]":  6861089.1499999994,
+                                             "[EjecutadoErequester]":  5704295.879999999,
                                              "[ComprometidoErequester]":  358544.16000000003,
                                              "[AsignadoErequester]":  6062840.04,
-                                             "[DisponibleErequester]":  800684.90000000049,
-                                             "[PorcentajeAsignado]":  0.8833420280396036,
-                                             "[PorcentajeDisponible]":  0.11665797196039625
+                                             "[DisponibleErequester]":  798249.11000000068,
+                                             "[PorcentajeAsignado]":  0.88365562776574624,
+                                             "[PorcentajeDisponible]":  0.11634437223425391
                                          },
                                          {
                                              "Rubros[Segmento]":  "Casas",
                                              "[RdiTotal]":  109239245.64523536,
-                                             "[PresupuestoErequester]":  103495239.44600016,
-                                             "[EjecutadoErequester]":  89732574.683999985,
-                                             "[ComprometidoErequester]":  9636611.2719999943,
-                                             "[AsignadoErequester]":  99369185.95600009,
-                                             "[DisponibleErequester]":  4126053.4899999974,
-                                             "[PorcentajeAsignado]":  0.96013291517478072,
-                                             "[PorcentajeDisponible]":  0.039867084825218592
+                                             "[PresupuestoErequester]":  103609340.84600006,
+                                             "[EjecutadoErequester]":  89896615.773999974,
+                                             "[ComprometidoErequester]":  9090465.52200001,
+                                             "[AsignadoErequester]":  98987081.296000078,
+                                             "[DisponibleErequester]":  4622259.5499999961,
+                                             "[PorcentajeAsignado]":  0.95538761744589917,
+                                             "[PorcentajeDisponible]":  0.044612382554100986
                                          },
                                          {
                                              "Rubros[Segmento]":  "Cocinas",
                                              "[RdiTotal]":  4688250.0,
                                              "[PresupuestoErequester]":  4688250.0,
-                                             "[EjecutadoErequester]":  3958539.6799999997,
-                                             "[ComprometidoErequester]":  690900.3,
+                                             "[EjecutadoErequester]":  3991439.6799999997,
+                                             "[ComprometidoErequester]":  658000.3,
                                              "[AsignadoErequester]":  4649439.98,
                                              "[DisponibleErequester]":  38810.020000000019,
                                              "[PorcentajeAsignado]":  0.99172185357009557,
@@ -852,8 +852,8 @@
                                              "Rubros[Segmento]":  "Desviaciones Aprobadas Casas",
                                              "[RdiTotal]":  0.0,
                                              "[PresupuestoErequester]":  3100917.8,
-                                             "[EjecutadoErequester]":  2444822.54,
-                                             "[ComprometidoErequester]":  440955.98,
+                                             "[EjecutadoErequester]":  2466822.54,
+                                             "[ComprometidoErequester]":  418955.98,
                                              "[AsignadoErequester]":  2885778.52,
                                              "[DisponibleErequester]":  215139.28000000006,
                                              "[PorcentajeAsignado]":  0.93062077298534007,
@@ -863,8 +863,8 @@
                                              "Rubros[Segmento]":  "Desviaciones Aprobadas Urbanización",
                                              "[RdiTotal]":  0.0,
                                              "[PresupuestoErequester]":  1091426.95,
-                                             "[EjecutadoErequester]":  422540.1,
-                                             "[ComprometidoErequester]":  602786.83,
+                                             "[EjecutadoErequester]":  469180.19999999995,
+                                             "[ComprometidoErequester]":  556146.73,
                                              "[AsignadoErequester]":  1025326.9299999999,
                                              "[DisponibleErequester]":  66100.020000000019,
                                              "[PorcentajeAsignado]":  0.93943706447783792,
@@ -873,13 +873,13 @@
                                          {
                                              "Rubros[Segmento]":  "Fee Construcción",
                                              "[RdiTotal]":  8752161.2322826516,
-                                             "[PresupuestoErequester]":  9852161.23,
+                                             "[PresupuestoErequester]":  9934437.32,
                                              "[EjecutadoErequester]":  8604164.39,
                                              "[ComprometidoErequester]":  1247966.0,
                                              "[AsignadoErequester]":  9852130.39,
-                                             "[DisponibleErequester]":  30.839999999850988,
-                                             "[PorcentajeAsignado]":  0.99999686972236046,
-                                             "[PorcentajeDisponible]":  3.1302776395845673E-06
+                                             "[DisponibleErequester]":  82306.9299999997,
+                                             "[PorcentajeAsignado]":  0.9917149882425349,
+                                             "[PorcentajeDisponible]":  0.0082850117574650613
                                          },
                                          {
                                              "Rubros[Segmento]":  "Imprevistos Casas 3.75%",
@@ -928,13 +928,13 @@
                                          {
                                              "Rubros[Segmento]":  "Urbanización",
                                              "[RdiTotal]":  28837608.819999997,
-                                             "[PresupuestoErequester]":  28177177.235999983,
-                                             "[EjecutadoErequester]":  25888257.738000013,
-                                             "[ComprometidoErequester]":  1790063.738,
-                                             "[AsignadoErequester]":  27678321.475999992,
-                                             "[DisponibleErequester]":  498855.7600000003,
-                                             "[PorcentajeAsignado]":  0.98229575106754707,
-                                             "[PorcentajeDisponible]":  0.017704248932453308
+                                             "[PresupuestoErequester]":  27983235.535999995,
+                                             "[EjecutadoErequester]":  25888257.738000009,
+                                             "[ComprometidoErequester]":  1776360.398,
+                                             "[AsignadoErequester]":  27664618.135999992,
+                                             "[DisponibleErequester]":  318617.40000000014,
+                                             "[PorcentajeAsignado]":  0.98861398998732275,
+                                             "[PorcentajeDisponible]":  0.011386010012677191
                                          }
                                      ],
                      "porMes":  [
@@ -1050,8 +1050,8 @@
                                     },
                                     {
                                         "Calendario[MesA]":  "jul 26",
-                                        "[AsignadoErequester]":  179302062.23999995,
-                                        "[EjecutadoErequester]":  157510431.73
+                                        "[AsignadoErequester]":  179109882.12,
+                                        "[EjecutadoErequester]":  157806202.92
                                     },
                                     {
                                         "Calendario[MesA]":  "jun 23",
@@ -1070,7 +1070,7 @@
                                     },
                                     {
                                         "Calendario[MesA]":  "jun 26",
-                                        "[AsignadoErequester]":  178903539.27999997,
+                                        "[AsignadoErequester]":  178903539.27999991,
                                         "[EjecutadoErequester]":  157510431.73
                                     },
                                     {
@@ -1405,13 +1405,13 @@
                                            {
                                                "Calendario[MesA]":  "jul 26",
                                                "[RdiTotal]":  162077315.88769463,
-                                               "[PresupuestoErequester]":  162692391.95199996,
-                                               "[EjecutadoErequester]":  139748785.54199997,
-                                               "[ComprometidoErequester]":  17113336.339999996,
-                                               "[AsignadoErequester]":  156862121.88199994,
-                                               "[DisponibleErequester]":  5830270.0699999863,
-                                               "[PorcentajeAsignado]":  0.96416384318868364,
-                                               "[PorcentajeDisponible]":  0.035836156811316189
+                                               "[PresupuestoErequester]":  162692391.952,
+                                               "[EjecutadoErequester]":  140014366.732,
+                                               "[ComprometidoErequester]":  16451947.15,
+                                               "[AsignadoErequester]":  156466313.88199994,
+                                               "[DisponibleErequester]":  6226078.0699999873,
+                                               "[PorcentajeAsignado]":  0.96173098203733487,
+                                               "[PorcentajeDisponible]":  0.038269017962664784
                                            },
                                            {
                                                "Calendario[MesA]":  "jun 23",
@@ -1449,13 +1449,13 @@
                                            {
                                                "Calendario[MesA]":  "jun 26",
                                                "[RdiTotal]":  162077315.88769463,
-                                               "[PresupuestoErequester]":  162692391.95200002,
-                                               "[EjecutadoErequester]":  139748785.542,
+                                               "[PresupuestoErequester]":  162692391.952,
+                                               "[EjecutadoErequester]":  139748785.54199997,
                                                "[ComprometidoErequester]":  16714813.379999999,
-                                               "[AsignadoErequester]":  156463598.92199993,
+                                               "[AsignadoErequester]":  156463598.92199987,
                                                "[DisponibleErequester]":  6228793.0299999872,
-                                               "[PorcentajeAsignado]":  0.9617142943485778,
-                                               "[PorcentajeDisponible]":  0.038285705651421614
+                                               "[PorcentajeAsignado]":  0.96171429434857758,
+                                               "[PorcentajeDisponible]":  0.038285705651421621
                                            },
                                            {
                                                "Calendario[MesA]":  "mar 23",
@@ -2045,20 +2045,20 @@
                                            {
                                                "Calendario[MesA]":  "jul 26",
                                                "Rubros[Area]":  "Construcción",
-                                               "[PresupuestoErequester]":  124201121.19600005,
-                                               "[EjecutadoErequester]":  105566571.22400005,
-                                               "[ComprometidoErequester]":  14170749.441999977,
-                                               "[AsignadoErequester]":  119737320.66600008,
-                                               "[DisponibleErequester]":  4463800.5299999909
+                                               "[PresupuestoErequester]":  124397498.68600005,
+                                               "[EjecutadoErequester]":  105785512.31400004,
+                                               "[ComprometidoErequester]":  13569703.691999985,
+                                               "[AsignadoErequester]":  119355216.00600009,
+                                               "[DisponibleErequester]":  5042282.6799999895
                                            },
                                            {
                                                "Calendario[MesA]":  "jul 26",
                                                "Rubros[Area]":  "Urbanización",
-                                               "[PresupuestoErequester]":  38491270.756000005,
-                                               "[EjecutadoErequester]":  34182214.318000011,
-                                               "[ComprometidoErequester]":  2942586.8979999986,
-                                               "[AsignadoErequester]":  37124801.216000013,
-                                               "[DisponibleErequester]":  1366469.5400000012
+                                               "[PresupuestoErequester]":  38294893.26600001,
+                                               "[EjecutadoErequester]":  34228854.41800002,
+                                               "[ComprometidoErequester]":  2882243.4579999996,
+                                               "[AsignadoErequester]":  37111097.876000017,
+                                               "[DisponibleErequester]":  1183795.3900000001
                                            },
                                            {
                                                "Calendario[MesA]":  "jun 23",
@@ -2117,19 +2117,19 @@
                                            {
                                                "Calendario[MesA]":  "jun 26",
                                                "Rubros[Area]":  "Construcción",
-                                               "[PresupuestoErequester]":  124201121.19600008,
-                                               "[EjecutadoErequester]":  105566571.22400004,
+                                               "[PresupuestoErequester]":  124201121.19600004,
+                                               "[EjecutadoErequester]":  105566571.224,
                                                "[ComprometidoErequester]":  13887144.401999976,
-                                               "[AsignadoErequester]":  119453715.62600009,
+                                               "[AsignadoErequester]":  119453715.62600006,
                                                "[DisponibleErequester]":  4747405.56999999
                                            },
                                            {
                                                "Calendario[MesA]":  "jun 26",
                                                "Rubros[Area]":  "Urbanización",
                                                "[PresupuestoErequester]":  38491270.756000005,
-                                               "[EjecutadoErequester]":  34182214.318000026,
+                                               "[EjecutadoErequester]":  34182214.318000011,
                                                "[ComprometidoErequester]":  2827668.9779999997,
-                                               "[AsignadoErequester]":  37009883.296000011,
+                                               "[AsignadoErequester]":  37009883.296000004,
                                                "[DisponibleErequester]":  1481387.4600000011
                                            },
                                            {
@@ -2446,13 +2446,13 @@
                                                 "Rubros[Segmento]":  "Casas",
                                                 "Rubros[Etapa]":  "3.01 OBRA GRIS",
                                                 "[RdiTotal]":  13403325.430219088,
-                                                "[PresupuestoErequester]":  13792381.110000003,
-                                                "[EjecutadoErequester]":  12305123.814000001,
-                                                "[ComprometidoErequester]":  1087125.45,
-                                                "[AsignadoErequester]":  13392249.264000004,
-                                                "[DisponibleErequester]":  400131.84600000049,
-                                                "[PorcentajeAsignado]":  0.97098892186861863,
-                                                "[PorcentajeDisponible]":  0.029011078131381506
+                                                "[PresupuestoErequester]":  13788498.270000003,
+                                                "[EjecutadoErequester]":  12392703.594,
+                                                "[ComprometidoErequester]":  999545.67,
+                                                "[AsignadoErequester]":  13392249.264,
+                                                "[DisponibleErequester]":  396249.00600000017,
+                                                "[PorcentajeAsignado]":  0.97126235227065061,
+                                                "[PorcentajeDisponible]":  0.028737647729349142
                                             },
                                             {
                                                 "Calendario[MesA]":  "jul 26",
@@ -2460,13 +2460,13 @@
                                                 "Rubros[Segmento]":  "Casas",
                                                 "Rubros[Etapa]":  "3.02 ACERO",
                                                 "[RdiTotal]":  14210593.245912042,
-                                                "[PresupuestoErequester]":  11818900.836000003,
+                                                "[PresupuestoErequester]":  11815017.996000003,
                                                 "[EjecutadoErequester]":  11521669.870000001,
                                                 "[ComprometidoErequester]":  226246.05599999998,
                                                 "[AsignadoErequester]":  11747915.926,
-                                                "[DisponibleErequester]":  70984.910000000193,
-                                                "[PorcentajeAsignado]":  0.99399394994636181,
-                                                "[PorcentajeDisponible]":  0.0060060500536380148
+                                                "[DisponibleErequester]":  67102.070000000167,
+                                                "[PorcentajeAsignado]":  0.99432061212071621,
+                                                "[PorcentajeDisponible]":  0.0056793878792836122
                                             },
                                             {
                                                 "Calendario[MesA]":  "jul 26",
@@ -2474,13 +2474,13 @@
                                                 "Rubros[Segmento]":  "Casas",
                                                 "Rubros[Etapa]":  "3.03 CONCRETO",
                                                 "[RdiTotal]":  17578830.166521955,
-                                                "[PresupuestoErequester]":  17362146.802,
-                                                "[EjecutadoErequester]":  16881287.636000004,
-                                                "[ComprometidoErequester]":  430905.92,
-                                                "[AsignadoErequester]":  17312193.556,
-                                                "[DisponibleErequester]":  49953.245999999745,
-                                                "[PorcentajeAsignado]":  0.99712286466819611,
-                                                "[PorcentajeDisponible]":  0.0028771353318038685
+                                                "[PresupuestoErequester]":  17544259.702,
+                                                "[EjecutadoErequester]":  16881287.636,
+                                                "[ComprometidoErequester]":  569337.91999999993,
+                                                "[AsignadoErequester]":  17450625.556,
+                                                "[DisponibleErequester]":  93634.145999999892,
+                                                "[PorcentajeAsignado]":  0.99466297537824733,
+                                                "[PorcentajeDisponible]":  0.0053370246217528255
                                             },
                                             {
                                                 "Calendario[MesA]":  "jul 26",
@@ -2488,13 +2488,13 @@
                                                 "Rubros[Segmento]":  "Casas",
                                                 "Rubros[Etapa]":  "3.04 AGREGADOS",
                                                 "[RdiTotal]":  3164342.4846184053,
-                                                "[PresupuestoErequester]":  2805116.7060000002,
+                                                "[PresupuestoErequester]":  2801453.136,
                                                 "[EjecutadoErequester]":  1924700.882,
-                                                "[ComprometidoErequester]":  526328.87,
-                                                "[AsignadoErequester]":  2451029.752,
-                                                "[DisponibleErequester]":  354086.95400000009,
-                                                "[PorcentajeAsignado]":  0.87377104373496239,
-                                                "[PorcentajeDisponible]":  0.1262289562650375
+                                                "[ComprometidoErequester]":  555328.87,
+                                                "[AsignadoErequester]":  2480029.7519999994,
+                                                "[DisponibleErequester]":  321423.38400000008,
+                                                "[PorcentajeAsignado]":  0.88526547887967222,
+                                                "[PorcentajeDisponible]":  0.11473452112032763
                                             },
                                             {
                                                 "Calendario[MesA]":  "jul 26",
@@ -2502,13 +2502,13 @@
                                                 "Rubros[Segmento]":  "Casas",
                                                 "Rubros[Etapa]":  "3.05 MATERIALES VARIOS",
                                                 "[RdiTotal]":  3568257.843537902,
-                                                "[PresupuestoErequester]":  3127433.696,
-                                                "[EjecutadoErequester]":  2305265.114,
-                                                "[ComprometidoErequester]":  390478.83,
-                                                "[AsignadoErequester]":  2695743.944,
-                                                "[DisponibleErequester]":  431689.752,
-                                                "[PorcentajeAsignado]":  0.86196677724866466,
-                                                "[PorcentajeDisponible]":  0.13803322275133534
+                                                "[PresupuestoErequester]":  3101848.406,
+                                                "[EjecutadoErequester]":  2321999.3140000007,
+                                                "[ComprometidoErequester]":  382194.63,
+                                                "[AsignadoErequester]":  2704193.9439999997,
+                                                "[DisponibleErequester]":  397654.46199999994,
+                                                "[PorcentajeAsignado]":  0.8718008071475043,
+                                                "[PorcentajeDisponible]":  0.12819919285249556
                                             },
                                             {
                                                 "Calendario[MesA]":  "jul 26",
@@ -2516,13 +2516,13 @@
                                                 "Rubros[Segmento]":  "Casas",
                                                 "Rubros[Etapa]":  "3.06 IMPERMEABILIZACION DE LOSAS",
                                                 "[RdiTotal]":  1763877.1889360766,
-                                                "[PresupuestoErequester]":  809389.5,
-                                                "[EjecutadoErequester]":  674867.0,
-                                                "[ComprometidoErequester]":  138355.0,
+                                                "[PresupuestoErequester]":  814184.5,
+                                                "[EjecutadoErequester]":  705667.0,
+                                                "[ComprometidoErequester]":  107555.0,
                                                 "[AsignadoErequester]":  813222.0,
-                                                "[DisponibleErequester]":  -3832.5,
-                                                "[PorcentajeAsignado]":  1.0047350503064347,
-                                                "[PorcentajeDisponible]":  -0.0047350503064346643
+                                                "[DisponibleErequester]":  962.5,
+                                                "[PorcentajeAsignado]":  0.99881783551516889,
+                                                "[PorcentajeDisponible]":  0.0011821644848311408
                                             },
                                             {
                                                 "Calendario[MesA]":  "jul 26",
@@ -2530,13 +2530,13 @@
                                                 "Rubros[Segmento]":  "Casas",
                                                 "Rubros[Etapa]":  "3.07 VARIOS MADERA (POR DUPLEX)",
                                                 "[RdiTotal]":  678492.18836245,
-                                                "[PresupuestoErequester]":  542697.136,
+                                                "[PresupuestoErequester]":  534931.44600000011,
                                                 "[EjecutadoErequester]":  349564.81200000003,
                                                 "[ComprometidoErequester]":  41604.73,
                                                 "[AsignadoErequester]":  391169.542,
-                                                "[DisponibleErequester]":  151527.594,
-                                                "[PorcentajeAsignado]":  0.72078792396649016,
-                                                "[PorcentajeDisponible]":  0.27921207603350978
+                                                "[DisponibleErequester]":  143761.904,
+                                                "[PorcentajeAsignado]":  0.73125172379565051,
+                                                "[PorcentajeDisponible]":  0.26874827620434932
                                             },
                                             {
                                                 "Calendario[MesA]":  "jul 26",
@@ -2545,8 +2545,8 @@
                                                 "Rubros[Etapa]":  "3.08 EQUIPO",
                                                 "[RdiTotal]":  467592.758135178,
                                                 "[PresupuestoErequester]":  374227.69199999992,
-                                                "[EjecutadoErequester]":  341161.62999999995,
-                                                "[ComprometidoErequester]":  21478.5,
+                                                "[EjecutadoErequester]":  343861.43,
+                                                "[ComprometidoErequester]":  18778.699999999997,
                                                 "[AsignadoErequester]":  362640.12999999995,
                                                 "[DisponibleErequester]":  11587.562,
                                                 "[PorcentajeAsignado]":  0.96903606481371785,
@@ -2558,13 +2558,13 @@
                                                 "Rubros[Segmento]":  "Casas",
                                                 "Rubros[Etapa]":  "3.09 ALQUILER DE FORMALETA",
                                                 "[RdiTotal]":  1641593.3902359288,
-                                                "[PresupuestoErequester]":  1516529.3339999998,
+                                                "[PresupuestoErequester]":  1500997.9740000002,
                                                 "[EjecutadoErequester]":  14946.983999999999,
                                                 "[ComprometidoErequester]":  0.0,
                                                 "[AsignadoErequester]":  14946.983999999999,
-                                                "[DisponibleErequester]":  1501582.3499999999,
-                                                "[PorcentajeAsignado]":  0.0098560467409989447,
-                                                "[PorcentajeDisponible]":  0.99014395325900106
+                                                "[DisponibleErequester]":  1486050.9900000002,
+                                                "[PorcentajeAsignado]":  0.0099580307628050115,
+                                                "[PorcentajeDisponible]":  0.990041969237195
                                             },
                                             {
                                                 "Calendario[MesA]":  "jul 26",
@@ -2573,12 +2573,12 @@
                                                 "Rubros[Etapa]":  "3.11 INSTALACIONES HIDROSANITARIAS",
                                                 "[RdiTotal]":  7792146.6254235459,
                                                 "[PresupuestoErequester]":  7655249.1099999985,
-                                                "[EjecutadoErequester]":  6836390.95,
-                                                "[ComprometidoErequester]":  633103.00000000012,
+                                                "[EjecutadoErequester]":  6862618.2599999988,
+                                                "[ComprometidoErequester]":  606875.69000000018,
                                                 "[AsignadoErequester]":  7469493.9499999983,
-                                                "[DisponibleErequester]":  185755.15999999968,
+                                                "[DisponibleErequester]":  185755.15999999992,
                                                 "[PorcentajeAsignado]":  0.975734929414988,
-                                                "[PorcentajeDisponible]":  0.024265070585011924
+                                                "[PorcentajeDisponible]":  0.024265070585011955
                                             },
                                             {
                                                 "Calendario[MesA]":  "jul 26",
@@ -2586,13 +2586,13 @@
                                                 "Rubros[Segmento]":  "Casas",
                                                 "Rubros[Etapa]":  "3.12 INSTALACIONES ELECTRICAS",
                                                 "[RdiTotal]":  8526613.780330155,
-                                                "[PresupuestoErequester]":  8516973.38,
+                                                "[PresupuestoErequester]":  8513303.2999999989,
                                                 "[EjecutadoErequester]":  7246599.922,
                                                 "[ComprometidoErequester]":  1097891.1480000003,
                                                 "[AsignadoErequester]":  8344491.07,
-                                                "[DisponibleErequester]":  172482.31000000008,
-                                                "[PorcentajeAsignado]":  0.9797484032995768,
-                                                "[PorcentajeDisponible]":  0.020251596700423181
+                                                "[DisponibleErequester]":  168812.23000000007,
+                                                "[PorcentajeAsignado]":  0.98017077225476057,
+                                                "[PorcentajeDisponible]":  0.019829227745239628
                                             },
                                             {
                                                 "Calendario[MesA]":  "jul 26",
@@ -2600,13 +2600,13 @@
                                                 "Rubros[Segmento]":  "Casas",
                                                 "Rubros[Etapa]":  "3.13 PISOS, AZULEJO Y FACHADA",
                                                 "[RdiTotal]":  6603753.004414469,
-                                                "[PresupuestoErequester]":  6494718.44,
+                                                "[PresupuestoErequester]":  6483069.9200000009,
                                                 "[EjecutadoErequester]":  5651233.6220000014,
                                                 "[ComprometidoErequester]":  462763.80800000008,
                                                 "[AsignadoErequester]":  6113997.4300000006,
-                                                "[DisponibleErequester]":  380721.00999999989,
-                                                "[PorcentajeAsignado]":  0.94137990530040594,
-                                                "[PorcentajeDisponible]":  0.058620094699594068
+                                                "[DisponibleErequester]":  369072.49,
+                                                "[PorcentajeAsignado]":  0.94307133895603579,
+                                                "[PorcentajeDisponible]":  0.056928661043964178
                                             },
                                             {
                                                 "Calendario[MesA]":  "jul 26",
@@ -2614,13 +2614,13 @@
                                                 "Rubros[Segmento]":  "Casas",
                                                 "Rubros[Etapa]":  "3.14 ACABADOS EN MUROS Y CIELOS",
                                                 "[RdiTotal]":  8468341.0196958184,
-                                                "[PresupuestoErequester]":  8446208.292,
+                                                "[PresupuestoErequester]":  8438442.612,
                                                 "[EjecutadoErequester]":  6900165.5160000017,
                                                 "[ComprometidoErequester]":  1381462.79,
                                                 "[AsignadoErequester]":  8281628.3060000008,
-                                                "[DisponibleErequester]":  164579.98600000006,
-                                                "[PorcentajeAsignado]":  0.98051433491690188,
-                                                "[PorcentajeDisponible]":  0.01948566508309834
+                                                "[DisponibleErequester]":  156814.30600000013,
+                                                "[PorcentajeAsignado]":  0.98141667684307066,
+                                                "[PorcentajeDisponible]":  0.018583323156929486
                                             },
                                             {
                                                 "Calendario[MesA]":  "jul 26",
@@ -2642,13 +2642,13 @@
                                                 "Rubros[Segmento]":  "Casas",
                                                 "Rubros[Etapa]":  "3.16 PINTURA",
                                                 "[RdiTotal]":  2667064.2641815268,
-                                                "[PresupuestoErequester]":  2615908.96,
-                                                "[EjecutadoErequester]":  2472250.15,
+                                                "[PresupuestoErequester]":  2628092.67,
+                                                "[EjecutadoErequester]":  2472250.1499999994,
                                                 "[ComprometidoErequester]":  128450.35,
                                                 "[AsignadoErequester]":  2600700.5,
-                                                "[DisponibleErequester]":  15208.460000000057,
-                                                "[PorcentajeAsignado]":  0.99418616617300015,
-                                                "[PorcentajeDisponible]":  0.0058138338269998731
+                                                "[DisponibleErequester]":  27392.170000000049,
+                                                "[PorcentajeAsignado]":  0.98957716738352308,
+                                                "[PorcentajeDisponible]":  0.010422832616476972
                                             },
                                             {
                                                 "Calendario[MesA]":  "jul 26",
@@ -2656,13 +2656,13 @@
                                                 "Rubros[Segmento]":  "Casas",
                                                 "Rubros[Etapa]":  "3.17 PUERTAS",
                                                 "[RdiTotal]":  4612581.7958337963,
-                                                "[PresupuestoErequester]":  4576647.3420000011,
+                                                "[PresupuestoErequester]":  4572764.502,
                                                 "[EjecutadoErequester]":  4018917.212,
                                                 "[ComprometidoErequester]":  427409.11,
                                                 "[AsignadoErequester]":  4446326.3220000006,
-                                                "[DisponibleErequester]":  130321.01999999997,
-                                                "[PorcentajeAsignado]":  0.97152478435381262,
-                                                "[PorcentajeDisponible]":  0.028475215646187307
+                                                "[DisponibleErequester]":  126438.17999999998,
+                                                "[PorcentajeAsignado]":  0.97234972849690837,
+                                                "[PorcentajeDisponible]":  0.027650271503091715
                                             },
                                             {
                                                 "Calendario[MesA]":  "jul 26",
@@ -2670,13 +2670,13 @@
                                                 "Rubros[Segmento]":  "Casas",
                                                 "Rubros[Etapa]":  "3.18 VENTANAS",
                                                 "[RdiTotal]":  4996687.873614192,
-                                                "[PresupuestoErequester]":  4626549.9200000027,
+                                                "[PresupuestoErequester]":  4618784.4900000021,
                                                 "[EjecutadoErequester]":  3492792.7899999991,
-                                                "[ComprometidoErequester]":  1496427.7599999995,
-                                                "[AsignadoErequester]":  4989220.5500000007,
-                                                "[DisponibleErequester]":  -362670.63,
-                                                "[PorcentajeAsignado]":  1.0783890017985578,
-                                                "[PorcentajeDisponible]":  -0.0783890017985583
+                                                "[ComprometidoErequester]":  903140.47000000009,
+                                                "[AsignadoErequester]":  4395933.2600000007,
+                                                "[DisponibleErequester]":  222851.23,
+                                                "[PorcentajeAsignado]":  0.95175110887236891,
+                                                "[PorcentajeDisponible]":  0.048248891127630832
                                             },
                                             {
                                                 "Calendario[MesA]":  "jul 26",
@@ -2698,13 +2698,13 @@
                                                 "Rubros[Segmento]":  "Casas",
                                                 "Rubros[Etapa]":  "3.21 BARANDA DE GRADAS (FHA)",
                                                 "[RdiTotal]":  3038128.6590713356,
-                                                "[PresupuestoErequester]":  2665328.972,
+                                                "[PresupuestoErequester]":  2661446.132,
                                                 "[EjecutadoErequester]":  2073938.3020000001,
                                                 "[ComprometidoErequester]":  378401.4,
                                                 "[AsignadoErequester]":  2452339.7019999996,
-                                                "[DisponibleErequester]":  212989.26999999993,
-                                                "[PorcentajeAsignado]":  0.92008893752421927,
-                                                "[PorcentajeDisponible]":  0.079911062475780545
+                                                "[DisponibleErequester]":  209106.42999999991,
+                                                "[PorcentajeAsignado]":  0.9214312747172293,
+                                                "[PorcentajeDisponible]":  0.0785687252827704
                                             },
                                             {
                                                 "Calendario[MesA]":  "jul 26",
@@ -2740,13 +2740,13 @@
                                                 "Rubros[Segmento]":  "Casas",
                                                 "Rubros[Etapa]":  "PAGO DE PLANILLAS PERSONAL DE APOYO",
                                                 "[RdiTotal]":  null,
-                                                "[PresupuestoErequester]":  282581.31,
+                                                "[PresupuestoErequester]":  296518.08,
                                                 "[EjecutadoErequester]":  75200.0,
-                                                "[ComprometidoErequester]":  200000.0,
-                                                "[AsignadoErequester]":  275200.0,
-                                                "[DisponibleErequester]":  7381.3099999999977,
-                                                "[PorcentajeAsignado]":  0.97387898725503108,
-                                                "[PorcentajeDisponible]":  0.026121012744968863
+                                                "[ComprometidoErequester]":  235300.63,
+                                                "[AsignadoErequester]":  310500.63,
+                                                "[DisponibleErequester]":  -13982.549999999988,
+                                                "[PorcentajeAsignado]":  1.0471558091837099,
+                                                "[PorcentajeDisponible]":  -0.04715580918370977
                                             },
                                             {
                                                 "Calendario[MesA]":  "jul 26",
@@ -2769,8 +2769,8 @@
                                                 "Rubros[Etapa]":  "Cocinas",
                                                 "[RdiTotal]":  4688250.0,
                                                 "[PresupuestoErequester]":  4688250.0,
-                                                "[EjecutadoErequester]":  3958539.6799999997,
-                                                "[ComprometidoErequester]":  690900.3,
+                                                "[EjecutadoErequester]":  3991439.6799999997,
+                                                "[ComprometidoErequester]":  658000.3,
                                                 "[AsignadoErequester]":  4649439.98,
                                                 "[DisponibleErequester]":  38810.020000000019,
                                                 "[PorcentajeAsignado]":  0.99172185357009557,
@@ -2783,8 +2783,8 @@
                                                 "Rubros[Etapa]":  "3.24 DESVIACIONES APROBADAS",
                                                 "[RdiTotal]":  0.0,
                                                 "[PresupuestoErequester]":  3100917.8,
-                                                "[EjecutadoErequester]":  2444822.54,
-                                                "[ComprometidoErequester]":  440955.98,
+                                                "[EjecutadoErequester]":  2466822.54,
+                                                "[ComprometidoErequester]":  418955.98,
                                                 "[AsignadoErequester]":  2885778.52,
                                                 "[DisponibleErequester]":  215139.28000000006,
                                                 "[PorcentajeAsignado]":  0.93062077298534007,
@@ -2796,13 +2796,13 @@
                                                 "Rubros[Segmento]":  "Fee Construcción",
                                                 "Rubros[Etapa]":  "1.4 Fee Construcción",
                                                 "[RdiTotal]":  8752161.2322826516,
-                                                "[PresupuestoErequester]":  9852161.23,
+                                                "[PresupuestoErequester]":  9934437.32,
                                                 "[EjecutadoErequester]":  8604164.39,
                                                 "[ComprometidoErequester]":  1247966.0,
                                                 "[AsignadoErequester]":  9852130.39,
-                                                "[DisponibleErequester]":  30.839999999850988,
-                                                "[PorcentajeAsignado]":  0.99999686972236046,
-                                                "[PorcentajeDisponible]":  3.1302776395845673E-06
+                                                "[DisponibleErequester]":  82306.9299999997,
+                                                "[PorcentajeAsignado]":  0.9917149882425349,
+                                                "[PorcentajeDisponible]":  0.0082850117574650613
                                             },
                                             {
                                                 "Calendario[MesA]":  "jul 26",
@@ -2838,13 +2838,13 @@
                                                 "Rubros[Segmento]":  "Amenidades",
                                                 "Rubros[Etapa]":  "4.01 CUARTOS DE MAQUINAS",
                                                 "[RdiTotal]":  98049.22,
-                                                "[PresupuestoErequester]":  83135.69,
+                                                "[PresupuestoErequester]":  83184.73000000001,
                                                 "[EjecutadoErequester]":  71724.47,
                                                 "[ComprometidoErequester]":  9958.19,
                                                 "[AsignadoErequester]":  81682.66,
-                                                "[DisponibleErequester]":  1453.0300000000011,
-                                                "[PorcentajeAsignado]":  0.98252218752259113,
-                                                "[PorcentajeDisponible]":  0.017477812477408934
+                                                "[DisponibleErequester]":  1502.0700000000011,
+                                                "[PorcentajeAsignado]":  0.981942959963926,
+                                                "[PorcentajeDisponible]":  0.018057040036073939
                                             },
                                             {
                                                 "Calendario[MesA]":  "jul 26",
@@ -2866,13 +2866,13 @@
                                                 "Rubros[Segmento]":  "Amenidades",
                                                 "Rubros[Etapa]":  "4.03 EQUIPO DE FILTRACION",
                                                 "[RdiTotal]":  1357760.0,
-                                                "[PresupuestoErequester]":  1274195.0,
+                                                "[PresupuestoErequester]":  1275593.01,
                                                 "[EjecutadoErequester]":  1267598.21,
                                                 "[ComprometidoErequester]":  2918.02,
                                                 "[AsignadoErequester]":  1270516.23,
-                                                "[DisponibleErequester]":  3678.7700000000186,
-                                                "[PorcentajeAsignado]":  0.99711286733977134,
-                                                "[PorcentajeDisponible]":  0.0028871326602286297
+                                                "[DisponibleErequester]":  5076.7800000000279,
+                                                "[PorcentajeAsignado]":  0.99602006285688249,
+                                                "[PorcentajeDisponible]":  0.0039799371431174808
                                             },
                                             {
                                                 "Calendario[MesA]":  "jul 26",
@@ -3062,13 +3062,13 @@
                                                 "Rubros[Segmento]":  "Amenidades",
                                                 "Rubros[Etapa]":  "5.08 Amenidades 2",
                                                 "[RdiTotal]":  null,
-                                                "[PresupuestoErequester]":  735868.17000000027,
+                                                "[PresupuestoErequester]":  731985.33000000031,
                                                 "[EjecutadoErequester]":  0.0,
                                                 "[ComprometidoErequester]":  10400.0,
                                                 "[AsignadoErequester]":  10400.0,
-                                                "[DisponibleErequester]":  725468.17000000027,
-                                                "[PorcentajeAsignado]":  0.014132966234971131,
-                                                "[PorcentajeDisponible]":  0.98586703376502882
+                                                "[DisponibleErequester]":  721585.33000000031,
+                                                "[PorcentajeAsignado]":  0.01420793501421674,
+                                                "[PorcentajeDisponible]":  0.98579206498578331
                                             },
                                             {
                                                 "Calendario[MesA]":  "jul 26",
@@ -3091,8 +3091,8 @@
                                                 "Rubros[Etapa]":  "2.20 DESVIACIONES APROBADAS",
                                                 "[RdiTotal]":  0.0,
                                                 "[PresupuestoErequester]":  1091426.95,
-                                                "[EjecutadoErequester]":  422540.1,
-                                                "[ComprometidoErequester]":  602786.83,
+                                                "[EjecutadoErequester]":  469180.19999999995,
+                                                "[ComprometidoErequester]":  556146.73,
                                                 "[AsignadoErequester]":  1025326.9299999999,
                                                 "[DisponibleErequester]":  66100.020000000019,
                                                 "[PorcentajeAsignado]":  0.93943706447783792,
@@ -3174,13 +3174,13 @@
                                                 "Rubros[Segmento]":  "Urbanización",
                                                 "Rubros[Etapa]":  "2.03 PAVIMENTACION Y BANQUETAS",
                                                 "[RdiTotal]":  3386302.83,
-                                                "[PresupuestoErequester]":  3328354.864,
-                                                "[EjecutadoErequester]":  3146648.9879999994,
+                                                "[PresupuestoErequester]":  3346581.1140000005,
+                                                "[EjecutadoErequester]":  3146648.987999999,
                                                 "[ComprometidoErequester]":  170435.71600000001,
-                                                "[AsignadoErequester]":  3317084.704,
-                                                "[DisponibleErequester]":  11270.160000000111,
-                                                "[PorcentajeAsignado]":  0.99661389471360162,
-                                                "[PorcentajeDisponible]":  0.003386105286398365
+                                                "[AsignadoErequester]":  3317084.7040000004,
+                                                "[DisponibleErequester]":  29496.410000000025,
+                                                "[PorcentajeAsignado]":  0.99118610635893278,
+                                                "[PorcentajeDisponible]":  0.00881389364106715
                                             },
                                             {
                                                 "Calendario[MesA]":  "jul 26",
@@ -3188,13 +3188,13 @@
                                                 "Rubros[Segmento]":  "Urbanización",
                                                 "Rubros[Etapa]":  "2.04 RELLENOS DE ZANJAS",
                                                 "[RdiTotal]":  1031947.81,
-                                                "[PresupuestoErequester]":  911870.66800000006,
+                                                "[PresupuestoErequester]":  912156.288,
                                                 "[EjecutadoErequester]":  899951.394,
                                                 "[ComprometidoErequester]":  12204.766,
                                                 "[AsignadoErequester]":  912156.15999999992,
-                                                "[DisponibleErequester]":  -285.492000000007,
-                                                "[PorcentajeAsignado]":  1.0003130838725474,
-                                                "[PorcentajeDisponible]":  -0.00031308387254760012
+                                                "[DisponibleErequester]":  0.127999999988333,
+                                                "[PorcentajeAsignado]":  0.9999998596731704,
+                                                "[PorcentajeDisponible]":  1.4032682959297102E-07
                                             },
                                             {
                                                 "Calendario[MesA]":  "jul 26",
@@ -3202,13 +3202,13 @@
                                                 "Rubros[Segmento]":  "Urbanización",
                                                 "Rubros[Etapa]":  "2.05 OBRA CIVIL INSTALACIONES HIDRAULICAS",
                                                 "[RdiTotal]":  2096520.5,
-                                                "[PresupuestoErequester]":  1844731.346,
-                                                "[EjecutadoErequester]":  1584231.5440000002,
-                                                "[ComprometidoErequester]":  231509.79,
-                                                "[AsignadoErequester]":  1815741.3339999998,
-                                                "[DisponibleErequester]":  28990.012000000053,
-                                                "[PorcentajeAsignado]":  0.98428496807252708,
-                                                "[PorcentajeDisponible]":  0.015715031927472898
+                                                "[PresupuestoErequester]":  1860934.686,
+                                                "[EjecutadoErequester]":  1584231.544,
+                                                "[ComprometidoErequester]":  273054.8,
+                                                "[AsignadoErequester]":  1857286.3439999998,
+                                                "[DisponibleErequester]":  3648.3420000000128,
+                                                "[PorcentajeAsignado]":  0.99803951099012389,
+                                                "[PorcentajeDisponible]":  0.0019604890098759826
                                             },
                                             {
                                                 "Calendario[MesA]":  "jul 26",
@@ -3216,13 +3216,13 @@
                                                 "Rubros[Segmento]":  "Urbanización",
                                                 "Rubros[Etapa]":  "2.06 INSTALACIONES HIDRAULICAS",
                                                 "[RdiTotal]":  2786364.96,
-                                                "[PresupuestoErequester]":  2460694.582,
+                                                "[PresupuestoErequester]":  2467929.962,
                                                 "[EjecutadoErequester]":  2175325.3279999997,
-                                                "[ComprometidoErequester]":  289166.676,
+                                                "[ComprometidoErequester]":  289166.67600000004,
                                                 "[AsignadoErequester]":  2464492.0039999997,
-                                                "[DisponibleErequester]":  -3797.4219999999941,
-                                                "[PorcentajeAsignado]":  1.0015432317475634,
-                                                "[PorcentajeDisponible]":  -0.0015432317475635399
+                                                "[DisponibleErequester]":  3437.9580000000251,
+                                                "[PorcentajeAsignado]":  0.99860694669097738,
+                                                "[PorcentajeDisponible]":  0.0013930533090225619
                                             },
                                             {
                                                 "Calendario[MesA]":  "jul 26",
@@ -3258,13 +3258,13 @@
                                                 "Rubros[Segmento]":  "Urbanización",
                                                 "Rubros[Etapa]":  "2.09 MURO PERIMETRAL",
                                                 "[RdiTotal]":  1776960.34,
-                                                "[PresupuestoErequester]":  1563204.8159999999,
-                                                "[EjecutadoErequester]":  1294802.716,
-                                                "[ComprometidoErequester]":  272513.69,
-                                                "[AsignadoErequester]":  1567316.4059999997,
-                                                "[DisponibleErequester]":  -4111.5899999999929,
-                                                "[PorcentajeAsignado]":  1.0026302311494413,
-                                                "[PorcentajeDisponible]":  -0.0026302311494413879
+                                                "[PresupuestoErequester]":  1563471.456,
+                                                "[EjecutadoErequester]":  1294802.7159999998,
+                                                "[ComprometidoErequester]":  218840.13,
+                                                "[AsignadoErequester]":  1513642.8459999997,
+                                                "[DisponibleErequester]":  49828.61,
+                                                "[PorcentajeAsignado]":  0.96812950450180757,
+                                                "[PorcentajeDisponible]":  0.031870495498192195
                                             },
                                             {
                                                 "Calendario[MesA]":  "jul 26",
@@ -3272,13 +3272,13 @@
                                                 "Rubros[Segmento]":  "Urbanización",
                                                 "Rubros[Etapa]":  "2.11 MURO DE MAMPOSTERIA",
                                                 "[RdiTotal]":  3136514.17,
-                                                "[PresupuestoErequester]":  2257175.05,
+                                                "[PresupuestoErequester]":  2021016.12,
                                                 "[EjecutadoErequester]":  1740980.6500000001,
-                                                "[ComprometidoErequester]":  83918.31,
-                                                "[AsignadoErequester]":  1824898.9600000002,
-                                                "[DisponibleErequester]":  432276.09,
-                                                "[PorcentajeAsignado]":  0.80848800805236631,
-                                                "[PorcentajeDisponible]":  0.19151199194763385
+                                                "[ComprometidoErequester]":  82343.51999999999,
+                                                "[AsignadoErequester]":  1823324.1700000002,
+                                                "[DisponibleErequester]":  197691.95,
+                                                "[PorcentajeAsignado]":  0.90218190342786586,
+                                                "[PorcentajeDisponible]":  0.097818096572134222
                                             },
                                             {
                                                 "Calendario[MesA]":  "jul 26",
