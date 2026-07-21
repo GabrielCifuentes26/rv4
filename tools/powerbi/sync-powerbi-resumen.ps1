@@ -6,7 +6,11 @@ param(
     [string]$DatasetId = "",
     [string]$ProjectKey = "bse",
     [string]$ProjectName = "Bosques de Santa Elena",
-    [string]$MesA = "abr 26",
+    [string]$MesA = ( & {
+        $meses = 'ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'
+        $hoy = Get-Date
+        '{0} {1}' -f $meses[$hoy.Month - 1], $hoy.ToString('yy')
+    } ),
     [string]$ModelProfile = "bse",
     [string[]]$AreaFilterValues = @(),
     [string]$OutputDir = "data/powerbi",
