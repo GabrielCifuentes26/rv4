@@ -1,4 +1,4 @@
-param(
+﻿param(
     [string]$SupabaseServiceKey = $env:SUPABASE_SERVICE_ROLE_KEY
 )
 
@@ -124,6 +124,40 @@ try {
 } catch {
     $errors.Add("CLC: $($_.Exception.Message)")
     Write-Warning "[RV4] Error CLC: $_"
+}
+
+# ── HSL ──────────────────────────────────────────────────────────────────────
+try {
+    Write-Host "[RV4] Sincronizando HSL ($mesA)..." -ForegroundColor Cyan
+    & (Join-Path $powerbIDir "sync-powerbi-hsl.ps1") `
+        -MesA              $mesA `
+        -UploadSupabase `
+        -SupabaseServiceKey $SupabaseServiceKey
+    $completed.Add("HSL — Hacienda El Sol")
+    Write-Host "[RV4] HSL completado." -ForegroundColor Green
+} catch {
+    $errors.Add("HSL: $($_.Exception.Message)")
+    Write-Warning "[RV4] Error HSL: $_"
+}
+
+# ── GIT COMMIT + PUSH (solo si hay cambios reales en los datos) ──────────────
+try {
+    $repoRoot = Resolve-Path (Join-Path $PSScriptRoot "..\..")
+    Push-Location $repoRoot
+    $cambios = git status --porcelain -- data/powerbi
+    if ($cambios) {
+        git add -- data/powerbi
+        git commit -m "data: sync automatico Power BI - $mesA" | Out-Null
+        git push rv4-dev HEAD:main | Out-Null
+        Write-Host "[RV4] Cambios subidos a rv4-dev." -ForegroundColor Green
+    } else {
+        Write-Host "[RV4] Sin cambios en los datos, nada que subir." -ForegroundColor DarkGray
+    }
+    Pop-Location
+} catch {
+    Pop-Location -ErrorAction SilentlyContinue
+    $errors.Add("Git commit/push: $($_.Exception.Message)")
+    Write-Warning "[RV4] Error subiendo a git: $_"
 }
 
 # ── EMAIL ─────────────────────────────────────────────────────────────────────

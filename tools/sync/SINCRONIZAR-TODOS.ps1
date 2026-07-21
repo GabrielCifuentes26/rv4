@@ -1,11 +1,12 @@
-param(
+﻿param(
     [string]$MesA = ( & {
         $meses = 'ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'
         $hoy = Get-Date
         '{0} {1}' -f $meses[$hoy.Month - 1], $hoy.ToString('yy')
     } ),
     [string]$SupabaseServiceKey = $env:SUPABASE_SERVICE_ROLE_KEY,
-    [string]$StatusFile = ""
+    [string]$StatusFile = "",
+    [switch]$Silent
 )
 
 $ErrorActionPreference = "Stop"
@@ -74,10 +75,10 @@ Write-Host ""
 if ($err.Count -gt 0) {
     Set-Status -State "error" -Message "Completado con errores: $($err -join ' | ')"
     Write-Host "Completado con $($err.Count) error(es)." -ForegroundColor Red
-    Read-Host "Presiona Enter para cerrar"
+    if (-not $Silent) { Read-Host "Presiona Enter para cerrar" }
     exit 1
 }
 
 Set-Status -State "completed" -Message "Todos los proyectos actualizados correctamente a $MesA"
 Write-Host "Listo. Todos los proyectos actualizados a $MesA." -ForegroundColor Green
-Start-Sleep -Seconds 3
+if (-not $Silent) { Start-Sleep -Seconds 3 }

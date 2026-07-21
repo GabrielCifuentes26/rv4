@@ -1,4 +1,4 @@
-#Requires -RunAsAdministrator
+﻿#Requires -RunAsAdministrator
 param(
     [string]$SupabaseServiceKey = $env:SUPABASE_SERVICE_ROLE_KEY
 )

@@ -1,4 +1,4 @@
-$port       = 8765
+﻿$port       = 8765
 $statusFile = "$env:TEMP\rv4-sync-status.json"
 $syncScript = Resolve-Path (Join-Path $PSScriptRoot "SINCRONIZAR-TODOS.ps1")
 
