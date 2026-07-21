@@ -1,5 +1,4 @@
-﻿#Requires -RunAsAdministrator
-param(
+﻿param(
     [string]$SupabaseServiceKey = $env:SUPABASE_SERVICE_ROLE_KEY
 )
 
@@ -30,6 +29,8 @@ function Register-SyncTask {
         -StartWhenAvailable `
         -MultipleInstances IgnoreNew
 
+    $principal = New-ScheduledTaskPrincipal -UserId "$env:USERDOMAIN\$env:USERNAME" -LogonType Interactive -RunLevel Limited
+
     Unregister-ScheduledTask -TaskName $Name -Confirm:$false -ErrorAction SilentlyContinue
 
     Register-ScheduledTask `
@@ -37,7 +38,7 @@ function Register-SyncTask {
         -Action   $action `
         -Trigger  $Trigger `
         -Settings $settings `
-        -RunLevel Highest `
+        -Principal $principal `
         -Force | Out-Null
 
     Write-Host "  ✓ $Name" -ForegroundColor Green
@@ -55,25 +56,25 @@ Register-SyncTask `
 
 # 8:30 AM — Lunes a Viernes
 Register-SyncTask `
-    -Name       "RV4 Sync 08:30" `
+    -Name       "RV4 Sync 08.30" `
     -ScriptPath $syncScript `
     -Trigger    (New-ScheduledTaskTrigger -Weekly -DaysOfWeek Monday,Tuesday,Wednesday,Thursday,Friday -At "08:30")
 
 # 3:00 PM — Lunes a Viernes
 Register-SyncTask `
-    -Name       "RV4 Sync 15:00" `
+    -Name       "RV4 Sync 15.00" `
     -ScriptPath $syncScript `
     -Trigger    (New-ScheduledTaskTrigger -Weekly -DaysOfWeek Monday,Tuesday,Wednesday,Thursday,Friday -At "15:00")
 
 # 6:00 PM — Lunes a Jueves
 Register-SyncTask `
-    -Name       "RV4 Sync 18:00" `
+    -Name       "RV4 Sync 18.00" `
     -ScriptPath $syncScript `
     -Trigger    (New-ScheduledTaskTrigger -Weekly -DaysOfWeek Monday,Tuesday,Wednesday,Thursday -At "18:00")
 
 # 3:30 PM — Viernes
 Register-SyncTask `
-    -Name       "RV4 Sync Viernes 15:30" `
+    -Name       "RV4 Sync Viernes 15.30" `
     -ScriptPath $syncScript `
     -Trigger    (New-ScheduledTaskTrigger -Weekly -DaysOfWeek Friday -At "15:30")
 
