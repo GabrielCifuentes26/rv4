@@ -1506,7 +1506,7 @@
             const t = new Date(s.last_seen || s.inicio);
             if (!userStats[n].ultimo || t > userStats[n].ultimo) userStats[n].ultimo = t;
         });
-        const userRows = Object.entries(userStats).sort((a,b)=>b[1].sesiones-a[1].sesiones);
+        const userRows = Object.entries(userStats).sort((a,b)=>(b[1].ultimo?.getTime()||0)-(a[1].ultimo?.getTime()||0));
         document.getElementById('m-user-rows').innerHTML = userRows.length
             ? userRows.map(([name, d]) => `
                 <tr style="border-bottom:1px solid var(--border);">
