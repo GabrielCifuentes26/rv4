@@ -3,17 +3,17 @@
     "rows":  [
                  {
                      "[RdiTotal]":  115122008.761931,
-                     "[PresupuestoErequester]":  159112410.21399996,
-                     "[EjecutadoErequester]":  151767175.82399994,
-                     "[ComprometidoErequester]":  4787616.4860000005,
-                     "[AsignadoErequester]":  156554792.31,
-                     "[DisponibleErequester]":  2557617.904,
-                     "[PorcentajeAsignado]":  0.98392571704142961,
-                     "[PorcentajeDisponible]":  0.016074282958570638
+                     "[PresupuestoErequester]":  159112410.214,
+                     "[EjecutadoErequester]":  151905988.73399997,
+                     "[ComprometidoErequester]":  4650674.156,
+                     "[AsignadoErequester]":  156556662.88999996,
+                     "[DisponibleErequester]":  2555747.324,
+                     "[PorcentajeAsignado]":  0.98393747338398907,
+                     "[PorcentajeDisponible]":  0.016062526616010778
                  }
              ],
     "metadata":  {
-                     "generatedAt":  "2026-07-30T21:01:13.6718152Z",
+                     "generatedAt":  "2026-07-31T15:52:27.4926733Z",
                      "workspaceId":  "d111fc11-b7f3-4976-b74b-99f47f06bd22",
                      "reportId":  "f3fdef8d-947a-4e1a-9188-c774420fde9c",
                      "datasetId":  "245c5962-1238-43bb-88ba-5dce10fbbfab",
