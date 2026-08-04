@@ -1,6 +1,6 @@
 {
     "metadata":  {
-                     "generatedAt":  "2026-08-03T21:51:04.3926841Z",
+                     "generatedAt":  "2026-08-04T00:00:21.4740720Z",
                      "workspaceId":  "d111fc11-b7f3-4976-b74b-99f47f06bd22",
                      "reportId":  "f3fdef8d-947a-4e1a-9188-c774420fde9c",
                      "datasetId":  "68161d1e-2ef3-4916-a65c-3e86d4abb2bc",
@@ -1050,8 +1050,8 @@
                                     },
                                     {
                                         "Calendario[MesA]":  "jul 26",
-                                        "[AsignadoErequester]":  181266489.19999996,
-                                        "[EjecutadoErequester]":  157810105.00000012
+                                        "[AsignadoErequester]":  181323087.34999993,
+                                        "[EjecutadoErequester]":  157812598.00000009
                                     },
                                     {
                                         "Calendario[MesA]":  "jun 23",
@@ -1405,13 +1405,13 @@
                                            {
                                                "Calendario[MesA]":  "jul 26",
                                                "[RdiTotal]":  162077315.88769463,
-                                               "[PresupuestoErequester]":  162692391.94200003,
+                                               "[PresupuestoErequester]":  162692391.942,
                                                "[EjecutadoErequester]":  140018268.81200007,
-                                               "[ComprometidoErequester]":  18486983.310000017,
-                                               "[AsignadoErequester]":  158505252.12199989,
-                                               "[DisponibleErequester]":  4187139.8199999882,
-                                               "[PorcentajeAsignado]":  0.97426345651434731,
-                                               "[PorcentajeDisponible]":  0.025736543485651787
+                                               "[ComprometidoErequester]":  18531358.11,
+                                               "[AsignadoErequester]":  158549626.9219999,
+                                               "[DisponibleErequester]":  4142765.0199999874,
+                                               "[PorcentajeAsignado]":  0.97453620928090479,
+                                               "[PorcentajeDisponible]":  0.02546379071909452
                                            },
                                            {
                                                "Calendario[MesA]":  "jun 23",
@@ -2045,20 +2045,20 @@
                                            {
                                                "Calendario[MesA]":  "jul 26",
                                                "Rubros[Area]":  "Construcción",
-                                               "[PresupuestoErequester]":  124475144.0360001,
-                                               "[EjecutadoErequester]":  105789414.39400007,
-                                               "[ComprometidoErequester]":  14395422.541999992,
-                                               "[AsignadoErequester]":  120184836.936,
-                                               "[DisponibleErequester]":  4290307.099999995
+                                               "[PresupuestoErequester]":  124475144.03600009,
+                                               "[EjecutadoErequester]":  105789414.39400005,
+                                               "[ComprometidoErequester]":  14439797.341999991,
+                                               "[AsignadoErequester]":  120229211.73600005,
+                                               "[DisponibleErequester]":  4245932.2999999914
                                            },
                                            {
                                                "Calendario[MesA]":  "jul 26",
                                                "Rubros[Area]":  "Urbanización",
-                                               "[PresupuestoErequester]":  38217247.906000026,
+                                               "[PresupuestoErequester]":  38217247.906000033,
                                                "[EjecutadoErequester]":  34228854.418000013,
-                                               "[ComprometidoErequester]":  4091560.7679999988,
-                                               "[AsignadoErequester]":  38320415.186000019,
-                                               "[DisponibleErequester]":  -103167.2799999995
+                                               "[ComprometidoErequester]":  4091560.7679999992,
+                                               "[AsignadoErequester]":  38320415.186000027,
+                                               "[DisponibleErequester]":  -103167.27999999927
                                            },
                                            {
                                                "Calendario[MesA]":  "jun 23",
