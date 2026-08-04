@@ -507,11 +507,6 @@ foreach ($entry in $queries.GetEnumerator()) {
     try {
         $queryResult = Invoke-PowerBIDaxQuery -WorkspaceId $WorkspaceId -DatasetId $DatasetId -Query $entry.Value -Name $entry.Key
         $results.datasets[$entry.Key] = $queryResult.rows
-        ConvertTo-Utf8JsonFile -InputObject @{
-            metadata = $metadata
-            name = $entry.Key
-            rows = $queryResult.rows
-        } -Path (Join-Path $outputPath "$($entry.Key).json")
     }
     catch {
         $message = Get-ErrorText -ErrorRecord $_
@@ -520,6 +515,28 @@ foreach ($entry in $queries.GetEnumerator()) {
             message = $message
         }
         Write-Host "[Power BI] Error en $($entry.Key): $message" -ForegroundColor Yellow
+    }
+}
+
+# Si el mes solicitado aun no tiene datos cargados en el modelo (RdiTotal existe
+# pero PresupuestoErequester viene en cero), no sobrescribir los archivos ya
+# publicados — se deja el ultimo mes bueno hasta que el modelo tenga el mes nuevo.
+$totalesRow = $results.datasets['totales'] | Select-Object -First 1
+$rdiTotal = [double]($totalesRow.'[RdiTotal]' | ForEach-Object { if ($_) { $_ } else { 0 } })
+$pptoEr   = [double]($totalesRow.'[PresupuestoErequester]' | ForEach-Object { if ($_) { $_ } else { 0 } })
+
+if ($totalesRow -and $rdiTotal -gt 0 -and $pptoEr -eq 0) {
+    Write-Host "[Power BI] $ProjectName ($MesA): el modelo aun no tiene datos para este mes (PresupuestoErequester=0). Se omite esta corrida, se conserva el ultimo mes publicado." -ForegroundColor Yellow
+    return
+}
+
+foreach ($entry in $queries.GetEnumerator()) {
+    if ($results.datasets.Contains($entry.Key)) {
+        ConvertTo-Utf8JsonFile -InputObject @{
+            metadata = $metadata
+            name = $entry.Key
+            rows = $results.datasets[$entry.Key]
+        } -Path (Join-Path $outputPath "$($entry.Key).json")
     }
 }
 

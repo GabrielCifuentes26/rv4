@@ -4,50 +4,50 @@
                  {
                      "Rubros[Area]":  "Construcción",
                      "[RdiTotal]":  75844560.095931038,
-                     "[PresupuestoErequester]":  0.0,
-                     "[EjecutadoErequester]":  0.0,
-                     "[ComprometidoErequester]":  0.0,
-                     "[AsignadoErequester]":  0.0,
-                     "[DisponibleErequester]":  0.0,
-                     "[PorcentajeAsignado]":  0.0,
-                     "[PorcentajeDisponible]":  0.0
+                     "[PresupuestoErequester]":  82685448.188000083,
+                     "[EjecutadoErequester]":  80783307.544000119,
+                     "[ComprometidoErequester]":  1475336.3440000005,
+                     "[AsignadoErequester]":  82258643.8880002,
+                     "[DisponibleErequester]":  426804.30000000005,
+                     "[PorcentajeAsignado]":  0.99483821749348855,
+                     "[PorcentajeDisponible]":  0.00516178250651293
                  },
                  {
                      "Rubros[Area]":  "Costo Indirecto",
                      "[RdiTotal]":  null,
-                     "[PresupuestoErequester]":  0.0,
-                     "[EjecutadoErequester]":  0.0,
-                     "[ComprometidoErequester]":  0.0,
-                     "[AsignadoErequester]":  0.0,
-                     "[DisponibleErequester]":  0.0,
-                     "[PorcentajeAsignado]":  0.0,
-                     "[PorcentajeDisponible]":  0.0
+                     "[PresupuestoErequester]":  32452032.538,
+                     "[EjecutadoErequester]":  28291246.869999994,
+                     "[ComprometidoErequester]":  2013002.0440000002,
+                     "[AsignadoErequester]":  30304248.913999997,
+                     "[DisponibleErequester]":  2147783.624,
+                     "[PorcentajeAsignado]":  0.93381666860203483,
+                     "[PorcentajeDisponible]":  0.066183331397965089
                  },
                  {
                      "Rubros[Area]":  "Preliminar",
                      "[RdiTotal]":  null,
-                     "[PresupuestoErequester]":  0.0,
-                     "[EjecutadoErequester]":  0.0,
+                     "[PresupuestoErequester]":  2744417.9399999995,
+                     "[EjecutadoErequester]":  2744417.9399999995,
                      "[ComprometidoErequester]":  0.0,
-                     "[AsignadoErequester]":  0.0,
+                     "[AsignadoErequester]":  2744417.9399999995,
                      "[DisponibleErequester]":  0.0,
-                     "[PorcentajeAsignado]":  0.0,
+                     "[PorcentajeAsignado]":  1.0,
                      "[PorcentajeDisponible]":  0.0
                  },
                  {
                      "Rubros[Area]":  "Urbanización",
                      "[RdiTotal]":  39277448.665999994,
-                     "[PresupuestoErequester]":  0.0,
-                     "[EjecutadoErequester]":  0.0,
-                     "[ComprometidoErequester]":  0.0,
-                     "[AsignadoErequester]":  0.0,
-                     "[DisponibleErequester]":  0.0,
-                     "[PorcentajeAsignado]":  0.0,
-                     "[PorcentajeDisponible]":  0.0
+                     "[PresupuestoErequester]":  41230511.548000038,
+                     "[EjecutadoErequester]":  40087016.38,
+                     "[ComprometidoErequester]":  1162335.768,
+                     "[AsignadoErequester]":  41249352.148000009,
+                     "[DisponibleErequester]":  -18840.599999999988,
+                     "[PorcentajeAsignado]":  1.0004569577066256,
+                     "[PorcentajeDisponible]":  -0.00045695770662622023
                  }
              ],
     "metadata":  {
-                     "generatedAt":  "2026-08-04T00:00:44.9970785Z",
+                     "generatedAt":  "2026-07-31T21:30:50.9655399Z",
                      "workspaceId":  "d111fc11-b7f3-4976-b74b-99f47f06bd22",
                      "reportId":  "f3fdef8d-947a-4e1a-9188-c774420fde9c",
                      "datasetId":  "245c5962-1238-43bb-88ba-5dce10fbbfab",
@@ -61,7 +61,7 @@
                                                    "COSTO INDIRECTO",
                                                    "PRELIMINAR"
                                                ],
-                                     "mesA":  "ago 26"
+                                     "mesA":  "jul 26"
                                  },
                      "source":  "Power BI Service"
                  }
