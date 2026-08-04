@@ -141,14 +141,24 @@ try {
 }
 
 # ── GIT COMMIT + PUSH (solo si hay cambios reales en los datos) ──────────────
+# Nota: git.exe escribe mensajes informativos (ej. "warning: LF sera reemplazado
+# por CRLF") en stderr. Con $ErrorActionPreference="Stop" (definido arriba para
+# todo el script), PowerShell 5.1 puede escalar ese stderr a un error terminante
+# aunque git haya devuelto exito, abortando el push silenciosamente. Por eso este
+# bloque baja la preferencia a "Continue" y valida el resultado con $LASTEXITCODE
+# en vez de depender de excepciones.
+$prevErrorPref = $ErrorActionPreference
+$ErrorActionPreference = "Continue"
 try {
     $repoRoot = Resolve-Path (Join-Path $PSScriptRoot "..\..")
     Push-Location $repoRoot
-    $cambios = git status --porcelain -- data/powerbi
+    $cambios = git status --porcelain -- data/powerbi 2>&1
     if ($cambios) {
-        git add -- data/powerbi
-        git commit -m "data: sync automatico Power BI - $mesA" | Out-Null
-        git push rv4-dev HEAD:main | Out-Null
+        git add -- data/powerbi 2>&1 | Out-Null
+        git commit -m "data: sync automatico Power BI - $mesA" 2>&1 | Out-Null
+        if ($LASTEXITCODE -ne 0) { throw "git commit fallo (exit $LASTEXITCODE)" }
+        git push rv4-dev HEAD:main 2>&1 | Out-Null
+        if ($LASTEXITCODE -ne 0) { throw "git push fallo (exit $LASTEXITCODE)" }
         Write-Host "[RV4] Cambios subidos a rv4-dev." -ForegroundColor Green
     } else {
         Write-Host "[RV4] Sin cambios en los datos, nada que subir." -ForegroundColor DarkGray
@@ -158,6 +168,8 @@ try {
     Pop-Location -ErrorAction SilentlyContinue
     $errors.Add("Git commit/push: $($_.Exception.Message)")
     Write-Warning "[RV4] Error subiendo a git: $_"
+} finally {
+    $ErrorActionPreference = $prevErrorPref
 }
 
 # ── EMAIL ─────────────────────────────────────────────────────────────────────
